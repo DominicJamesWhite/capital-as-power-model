@@ -41,7 +41,7 @@ From these it works out what the firm is worth to its owners. The theory calls t
 
 For example, take a firm with 1,000 employees that earns 2 for each of them. Hype and risk are both 1, and the normal rate of return is 5 per cent. The firm's capitalization is 1,000 × 2 × 1 ÷ (1 × 0.05) = 40,000.
 
-The formula comes from the book. The model calls each firm a "claim", because what the model tracks is the owners' claim on the firm's earnings.
+The formula comes from the book.
 
 ### The main result
 
