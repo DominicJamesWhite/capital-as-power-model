@@ -22,12 +22,13 @@ multiplied by it. The second is the part of all employees whose firms closed, wh
 off the unemployment that this module reads: the book ties debt to "the strength and solidity
 of existing power institutions", and promises that are being broken are no sign of solidity.
 
-Two optional modules change the government's debt, and each publishes a number that this
-module reads. Both numbers are 0 when those modules are off, and they then change
+Three optional modules change the government's debt, and each publishes a number that this
+module reads. The numbers are 0 when those modules are off, and they then change
 nothing. The risk shaping module publishes what the government borrows to
-bail out dominant capital. The privatisation module publishes what dominant capital pays for
+bail out dominant capital. The sales module publishes what the government borrows and spends
+when people are without work. The privatisation module publishes what dominant capital pays for
 the public services it takes over, and the government retires debt with it. The module keeps
-the sum of the two as a stock of money and adds it to the debt. A government whose proceeds
+the sum of the three as a stock of money and adds it to the debt. A government whose proceeds
 exceed its whole debt has no debt, and the rest of the proceeds is set against later borrowing.
 
 Additions to the book: the speed and slope of the interest share, pooling corporate debt into
@@ -60,7 +61,7 @@ class Debt:
         self.government_part = government_part   # government interest payments as a part of all income
         self.share = start
         self.past = []
-        self.added = 0.0                  # debt added by bailouts less debt retired with the proceeds of privatisation, in money
+        self.added = 0.0                  # debt added by bailouts and by borrowing to spend, less debt retired with the proceeds of privatisation, in money
 
     def accounts(self, L):
         capitalist = L.earnings().sum()
@@ -82,8 +83,10 @@ class Debt:
 
     def propose(self, L, rng):
         A = L.accounts
-        # Last year's borrowing for bailouts, less last year's proceeds of privatisation (optional modules; 0 without them).
-        self.added += A.get("bailout_borrowing", 0.0) - A.get("privatisation_proceeds", 0.0)
+        # Last year's borrowing for bailouts and for spending when people are without work, less last year's
+        # proceeds of privatisation (optional modules; 0 without them).
+        self.added += (A.get("bailout_borrowing", 0.0) + A.get("deficit_borrowing", 0.0)
+                       - A.get("privatisation_proceeds", 0.0))
         # Firms that closed last year stopped paying their lenders (the failure module); 1 when no firm closed.
         self.share = self.share * A.get("interest_left", 1.0)
         # Unemployment stands here for how solid the institutions of power are. People who lost their jobs

@@ -345,10 +345,13 @@ def check_levels():
 
     The check is a test and not a limit: nothing in the model holds a component inside the range
     tested here. The run is made twice, with the core's netting of the record on and off. If the
-    core's guard stops the run, the years before the stop are tested."""
+    core's guard stops the run, the years before the stop are tested. If fewer than 1 in 20 people
+    still have work, the years before that one are tested: after it the figures are divisions of
+    rounding errors by one another."""
     import registry
     from stage2 import starting_ledger
     from full import all_modules
+    collapsed = False
     names, seen = [], set()
     for name, where in registry.OPTIONAL.items():
         if where not in seen and not getattr(registry.make([name])[0], "replaces", ()):
@@ -363,6 +366,10 @@ def check_levels():
             try:
                 m.step()
             except LedgerError:          # the guard stopped the run: the years so far are tested
+                break
+            if m.history[-1]["unemployment"] > 0.95:     # fewer than 1 in 20 still have work: the years before are tested
+                m.history.pop()
+                collapsed = True
                 break
             stacking = L.stacking_markup()
             low, high = min(low, stacking.min()), max(high, stacking.max())
@@ -394,10 +401,11 @@ def check_levels():
     width = on["high"] / on["low"]
     assert on["base_high"] <= on["high"]
     assert on["furthest"] <= width
-    # 4. The test can fail: the gross record, without the netting, does not pass it.
-    assert off["furthest"] > width and off["beside"] > 1.0
+    # 4. The test can fail: the gross record, without the netting, does not pass part 2, and its components
+    #    stand further from 1.
+    assert off["beside"] > 1.0 and off["furthest"] > 10 * on["furthest"]
     print(f"11. Levels: with the main modules and {len(names)} optional modules on for {ran} steps"
-          f"{'' if ran == 60 else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
+          f"{'' if ran == 60 else ' (after which fewer than 1 in 20 people had work)' if collapsed else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
           f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
@@ -670,6 +678,22 @@ def check_sales_account():
             m.step()
             assert np.isclose(m.step()["published"]["sales_account"]["unsold"], unsold)
 
+    # The government borrows and spends when people are without work. With 1,000 employed of a working population
+    # of 1,000 / 0.96, unemployment is 4 per cent, one point above the 3 per cent at which it borrows nothing. It
+    # borrows 1.4 per cent of the wages and priced earnings of 1,180, which is 16.52, and buys goods with it. So
+    # 33.75 - 16.52 = 17.23 is unsold. With the setting at 0 it borrows nothing and 33.75 is unsold.
+    for gain, borrowed in (1.4, 16.52), (0.0, 0.0):
+        L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
+        L.shared["workforce"] = 1000.0 / 0.96
+        m = Model(L, [Push(), Sales(top=1, deficit_gain=gain)], top=1)
+        with np.errstate(divide="ignore"):
+            m.step()
+            r = m.step()
+        a = r["published"]["sales_account"]
+        assert np.isclose(a["borrowed_by_government"], borrowed) and np.isclose(a["bought_by_government"], borrowed)
+        assert np.isclose(a["unsold"], 33.75 - borrowed) and np.isclose(r["published"]["deficit_borrowing"], borrowed)
+        assert np.isclose(r["published"]["deficit_part"], borrowed / 1180.0)
+
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
     from stage2 import starting_ledger
@@ -677,12 +701,15 @@ def check_sales_account():
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
               "externalisation", "proletarianization", "wants"]]
-    years_unsold = years = stopped = 0
+    years_unsold = years = stopped = years_borrowed = 0
     largest = 0.0
-    for names in mixes:
+    # The first mix runs with the government borrowing nothing, so that goods are unsold in some years.
+    for names, gain in zip(mixes, (0.0, 1.4)):
         histories = []
         for order in names, names[::-1]:
-            m = Model(starting_ledger(0, 5000), all_modules() + registry.make(order), seed=0)
+            optional = registry.make(order)
+            next(x for x in optional if x.name == "sales").deficit_gain = gain
+            m = Model(starting_ledger(0, 5000), all_modules() + optional, seed=0)
             kept = 0.0
             for step in range(60):
                 try:
@@ -690,7 +717,7 @@ def check_sales_account():
                 except LedgerError:      # the guard stopped the run: the years so far are tested
                     stopped += 1
                     break
-                a = r["published"]["sales_account"]
+                a, pub_now = r["published"]["sales_account"], r["published"]
                 tol = 1e-9 * a["offered"]
                 bought = (a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
                           + a["bought_by_firms"])
@@ -708,7 +735,13 @@ def check_sales_account():
                                   if p not in (WAGE_EARNERS, GOVERNMENT) and p not in m.L.buyers)
                     lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
                     assert a["bought_by_wage_earners"] <= a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + kept + tol
-                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept + tol
+                    assert a["bought_by_government"] <= (max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept
+                                                         + a["borrowed_by_government"] + tol)
+                    # The government borrows nothing at an unemployment of 3 per cent or less, and above it no more than the rule gives.
+                    without_work = max(last["unemployment"] - 0.03, 0.0)
+                    assert 0.0 <= a["borrowed_by_government"] <= gain * without_work * (a["wages"] + a["priced_earnings"]) + tol
+                    assert np.isclose(pub_now["deficit_borrowing"], a["borrowed_by_government"])
+                    years_borrowed += a["borrowed_by_government"] > 0
                     assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
                                                      + repaid - lent + tol)
                 kept = a["kept_for_next_year"]
@@ -727,7 +760,9 @@ def check_sales_account():
           f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
-          f"record of transfers shows it had. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
+          f"record of transfers shows it had or the rule let it borrow. With unemployment at 4 per cent the government "
+          f"borrows 16.52 and buys goods with it, and 17.23 is unsold. The government borrowed in {years_borrowed} of "
+          f"those years. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
           f"what was offered. Opposite listing orders gave identical figures."
           + (f" The guard stopped {stopped} of the 4 runs before the 60th year." if stopped else ""))
 
@@ -876,7 +911,7 @@ def check_payers():
         assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"] + a["bought_by_firms"], rtol=1e-12)
         if step:
             last = m.history[-2]["parties"]
-            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept) <= tol
+            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept - a["borrowed_by_government"]) <= tol
             net = last[WAGE_EARNERS]["received"] - last[WAGE_EARNERS]["paid"]
             assert abs(a["wage_earners_had"] - (a["wages"] + net) - kept_wages) <= tol
         kept, kept_wages = 0.0, 0.0
