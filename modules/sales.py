@@ -13,17 +13,23 @@ firms sell.
      they paid back.
   2. The government buys with what it collected in the year and did not pay out. An organ of
      government that a module names as a buyer, such as the armed forces, buys with all it
-     received. The government also borrows from owners and spends what it borrows, and it
-     borrows more when more people are without work: for each point of unemployment above
-     3 per cent it borrows 1.4 per cent of all income. With unemployment at 8 per cent it
-     borrows and spends 7 per cent of all income. The debt module adds what it borrows to
-     the government's debt.
-  3. Owners lay out on goods what firms pay out to them, kept level against the wage. Firms
+     received.
+  3. The modules that tax set each year's tax to cover what the government pays out that
+     year. A tax is set in law, though, and its rate changes slowly. So the account holds a
+     rate of tax on all income, wages and priced earnings alike, that moves each year only a
+     twentieth of the way toward the rate that the modules charged. When the modules charge
+     more than that rate, as in a slump, when fewer people are employed and what the
+     government pays out stays the same, the difference is not taxed. The government
+     borrows it from owners, and wage earners and owners keep it, in proportion to wages and
+     priced earnings. When the modules charge less, the difference is taxed and repays the
+     government's debt to owners, who do not spend what is repaid. The debt module adds the
+     borrowing to the government's debt and takes the repayment off it.
+  4. Owners lay out on goods what firms pay out to them, kept level against the wage. Firms
      keep a part of what owners earn. What they pay out follows the rest part of the way each
      year. The part that firms keep buys goods only as the equipment of the year's new jobs,
      and that equipment is bought whether or not the part kept covers it. Owners here are the
      owners of the firms and every party that receives payments as a holder of debt.
-  4. Firms buy from firms. A cost in a price that a module marks as laid out on what firms
+  5. Firms buy from firms. A cost in a price that a module marks as laid out on what firms
      sell, such as the outlay on advertising, is collected from buyers and spent in the same
      year. It is on both sides of the account and is never unsold.
 
@@ -63,7 +69,8 @@ WHAT IT RESTS ON
     stabilizers". It "was hastily reversed", and the reason given was "the public debt".
   - Sandy Brian Hager, "Corporate Ownership of the Public Debt" (2015): "the government comes
     to finance its expenditures, on interest and everything else, by borrowing from the rich,
-    instead of taxing them".
+    instead of taxing them". His book "Public Debt, Inequality, and Power" (2016), chapter 4,
+    "Fiscal Conflict": "gradual increases in government spending" are "difficult to reverse".
   - Chapter 14, Proposition 3, on the threat of excess capacity: "Mergers and acquisitions
     alleviate the problem whereas greenfield aggravates it." Chapter 15: "the large
     accumulators have learned to 'manage' this stagnation for their own ends".
@@ -84,12 +91,12 @@ itself; that owners lay out all they are paid; that the equipment of a new
 job is bought on top of it; that the shortfall falls on every firm in
 proportion to its priced earnings; how far small sellers cut prices; that dominant capital
 cuts its hiring by the unsold part and buys firms in place of the jobs; and the number of
-years over which the two conditions are judged; and that the government's borrowing follows
-unemployment along a straight line.
+years over which the two conditions are judged; and that the tax that the government does not
+collect falls on wage earners and owners in proportion to wages and priced earnings.
 
-FIVE FIGURES FROM THE NATIONAL ACCOUNTS
+FOUR FIGURES FROM THE NATIONAL ACCOUNTS
 
-Neither the book nor the papers give the five figures the account needs, so they are measured
+Neither the book nor the papers give the four figures the account needs, so they are measured
 from the national accounts of the United States for 1947 to 2019 (Bureau of Economic Analysis).
 
   - `retained`, 0.25. Firms kept a quarter of owners' income: net saving of domestic business
@@ -104,26 +111,30 @@ from the national accounts of the United States for 1947 to 2019 (Bureau of Econ
   - `job_cost`, 3.0. The plant and equipment of private business, at what it would cost to
     replace, came to 3.0 years of the wages and salaries that private business paid. In half
     of the years it lay between 2.7 and 3.3, and in all of them between 2.5 and 3.6.
-  - `deficit_gain`, 1.4, and `deficit_from`, 0.03. What all levels of government spent beyond
-    what they collected (net government saving, with the sign turned), as a part of national
-    income, rose by 1.4 points for each point of unemployment over 1960 to 2019, give or
-    take 0.2, and by 1.1 over 1948 to 1979. The line crosses nothing borrowed at an
-    unemployment of 3 per cent. In terms of power: when people are without work, the
-    government does not tax owners for what it spends, and borrows from them in its place.
-    From 1931 to 1936, with far more people without work, the government borrowed about 2
-    per cent of national income. So the line describes the United States after 1945, and
-    is not a law.
+  - `tax_follows`, 0.05. The current receipts of all levels of government, as a part of
+    national income, closed 0.05 of the gap to their current spending (as the same part)
+    in a year, give or take 0.04, over 1960 to 2019, and 0.07 and 0.06 over its two halves.
+    The rate of tax hardly follows spending at all. Over the same years spending rose by 1.2
+    points of national income for each point of unemployment and receipts fell by 0.5, the
+    government spent 6 per cent of national income more than it collected, and unemployment
+    averaged 6 per cent. In terms of power: what the government pays out is a set of
+    commitments to its employees, its contractors and the holders of its debt, and owners
+    lend it what they are not taxed. With `tax_follows` at 1 the tax covers what the
+    government pays out in every year, and nothing is borrowed.
 
-With the first three figures alone, the account is the one the paper reports from Kalecki
+With the first three figures, the account is the one the paper reports from Kalecki
 and from Baran and Sweezy: the part of owners' income that is kept and not built with buys
-nothing, and that much stays unsold. The government's borrowing takes that money up. Setting `retained` to 0 and `payout_follows` to 1 gives the other reading,
+nothing, and that much stays unsold. Setting `retained` to 0 and `payout_follows` to 1 gives the other reading,
 in which owners as a class lay out all they receive a year late.
 
 WHAT IS LEFT OUT
 
-Below an unemployment of 3 per cent the accounts show a government that collects more than it
-spends. The module does not follow that: there the government borrows nothing and repays
-nothing, so the debt it has run up never falls.
+The record shows the rate of tax falling a little in a slump, through taxes on income that rise
+faster than income and through cuts. Here the rate held does not fall. Payments to people out of
+work are not in the model, so they add nothing to what the government pays out in a slump. The
+government's borrowing changes the money of wage earners and owners in this account only: the
+core's record of earnings and of the capitalist share still shows the whole tax that the modules
+charged.
 
 Money paid for firms that are bought, and money that dominant capital pays for public
 services, pass from owners to owners (the government retires debt with it), so they buy no
@@ -164,7 +175,7 @@ class Sales:
         "sold_part": ("Priced earnings received", "share", "Part of the earnings that firms priced for last year that owners received."),
         "sales_cut": ("Hiring held back for unsold goods", "rate", "Fall in the hiring rate of the top 100 firms because goods were unsold."),
         "bought_not_built": ("Buying in place of building", "rate", "Employees that a top 100 firm seeks by buying firms in place of jobs it held back, as a part of its own."),
-        "deficit_borrowing": ("Borrowed by the government", "number", "What the government borrowed from owners last year and spent, in money."),
+        "deficit_borrowing": ("Borrowed by the government", "number", "Tax that the government did not collect last year and borrowed from owners, in money; below 0, what it repaid."),
         "deficit_part": ("Government borrowing", "share", "What the government borrowed last year, as a part of the wages and priced earnings of the year."),
         "accumulation_differential": ("Differential accumulation holds", "index", "1 if differential capitalization has not fallen over the years judged, 0 if it has."),
         "accumulation_share": ("Capitalist share holds", "index", "1 if the capitalist share of income has not fallen over the years judged, 0 if it has."),
@@ -172,15 +183,14 @@ class Sales:
     }
 
     def __init__(self, job_cost=3.0, price_give=0.5, held_back=1.0, buy_instead=1.0, retained=0.25,
-                 payout_follows=0.5, deficit_gain=1.4, deficit_from=0.03, judged_over=5, significant=0.01,
-                 top=100):
+                 payout_follows=0.5, tax_follows=0.05, judged_over=5, significant=0.01, top=100):
         self.job_cost = job_cost        # money spent on equipment for each new job, in years of the wage
         self.price_give = price_give    # part of its shortfall that a price-cutting seller takes out of its markup within a year
         self.held_back = held_back      # fall in the hiring rate of a firm of dominant capital per unit of the unsold part
         self.buy_instead = buy_instead  # employees that such a firm seeks by purchase for each job it holds back
         self.retained = retained        # part of owners' money income that firms keep; it buys goods only as the equipment of new jobs
-        self.deficit_gain = deficit_gain  # what the government borrows and spends, as a part of all income, for each unit of unemployment above the level below
-        self.deficit_from = deficit_from  # the unemployment at which the government borrows nothing
+        self.tax_follows = tax_follows  # part of the gap between the rate of tax held and the rate the modules charged that closes in a year
+        self.tax_rate = None            # the rate of tax on all income that is held, as set in law
         self.judged_over = judged_over  # years over which each condition of accumulation is judged
         self.significant = significant  # a fall smaller than this part of the level counts as steady
         self.top = top
@@ -218,14 +228,23 @@ class Sales:
                        for name in sorted(L.info) if L.info[name].settled)
         lent, repaid = float(A.get("household_debt_lent", 0.0)), float(A.get("household_debt_repaid", 0.0))
 
-        # What each party had to spend.
-        has_wages = max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0) + self.carried[WAGE_EARNERS]
+        # The tax set in law. The modules charged what the government and its organs received. At the rate held, the
+        # government collects less than that in a slump and borrows the rest from owners, or collects more and repays them.
+        taxes = sum(flows[p]["received"] for p in sorted(flows) if p == GOVERNMENT or p in L.buyers)
+        charged = taxes / goods
+        if self.tax_rate is None and taxes > 0:           # the rate in law starts at the first rate charged
+            self.tax_rate = charged
+        borrowed = 0.0
+        if self.tax_rate is not None:                     # the rate moves part of the way to the rate charged this year
+            gap = charged - self.tax_rate
+            self.tax_rate += self.tax_follows * gap
+            borrowed = (1.0 - self.tax_follows) * gap * goods     # the tax not collected; below 0, what is repaid
+
+        # What each party had to spend. Wage earners and owners keep the tax not collected, in proportion to wages
+        # and priced earnings, and pay any extra tax in the same proportion.
+        has_wages = (max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid + borrowed * wages / goods, 0.0)
+                     + self.carried[WAGE_EARNERS])
         has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + organs + self.carried[GOVERNMENT]
-        # The government borrows from owners and spends what it borrows, more when more people are without work.
-        # It borrows less by the money for which it found no goods the year before.
-        without_work = max(float(A["unemployment"]) - self.deficit_from, 0.0)
-        borrowed = max(self.deficit_gain * without_work * goods - self.carried[GOVERNMENT], 0.0)
-        has_government += borrowed
         building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
         outlay = self.payout * wage
 
@@ -240,16 +259,16 @@ class Sales:
         unsold = rest - by_owners
         if unsold < 1e-12 * offered:                      # a rounding error is not unsold goods
             by_owners, unsold = rest, 0.0
-        income = priced - unsold + to_firms + holders     # owners' money income of the year
+        income = priced - unsold + to_firms + holders + borrowed * priced / goods     # owners' money income of the year
         # What is paid out to owners moves part of the way toward the paid-out part of the year's income.
         self.payout += self.payout_follows * ((1.0 - self.retained) * income / wage - self.payout)
         return {"offered": offered, "wages": wages, "priced_earnings": priced,
                 "bought_by_wage_earners": by_wages, "bought_by_government": by_government,
                 "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
                 "wage_earners_had": has_wages, "government_had": has_government,
-                "owners_had": income + repaid - lent, "owners_income": income,
+                "owners_had": income - borrowed + repaid - lent, "owners_income": income,
                 "owners_outlay": outlay, "building": building, "lent": lent, "repaid": repaid,
-                "borrowed_by_government": borrowed,
+                "borrowed_by_government": borrowed, "tax_charged": taxes, "tax_rate_held": self.tax_rate or 0.0,
                 "kept_for_next_year": self.carried[WAGE_EARNERS] + self.carried[GOVERNMENT]}
 
     def conditions(self, L, top):

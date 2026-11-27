@@ -678,21 +678,39 @@ def check_sales_account():
             m.step()
             assert np.isclose(m.step()["published"]["sales_account"]["unsold"], unsold)
 
-    # The government borrows and spends when people are without work. With 1,000 employed of a working population
-    # of 1,000 / 0.96, unemployment is 4 per cent, one point above the 3 per cent at which it borrows nothing. It
-    # borrows 1.4 per cent of the wages and priced earnings of 1,180, which is 16.52, and buys goods with it. So
-    # 33.75 - 16.52 = 17.23 is unsold. With the setting at 0 it borrows nothing and 33.75 is unsold.
-    for gain, borrowed in (1.4, 16.52), (0.0, 0.0):
+    # The tax set in law. A stand-in module taxes wage earners 115 in the first year and 230 in the second, and the
+    # government pays it all out to them, as the pay of public employees is paid. Firms keep nothing, so owners lay
+    # out all they receive and nothing is unsold at first. The wages and priced earnings are 1,150 in both years, so the rates charged are 0.1 and 0.2. The rate held starts at 0.1 and moves a twentieth of
+    # the way to 0.2, to 0.105. So 0.095 x 1,150 = 109.25 is not collected: the government borrows it, wage earners
+    # keep 1,000 / 1,150 of it and owners the rest. In the third year the tax falls back to 115: the rate held moves
+    # to 0.10475 and the government collects 0.95 x 0.005 x 1,150 more than charged and repays it. With the
+    # setting at 1 the tax covers what is paid out in every year and nothing is borrowed.
+    class Levy:
+        name, supplies = "levy", ("jobs_created",)
+
+        def __init__(self):
+            self.year = 0
+
+        def start(self, L):
+            return {"jobs_created": 0.0}
+
+        def propose(self, L, rng):
+            self.year += 1
+            amount = 230.0 if self.year == 2 else 115.0
+            return [Transfer("levy", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=amount),
+                    Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=amount)]
+
+    for follows, borrowed, repaid in (0.05, 0.095 * 1150, 0.95 * 0.005 * 1150), (1.0, 0.0, 0.0):
         L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
-        L.shared["workforce"] = 1000.0 / 0.96
-        m = Model(L, [Push(), Sales(top=1, deficit_gain=gain)], top=1)
+        m = Model(L, [Levy(), Sales(top=1, tax_follows=follows, retained=0.0, payout_follows=1.0)], top=1)
         with np.errstate(divide="ignore"):
-            m.step()
-            r = m.step()
-        a = r["published"]["sales_account"]
-        assert np.isclose(a["borrowed_by_government"], borrowed) and np.isclose(a["bought_by_government"], borrowed)
-        assert np.isclose(a["unsold"], 33.75 - borrowed) and np.isclose(r["published"]["deficit_borrowing"], borrowed)
-        assert np.isclose(r["published"]["deficit_part"], borrowed / 1180.0)
+            rs = [m.step() for _ in range(4)]      # each year's account is of the year before
+        a, b = rs[2]["published"]["sales_account"], rs[3]["published"]["sales_account"]
+        assert np.isclose(a["tax_charged"], 230.0) and np.isclose(a["borrowed_by_government"], borrowed)
+        assert np.isclose(a["wage_earners_had"], 1000.0 + borrowed * 1000.0 / 1150.0)
+        assert np.isclose(rs[2]["published"]["deficit_borrowing"], borrowed) and a["unsold"] == 0.0
+        assert np.isclose(b["borrowed_by_government"], -repaid)
+        assert np.isclose(b["owners_income"] - b["priced_earnings"] + b["unsold"], -repaid * 150.0 / 1150.0)
 
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
@@ -701,16 +719,16 @@ def check_sales_account():
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
               "externalisation", "proletarianization", "wants"]]
-    years_unsold = years = stopped = years_borrowed = 0
+    years_unsold = years = stopped = years_borrowed = years_repaid = 0
     largest = 0.0
-    # The first mix runs with the government borrowing nothing, so that goods are unsold in some years.
-    for names, gain in zip(mixes, (0.0, 1.4)):
+    # The second mix runs with the tax set in law, so that the government borrows and repays.
+    for names, follows in zip(mixes, (1.0, 0.05)):
         histories = []
         for order in names, names[::-1]:
             optional = registry.make(order)
-            next(x for x in optional if x.name == "sales").deficit_gain = gain
+            next(x for x in optional if x.name == "sales").tax_follows = follows
             m = Model(starting_ledger(0, 5000), all_modules() + optional, seed=0)
-            kept = 0.0
+            kept, rate_before = 0.0, None
             for step in range(60):
                 try:
                     r = m.step()
@@ -734,16 +752,26 @@ def check_sales_account():
                     holders = sum(row["received"] for p, row in parties.items()
                                   if p not in (WAGE_EARNERS, GOVERNMENT) and p not in m.L.buyers)
                     lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
-                    assert a["bought_by_wage_earners"] <= a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + kept + tol
-                    assert a["bought_by_government"] <= (max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept
-                                                         + a["borrowed_by_government"] + tol)
-                    # The government borrows nothing at an unemployment of 3 per cent or less, and above it no more than the rule gives.
-                    without_work = max(last["unemployment"] - 0.03, 0.0)
-                    assert 0.0 <= a["borrowed_by_government"] <= gain * without_work * (a["wages"] + a["priced_earnings"]) + tol
+                    relief = a["borrowed_by_government"] * a["wages"] / (a["wages"] + a["priced_earnings"])
+                    assert a["bought_by_wage_earners"] <= max(a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + relief, 0.0) + kept + tol
+                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept + tol
+                    # What the government borrowed is the tax charged less the tax at the rate held, and the rate held
+                    # lies between its last value and the rate charged.
+                    charged = (net.get(GOVERNMENT, 0.0) + parties.get(GOVERNMENT, {}).get("paid", 0.0) + organs) / (a["wages"] + a["priced_earnings"])
+                    assert np.isclose(a["tax_charged"], charged * (a["wages"] + a["priced_earnings"]))
+                    if rate_before is not None:
+                        assert min(rate_before, charged) - 1e-12 <= a["tax_rate_held"] <= max(rate_before, charged) + 1e-12
+                        assert np.isclose(a["borrowed_by_government"], a["tax_charged"] - a["tax_rate_held"] * (a["wages"] + a["priced_earnings"]),
+                                          atol=tol)
+                    if a["tax_charged"] > 0:
+                        rate_before = a["tax_rate_held"]
+                    if follows == 1.0:
+                        assert a["borrowed_by_government"] == 0.0
                     assert np.isclose(pub_now["deficit_borrowing"], a["borrowed_by_government"])
-                    years_borrowed += a["borrowed_by_government"] > 0
+                    years_borrowed += a["borrowed_by_government"] > tol
+                    years_repaid += a["borrowed_by_government"] < -tol
                     assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
-                                                     + repaid - lent + tol)
+                                                     - relief + repaid - lent + tol)
                 kept = a["kept_for_next_year"]
                 years += 1
                 years_unsold += a["unsold"] > 0
@@ -760,9 +788,10 @@ def check_sales_account():
           f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
-          f"record of transfers shows it had or the rule let it borrow. With unemployment at 4 per cent the government "
-          f"borrows 16.52 and buys goods with it, and 17.23 is unsold. The government borrowed in {years_borrowed} of "
-          f"those years. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
+          f"record of transfers shows it had. When the tax charged doubles from a rate of 0.1 to 0.2, the rate held moves "
+          f"to 0.105 and the government borrows 109.25, which wage earners and owners keep; when it falls back, the "
+          f"government repays. With the tax set in law the government borrowed in {years_borrowed} of those years and "
+          f"repaid in {years_repaid}. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
           f"what was offered. Opposite listing orders gave identical figures."
           + (f" The guard stopped {stopped} of the 4 runs before the 60th year." if stopped else ""))
 
@@ -911,9 +940,10 @@ def check_payers():
         assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"] + a["bought_by_firms"], rtol=1e-12)
         if step:
             last = m.history[-2]["parties"]
-            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept - a["borrowed_by_government"]) <= tol
+            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept) <= tol
             net = last[WAGE_EARNERS]["received"] - last[WAGE_EARNERS]["paid"]
-            assert abs(a["wage_earners_had"] - (a["wages"] + net) - kept_wages) <= tol
+            relief = a["borrowed_by_government"] * a["wages"] / (a["wages"] + a["priced_earnings"])   # tax not collected
+            assert abs(a["wage_earners_had"] - max(a["wages"] + net + relief, 0.0) - kept_wages) <= tol
         kept, kept_wages = 0.0, 0.0
         if a["kept_for_next_year"] > 0:          # money that found no goods is split between the two; follow it from the account
             kept = a["government_had"] - a["bought_by_government"]

@@ -25,8 +25,9 @@ of existing power institutions", and promises that are being broken are no sign 
 Three optional modules change the government's debt, and each publishes a number that this
 module reads. The numbers are 0 when those modules are off, and they then change
 nothing. The risk shaping module publishes what the government borrows to
-bail out dominant capital. The sales module publishes what the government borrows and spends
-when people are without work. The privatisation module publishes what dominant capital pays for
+bail out dominant capital. The sales module publishes the tax that the government did not
+collect and borrowed from owners, which is below 0 when it collected more than the modules
+charged and repaid owners. The privatisation module publishes what dominant capital pays for
 the public services it takes over, and the government retires debt with it. The module keeps
 the sum of the three as a stock of money and adds it to the debt. A government whose proceeds
 exceed its whole debt has no debt, and the rest of the proceeds is set against later borrowing.
@@ -83,8 +84,8 @@ class Debt:
 
     def propose(self, L, rng):
         A = L.accounts
-        # Last year's borrowing for bailouts and for spending when people are without work, less last year's
-        # proceeds of privatisation (optional modules; 0 without them).
+        # Last year's borrowing for bailouts and in place of tax, less last year's repayment and proceeds of
+        # privatisation (optional modules; 0 without them).
         self.added += (A.get("bailout_borrowing", 0.0) + A.get("deficit_borrowing", 0.0)
                        - A.get("privatisation_proceeds", 0.0))
         # Firms that closed last year stopped paying their lenders (the failure module); 1 when no firm closed.
