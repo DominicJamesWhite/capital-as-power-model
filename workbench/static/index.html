@@ -4,161 +4,65 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Capital as power workbench</title>
+<link rel="stylesheet" href="/static/fonts/switzer.css">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<a class="skip" href="#main">Skip to main content</a>
-
-<header class="topbar">
-  <div class="topbar-title">
-    <span class="app-name">Capital as power workbench</span>
-    <span class="app-note">Runs on this computer only</span>
-  </div>
-  <div class="topbar-tools">
-    <span id="top-status" class="badge running" hidden>Running</span>
-    <button type="button" class="btn quiet" id="toggle-setup" aria-controls="setup" aria-expanded="true">Hide the run set-up</button>
-    <a class="toplink" href="#words">Words used on this page</a>
-  </div>
-</header>
-
-<div class="shell" id="shell">
-
-  <!-- ===================================================== set up a run -->
-  <aside class="side" id="setup" aria-labelledby="setup-heading">
-    <div class="side-scroll" id="side-scroll">
-      <h2 id="setup-heading">Set up a run</h2>
-
-      <div id="problems" class="problems" hidden tabindex="-1" role="alert">
-        <h3>There is a problem</h3>
-        <ul id="problem-list"></ul>
+<div class="app">
+  <aside class="runs" aria-label="Runs">
+    <div class="runs-head">
+      <div class="app-name">Capital as power workbench</div>
+      <div class="runs-title"><h1 style="font-size:var(--step-1)">Runs</h1><button class="btn primary sm" id="new-btn" aria-haspopup="menu" aria-expanded="false">+ New ▾</button></div>
+      <div class="new-menu" id="new-menu" role="menu" hidden>
+        <button role="menuitem" id="m-run">New run<span>One run with the settings you choose.</span></button>
+        <button role="menuitem" id="m-exp">New experiment<span>Several runs that vary one or more settings.</span></button>
       </div>
-
-      <div class="field">
-        <label class="label" for="run-name">Name of the run (optional)</label>
-        <p class="help" id="run-name-help">A name helps you tell runs apart, for example "Hype switched on" or "Mergers twice as fast". You can change it later.</p>
-        <input class="input full" id="run-name" type="text" maxlength="120" aria-describedby="run-name-help" autocomplete="off">
-      </div>
-
-      <fieldset class="field" id="claims-field">
-        <legend class="label">Number of firms at the start</legend>
-        <p class="help">The model was built to start with 300,000 firms, which is close to the number of firms in the United States in the 1910s.</p>
-        <p class="aside-note">Fewer firms make a run much faster. But with fewer firms, the 100 largest make up a bigger part of the whole, and this changes the results for them. Use a smaller number to try ideas out. Use 300,000 before you rely on a result.</p>
-        <div class="choices">
-          <div class="choice"><input type="radio" name="claims" id="claims-300000" value="300000"><label for="claims-300000">300,000, the full number. A run of 119 years can take 10 minutes or more.</label></div>
-          <div class="choice"><input type="radio" name="claims" id="claims-100000" value="100000"><label for="claims-100000">100,000. A run of 119 years takes a few minutes.</label></div>
-          <div class="choice"><input type="radio" name="claims" id="claims-30000" value="30000" checked><label for="claims-30000">30,000. Quick, usually under a minute. Results for the 100 largest firms will differ.</label></div>
-          <div class="choice"><input type="radio" name="claims" id="claims-other" value="other"><label for="claims-other">Another number</label></div>
-          <div class="sub-field" id="claims-other-box" hidden>
-            <label class="label" for="claims-number">Number of firms</label>
-            <p class="help" id="claims-number-help">Enter a whole number between 1,000 and 3,000,000.</p>
-            <input class="input num" id="claims-number" type="text" inputmode="numeric" aria-describedby="claims-number-help">
-          </div>
-        </div>
-      </fieldset>
-
-      <div class="pair">
-        <div class="field">
-          <label class="label" for="years">Number of years</label>
-          <input class="input num" id="years" type="text" inputmode="numeric" value="119" aria-describedby="years-help">
-        </div>
-        <div class="field">
-          <label class="label" for="seed">Seed</label>
-          <input class="input num" id="seed" type="text" inputmode="numeric" value="0" aria-describedby="seed-help">
-        </div>
-      </div>
-      <p class="help" id="years-help">Years are counted from a start labelled 1890. With 119 years the run ends at the year labelled 2009. The labels are not real dates.</p>
-      <p class="help" id="seed-help">Some rules in the model use chance. The seed is a number that fixes those chances. Two runs with the same seed and the same settings give the same results. Change the seed to see how much a result depends on chance.</p>
-
-      <h3>Modules</h3>
-      <p class="help">A module is one part of the theory written as a rule, for example mergers or resistance. Each module has settings. A setting is a number that controls how strong or how fast its rule is. Every setting starts at its default, the value the model's builders chose.</p>
-      <p id="catalogue-status" class="status-line" role="status">Reading the list of modules from the model…</p>
-      <div id="catalogue-problems"></div>
-
-      <div class="field filter">
-        <label class="label" for="module-filter">Find a module</label>
-        <input class="input full" id="module-filter" type="search" aria-describedby="module-filter-help" autocomplete="off" placeholder="Type part of its name, for example &quot;debt&quot;.">
-        <p class="help visually-hidden" id="module-filter-help">Type part of its name, for example "debt".</p>
-      </div>
-      <p class="reload"><button type="button" class="btn quiet small" id="reload-catalogue">Read the modules again</button>
-        <span class="help">Use this if the model has been changed since you opened the page. Your choices are kept where they still apply.</span></p>
-
-      <div id="module-groups"></div>
+      <p class="small muted">Tick runs to show them. ★ marks the baseline.</p>
     </div>
-
-    <div class="start-bar">
-      <p id="run-summary" class="run-summary"></p>
-      <div class="btn-row">
-        <button type="button" class="btn primary" id="start-run">Start run</button>
-        <button type="button" class="btn quiet" id="reset-settings">Reset all settings</button>
-      </div>
-    </div>
+    <div class="runs-list" id="runs-list"></div>
   </aside>
 
-  <!-- ===================================================== runs and charts -->
-  <main id="main" class="main" tabindex="-1">
-    <div class="intro">
-      <h1>Run and compare the capital as power model</h1>
-      <p class="lead">Use this page to run the model, see the results as charts and compare runs with different settings.</p>
-      <details class="about">
-        <summary>What this model is, and what it is not</summary>
-        <div class="about-body">
-          <p>The model is a computer simulation of a theory by Jonathan Nitzan and Shimshon Bichler, called capital as power. The theory says that owning capital is a form of power over society. It says that owners judge this power by comparing themselves with the average, not by how much they produce.</p>
-          <p>The model is about power relations. It is not built to predict the future or to copy the historical record. Do not read its results as a forecast or as history.</p>
-          <p>Years in the model are labels counted from a start labelled 1890. They are not real dates.</p>
-          <p>Every number in the model that the book does not give was added by the people who built the model. The description of each module says which parts are additions.</p>
-          <h3>How to use this page</h3>
-          <ol>
-            <li>Under <b>Set up a run</b>, choose how many firms and years to run, and which modules to switch on.</li>
-            <li>Select <b>Start run</b>. The charts fill in year by year while the model runs.</li>
-            <li>To see what difference one change makes, start a second run that differs in that one thing. Then tick both runs in the list under <b>Runs and charts</b>.</li>
-          </ol>
-          <p>New words are explained under <b>Words used on this page</b>.</p>
-        </div>
-      </details>
-    </div>
-
-    <div id="notice" class="notice" hidden tabindex="-1"></div>
-
-    <section class="block" aria-labelledby="results-heading">
-      <h2 id="results-heading">Runs and charts</h2>
-      <div id="progress-area" aria-live="polite"></div>
-
-      <h3>Your runs</h3>
-      <p class="help">Tick the runs you want to see on the charts. To compare runs, tick two or more. Runs are saved on this computer, so they are still here after you close the workbench.</p>
-      <div id="runs-area"></div>
-      <div id="run-messages"></div>
-      <div id="differences-area"></div>
-    </section>
-
-    <section class="block" aria-labelledby="charts-heading">
-      <h2 id="charts-heading">Charts</h2>
-      <p class="help">Point at a chart, or select it and use the left and right arrow keys, to read the figures for each year.</p>
-      <p id="charts-empty" class="aside-note" hidden>Tick a run in the list above to show it on the charts.</p>
-      <h3>Main figures</h3>
-      <div id="main-charts" class="chart-grid"></div>
-
-      <h3>Gain by source</h3>
-      <div id="gain-area"></div>
-
-      <h3>Other figures</h3>
-      <p class="help">The model reports many other figures each year. Choose one to add a chart for it.</p>
-      <div class="inline-field">
-        <label class="label" for="extra-select">Figure</label>
-        <select class="select" id="extra-select"></select>
-        <button type="button" class="btn quiet" id="add-chart">Add chart</button>
+  <main class="main" id="main">
+    <div class="tabs" role="tablist" id="tabs"><div class="spacer"></div><div class="legend" id="legend"></div></div>
+    <div class="panel" id="panel-charts" role="tabpanel"></div>
+    <div class="panel" id="panel-map" role="tabpanel" hidden>
+      <div class="mp-top">
+        <div class="ctl"><label for="mp-run">Run</label><span class="ln"></span><select class="select" id="mp-run"></select></div>
+        <div class="ctl"><label for="mp-vs">Compare with</label><span class="ln b" id="mp-vs-ln" hidden></span><select class="select" id="mp-vs"></select></div>
+        <div class="ctl"><label for="mp-measure">Show</label><select class="select" id="mp-measure">
+          <option value="run">Gain over the run</option><option value="year">Gain in one year</option><option value="diff">Difference between the 2 runs</option></select></div>
+        <div class="ctl" id="mp-year-ctl" hidden><label for="mp-year">Year</label><input id="mp-year" type="range" min="1891" max="2009" value="1920"><b id="mp-year-out">1920</b></div>
+        <div class="spacer"></div>
       </div>
-      <div id="extra-charts" class="chart-grid"></div>
-    </section>
-
-    <section class="block" id="words" aria-labelledby="words-heading" tabindex="-1">
-      <h2 id="words-heading">Words used on this page</h2>
-      <p class="help">The theory has its own words. This page keeps them, because they are the theory's, and explains each one here.</p>
-      <dl class="glossary" id="glossary"></dl>
-    </section>
-
-    <p class="page-foot">This workbench runs on your own computer. It sends nothing to any other website.</p>
+      <div class="mp-body">
+        <div class="mp-canvas" id="mp-canvas">
+          <svg id="mp-svg" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of modules and the figures they pass to each other">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="var(--edge)"/></marker>
+              <marker id="arr-core" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="var(--edge-core)"/></marker>
+              <marker id="arr-hi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="var(--accent)"/></marker>
+            </defs>
+            <g id="mp-edges"></g><g id="mp-nodes"></g>
+          </svg>
+          <p class="mp-hint">Arrows show the figures one module passes to another. Point at an arrow to see them.</p>
+          <div class="mp-legend" id="mp-legend"></div>
+          <section class="drawer" id="mp-drawer" hidden aria-live="polite"></section>
+        </div>
+        <aside class="insp" id="mp-insp" aria-label="Selected module"></aside>
+      </div>
+      <nav class="mp-strip" id="mp-strip" aria-label="Main figures"></nav>
+    </div>
+    <div class="panel" id="panel-compare" role="tabpanel" hidden></div>
+    <div class="panel" id="panel-gain" role="tabpanel" hidden></div>
+    <div class="panel" id="panel-experiment" role="tabpanel" hidden></div>
   </main>
 </div>
+<div class="setup" id="setup" role="dialog" aria-modal="true" hidden></div>
+<div class="pop" id="pop" role="menu" hidden></div>
+<div class="modal-back" id="confirm" hidden></div>
+<div class="modal-back" id="picker" hidden></div>
+<div class="tip" id="tip" hidden></div>
+<div class="hovtip" id="hovtip" hidden></div>
 <script src="/static/app.js"></script>
 </body>
 </html>

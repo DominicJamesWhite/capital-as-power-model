@@ -370,6 +370,50 @@ def images_of(name):
     return out
 
 
+UNITS = ("share", "rate", "times", "index", "number")
+PER_PART = re.compile(r"_by_(industry|sector|nation|country|claim|firm)$")
+
+
+def figure(key, declared):
+    """One figure for the "Add a chart" list: a declared one, or a plain guess from its name."""
+    if declared:
+        label, unit, note = (list(declared) + ["", "", ""])[:3]
+        return {"key": key, "label": str(label) or humanise(key), "unit": unit if unit in UNITS else "number",
+                "note": str(note), "declared": True}
+    return {"key": key, "label": humanise(key), "unit": "number", "note": "", "declared": False}
+
+
+def humanise(key):
+    text = key.replace("_", " ").strip()
+    return text[:1].upper() + text[1:]
+
+
+def figures_of(cls):
+    """The yearly figures a module publishes. If the module declares figures, even none, those are
+    the list; otherwise every name in supplies that does not look like a figure for each industry."""
+    declared = getattr(cls, "figures", None)
+    if isinstance(declared, dict):
+        return [figure(k, v) for k, v in declared.items()]
+    return [figure(k, None) for k in (getattr(cls, "supplies", ()) or ()) if not PER_PART.search(k)]
+
+
+def links_of(cls):
+    return {"reads": list(getattr(cls, "reads", ()) or ()), "supplies": list(getattr(cls, "supplies", ()) or ()),
+            "figures": figures_of(cls)}
+
+
+def core_figures(notes):
+    """The figures the core bookkeeping reports each year."""
+    try:
+        import core
+        declared = getattr(core, "CORE_FIGURES", None)
+    except Exception:
+        declared = None
+    if isinstance(declared, dict) and declared:
+        return [figure(k, v) for k, v in declared.items()]
+    return [dict(figure(k, None), note=v[:1].upper() + v[1:]) for k, v in notes.items()]
+
+
 def load_core():
     import full
     return full.all_modules()
@@ -378,6 +422,7 @@ def load_core():
 def catalogue():
     sections = md_sections()
     out = {"core": [], "optional": [], "problems": [], "readout_notes": readout_notes(), "start_year": None}
+    out["core_figures"] = core_figures(out["readout_notes"])
     try:
         import full
         out["start_year"] = getattr(full, "START", None)
@@ -393,6 +438,7 @@ def catalogue():
         cls = type(m)
         entry = {"id": "core:" + m.name, "name": m.name, "class": cls.__name__, "file": cls.__module__,
                  "settings": settings_of(cls), "replaces": [], "error": ""}
+        entry.update(links_of(cls))
         entry.update(describe(cls, None, sections))
         entry.update(images_of(m.name))
         out["core"].append(entry)
@@ -406,13 +452,14 @@ def catalogue():
     for key, (path, clsname) in optional.items():
         entry = {"id": "opt:" + key, "name": key, "class": clsname, "file": path, "settings": [],
                  "replaces": [], "error": "", "title": "", "summary": "", "rule": [], "book": [],
-                 "additions": [], "class_note": "", "doc_note": ""}
+                 "additions": [], "class_note": "", "doc_note": "", "reads": [], "supplies": [], "figures": []}
         entry.update(images_of(key))
         try:
             cls = getattr(importlib.import_module(path), clsname)
             entry["settings"] = settings_of(cls)
             entry["replaces"] = list(getattr(cls, "replaces", ()) or ())
             entry["model_name"] = getattr(cls, "name", key)
+            entry.update(links_of(cls))
             entry.update(describe(cls, key, sections))
         except Exception as e:
             entry["error"] = f"{type(e).__name__}: {e}"

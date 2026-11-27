@@ -8,8 +8,9 @@ and open http://127.0.0.1:8765 in a web browser. The page opens by itself unless
 is given. --port N chooses another port. --runs FOLDER keeps the saved runs in another folder.
 
 The server only listens on this computer (127.0.0.1) and sends nothing anywhere else. Each run
-of the model happens in its own process (worker.py). Runs wait in a queue and go one at a time.
-Finished runs are saved in the folder runs\ beside this file.
+of the model happens in its own process (worker.py). Runs wait in a queue, and up to three go
+at once. Every run belongs to an experiment, which works as a folder. Finished runs are saved in
+the folder runs\ beside this file, and the list of experiments in runs\experiments.json.
 """
 import csv
 import io
@@ -37,8 +38,10 @@ PYTHON = sys.executable
 RUNS.mkdir(exist_ok=True)
 LOCK = threading.RLock()
 RUN_TABLE = {}                         # id -> run record (a dict)
+EXPERIMENTS = {}                       # id -> {"id", "name", "created"}
 PROCS = {}                             # id -> subprocess.Popen
-COLOURS = 8
+AT_ONCE = 3                            # runs that may go at the same time
+DEFAULT_EXPERIMENT = "Runs"
 
 
 def now():
@@ -56,8 +59,49 @@ def save(run):
     tmp.replace(path)
 
 
+def save_experiments():
+    path = RUNS / "experiments.json"
+    tmp = path.with_suffix(".tmp")
+    with LOCK:
+        text = json.dumps(sorted(EXPERIMENTS.values(), key=lambda e: e["created"]))
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+
+def new_id(table):
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    n, rid = 1, stamp
+    while rid in table:
+        n += 1
+        rid = f"{stamp}-{n}"
+    return rid
+
+
+def make_experiment(name):
+    with LOCK:
+        eid = "e" + new_id({k[1:] for k in EXPERIMENTS})
+        EXPERIMENTS[eid] = {"id": eid, "name": name, "created": now()}
+    save_experiments()
+    return eid
+
+
+def default_experiment():
+    with LOCK:
+        for e in EXPERIMENTS.values():
+            if e["name"] == DEFAULT_EXPERIMENT:
+                return e["id"]
+    return make_experiment(DEFAULT_EXPERIMENT)
+
+
 def load_all():
+    try:
+        for e in json.loads((RUNS / "experiments.json").read_text(encoding="utf-8")):
+            EXPERIMENTS[e["id"]] = e
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
     for path in sorted(RUNS.glob("*.json")):
+        if path.name == "experiments.json":
+            continue
         try:
             run = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
@@ -67,13 +111,17 @@ def load_all():
             run["message"] = ("The workbench was closed before this run finished. "
                               "The figures up to that point have been kept.")
             save(run)
+        if run.get("experiment") not in EXPERIMENTS:
+            run["experiment"] = default_experiment()
+            save(run)
         RUN_TABLE[run["id"]] = run
 
 
 def summary(run):
     keys = ("id", "name", "status", "claims", "years", "seed", "optional", "changed", "created",
-            "finished", "message", "colour", "step", "warnings", "left_out", "modules")
+            "finished", "message", "step", "warnings", "left_out", "modules", "experiment", "settings_used")
     out = {k: run.get(k) for k in keys}
+    out["settings"] = (run.get("spec") or {}).get("settings", {})
     out["rows_count"] = len(run.get("rows", []))
     return out
 
@@ -81,12 +129,18 @@ def summary(run):
 # ------------------------------------------------------------------ the queue
 
 def start_next():
+    while start_one():
+        pass
+
+
+def start_one():
     with LOCK:
-        if any(r["status"] == "running" for r in RUN_TABLE.values()):
-            return
-        waiting = sorted((r for r in RUN_TABLE.values() if r["status"] == "waiting"), key=lambda r: r["created"])
+        if sum(r["status"] == "running" for r in RUN_TABLE.values()) >= AT_ONCE:
+            return False
+        waiting = sorted((r for r in RUN_TABLE.values() if r["status"] == "waiting"),
+                         key=lambda r: (r["created"], r.get("order", 0)))
         if not waiting:
-            return
+            return False
         run = waiting[0]
         run["status"] = "running"
         run["started"] = now()
@@ -101,10 +155,11 @@ def start_next():
             run["status"] = "failed"
             run["message"] = f"The model could not be started: {e}"
         save(run)
-        return
+        return True
     with LOCK:
         PROCS[run["id"]] = proc
     threading.Thread(target=follow, args=(run, proc, spec_path), daemon=True).start()
+    return True
 
 
 def follow(run, proc, spec_path):
@@ -177,44 +232,125 @@ def bad(msg):
     return 400, {"error": msg}
 
 
-def new_run(body):
+def make_run(body, experiment, order=0):
+    """Check one run's set-up and return (run, None), or (None, error message)."""
     try:
         claims = int(body.get("claims"))
         years = int(body.get("years"))
         seed = int(body.get("seed"))
     except (TypeError, ValueError):
-        return bad("The number of firms, the number of years and the seed must all be whole numbers.")
+        return None, "The number of firms, the number of years and the seed must all be whole numbers."
     if not 1000 <= claims <= 3_000_000:
-        return bad("The number of firms must be between 1,000 and 3,000,000.")
+        return None, "The number of firms must be between 1,000 and 3,000,000."
     if not 1 <= years <= 1000:
-        return bad("The number of years must be between 1 and 1,000.")
+        return None, "The number of years must be between 1 and 1,000."
     if not 0 <= seed <= 2**32 - 1:
-        return bad("The seed must be a whole number of 0 or more.")
+        return None, "The seed must be a whole number of 0 or more."
     optional = [str(x) for x in body.get("optional", [])]
     settings = body.get("settings") or {}
-    if not isinstance(settings, dict):
-        return bad("The settings could not be read.")
-    changed = sum(len(v) for v in settings.values() if isinstance(v, dict))
+    if not isinstance(settings, dict) or not all(isinstance(v, dict) for v in settings.values()):
+        return None, "The settings could not be read."
+    changed = sum(len(v) for v in settings.values())
     with LOCK:
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        n = 1
-        rid = stamp
-        while rid in RUN_TABLE:
-            n += 1
-            rid = f"{stamp}-{n}"
-        used = {r.get("colour", 0) for r in RUN_TABLE.values()}
-        count = len(RUN_TABLE)
-        colour = next((c for c in range(COLOURS) if c not in used), count % COLOURS)
-        name = str(body.get("name") or "").strip()[:120] or f"Run {count + 1}"
+        rid = new_id(RUN_TABLE)
+        name = str(body.get("name") or "").strip()[:120] or f"Run {len(RUN_TABLE) + 1}"
         run = {"id": rid, "name": name, "status": "waiting", "created": now(), "finished": None,
+               "order": order, "experiment": experiment,
                "claims": claims, "years": years, "seed": seed, "optional": optional, "changed": changed,
                "spec": {"claims": claims, "years": years, "seed": seed, "optional": optional, "settings": settings},
-               "rows": [], "step": 0, "message": "", "colour": colour, "modules": [], "settings_used": {},
+               "rows": [], "step": 0, "message": "", "modules": [], "settings_used": {},
                "warnings": [], "left_out": []}
         RUN_TABLE[rid] = run
+    return run, None
+
+
+def experiment_for(body):
+    """The experiment a new run goes into: a given one, a new one, or the default."""
+    if body.get("new_experiment"):
+        name = str(body["new_experiment"]).strip()[:120]
+        if not name:
+            return None, "Enter a name for the experiment."
+        return make_experiment(name), None
+    eid = body.get("experiment")
+    if eid:
+        if eid not in EXPERIMENTS:
+            return None, "That experiment no longer exists."
+        return eid, None
+    return default_experiment(), None
+
+
+def new_run(body):
+    eid, err = experiment_for(body)
+    if err:
+        return bad(err)
+    run, err = make_run(body, eid)
+    if err:
+        return bad(err)
     save(run)
     start_next()
-    return 200, {"id": rid}
+    return 200, {"id": run["id"], "experiment": eid}
+
+
+def new_runs(eid, body):
+    specs = body.get("runs")
+    if not isinstance(specs, list) or not specs:
+        return bad("Add at least one run to the table.")
+    if len(specs) > 500:
+        return bad("An experiment can have at most 500 runs.")
+    made = []
+    for i, spec in enumerate(specs):
+        if not isinstance(spec, dict):
+            err = "The table could not be read."
+        else:
+            run, err = make_run(spec, eid, order=i)
+        if err:
+            with LOCK:
+                for r in made:
+                    RUN_TABLE.pop(r["id"], None)
+            return bad(f"Run {i + 1}: {err}")
+        made.append(run)
+    for run in made:
+        save(run)
+    start_next()
+    return 200, {"ids": [r["id"] for r in made]}
+
+
+def runs_in(eid):
+    with LOCK:
+        return sorted((r for r in RUN_TABLE.values() if r.get("experiment") == eid),
+                      key=lambda r: (r["created"], r.get("order", 0)))
+
+
+def experiment_list():
+    out = []
+    with LOCK:
+        exps = sorted(EXPERIMENTS.values(), key=lambda e: e["created"])
+    for e in exps:
+        out.append({**e, "run_ids": [r["id"] for r in runs_in(e["id"])]})
+    return out
+
+
+def stop_run(run):
+    with LOCK:
+        proc = PROCS.get(run["id"])
+        if run["status"] == "waiting":
+            run["status"] = "stopped"
+            run["message"] = "You stopped this run before it began."
+            run["finished"] = now()
+        elif run["status"] == "running" and proc:
+            run["stop_asked"] = True
+            proc.terminate()
+    save(run)
+
+
+def delete_run(run):
+    with LOCK:
+        RUN_TABLE.pop(run["id"], None)
+    for suffix in (".json", ".spec"):
+        try:
+            (RUNS / f"{run['id']}{suffix}").unlink()
+        except OSError:
+            pass
 
 
 def to_csv(run):
@@ -233,6 +369,28 @@ def to_csv(run):
     for row in rows:
         w.writerow([row["year"], row["step"]] + [_cell(row["values"].get(k)) for k in vkeys]
                    + [_cell(row["gain"].get(k)) for k in sorted(gkeys)])
+    return buf.getvalue()
+
+
+def experiment_csv(eid):
+    runs = runs_in(eid)
+    vkeys, gkeys = [], []
+    for run in runs:
+        for row in run.get("rows", []):
+            for k in row["values"]:
+                if k not in vkeys:
+                    vkeys.append(k)
+            for k in row["gain"]:
+                if k not in gkeys:
+                    gkeys.append(k)
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["run", "seed", "year", "step"] + vkeys + [f"gain from {k}" for k in sorted(gkeys)])
+    for run in runs:
+        for row in run.get("rows", []):
+            w.writerow([run["name"], run["seed"], row["year"], row["step"]]
+                       + [_cell(row["values"].get(k)) for k in vkeys]
+                       + [_cell(row["gain"].get(k)) for k in sorted(gkeys)])
     return buf.getvalue()
 
 
@@ -287,6 +445,16 @@ class Handler(BaseHTTPRequestHandler):
             return None
         return RUN_TABLE.get(rid)
 
+    def experiment_of(self, eid):
+        if not re.fullmatch(r"e[0-9-]+", eid or ""):
+            return None
+        return EXPERIMENTS.get(eid)
+
+    def csv(self, name, text):
+        safe = re.sub(r"[^A-Za-z0-9_-]+", "-", name).strip("-") or "figures"
+        return self.send(200, text, "text/csv; charset=utf-8",
+                         {"Content-Disposition": f'attachment; filename="{safe}.csv"'})
+
     def do_GET(self):
         url = urlparse(self.path)
         parts = [p for p in url.path.split("/") if p]
@@ -294,33 +462,43 @@ class Handler(BaseHTTPRequestHandler):
             return self.static("index.html")
         if parts[:1] == ["static"] and len(parts) == 2:
             return self.static(parts[1])
-        if parts[:2] == ["static", "module_images"] and len(parts) == 3:
-            return self.static(parts[2], "module_images")
+        if parts[:1] == ["static"] and len(parts) == 3 and parts[1] in ("module_images", "fonts"):
+            return self.static(parts[2], parts[1])
         if parts == ["api", "catalogue"]:
             return self.send(*catalogue())
+        if parts == ["api", "experiments"]:
+            return self.send(200, {"experiments": experiment_list()})
+        if len(parts) == 4 and parts[:2] == ["api", "experiments"] and parts[3] == "csv":
+            exp = self.experiment_of(parts[2])
+            if exp is None:
+                return self.send(404, {"error": "There is no experiment with that name."})
+            with LOCK:
+                text = experiment_csv(exp["id"])
+            return self.csv(exp["name"], text)
         if parts == ["api", "runs"]:
             with LOCK:
-                runs = [summary(r) for r in sorted(RUN_TABLE.values(), key=lambda r: r["created"])]
+                runs = [summary(r) for r in sorted(RUN_TABLE.values(), key=lambda r: (r["created"], r.get("order", 0)))]
             return self.send(200, {"runs": runs})
         if len(parts) >= 3 and parts[:2] == ["api", "runs"]:
             run = self.run_of(parts[2])
             if run is None:
                 return self.send(404, {"error": "There is no saved run with that name."})
             if len(parts) == 3:
-                since = int((parse_qs(url.query).get("since") or ["0"])[0] or 0)
+                try:
+                    since = int((parse_qs(url.query).get("since") or ["0"])[0] or 0)
+                except ValueError:
+                    since = 0
                 with LOCK:
                     out = summary(run)
                     out["rows"] = run["rows"][since:]
                     out["since"] = since
-                    for k in ("settings_used", "spec", "detail", "error_step", "error_year", "guard"):
+                    for k in ("spec", "detail", "error_step", "error_year", "guard"):
                         out[k] = run.get(k)
                 return self.send(200, out)
             if parts[3] == "csv":
                 with LOCK:
                     text = to_csv(run)
-                safe = re.sub(r"[^A-Za-z0-9_-]+", "-", run["name"]).strip("-") or run["id"]
-                return self.send(200, text, "text/csv; charset=utf-8",
-                                 {"Content-Disposition": f'attachment; filename="{safe}.csv"'})
+                return self.csv(run["name"], text)
         return self.send(404, {"error": "Page not found."})
 
     def static(self, name, folder=None):
@@ -330,29 +508,56 @@ class Handler(BaseHTTPRequestHandler):
         if not path.is_file():
             return self.send(404, {"error": "Page not found."})
         ctype = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-                 ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png"}.get(path.suffix, "application/octet-stream")
+                 ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png",
+                 ".woff2": "font/woff2"}.get(path.suffix, "application/octet-stream")
         return self.send(200, path.read_bytes(), ctype)
 
     def do_POST(self):
         parts = [p for p in urlparse(self.path).path.split("/") if p]
         if parts == ["api", "runs"]:
             return self.send(*new_run(self.body()))
+        if parts == ["api", "experiments"]:
+            name = str(self.body().get("name") or "").strip()[:120]
+            if not name:
+                return self.send(*bad("Enter a name for the experiment."))
+            return self.send(200, {"id": make_experiment(name)})
+        if len(parts) == 4 and parts[:2] == ["api", "experiments"]:
+            exp = self.experiment_of(parts[2])
+            if exp is None:
+                return self.send(404, {"error": "There is no experiment with that name."})
+            action = parts[3]
+            if action == "runs":
+                return self.send(*new_runs(exp["id"], self.body()))
+            if action == "rename":
+                name = str(self.body().get("name") or "").strip()[:120]
+                if not name:
+                    return self.send(*bad("Enter a name for the experiment."))
+                with LOCK:
+                    exp["name"] = name
+                save_experiments()
+                return self.send(200, {"ok": True})
+            if action == "stop":
+                for run in runs_in(exp["id"]):
+                    if run["status"] in ("running", "waiting"):
+                        stop_run(run)
+                return self.send(200, {"ok": True})
+            if action == "delete":
+                runs = runs_in(exp["id"])
+                if any(r["status"] in ("running", "waiting") for r in runs):
+                    return self.send(*bad("Stop the runs in this experiment before you delete it."))
+                for run in runs:
+                    delete_run(run)
+                with LOCK:
+                    EXPERIMENTS.pop(exp["id"], None)
+                save_experiments()
+                return self.send(200, {"ok": True})
         if len(parts) == 4 and parts[:2] == ["api", "runs"]:
             run = self.run_of(parts[2])
             if run is None:
                 return self.send(404, {"error": "There is no saved run with that name."})
             action = parts[3]
             if action == "stop":
-                with LOCK:
-                    proc = PROCS.get(run["id"])
-                    if run["status"] == "waiting":
-                        run["status"] = "stopped"
-                        run["message"] = "You stopped this run before it began."
-                        run["finished"] = now()
-                    elif run["status"] == "running" and proc:
-                        run["stop_asked"] = True
-                        proc.terminate()
-                save(run)
+                stop_run(run)
                 return self.send(200, {"ok": True})
             if action == "rename":
                 name = str(self.body().get("name") or "").strip()[:120]
@@ -362,16 +567,19 @@ class Handler(BaseHTTPRequestHandler):
                     run["name"] = name
                 save(run)
                 return self.send(200, {"ok": True})
+            if action == "move":
+                eid = self.body().get("experiment")
+                if eid not in EXPERIMENTS:
+                    return self.send(*bad("That experiment no longer exists."))
+                with LOCK:
+                    run["experiment"] = eid
+                save(run)
+                return self.send(200, {"ok": True})
             if action == "delete":
                 with LOCK:
                     if run["status"] in ("running", "waiting"):
                         return self.send(*bad("Stop the run before you delete it."))
-                    RUN_TABLE.pop(run["id"], None)
-                for suffix in (".json", ".spec"):
-                    try:
-                        (RUNS / f"{run['id']}{suffix}").unlink()
-                    except OSError:
-                        pass
+                delete_run(run)
                 return self.send(200, {"ok": True})
         return self.send(404, {"error": "Page not found."})
 

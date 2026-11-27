@@ -3,3 +3,4 @@ __pycache__/
 *_output.txt
 workbench/runs/
 workbench/saved_runs/
+workbench/static/fonts/*.woff2
