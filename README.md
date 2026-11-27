@@ -1,0 +1,163 @@
+# A model of capital as power
+
+This is a computer simulation of an economy, built on the theory of capital as power by Jonathan Nitzan and Shimshon Bichler.
+
+You can use it to see what each part of the theory does. You switch parts on and off, run the simulation, and compare the results.
+
+It is unfinished. It does not predict anything, and it does not yet reproduce history. See "What works and what does not" below.
+
+## The theory in brief
+
+Most economics says that capital is a stock of useful things, such as machines, and that profit is a reward for producing.
+
+Nitzan and Bichler say capital is something else. It is the price that owners put on a firm's expected future earnings. They argue that those earnings depend on power: the ability of owners to shape society so that income flows to them.
+
+Three ideas from the theory matter most here.
+
+- **Owners try to beat the average.** A large firm does not aim for the highest possible profit. It aims to grow faster than everyone else. The theory calls this differential accumulation.
+- **Earnings often come from holding back.** A firm can earn more by keeping prices high and limiting what is produced. The theory calls this strategic sabotage.
+- **There are a few main ways to beat the average.** Large firms can buy other firms. They can raise prices faster than others. They can also hire faster or cut costs faster, though the theory says these rarely work for long.
+
+The theory is set out in *Capital as Power: A Study of Order and Creorder* (2009). The authors make it free to read at [bnarchives.net](https://bnarchives.net).
+
+This project is independent. The authors of the theory have not reviewed or endorsed it.
+
+## How the model works
+
+### Firms
+
+The model holds a list of firms. A run usually starts with 300,000 of them.
+
+The model records four numbers for each firm:
+
+- how many people it employs
+- how much it earns for each employee in a year
+- hype: how far owners' expectations run ahead of earnings
+- risk: how uncertain owners think those earnings are
+
+From these it works out what the firm is worth to its owners. The theory calls this the firm's capitalization.
+
+> capitalization = employees × earnings per employee × hype ÷ (risk × normal rate of return)
+
+For example, take a firm with 1,000 employees that earns 2 for each of them. Hype and risk are both 1, and the normal rate of return is 5 per cent. The firm's capitalization is 1,000 × 2 × 1 ÷ (1 × 0.05) = 40,000.
+
+The formula comes from the book. The model calls each firm a "claim", because what the model tracks is the owners' claim on the firm's earnings.
+
+### The main result
+
+The main number the model reports is differential capitalization.
+
+It is the average capitalization of the 100 largest firms, divided by the average capitalization of all firms. If the answer is 500, a typical top-100 firm is worth 500 times a typical firm.
+
+When this number rises, the largest firms are beating the average. When it falls, they are losing ground.
+
+The model also reports unemployment, prices, and the share of all income that goes to owners.
+
+### Modules
+
+The list of firms does nothing by itself. Every change comes from a module.
+
+Each module describes one way that power is used. Nine modules always run.
+
+| Module | What it does |
+|---|---|
+| Sabotage | Sets how much each firm adds to its wage costs when it sets a price. Firms in industries that a few large firms control add more. |
+| Green-field growth | Firms hire new workers, and new small firms are founded. |
+| Mergers | Large firms buy other firms. |
+| Cost cutting | Firms lower their costs. Rivals copy them, so the gain does not last. |
+| Stagflation | Large firms raise prices faster than small ones. Unemployment and risk rise with prices. |
+| Compass | Decides whether large firms lean towards mergers or towards raising prices. |
+| Resistance | Wage earners and others push back when prices, unemployment or mergers go too far. |
+| Envelope | Opens the boundaries between industries, sectors and countries, so that large firms can buy firms beyond them. |
+| Debt | Records lending. |
+
+About 34 more modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
+
+You can replace any module with a different version. This is deliberate. The theory describes relations between people, and there is often more than one reasonable way to write such a relation as a rule.
+
+### Rules the model follows
+
+- **Nothing comes from outside.** Nobody types in a crisis or a war. If a crisis happens in a run, the modules produced it.
+- **Government is not a separate actor.** The theory treats governments and corporations as parts of one system of power. The model does the same.
+- **The model can fail.** The theory says that large firms do not always win. A model in which they always won would be wrong.
+- **The model does not use the usual building blocks of economics.** There is no "utility", no labour theory of value and no balance that the economy returns to.
+
+## Run it
+
+You need Python 3 and the `numpy` package.
+
+Run the nine main modules for 60 years, starting with 30,000 firms:
+
+```
+python full.py 30000 60
+```
+
+The three numbers you can give are the number of firms, the number of years and a seed for the random numbers. If you leave them out, the model runs 300,000 firms for 119 years. That takes about 10 minutes.
+
+Add optional modules by name:
+
+```
+python full.py 30000 60 0 --with labour,public_debt
+```
+
+Small runs are faster but less reliable. With fewer firms, the top 100 are a bigger part of the whole, and the results change.
+
+Check that the bookkeeping is correct:
+
+```
+python checks.py
+```
+
+## What works and what does not
+
+What works:
+
+- The bookkeeping is exact. The model can say how much of any year's change came from each module.
+- The nine main modules run together and produce waves of mergers, periods of rising prices with unemployment, and resistance, without anyone entering them by hand.
+- Each optional module runs when it is switched on alone.
+
+What does not work yet:
+
+- **Many modules together.** With most optional modules on, unemployment reaches levels that are not believable.
+- **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
+- **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
+- **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.
+
+## What is in this folder
+
+| File or folder | What it is |
+|---|---|
+| `core.py` | The list of firms and the bookkeeping. |
+| `modules/` | One file for each module. |
+| `registry.py` | The names of the optional modules. |
+| `full.py` | Runs the model. |
+| `stage2.py` | Runs only three modules: sabotage, green-field growth and mergers. |
+| `checks.py` | Tests of the bookkeeping. |
+| `modules.md` | What each module does, and the passage in the book it is based on. |
+
+## How to contribute
+
+You can report a fault, suggest a change or send a pull request on GitHub.
+
+### Add or replace a module
+
+A module is one Python file in `modules/` that holds one class. Look at `modules/costcutting.py` for a short example.
+
+1. Give the class a `name`.
+2. List the numbers it uses from other modules in `reads`, and the numbers it publishes in `supplies`.
+3. Put every setting in the class's `__init__`, with a default value.
+4. Write a `propose` method. Each year it looks at the firms and returns a list of the changes it wants. The module never changes a firm directly.
+5. Add the module to `registry.py`, so that people can switch it on by name.
+6. Describe the module in `modules.md`.
+
+### What we ask of a module
+
+- **Base it on the literature where you can.** Say which passage each rule comes from. If a rule is your own, say so.
+- **Make every number a setting.** Say whether it comes from a source or is your own choice.
+- **Do not add limits to make a run behave.** If a number runs away, something in the model should hold it back, as something does in the world.
+- **Keep to the rules under "Rules the model follows".**
+- **Run `python checks.py`.** Every check must pass.
+
+### Writing
+
+Write for a reader who is curious and new to the project. Use everyday words, give an example, and explain each term from the theory the first time you use it.
