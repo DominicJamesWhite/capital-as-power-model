@@ -149,12 +149,13 @@ Privatisation provokes no resistance of its own, which follows the book's remark
 population is "impartial to breadth", and may be too kind.
 """
 import numpy as np
-from core import Scale, Publish, Transfer, top_positions, WAGE_EARNERS, GOVERNMENT
+from core import Scale, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS, GOVERNMENT
 
 TAX = "tax for public employment"       # this module's income component: what each firm pays, for each employee; the core sets it
 TAX_EARNINGS = "tax on earnings for public employment"
 TAX_WAGES = "tax on wages for public employment"
 PAY = "pay of public employees"
+LENT = "lent to the government for public employment"   # below 0 in a year, repaid by it
 
 
 class Privatisation:
@@ -191,7 +192,8 @@ class Privatisation:
         self.planned_build = 0.0        # public hiring planned last year for this year, in employees
         self.taken = 0.0                # employees of the top hundred that came from the pool (grows with the working population)
         self.door = 0.0
-        self.rate = 0.0                 # the year's tax for the pay of public employees, as a part of the wage bill and of earnings
+        self.rate = 0.0                 # the tax for the pay of public employees, as a part of the wage bill and of earnings; set in law once
+        self.in_law = False             # whether the rate has been set
 
     def readouts(self, L, held):
         W = L.shared["workforce"]
@@ -252,10 +254,16 @@ class Privatisation:
         pay = self.pool * wage
         wages = wage * employed
         base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
-        self.rate = float(pay / (wages + base.sum()))
-        if pay > 0:
+        # The rate is set in law in the first year with public pay, to cover that year's pay, and stays put.
+        # The difference between the pay and the tax at that rate is lent by owners, or repays them.
+        if not self.in_law and pay > 0:
+            self.rate, self.in_law = float(pay / (wages + base.sum())), True
+        if self.in_law:
+            tax = self.rate * (wages + base.sum())
             changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=GOVERNMENT, source=self.name),
                         Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
-                                 amount=self.rate * wages),
-                        Transfer(PAY, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay)]
+                                 amount=self.rate * wages)]
+            changes += lend_to_government(LENT, float(pay - tax), L, GOVERNMENT, self.name)
+            if pay > 0:
+                changes.append(Transfer(PAY, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay))
         return changes + self.readouts(L, held + take)

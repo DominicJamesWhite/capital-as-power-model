@@ -127,7 +127,7 @@ close any boundary. The module holds no resistance
 to war itself.
 """
 import numpy as np
-from core import Scale, Publish, Transfer, top_positions, WAGE_EARNERS
+from core import Scale, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS, GOVERNMENT
 
 CONFLICT_LABEL, UNSET_LABEL = 1, -1     # the codes the coalitions module uses for its labels
 
@@ -135,6 +135,8 @@ TAX = "tax for military orders"         # this module's income component: what e
 ARMED_FORCES = "armed forces"           # a party that spends all it receives on what firms sell: the organ of government that places the orders
 TAX_EARNINGS = "tax on earnings for military orders"
 TAX_WAGES = "tax on wages for military orders"
+ORDERS = "military orders paid by the government"
+LENT = "lent to the government for military orders"     # below 0 in a year, repaid by it
 
 
 class Force:
@@ -165,7 +167,8 @@ class Force:
         self.level = 0.0                    # the level of organised force, from 0 to 1
         self.jobs = 0.0                     # military jobs now on the contractors' books
         self.planned = 0.0                  # hiring (+) or dismissals (-) planned last year for this year
-        self.rate = 0.0                     # the year's tax for military orders, as a part of the wage bill and of earnings
+        self.rate = 0.0                     # the tax for military orders, as a part of the wage bill and of earnings; set in law once
+        self.in_law = False                 # whether the rate has been set
 
     def contractors(self, L):
         """Positions of the arms contractors, and the top hundred."""
@@ -232,9 +235,17 @@ class Force:
         orders = self.jobs * price
         wages = L.shared["wage"] * employed
         base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
-        self.rate = float(orders / (wages + base.sum()))
-        if orders > 0:
-            changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=ARMED_FORCES, source=self.name),
-                        Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=ARMED_FORCES, source=self.name,
+        # The rate is set in law in the first year with orders, to cover them, and stays put. The tax goes to
+        # the government, which pays the armed forces for the orders. The difference is lent by owners, or
+        # repays them.
+        if not self.in_law and orders > 0:
+            self.rate, self.in_law = float(orders / (wages + base.sum())), True
+        if self.in_law:
+            tax = self.rate * (wages + base.sum())
+            changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=GOVERNMENT, source=self.name),
+                        Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
                                  amount=self.rate * wages)]
+            changes += lend_to_government(LENT, float(orders - tax), L, GOVERNMENT, self.name)
+            if orders > 0:
+                changes.append(Transfer(ORDERS, payer=GOVERNMENT, receiver=ARMED_FORCES, source=self.name, amount=orders))
         return changes + self.readouts(L)

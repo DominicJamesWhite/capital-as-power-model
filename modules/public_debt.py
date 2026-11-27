@@ -137,7 +137,7 @@ through the corporations and funds that they own. Hager's finding that policy pa
 speak the language of bondholders has no place in this rule.
 """
 import numpy as np
-from core import Transfer, Publish, top_positions, WAGE_EARNERS, GOVERNMENT
+from core import Transfer, Publish, top_positions, lend_to_government, WAGE_EARNERS, GOVERNMENT
 
 INCOME = "public debt income"   # this module's income component: interest received less tax paid, for each employee; the core sets it from the transfers below
 RICH = "richest households"                             # a party that only receives: the richest one per cent of households
@@ -150,6 +150,7 @@ TO_WAGES = "interest on the public debt, to households outside the richest one p
 TO_RICH = "interest on the public debt, to the richest one per cent of households"
 TO_REST = "interest on the public debt, to holders outside the ledger"
 INTEREST = (TO_FIRMS, TO_WAGES, TO_RICH, TO_REST)
+LENT = "lent to the government for interest on the public debt"   # below 0 in a year, repaid by it
 
 
 class PublicDebt:
@@ -187,6 +188,7 @@ class PublicDebt:
         self.tax_advantage = tax_advantage      # fall in dominant capital's tax rate, as a part of the rate of others, per unit of the top hundred's part of all capitalization
         self.wage_tax = wage_tax                # the rate on wages as a part of the rate on earnings; 1 means one rate on all income
         self.top = top
+        self.rate = None                        # the rate of tax for interest, set in law in the first year and kept
 
     def start(self, L):
         # No firm, old or new, starts with public-debt income. The core sets the component each year
@@ -225,7 +227,9 @@ class PublicDebt:
         relative = 1.0 - float(np.clip(self.tax_advantage * tie * (1.0 - resistance), 0.0, 1.0))
         liable = base * np.where(dominant, relative, 1.0)
         taxable = self.wage_tax * wages + liable.sum()
-        rate = interest / taxable
+        if self.rate is None and interest > 0:  # the rate in law covers the first year's interest and stays put
+            self.rate = float(interest / taxable)
+        rate = self.rate or 0.0
         paid = rate * liable
         wage_tax = rate * self.wage_tax * wages
 
@@ -241,6 +245,8 @@ class PublicDebt:
                      Transfer(TO_WAGES, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=to_wages),
                      Transfer(TO_RICH, payer=GOVERNMENT, receiver=RICH, source=self.name, amount=to_rich),
                      Transfer(TO_REST, payer=GOVERNMENT, receiver=REST, source=self.name, amount=to_rest)]
+        # Owners lend what the tax at the rate in law does not cover, or are repaid what it collects beyond the interest.
+        transfers += lend_to_government(LENT, float(interest - rate * taxable), L, GOVERNMENT, self.name)
         # The part of last year's interest that the government was able to pay (1 in the first year).
         last = A.get("transfers", {})
         asked = sum(last[label]["asked"] for label in INTEREST if label in last)
@@ -255,8 +261,8 @@ class PublicDebt:
             "public_debt_markup_part": markup_part,                                        # by industry; no module reads it
             "public_debt_dominant": float(self.firms_part * holding[top].sum()),          # top hundred's part of the whole public debt
             "public_debt_dominant_of_firms": float(holding[top].sum()),                   # top hundred's part of what firms hold
-            "public_debt_tax_dominant": float(paid[top].sum() / interest),                 # part of the tax that the top hundred pay
-            "public_debt_tax_wages": float(wage_tax / interest),                           # part of the tax that is paid from wages
+            "public_debt_tax_dominant": float(paid[top].sum() / max(paid.sum() + wage_tax, 1e-300)),               # part of the tax that the top hundred pay
+            "public_debt_tax_wages": float(wage_tax / max(paid.sum() + wage_tax, 1e-300)),                         # part of the tax that is paid from wages
             "public_debt_relative_tax": relative,                                          # dominant capital's rate as a part of the rate of others
             "public_debt_net_dominant": float((received[top] - paid[top]).sum() / base[top].sum()),          # net gain of the top hundred, as a part of their other earnings
             "public_debt_net_others": float((received[~dominant] - paid[~dominant]).sum() / base[~dominant].sum()),   # the same for all other firms

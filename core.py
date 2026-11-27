@@ -48,6 +48,9 @@ before any transfer. Wage earners have the wage bill. The government has what it
 it received earlier and has not paid out, and what it receives in the same year. What a payer
 cannot pay, the receiver does not get. The net amount that each firm receives or pays under a
 module's transfers is entered by the core in an income component of that module.
+A transfer can be marked as a loan: owners lend to the government out of their earnings of the
+year, or the government repays them. A loan is paid as any transfer is, and it is no income to
+anybody, so it is not entered in the component. The record of the year shows what was lent.
 
 Two kinds of money are spent on goods and are therefore not transfers between the parties above.
 A module can name a party that spends all it receives, in the same year, on what firms sell: an
@@ -183,6 +186,9 @@ class Transfer:
               (the parts are divided by their sum).
     amount    the money asked from a payer that is a party. Left out when firms pay: the amount
               asked is then the sum of the array.
+    loan      True when the money is lent or repaid and is no income to anybody: owners who lend to
+              the government pay it out of their earnings of the year, and their earnings do not
+              fall; a repayment adds nothing to the earnings of the firms that receive it.
     The core pays out no more than the payer has (see Model._settle). The proposing module must
     have registered an income component with transfers=True if firms pay or receive: the core
     enters there, for each firm, what it received less what it paid, for each employee."""
@@ -191,6 +197,25 @@ class Transfer:
     receiver: object
     source: str
     amount: float = None
+    loan: bool = False
+
+
+def lend_to_government(label, gap, L, receiver, source):
+    """The transfer that covers a gap between what a module makes the government pay and the tax it
+    collects for it. Above 0, owners lend the gap, each firm in proportion to its earnings, which is
+    what its owners have in the year; below 0, the government repays as much to the owners, each firm
+    in proportion to its capitalization, as holdings of the debt are (Hager 2015). It repays no more
+    than the debt it owes; what it collects beyond that it holds. Returns a list."""
+    if not (gap != 0.0 and np.isfinite(gap)):
+        return []
+    if gap > 0:
+        have = np.maximum(L.n * L.e, 0.0)
+        return [Transfer(label, payer=gap * have / have.sum(), receiver=receiver, source=source, loan=True)] if have.sum() > 0 else []
+    owed = max(float(L.accounts.get("government_debt", 0.0)), 0.0)      # the debt last published by the debt module
+    K = np.maximum(L.cap(), 0.0)
+    if K.sum() <= 0 or owed <= 0:
+        return []
+    return [Transfer(label, payer=GOVERNMENT, receiver=K, source=source, amount=min(-gap, owed), loan=True)]
 
 
 # ---------------------------------------------------------------- components
@@ -619,9 +644,11 @@ class Model:
         # reads it the next year, like every account, to learn whether its transfers were paid in full.
         paid = {}
         for t in self.settlement["transfers"]:
-            row = paid.setdefault(t["label"], {"asked": 0.0, "paid": 0.0})
+            row = paid.setdefault(t["label"], {"asked": 0.0, "paid": 0.0, "lent_to_government": 0.0})
             row["asked"] += t["asked"]
             row["paid"] += t["paid"]
+            if t["loan"]:                   # money lent to the government (above 0) or repaid by it (below 0)
+                row["lent_to_government"] += t["paid"] * ((t["payer"] == "firms") - (t["receiver"] == "firms"))
         # "wage_earners_net": what wage earners received in transfers less what they paid, as a part of the wage bill.
         w = self.settlement["parties"].get(WAGE_EARNERS)
         net = (w["received"] - w["paid"]) / w["wage_bill"] if w and w["wage_bill"] > 0 else 0.0
@@ -1002,13 +1029,15 @@ class Model:
             t = row["t"]
             row["paid"] = float(total)
             if paid_by_firms is not None:
-                net[t.source] = net.get(t.source, 0.0) - paid_by_firms
+                if not t.loan:              # money lent is paid out of earnings and does not lower them
+                    net[t.source] = net.get(t.source, 0.0) - paid_by_firms
                 row["paid_top"] = float(paid_by_firms[group].sum())
             else:
                 paid_out[t.payer] += float(total)
             if row["parts"] is not None:
                 share = row["parts"] * (total / row["parts"].sum()) if total > 0 else np.zeros(count)
-                net[t.source] = net.get(t.source, 0.0) + share
+                if not t.loan:              # a repayment is no income
+                    net[t.source] = net.get(t.source, 0.0) + share
                 row["received_top"] = float(share[group].sum())
             else:
                 received[t.receiver] += float(total)
@@ -1062,7 +1091,7 @@ class Model:
             record.append({"label": t.label, "source": t.source,
                            "payer": t.payer if row["ask"] is None else "firms",
                            "receiver": t.receiver if row["parts"] is None else "firms",
-                           "asked": row["asked"], "paid": row["paid"],
+                           "asked": row["asked"], "paid": row["paid"], "loan": bool(t.loan),
                            "paid_by_top": row.get("paid_top", 0.0),            # the part the hundred largest firms paid
                            "received_by_top": row.get("received_top", 0.0)})   # the part they received
         return {"transfers": record, "parties": parties}

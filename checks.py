@@ -20,7 +20,7 @@ Run from the folder that holds this file:
 """
 import numpy as np
 from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Publish, Transfer, LedgerError,
-                  readouts, top_positions, group_value, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT)
+                  readouts, top_positions, group_value, lend_to_government, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT)
 
 
 def make_ledger(count=3000, seed=1):
@@ -528,6 +528,46 @@ def check_transfers():
     # Total income is unchanged by any transfer: the capitalist share is the firms' earnings over the same total.
     assert np.isclose(r["capital_share"], (L.n * L.e).sum() / (140.0 + 280.0))
 
+    # 1b. A loan. Owners lend the government 30 out of their earnings (10 from each firm) and it pays wage earners 30:
+    #     the earnings do not fall. The next year wage earners are taxed 30 and the government repays the owners:
+    #     the earnings do not rise. The record shows 30 lent and 30 repaid.
+    def lend(L):
+        if L.holds[GOVERNMENT] == 0 and not getattr(L, "_lent", False):
+            L._lent = True
+            return [Transfer("loan", payer=np.array([10.0, 10.0, 10.0]), receiver=GOVERNMENT, source="levy", loan=True),
+                    Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source="levy", amount=30.0)]
+        return [Transfer("tax", payer=WAGE_EARNERS, receiver=GOVERNMENT, source="levy", amount=30.0),
+                Transfer("repaid", payer=GOVERNMENT, receiver=np.ones(3), source="levy", amount=30.0, loan=True)]
+
+    m = Model(small(), [Fixed("levy", lend, begin)], top=1)
+    r1 = m.step()
+    assert np.allclose(m.L.n * m.L.e, [50.0, 50.0, 40.0]) and np.isclose(m.L.accounts["transfers"]["loan"]["lent_to_government"], 30.0)
+    r2 = m.step()
+    assert np.allclose(m.L.n * m.L.e, [50.0, 50.0, 40.0]) and np.isclose(m.L.accounts["transfers"]["repaid"]["lent_to_government"], -30.0)
+    assert abs(m.L.holds[GOVERNMENT]) < 1e-9 and np.isclose(r1["capital_share"], 140.0 / 420.0)
+
+    # 1c. The holders of the debt. A stand-in lends the government 1,000 once. The debt module adds it to the debt
+    #     the next year, and from then on taxes wages and earnings at one rate for holders_press times what is added,
+    #     and repays that much to owners, so the added debt falls by a twentieth each year.
+    from modules.debt import Debt
+    def lend_once(L):
+        if not getattr(L, "_lent", False):
+            L._lent = True
+            return [Transfer("loan", payer=1000.0 * L.n * L.e / (L.n * L.e).sum(), receiver=GOVERNMENT, source="lender", loan=True)]
+        return []
+    def lender_start(L):
+        L.add_component("lender income", "lender", kind="income", transfers=True)
+    m = Model(make_ledger(), [Debt(), Fixed("lender", lend_once, lender_start)])
+    rs = [m.step() for _ in range(4)]
+    debt = m.modules[0] if isinstance(m.modules[0], Debt) else m.modules[1]
+    pressed = [sum(t["paid"] for t in r["transfers"] if t["label"].startswith("tax on")) for r in rs]
+    repaid = [sum(t["paid"] for t in r["transfers"] if t["label"] == "repaid to the holders of the public debt") for r in rs]
+    assert pressed[0] == 0.0 and np.isclose(pressed[1], 50.0) and np.isclose(pressed[2], 47.5) and np.allclose(pressed, repaid)
+    assert np.isclose(debt.added, 1000.0 * 0.95 ** 2)
+    # With nothing lent, the debt module proposes no transfer.
+    m = Model(make_ledger(), [Debt()])
+    assert all(not m.step()["transfers"] for _ in range(3))
+
     # 2. Wage earners asked for more than the wage bill pay the wage bill. What the government does not
     #    pay out it holds, and it can pay it out in a later year.
     def squeeze(L):
@@ -607,7 +647,9 @@ def check_transfers():
         for key in a["attribution"]:
             assert a["attribution"][key] == b["attribution"][key], key
     print(f"13. Transfers: a firm asked for 100 that has 40 pays 40, and a government asked for 90 that has "
-          f"received 50 pays five ninths of each payment. Wage earners asked for more than the wage bill pay the "
+          f"received 50 pays five ninths of each payment. Owners who lend the government 30 keep their earnings, and "
+          f"so do owners who are repaid. Once owners have lent the government 1,000, the holders of the debt have it "
+          f"tax 50 the next year and 47.5 the year after, and repay as much; with nothing lent there is no such tax. Wage earners asked for more than the wage bill pay the "
           f"wage bill. The core refuses a transfer with an unknown side, a payment by a party that only receives, "
           f"a negative amount, and a direct change of a component that records transfers. A tax fixed before a "
           f"markup falls by 95 per cent is paid only as far as the earnings reach, and no earnings go below zero. "
@@ -678,39 +720,48 @@ def check_sales_account():
             m.step()
             assert np.isclose(m.step()["published"]["sales_account"]["unsold"], unsold)
 
-    # The tax set in law. A stand-in module taxes wage earners 115 in the first year and 230 in the second, and the
-    # government pays it all out to them, as the pay of public employees is paid. Firms keep nothing, so owners lay
-    # out all they receive and nothing is unsold at first. The wages and priced earnings are 1,150 in both years, so the rates charged are 0.1 and 0.2. The rate held starts at 0.1 and moves a twentieth of
-    # the way to 0.2, to 0.105. So 0.095 x 1,150 = 109.25 is not collected: the government borrows it, wage earners
-    # keep 1,000 / 1,150 of it and owners the rest. In the third year the tax falls back to 115: the rate held moves
-    # to 0.10475 and the government collects 0.95 x 0.005 x 1,150 more than charged and repays it. With the
-    # setting at 1 the tax covers what is paid out in every year and nothing is borrowed.
+    # A tax set in law. A stand-in module pays wage earners 115 in the first year and 230 in the second, taxes them 115
+    # in both, and has owners lend the difference of 115 in the second. Firms keep nothing, so owners lay out all they
+    # receive and nothing is unsold in the first year. In the second, the government had 230 to spend and owners
+    # 115 less than they received; nothing is unsold, because the loan is spent by the government. In the third year
+    # the pay falls to 0 and the 115 repays owners, who do not spend it.
     class Levy:
-        name, supplies = "levy", ("jobs_created",)
+        name, supplies = "levy", ("jobs_created", "government_debt")
 
         def __init__(self):
             self.year = 0
 
         def start(self, L):
-            return {"jobs_created": 0.0}
+            L.add_component("levy income", self.name, kind="income", transfers=True)
+            return {"jobs_created": 0.0, "government_debt": 1000.0}     # a debt that the government can repay
 
         def propose(self, L, rng):
             self.year += 1
-            amount = 230.0 if self.year == 2 else 115.0
-            return [Transfer("levy", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=amount),
-                    Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=amount)]
+            pay = {1: 115.0, 2: 230.0}.get(self.year, 0.0)
+            out = [Transfer("levy", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=115.0)]
+            out += lend_to_government("lent", pay - 115.0, L, GOVERNMENT, self.name)
+            if pay > 0:
+                out.append(Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay))
+            return out
 
-    for follows, borrowed, repaid in (0.05, 0.095 * 1150, 0.95 * 0.005 * 1150), (1.0, 0.0, 0.0):
-        L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
-        m = Model(L, [Levy(), Sales(top=1, tax_follows=follows, retained=0.0, payout_follows=1.0)], top=1)
-        with np.errstate(divide="ignore"):
-            rs = [m.step() for _ in range(4)]      # each year's account is of the year before
-        a, b = rs[2]["published"]["sales_account"], rs[3]["published"]["sales_account"]
-        assert np.isclose(a["tax_charged"], 230.0) and np.isclose(a["borrowed_by_government"], borrowed)
-        assert np.isclose(a["wage_earners_had"], 1000.0 + borrowed * 1000.0 / 1150.0)
-        assert np.isclose(rs[2]["published"]["deficit_borrowing"], borrowed) and a["unsold"] == 0.0
-        assert np.isclose(b["borrowed_by_government"], -repaid)
-        assert np.isclose(b["owners_income"] - b["priced_earnings"] + b["unsold"], -repaid * 150.0 / 1150.0)
+    L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
+    m = Model(L, [Levy(), Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)], top=1)
+    with np.errstate(divide="ignore"):
+        rs = [m.step() for _ in range(4)]      # each year's account is of the year before
+    a, b = rs[2]["published"]["sales_account"], rs[3]["published"]["sales_account"]
+    assert np.isclose(a["borrowed_by_government"], 115.0) and np.isclose(a["wage_earners_had"], 1115.0)
+    assert np.isclose(a["owners_had"], a["owners_income"] - 115.0) and a["unsold"] == 0.0
+    assert np.isclose(rs[2]["published"]["deficit_part"], 115.0 / 1150.0)
+    assert np.isclose(b["borrowed_by_government"], -115.0) and np.isclose(b["owners_had"], b["owners_income"] + 115.0)
+    assert np.isclose(rs[2]["capital_share"], 150.0 / 1150.0)     # the loan lowers no earnings
+    # The government repays no more than it owes. With a debt of 50, the surplus of 115 repays 50 and the government holds 65.
+    Levy.start = lambda self, L: (L.add_component("levy income", self.name, kind="income", transfers=True),
+                                  {"jobs_created": 0.0, "government_debt": 50.0})[1]
+    m = Model(Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0]),
+              [Levy(), Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)], top=1)
+    with np.errstate(divide="ignore"):
+        r3 = [m.step() for _ in range(3)][-1]
+    assert np.isclose(m.L.accounts["transfers"]["lent"]["lent_to_government"], -50.0) and np.isclose(r3["parties"][GOVERNMENT]["holds"], 65.0)
 
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
@@ -721,14 +772,12 @@ def check_sales_account():
               "externalisation", "proletarianization", "wants"]]
     years_unsold = years = stopped = years_borrowed = years_repaid = 0
     largest = 0.0
-    # The second mix runs with the tax set in law, so that the government borrows and repays.
-    for names, follows in zip(mixes, (1.0, 0.05)):
+    for names in mixes:
         histories = []
         for order in names, names[::-1]:
             optional = registry.make(order)
-            next(x for x in optional if x.name == "sales").tax_follows = follows
             m = Model(starting_ledger(0, 5000), all_modules() + optional, seed=0)
-            kept, rate_before = 0.0, None
+            kept = 0.0
             for step in range(60):
                 try:
                     r = m.step()
@@ -747,31 +796,21 @@ def check_sales_account():
                     parties, pub = last["parties"], last["published"]
                     net = {p: row["received"] - row["paid"] for p, row in parties.items()}
                     to_firms = sum(t["paid"] * ((t["receiver"] == "firms") - (t["payer"] == "firms"))
-                                   for t in last["transfers"])
+                                   for t in last["transfers"] if not t["loan"])     # a loan is no income
                     organs = sum(row["received"] for p, row in parties.items() if p in m.L.buyers)
                     holders = sum(row["received"] for p, row in parties.items()
                                   if p not in (WAGE_EARNERS, GOVERNMENT) and p not in m.L.buyers)
                     lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
-                    relief = a["borrowed_by_government"] * a["wages"] / (a["wages"] + a["priced_earnings"])
-                    assert a["bought_by_wage_earners"] <= max(a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + relief, 0.0) + kept + tol
+                    assert a["bought_by_wage_earners"] <= max(a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0) + kept + tol
                     assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept + tol
-                    # What the government borrowed is the tax charged less the tax at the rate held, and the rate held
-                    # lies between its last value and the rate charged.
-                    charged = (net.get(GOVERNMENT, 0.0) + parties.get(GOVERNMENT, {}).get("paid", 0.0) + organs) / (a["wages"] + a["priced_earnings"])
-                    assert np.isclose(a["tax_charged"], charged * (a["wages"] + a["priced_earnings"]))
-                    if rate_before is not None:
-                        assert min(rate_before, charged) - 1e-12 <= a["tax_rate_held"] <= max(rate_before, charged) + 1e-12
-                        assert np.isclose(a["borrowed_by_government"], a["tax_charged"] - a["tax_rate_held"] * (a["wages"] + a["priced_earnings"]),
-                                          atol=tol)
-                    if a["tax_charged"] > 0:
-                        rate_before = a["tax_rate_held"]
-                    if follows == 1.0:
-                        assert a["borrowed_by_government"] == 0.0
-                    assert np.isclose(pub_now["deficit_borrowing"], a["borrowed_by_government"])
+                    # What the government borrowed is what the record shows owners lent, less what they were repaid.
+                    loans = sum(t["paid"] * ((t["payer"] == "firms") - (t["receiver"] == "firms"))
+                                for t in last["transfers"] if t["loan"])
+                    assert np.isclose(a["borrowed_by_government"], loans, atol=tol)
                     years_borrowed += a["borrowed_by_government"] > tol
                     years_repaid += a["borrowed_by_government"] < -tol
                     assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
-                                                     - relief + repaid - lent + tol)
+                                                     - a["borrowed_by_government"] + repaid - lent + tol)
                 kept = a["kept_for_next_year"]
                 years += 1
                 years_unsold += a["unsold"] > 0
@@ -788,9 +827,10 @@ def check_sales_account():
           f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
-          f"record of transfers shows it had. When the tax charged doubles from a rate of 0.1 to 0.2, the rate held moves "
-          f"to 0.105 and the government borrows 109.25, which wage earners and owners keep; when it falls back, the "
-          f"government repays. With the tax set in law the government borrowed in {years_borrowed} of those years and "
+          f"record of transfers shows it had. When the government pays out 115 more than a tax set in law collects, "
+          f"owners lend it 115, have 115 less to spend, and nothing is unsold; when the pay stops, the tax repays them, "
+          f"but no more than the government owes. "
+          f"The loans lower no earnings. In the long runs the government borrowed in {years_borrowed} of those years and "
           f"repaid in {years_repaid}. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
           f"what was offered. Opposite listing orders gave identical figures."
           + (f" The guard stopped {stopped} of the 4 runs before the 60th year." if stopped else ""))
@@ -913,7 +953,7 @@ def check_payers():
     # 2. A run with the four modules and the sales module.
     names = ["sales", "force", "privatisation", "externalisation", "wants"]
     m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
-    arms = pay = burdens = advertising = 0.0
+    arms = pay = burdens = advertising = short = 0.0
     kept = 0.0
     for step in range(45):
         outlay = float((m.L.n * m.L.shared["wage"] * m.L.components[OUTLAY]).sum())
@@ -921,12 +961,16 @@ def check_payers():
         rows = {t["label"]: t for t in r["transfers"]}
         parties = r["parties"]
         tol = 1e-9 * r["employment"] * m.L.shared["wage"]
-        # The armed forces receive the tax for military orders and hold nothing.
-        tax = sum(rows[k]["paid"] for k in rows if k.endswith("for military orders"))
+        # The armed forces receive the orders from the government and hold nothing. The government pays the orders,
+        # public employees and people out of work in full, from the tax and what owners lent, and keeps nothing.
+        tax = rows["military orders paid by the government"]["paid"] if "military orders paid by the government" in rows else 0.0
         assert abs(parties[ARMED_FORCES]["received"] - tax) <= tol and parties[ARMED_FORCES]["holds"] is None
-        # The government pays public employees what it collected for them, and keeps nothing.
-        collected = sum(rows[k]["paid"] for k in rows if k.endswith("for public employment"))
-        assert abs(rows["pay of public employees"]["paid"] - collected) <= tol
+        collected = rows["pay of public employees"]["paid"]
+        # Firms whose earnings fell during the year may lend or pay a little less than they were asked, and the
+        # government then pays a little less in the same proportion.
+        for k in ("pay of public employees", "military orders paid by the government", "pay to people out of work"):
+            if k in rows:
+                short = max(short, 1.0 - rows[k]["paid"] / rows[k]["asked"])
         assert abs(parties[GOVERNMENT]["holds"]) <= tol
         # Wage earners pay for the burdens on employees and communities, in full.
         b = rows["burdens borne by employees and communities"]
@@ -942,8 +986,7 @@ def check_payers():
             last = m.history[-2]["parties"]
             assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept) <= tol
             net = last[WAGE_EARNERS]["received"] - last[WAGE_EARNERS]["paid"]
-            relief = a["borrowed_by_government"] * a["wages"] / (a["wages"] + a["priced_earnings"])   # tax not collected
-            assert abs(a["wage_earners_had"] - max(a["wages"] + net + relief, 0.0) - kept_wages) <= tol
+            assert abs(a["wage_earners_had"] - max(a["wages"] + net, 0.0) - kept_wages) <= tol
         kept, kept_wages = 0.0, 0.0
         if a["kept_for_next_year"] > 0:          # money that found no goods is split between the two; follow it from the account
             kept = a["government_had"] - a["bought_by_government"]
@@ -951,12 +994,12 @@ def check_payers():
         income = r["employment"] * m.L.shared["wage"] / (1 - r["capital_share"])
         arms, pay = max(arms, tax / income), max(pay, collected / income)
         burdens, advertising = max(burdens, b["paid"] / income), max(advertising, a["bought_by_firms"] / a["offered"])
-    assert arms > 0 and pay > 0 and burdens > 0 and advertising > 0
+    assert arms > 0 and pay > 0 and burdens > 0 and advertising > 0 and short < 0.05
     print(f"16. Payers: a party that spends all it receives holds nothing. In a run of 45 years from 5,000 firms with "
           f"the sales, force, privatisation, externalisation and wants modules, the armed forces received exactly the "
-          f"tax for military orders (at most {arms:.1%} of all income) and the sales account counted it as bought by "
-          f"the government; the government paid public employees exactly the tax collected for them (at most "
-          f"{pay:.1%}); wage earners paid in full for the burdens on employees and communities (at most "
+          f"military orders that the government paid (at most {arms:.1%} of all income) and the sales account counted "
+          f"them as bought by the government; the government paid out all it collected and borrowed and kept nothing, "
+          f"public employees (at most {pay:.1%}) among them, short of what was asked by at most {short:.2%} in a year; wage earners paid in full for the burdens on employees and communities (at most "
           f"{burdens:.1%}); and the outlay on advertising (at most {advertising:.1%} of what firms offered) was on "
           f"both sides of the sales account.")
 
