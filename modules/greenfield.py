@@ -19,9 +19,10 @@ from core import Scale, Found, Set, Publish, top_positions
 class Greenfield:
     name = "greenfield"
     reads = ("hire_small", "hire_dominant", "entry_open")
-    supplies = ("new_hires", "industry_growth")
+    supplies = ("new_hires", "jobs_created", "industry_growth")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "new_hires": ("New hires", "number", "Employees added by hiring in the year."),
+        "jobs_created": ("Jobs created", "number", "Employees added by the firms that grew, before the cutbacks of other firms are taken off."),
     }
 
     def __init__(self, new_firm_share=0.35, new_firm_size=0.15, floor=0.005, top=100):
@@ -33,7 +34,7 @@ class Greenfield:
         self.withheld = 0     # new firms that the rounding asked for and the year's hiring could not staff
 
     def start(self, L):
-        return {"new_hires": 0.0}
+        return {"new_hires": 0.0, "jobs_created": 0.0}
 
     def propose(self, L, rng):
         k, ind, n = L.sector_of.size, L.ind, L.n
@@ -45,7 +46,7 @@ class Greenfield:
         A = L.accounts
         rate = np.where(dominant, A["hire_dominant"][ind], A["hire_small"][ind])
         rate = rate - A.get("crisis", 0.0)                       # stagflation's cut in hiring: the crisis
-        rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0)   # dismissals for want of sales (optional module)
+        rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0)   # production held back for want of sales (optional module); 0 without it
         jobs = rate * n
         up = jobs > 0
         jobs[up] *= 1 - min(1.0, A.get("hiring_drag", 0.0))      # money spent on buying is not spent on building
@@ -81,6 +82,8 @@ class Greenfield:
 
         changes = [Set("workforce", workforce, self.name),
                    Publish("new_hires", float(jobs.sum()), self.name),
+                   # the jobs added by the firms that grew, before the cutbacks of other firms are taken off
+                   Publish("jobs_created", float(jobs[up].sum()), self.name),
                    Publish("industry_growth", np.bincount(ind, jobs, k) / np.maximum(np.bincount(ind, n, k), 1e-12),
                            self.name),
                    Scale("employees", 1 + kept / n, self.name)]

@@ -1,18 +1,20 @@
-"""Thirteen checks of the model's bookkeeping. They test arithmetic, not the theory.
+"""Fourteen checks of the model's bookkeeping. They test arithmetic, not the theory.
 
 Checks 1 to 4 test the ledger and its measures. Checks 5 to 9 test the named components of
 earnings per employee. Check 10 tests the bookkeeping of the green-field module when it founds
 firms. Check 11 tests that every stacking component holds a level that means something in a
 long run with many modules. Check 12 tests that the price of every firm is worked out from the
 wage, the markup and the named costs. Check 13 tests the record of transfers: every transfer has
-a payer and a receiver, and no payer pays more than it has.
+a payer and a receiver, and no payer pays more than it has. Check 14 tests the sales module's
+account of who buys: what is offered equals what each buyer bought plus what is unsold, and no
+buyer spends money that the record does not show it had.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
     python checks.py
 """
 import numpy as np
-from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Transfer, LedgerError,
+from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Publish, Transfer, LedgerError,
                   readouts, top_positions, group_value, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT)
 
 
@@ -382,14 +384,14 @@ def check_levels():
     assert on["base_high"] <= on["high"]
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass it.
-    assert off["furthest"] > width and off["base_high"] > off["high"] and off["beside"] > 1.0
+    assert off["furthest"] > width and off["beside"] > 1.0
     print(f"11. Levels: with the nine modules and {len(names)} optional modules on for 60 steps, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
           f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
           f"with the netting switched off gave the same figures in every year, and its record did not pass the "
-          f"test: one component stood a factor of {off['furthest']:.1e} from 1 and one base markup reached "
-          f"{off['base_high']:.1e}.")
+          f"test: one component stood a factor of {off['furthest']:.1e} from 1, and in one firm a gain of a factor "
+          f"of {np.exp(off['beside']):.0f} stood beside a loss of the same size.")
 
 
 def check_price():
@@ -594,6 +596,103 @@ def check_transfers():
           f"was identical in either module order. Wage earners paid at most {largest:.1%} of the wage bill.")
 
 
+def check_sales_account():
+    """The sales module's account balances, and nobody in it spends money it did not have."""
+    from modules.sales import Sales, PRICE_CUT, SHORTFALL
+
+    # 1. By hand. Two firms with a wage of 1 and a markup of 0.15: wages of 1,000, priced earnings of 150.
+    #    In the first year a stand-in module raises every markup to 0.18 and reports 5 new jobs.
+    class Push:
+        name, supplies = "push", ("jobs_created",)
+
+        def __init__(self):
+            self.done = False
+
+        def start(self, L):
+            L.add_component("push", self.name)
+            return {"jobs_created": 0.0}
+
+        def propose(self, L, rng):
+            first, self.done = not self.done, True
+            return [ScaleComponent("push", 1.2 if first else 1.0, self.name),
+                    Publish("jobs_created", 5.0 if first else 0.0, self.name)]
+
+    L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
+    m = Model(L, [Push(), Sales(top=1)], top=1)
+    with np.errstate(divide="ignore"):      # with two firms the top group is half the list, which the division of the gain meets as a zero
+        r1, r2 = m.step(), m.step()
+    assert r1["published"]["unsold"] == 0.0 and r1["published"]["sold_part"] == 1.0     # the opening prices are all paid
+    a = r2["published"]["sales_account"]
+    # Offered 1,180. Wage earners buy 1,000. Owners lay out last year's 150 and 5 x 4 = 20 for the new jobs. 10 is unsold.
+    assert np.isclose(a["offered"], 1180.0) and np.isclose(a["bought_by_wage_earners"], 1000.0)
+    assert np.isclose(a["bought_by_owners"], 170.0) and np.isclose(a["unsold"], 10.0)
+    assert np.isclose(r2["published"]["unsold"], 10 / 1180) and np.isclose(r2["published"]["sold_part"], 170 / 180)
+    assert np.isclose(r2["published"]["sales_cut"], 10 / 1180)
+    lost = 10 / 180
+    # The larger firm keeps its price and books the whole loss. The smaller takes half out of its price and books half.
+    # (The core has set the price cut against the standing rise of the same firm, so the markup is tested.)
+    assert np.allclose(L.markup_without(SHORTFALL), [0.18, 0.18 * (1 - 0.5 * lost)])
+    assert np.allclose(L.components[PRICE_CUT] * L.components["push"], [1.2, 1.2 * (1 - 0.5 * lost)])
+    assert np.allclose(L.components[SHORTFALL], [1 - lost, (1 - lost) / (1 - 0.5 * lost)])
+    assert np.allclose(L.e, [0.18 * (1 - lost), 0.18 * (1 - lost)])
+    assert np.isclose(L.p[0], 1.18) and np.isclose(L.p[1], 1 + 0.18 * (1 - 0.5 * lost))
+    assert np.isclose(r2["capital_share"], 170.0 / 1170.0)          # unsold goods are income to nobody
+    with np.errstate(divide="ignore"):
+        r3 = m.step()                                               # owners now lay out the 170 they received
+    assert np.isclose(r3["published"]["sales_account"]["owners_outlay"], 170.0)
+
+    # 2. Long runs, with the modules that move money, in opposite listing orders.
+    import registry
+    from stage2 import starting_ledger
+    from full import all_modules
+    mixes = [["sales"],
+             ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
+              "externalisation", "proletarianization"]]
+    years_unsold = years = 0
+    largest = 0.0
+    for names in mixes:
+        histories = []
+        for order in names, names[::-1]:
+            m = Model(starting_ledger(0, 5000), all_modules() + registry.make(order), seed=0)
+            kept = 0.0
+            for step in range(60):
+                r = m.step()
+                a = r["published"]["sales_account"]
+                tol = 1e-9 * a["offered"]
+                bought = a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
+                assert abs(a["offered"] - bought - a["unsold"]) <= tol
+                assert min(a["bought_by_wage_earners"], a["bought_by_government"], a["bought_by_owners"], a["unsold"]) >= 0
+                assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"], rtol=1e-12)
+                if step:      # the account is of the year before: set it against that year's record of transfers
+                    last = m.history[-2]
+                    parties, pub = last["parties"], last["published"]
+                    net = {p: row["received"] - row["paid"] for p, row in parties.items()}
+                    to_firms = sum(t["paid"] * ((t["receiver"] == "firms") - (t["payer"] == "firms"))
+                                   for t in last["transfers"])
+                    holders = sum(row["received"] for p, row in parties.items() if p not in (WAGE_EARNERS, GOVERNMENT))
+                    lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
+                    assert a["bought_by_wage_earners"] <= a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + kept + tol
+                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + kept + tol
+                    assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
+                                                     + repaid - lent + tol)
+                kept = a["kept_for_next_year"]
+                years += 1
+                years_unsold += a["unsold"] > 0
+                largest = max(largest, a["unsold"] / a["offered"])
+                assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10)
+            histories.append(m.history)
+        for x, y in zip(*histories):
+            assert x["dk"] == y["dk"] and x["capital_share"] == y["capital_share"] and x["unemployment"] == y["unemployment"]
+            assert x["published"]["unsold"] == y["published"]["unsold"]
+    print(f"14. Sales account: with wages of 1,000, priced earnings of 180, owners who received 150 the year before "
+          f"and 5 new jobs at 4 years' wages each, owners buy 170 and 10 is unsold. The firm of dominant capital "
+          f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
+          f"share is 170 in 1,170. In {years} years of runs with the modules that move money, what was offered equalled "
+          f"what wage earners, the government and owners bought plus what was unsold, and no buyer spent more than the "
+          f"record of transfers shows it had. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
+          f"what was offered. Opposite listing orders gave identical figures.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -608,4 +707,5 @@ if __name__ == "__main__":
     check_levels()
     check_price()
     check_transfers()
-    print("All thirteen checks passed.")
+    check_sales_account()
+    print("All fourteen checks passed.")

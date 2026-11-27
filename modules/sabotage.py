@@ -49,7 +49,11 @@ class Sabotage:
         dominant[top_positions(L.cap(), np.arange(len(L)), self.top)] = True
         n = np.bincount(L.ind, L.n, k)
         held = np.bincount(L.ind[dominant], L.n[dominant], k)
-        earnings = np.bincount(L.ind, L.markup_earnings(), k)   # earnings from the markup alone: interest and other income are left out
+        priced = L.markup_earnings()          # earnings from the markup alone: interest and other income are left out
+        # The rule works on the markup that firms price for. Where goods were unsold (optional module), each
+        # firm's earnings are divided by the part of them that it received; without that module the division is by 1.
+        priced = priced / L.components.get("sales shortfall", 1.0)
+        earnings = np.bincount(L.ind, priced, k)
         safe = np.maximum(n, 1e-12)
         markup = np.where(n > 0, earnings / (L.shared["wage"] * safe), self.normal_markup)
         held = held / safe

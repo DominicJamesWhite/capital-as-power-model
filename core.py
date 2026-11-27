@@ -549,7 +549,7 @@ class Model:
     applied in the alphabetical order of their sources, and components are combined in the
     alphabetical order of their names.
     """
-    CORE_SUPPLIES = ("unemployment", "capital_share", "concentration", "transfers", "wage_earners_net")
+    CORE_SUPPLIES = ("unemployment", "capital_share", "concentration", "transfers", "wage_earners_net", "party_flows")
 
     def __init__(self, ledger, modules=(), top=100, seed=0, overlap=None, netting=True, discounts_overlap=()):
         self.L = ledger
@@ -599,8 +599,12 @@ class Model:
         # "wage_earners_net": what wage earners received in transfers less what they paid, as a part of the wage bill.
         w = self.settlement["parties"].get(WAGE_EARNERS)
         net = (w["received"] - w["paid"]) / w["wage_bill"] if w and w["wage_bill"] > 0 else 0.0
+        # "party_flows": for each party that is not a firm, what it received and paid in transfers in the last
+        # year and what it holds. It is empty in a year with no transfers.
+        flows = {p: dict(row) for p, row in self.settlement["parties"].items()}
         self.L.accounts.update(unemployment=r["unemployment"], capital_share=r["capital_share"],
-                               concentration=r["top_share_employees"], transfers=paid, wage_earners_net=net)
+                               concentration=r["top_share_employees"], transfers=paid, wage_earners_net=net,
+                               party_flows=flows)
 
     def _lndk(self, group=None):
         K = self.L.cap()

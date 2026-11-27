@@ -96,7 +96,7 @@ Three things follow from this order.
 
 ### What the core publishes
 
-The core has no behaviour, but it publishes five numbers each year that any module may read:
+The core has no behaviour, but it publishes six things each year that any module may read:
 
 | Name in the code | What it is |
 |---|---|
@@ -105,6 +105,7 @@ The core has no behaviour, but it publishes five numbers each year that any modu
 | `concentration` | The part of all employees who work for the top 100 firms |
 | `transfers` | For each kind of payment, how much was asked for and how much was paid last year |
 | `wage_earners_net` | What wage earners received in payments less what they paid, as a part of all wages |
+| `party_flows` | For wage earners, the government and every other party that is not a firm: what it received and what it paid last year, and what it holds |
 
 ### How the year's gain is divided among the modules
 
@@ -194,12 +195,12 @@ It gives the green-field module three numbers for each industry:
 
 It owns the part of each firm's markup that the code calls the base. "How modules share a quantity" explains what that means.
 
-When optional modules are on, it also reads `second_country_held` and `foreign_held` (both add to the part held), `policy_rate_markup` (moves the normal markup), `protection_open` and `nature_open` (bar small firms' extra hiring), `labour_strength_by_industry` (takes the place of popular resistance in step 1), `second_country_labour` (raises the 5 per cent level), `currency_markup` (adds to every markup) and `eruption_frees_markups` (weakens step 3).
+When optional modules are on, it also reads `second_country_held` and `foreign_held` (both add to the part held), `policy_rate_markup` (moves the normal markup), `protection_open` and `nature_open` (bar small firms' extra hiring), `labour_strength_by_industry` (takes the place of popular resistance in step 1), `second_country_labour` (raises the 5 per cent level), `currency_markup` (adds to every markup) and `eruption_frees_markups` (weakens step 3). With the sales module on, a firm may have received less than it priced for. The sabotage module works on the markup that firms price for, so it puts the part not received back before it measures an industry's markup.
 
 ### What is known to be wrong or untested
 
 - **A long slump raises markups without end.** Step 1 makes the yearly change of the markup depend on the level of unemployment. If unemployment stays at 15 per cent for forty years, markups rise every one of those years. Figure 12.1 of the book sets a level against a level.
-- **The falling side of Figure 12.1 is missing.** The module cannot make the capitalist share fall when industry is held back too far, because it has no account of how much can be sold. The optional sales module adds one, and even then the share does not fall.
+- **The falling side of Figure 12.1 is missing.** The module cannot make the capitalist share fall when industry is held back too far, because it has no account of how much can be sold. The optional sales module adds one. With its default settings the share still does not fall; with its setting `hoarded` above 0 it does.
 - **The lowest markup of 0.005 has no source.** It applies to the average of an industry, so a single firm can lie below it.
 - **Two changes to one markup in one year are multiplied.** If this module wants to raise a markup of 0.10 by 0.06 and another module wants to lower it by 0.05, the result is 0.10 × 1.6 × 0.5 = 0.08 and not 0.11.
 - **Three 5 per cent levels are separate settings.** `labour_holds_at` here and `usual_unemployment` in four other modules all default to 0.05. Changing one does not change the others.
@@ -322,7 +323,8 @@ It reads:
 It publishes:
 
 - `industry_growth`: how fast each industry hired. The sabotage module reads it.
-- `new_hires`: the total hired. The run report uses it to compare buying with building.
+- `new_hires`: the total hired, after the cutbacks of firms that shrank are taken off. The run report uses it to compare buying with building.
+- `jobs_created`: the employees added by the firms that grew. The optional sales module reads it to work out what new jobs cost to equip.
 
 When optional modules are on, it also reads `sales_cut`, `force_hires`, `privatisation_jobs`, `public_workforce_change`, `protection_open` and `nature_open`.
 
@@ -390,7 +392,7 @@ It publishes:
 - `hiring_drag`, read by the green-field module
 - `pool_open`, the free part of dominant capital's reach, read by the envelope module
 
-When optional modules are on, it also reads `merger_hype`, `merger_appetite`, `line_barrier` and `eruption_stops_buying`.
+When optional modules are on, it also reads `merger_hype`, `merger_appetite`, `line_barrier`, `eruption_stops_buying` and `bought_not_built`. The last comes from the sales module. It is added to the 15 per cent of its own employees that a buyer seeks each year, and it is zero when that module is off or nothing is unsold.
 
 ### What is known to be wrong or untested
 
@@ -820,7 +822,7 @@ A cost component enters the firm's price and never its earnings. "How the price 
 | base | markup | sabotage | The markup the firm would have if no gain or loss stood on top of it. For a new firm this is the whole markup, for example 0.10. |
 | stagflation lead | markup | stagflation | What is left of the firm's gain over wages from its price rises. A lead of 1.3 says the markup is three tenths higher than it would be without that gain. |
 | cost-cutting edge | markup | cost cutting | What is left of the firm's edge over its industry from its yearly draws, or of its lag behind it |
-| unsold goods | markup | sales | The part of the markup given up for want of sales and not yet recovered. A value of 0.8 says a fifth is still given up. |
+| unsold goods | markup | sales | The part of the markup that a firm outside the top 100 gave up by cutting its price when goods were unsold, and has not recovered. A value of 0.8 says a fifth is still given up. |
 | war premium | markup | coalitions | What is left of the markup that a group of firms gained from violence |
 | rival cost | markup | boundary contest | What is left of the markup that dominant capital lost to new rivals when a boundary opened |
 | resource premium | markup | nature | What is left of the rise in a resource industry's markup towards the aim of its owners |
@@ -830,11 +832,12 @@ A cost component enters the firm's price and never its earnings. "How the price 
 | public debt income | income | public_debt | Interest received on the public debt less the tax paid towards it. The core fills it in from the module's payments. |
 | household interest | income | household_debt | Interest received from households. The core fills it in from the module's payment. |
 | burdens off the books | income | externalisation | What the firm gains from burdens it has shifted onto others |
+| sales shortfall | markup, a group of its own | sales | The part of its priced earnings that the firm receives this year, after the loss it books for goods left unsold the year before. A value of 0.9 says a tenth is lost. It is set afresh every year and is 1 when everything was sold. |
 | cost difference | cost | cost cutting | How far the firm's cost for each employee stands below the wage (a saving, below 0) or above it (a lag, above 0) as a result of its yearly draws |
-| idle overhead | cost | sales | The overhead that a seller who kept its price has carried on goods it did not sell |
+| unsold goods carried | cost | sales | What the firm laid out on goods it did not sell. It equals what the sales shortfall takes from the markup, so the price does not move. |
 | outlay on wants | cost | wants | The outlay of the firm's industry on shaping what buyers want, for each employee |
 
-The base, the stagflation lead, the cost-cutting edge and the cost difference belong to main modules and are always present. The rest appear only when their optional module is on. Three markup components are marked "hold on buyers". The next part explains why they are treated differently.
+The base, the stagflation lead, the cost-cutting edge and the cost difference belong to main modules and are always present. The rest appear only when their optional module is on. Three markup components are marked "hold on buyers". The next part explains why they are treated differently. The sales shortfall is alone in a group of its own: it multiplies the markup like any other part, but it is a level that its module sets each year, so the core does not cancel it against the gains and losses of other modules.
 
 ### How markup components combine
 
@@ -963,7 +966,7 @@ The model holds the book's "units per employee" at one for every firm, because i
 | sabotage | The markup of an industry | Price. Each firm's price moves with its own markup. |
 | stagflation | The wage, and the markup of each firm | Price. The new markup is the one at which the wage and the markup together have risen by the firm's price rise. |
 | cost cutting | The edge of each firm | Cost for the yearly draw. Cost for the part of the drift back that removes a saving or a lag that stands. Price for the rest of the drift back. |
-| sales | The markup of an industry | Price for sellers who cut prices. Cost, named "idle overhead", for sellers who keep them. |
+| sales | The markup of every firm | Price for the cut that a firm outside the top 100 makes. Cost, named "unsold goods carried", for the earnings that a firm priced for and did not receive. |
 | leaders, protections | A premium of the overlap group | Price, and only as far as the markup counts the premium |
 | wants | A premium of the overlap group, and the outlay | Price for the premium. Cost, named "outlay on wants", for the outlay. |
 | coalitions, nature, boundary contest | A stacking premium or loss | Price |
@@ -972,16 +975,16 @@ The model holds the book's "units per employee" at one for every firm, because i
 **The three cost components.**
 
 - **The cost difference** belongs to the cost cutting module. Module 5 describes it.
-- **The idle overhead** belongs to the sales module. Chapter 12 says that sellers work out their price on the cost "at 'normal' levels of output" and keep it "stable in the face of cyclical variations in demand". A seller who keeps its price while its sales fall therefore has a higher cost for each thing sold. Each year the module adds to this cost what its rule takes from the markup of sellers who keep their prices.
+- **The unsold goods carried** belong to the sales module. A firm whose goods were partly unsold paid the wages for all of them and was paid for some. Its earnings fall and its price stays. The module says so by entering, as a cost, exactly what the shortfall takes from the markup. The cost is set afresh each year and is zero when everything was sold.
 - **The outlay on wants** belongs to the wants module. Chapter 9 says that estimates of advertising leave out "sales promoting expenditures buried in the 'cost of production'". Each year the module sets this cost, for every firm of an industry, to the industry's average outlay as a part of earnings, times the industry's markup.
 
-**What the price level shows.** With the nine main modules, the average price stays within 0.1 per cent of the wage times one plus the average markup. With the sales module on, it stands up to 3.9 per cent above that, which is the idle overhead. With the wants module on, it stands up to 11.6 per cent above, which is the outlay on wants.
+**What the price level shows.** With the nine main modules, the average price stays within 0.1 per cent of the wage times one plus the average markup. With the wants module on, it stands up to 11.6 per cent above, which is the outlay on wants.
 
 **What is our own here.** The price is worked out for what one employee makes in a year, with no count of goods. A cost component is counted in wages. Each module decides whether its change to a markup is a change of price or of cost. The cost cutting module's drift back is split between cost and price. A merger adds the costs of the two firms. Nothing keeps a cost inside a range.
 
 **What is doubtful.**
 
-1. The idle overhead only ever rises. The sales rule gives nothing back when sales recover. After 60 years it averaged 0.044 of the wage with the sales module alone.
+1. The cost of unsold goods is set at the start of a year. If another module moves the same firm's markup during that year, the firm's price moves by slightly more or less than that module intended. The model does not say what happened to the goods.
 2. The cost cutting rule wears away gains that have nothing to do with cost, and that wearing away is recorded as a fall of price.
 3. A cost component rises with the wage. For a firm that carries one, the price therefore rises by slightly less or more than the stagflation module intended. The book does not say what a cost other than the wage should follow.
 4. The outlay on wants is paid to nobody. It is worked out on the whole markup of an industry, premiums included. A firm founded during a year carries no outlay until the next year.
@@ -1025,7 +1028,8 @@ The wage itself is not changed by a transfer. The government in this record is t
 | Module | What it records |
 |---|---|
 | public debt | Six transfers. Firms and wage earners pay the tax to the government. The government pays the interest to firms, to wage earners (for the households outside the richest one per cent), to the richest one per cent of households, and to the holders that the module does not follow. |
-| household debt | One transfer: wage earners pay the interest and firms receive it. |
+| household debt | One transfer: wage earners pay the interest and firms receive it. The money lent and the money repaid are not transfers; the module publishes both. |
+| sales | No transfer of its own. It reads the record, through `party_flows`, to work out what wage earners, the government and owners had to spend. |
 | risk shaping | No transfer of its own. It publishes what a bailout is worth, which is the capitalization that the bailout adds. Module 2 adds that amount to the government's debt. |
 | privatisation | No transfer of its own. Dominant capital pays a part of what the takeover is worth, and module 2 takes that amount off the government's debt. |
 
@@ -1075,7 +1079,7 @@ A different choice in any of these would give different results. None has been t
 
 The message gives the year, how many firms are affected, and which modules changed those firms that year. The guard tests for impossible values. It does not hold any number inside a range.
 
-**The checks.** `checks.py` runs thirteen tests of the bookkeeping. All must pass.
+**The checks.** `checks.py` runs fourteen tests of the bookkeeping. All must pass.
 
 | Check | What it tests |
 |---|---|
@@ -1092,6 +1096,7 @@ The message gives the year, how many firms are affected, and which modules chang
 | 11. Levels | With the nine main modules and the optional ones on for 60 years, no firm ends a year with a gain standing beside a loss, and no base lies above the highest markup seen in the run. |
 | 12. Price | A firm with a wage of 2, a base of 0.1, premiums of 1.5 and 1.2 in the overlap group and a cost component of 0.03 has a price of 2.36. The core refuses a direct change to a price. Every price equals the formula in every year. |
 | 13. Transfers | The worked examples of transfers above come out as stated. No transfer is paid above what was asked or above what its payer had. Runs with modules listed in opposite orders give identical figures. |
+| 14. Sales account | The worked example of the sales module comes out as stated. In every year of long runs, what firms offered equals what wage earners, the government and owners bought plus what was unsold, and no buyer spent more than the record of transfers shows it had. Opposite listing orders give identical figures. |
 
 ---
 
@@ -1103,85 +1108,110 @@ Switch it on by adding `--with sales` to the command.
 
 ### What it is about
 
-The nine main modules assume that firms sell everything they offer. This module drops that assumption. Each year it adds up the money that comes back to buy goods. If less money comes back than the goods are priced at, some goods stay unsold, and firms respond.
+The nine main modules assume that firms sell everything they offer. This module drops that assumption. Each year it works out who had money and what that money bought. If the money does not buy all that firms offered at their prices, some goods stay unsold. Nobody is paid for unsold goods, so the loss falls on owners, and owners respond.
 
-Think of a town where a few families own all the shops. The shop workers spend all their pay in the shops. The families spend only part of their profit there. The rest of the profit comes back to the shops only if the families spend it on building new shops. If they use it to buy each other's shops, or do nothing with it, some goods stay on the shelves.
+Think of a town where a few families own all the shops. The shop workers spend their pay in the shops. The families spend there what the shops paid them last year, and they pay builders when they open a new shop. If the families raise prices faster than they raise their own spending, and open no new shop, some goods stay on the shelves. The small shops then cut prices. The large shops keep their prices and take on fewer people.
 
 ### What the theory says
 
-Chapter 12, "Business as usual" with Figures 12.1 and 12.2, "From price taking to price making", "The markup and the target rate of return" and "In sum". Chapter 14, Proposition 3 and the footnote on excess capacity. Chapter 15, "Tobin's Q" and "From classical Marxism to monopoly capitalism". Chapter 17, the footnote on "the bifurcated experience of the 1930s". Two papers by Shimshon Bichler and Jonathan Nitzan from 2014: "Nonlinearities of the Sabotage-Redistribution Process" and "Can Capitalists Afford Recovery?", section "Underconsumption".
+"Can Capitalists Afford Recovery?" by Shimshon Bichler and Jonathan Nitzan (2014), sections "Underconsumption" and "Capital as power and strategic sabotage". Chapter 12, "Business as usual" with Figures 12.1 and 12.2, and "From price taking to price making". Chapter 14, Proposition 3. Chapter 15, "Tobin's Q". Chapter 4, "Realization and institutionalized waste". Chapter 8, "Separating quantity from price".
 
-- Strategic sabotage is the book's name for the way business earns by holding industry back. It can be overdone: "When business sabotage becomes excessive, pushing output toward the zero mark, the result is recession and low capitalist earnings" (chapter 12).
-- The first 2014 paper measures this for the United States before the Second World War, when "sabotage was excessive and unemployment undermined the capitalist share of income (regression slope = –0.35)".
-- The book reports Gardiner Means's finding on the Depression of the 1930s. "Competitive industries saw massive declines in their market prices, but only moderate drops in their output and employment." In concentrated industries "prices declined slightly, while production and payroll collapsed, sometimes by as much as 80 per cent".
-- The book reports how large firms set prices. They work out "the cost at 'normal' levels of output", add "a 'conventional' markup", and keep the price "stable in the face of cyclical variations in demand". The aim is "a target rate of return at some standard capacity utilization". A price set in this way earns less than its markup when sales fall below normal, because some costs do not fall with sales.
-- On building too much capacity: "glut means the disintegration of full-cost pricing; and if prices end up dropping faster than costs, the consequence is falling profit" (chapter 15).
-- When large firms turn "from building to buying", the "broader consequence" is "creeping stagnation" (chapter 14, Proposition 3, and chapter 15).
-- The second 2014 paper reports an argument of the economist Michal Kalecki. Workers "spend most if not all of that income on consumption" and capitalists "save most of it". So the higher the capitalist share of income, the greater the "tendency toward deficient demand and stagnation". The authors say their evidence "certainly seems consistent" with this. They do not adopt the argument as their own.
+- **What counts as a crisis.** The paper says that "a crisis of accumulation is not a crisis of production or consumption, but a crisis of capitalist power". It gives two conditions for accumulation to go on. "The first and key condition is non-negative differential accumulation": the largest firms must not lose ground to the average firm. The second is that the capitalist share of income, which is the part of all income that goes to owners, holds steady or rises. A fall in sales that leaves both conditions standing is not a crisis for owners, however many people are out of work. The module reports both conditions every year.
+- **Holding back can go too far.** Strategic sabotage is the book's name for the way owners earn by limiting what industry makes. Figure 12.1 shows the capitalist share rising as industry is held back, and then falling: "When business sabotage becomes excessive, pushing output toward the zero mark, the result is recession and low capitalist earnings" (chapter 12). In the module, goods that nobody buys are earnings that owners do not receive.
+- **Large and small sellers respond differently.** The book reports Gardiner Means's finding on the 1930s. Competitive industries "saw massive declines in their market prices, but only moderate drops in their output and employment". In concentrated industries "prices declined slightly, while production and payroll collapsed" (chapter 12). In the module, firms outside the top 100 cut prices, and top-100 firms keep prices and hold back production.
+- **Buying in place of building.** When too much capacity threatens, "Mergers and acquisitions alleviate the problem whereas greenfield aggravates it" (chapter 14, Proposition 3). In the module, a top-100 firm seeks by purchase the employees it does not hire.
+- **The account is kept in money.** The book says there is no count of goods that does not rest on prices: "in order to compute the quantity we first need to know the price" (chapter 8). So the module never counts goods. What firms offer is the wages they pay plus the earnings they price for.
+- **Whose argument the account is.** The argument that goods stay unsold because owners do not spend their income belongs to Michal Kalecki and to Paul Baran and Paul Sweezy. The paper reports it: workers spend nearly all their income, while capitalists "save most of it", so a higher capitalist share means less spending. The authors say their evidence "certainly seems consistent" with it. They do not adopt it. They ask instead what a crisis is, and answer with the two conditions above.
 
-The book and the papers do not say how much can be sold. A footnote to chapter 14 calls the idea of excess capacity "admittedly problematic". The whole account of spending below is therefore an addition of ours. It joins Kalecki's argument, as the authors report it, to the book's distinction between building and buying.
+The book and the papers give no account of how much can be sold. The whole account below is our own. So is every rule for how owners respond, beyond the direction that the passages above give.
 
 ### What the module does each year
 
-In the first year of a run the module does nothing, because there is no earlier hiring to read.
+At the start of each year the module works out the account of the year just ended. Published numbers reach other modules a year late, so the responses follow a year after the goods were left unsold.
 
-1. **It adds up the value offered.** This is all wages plus the earnings of all firms.
-2. **It splits owners' earnings.** Wage earners spend all their wages. Owners spend 40 per cent of their earnings on their own consumption. The other 60 per cent is money for expansion.
-3. **It works out what building costs.** Money for expansion buys goods only when it pays for new capacity. Equipping one new job costs 4 years of the wage. The number of new jobs is the average yearly hiring of the last 3 years.
-4. **It works out what buying costs.** Money that buys existing firms buys no goods. The cost is the number of employees acquired, averaged over the last 3 years, times the average capitalization for each employee of the firms outside the top 100.
-5. **It finds the unsold part.** If the money for expansion covers both building and buying, all the building is paid for. If it does not, building and buying share the money in proportion. The money for expansion that paid for no new capacity is the value left unsold. The unsold part is that value divided by the value offered. It is never below zero, because nobody in this account spends more than an income.
-6. **It lowers the markup of every industry.** The module looks at the part of an industry's employees who work for top-100 firms. This follows Means's finding.
-   - For the rest of the industry, sellers cut their prices. The markup falls by half of the unsold part, times the industry's price.
-   - For the part that top-100 firms hold, sellers keep their prices. Their overhead, taken as 30 per cent of costs, is now spread over fewer sales. The markup falls by 30 per cent of the unsold part, times the industry's price. The module enters this fall as a cost, so the price does not move.
-   - Every firm in the industry takes the industry's fall in the same proportion. No markup goes below 0.005.
-7. **It tells top-100 firms to dismiss employees.** It publishes a rate equal to the unsold part less the 30 per cent of staff who are overhead. Next year the green-field module takes that rate off the hiring rate of every top-100 firm.
+1. **It adds up what firms offered.** This is all wages plus the earnings that firms priced for, which is each firm's wage bill times its markup.
+2. **It works out what wage earners bought.** Wage earners spend all the money they have. That is their wages, plus payments they received, less the taxes and interest they paid, plus what households borrowed, less what they paid back. The payments come from the core's record of transfers. The household debt module publishes the money lent and repaid.
+3. **It works out what the government bought.** The government spends what it collected in the year and did not pay out. It spends nothing that the record does not show.
+4. **It works out what owners bought.** Owners lay out what they received the year before. The amount is kept level against the wage: if the wage has risen by 5 per cent, so has the outlay. On top of this, owners pay for the equipment of the year's new jobs, at 4 years of the wage for each job. Owners cannot buy more than is left after wage earners and the government have bought.
+5. **What is left is unsold.** The unsold part is the unsold amount divided by all that was offered. The wages were paid in full, so the whole loss falls on owners. Their money income for the year is the priced earnings less the unsold amount, plus the interest and other payments that firms and holders of debt received. That income is what they lay out next year.
+6. **Every firm loses the same part of its priced earnings.** The model has no account of which goods buyers want, so no firm is hit harder than another.
+   - A top-100 firm keeps its price. It books the whole loss once, on this year's earnings.
+   - Any other firm takes half of the loss out of its price. That cut stays until a later rise of its markup restores it. It books the other half once.
+7. **Top-100 firms hold back production.** The module publishes the unsold part as a rate. Next year the green-field module takes that rate off the hiring rate of every top-100 firm, and the merger module adds the same rate to the employees each buyer seeks.
+8. **It reports the two conditions.** Differential capitalization is the average worth of a top-100 firm divided by the average worth of all firms. The first condition holds if it is not lower than 5 years before. The second holds if the capitalist share of income is not lower than 5 years before. A fall of less than 1 per cent of the level counts as steady.
 
-**An example.** Wages are 1,000 and all firms together earn 150, so the value offered is 1,150. Owners consume 60 and have 90 for expansion. Hiring has averaged 1.5 per cent a year, which is 15 new jobs, and equipping them costs 15 × 4 = 60. Top-100 firms have bought 5 employees' worth of small firms a year, at a capitalization of 3 for each employee, which costs 15. Building and buying take 75 of the 90. The other 30 buys nothing, so the unsold part is 30 ÷ 1,150 = 2.6 per cent.
+When nothing is unsold, steps 6 and 7 do nothing.
 
-Take an industry with a markup of 0.15, where top-100 firms employ 40 per cent of the employees. The price-cutting part lowers the markup by 0.6 × 0.5 × 0.026 × 1.15 = 0.0090. The price-keeping part lowers it by 0.4 × 0.3 × 0.026 × 1.15 = 0.0036. The industry's markup falls from 0.15 to 0.1374. Its average price falls only from 1.15 to 1.141, because the 0.0036 is carried as a cost. Next year every top-100 firm hires 0.026 × 0.7 = 1.8 points more slowly.
+**An example.** Wages are 1,000. Firms priced for earnings of 150 last year and were paid all of it. This year they raise their markups and price for 180, so they offer 1,180. Firms that grew added 5 jobs.
 
-**How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module, and a firm's price can also carry named costs. "How modules share a quantity" explains this. The sales module owns one part of the markup, named "unsold goods", and one cost, named "idle overhead". An "unsold goods" value of 0.9 says that a tenth of the firm's markup is still given up for want of sales. An "idle overhead" of 0.004 says that the firm carries a cost of 0.4 per cent of the wage on goods it did not sell.
+- Wage earners buy 1,000.
+- Owners lay out the 150 they received last year, and 5 × 4 = 20 for the new jobs. They buy 170.
+- 1,180 − 1,000 − 170 = 10 is unsold. The unsold part is 10 ÷ 1,180 = 0.85 per cent.
+- Owners receive 170 of the 180 they priced for. Each firm loses 10 ÷ 180 = 5.6 per cent of its priced earnings.
+- A top-100 firm with a markup of 0.18 keeps its price at 1.18 times the wage and earns 0.17 for each employee this year.
+- A firm outside the top 100 cuts its markup by 2.8 per cent, from 0.18 to 0.175, and books the other 2.8 per cent once.
+- Next year every top-100 firm hires 0.85 points more slowly and seeks 0.85 per cent more employees by purchase.
+- Next year owners lay out 170. If firms outside the top 100 keep their cut and nothing else changes, less is unsold.
+
+The capitalist share in the example is 170 ÷ 1,170 = 14.5 per cent, not 180 ÷ 1,180 = 15.3 per cent.
+
+**Why the responses can end.** Each one lowers the unsold amount. A price cut lowers what firms price for. A top-100 firm that takes on fewer people offers less, and the wages it does not pay are smaller than the price of the goods it does not offer. When firms hire again, the equipment of the new jobs is bought, and at 4 years of the wage it is large beside any rise in priced earnings. So goods are unsold only in years when firms raise what they price for and do not build.
+
+**How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module. "How modules share a quantity" explains this. The sales module owns two parts and one cost. "Unsold goods" holds a firm's price cut for as long as it stands. "Sales shortfall" is the part of its priced earnings that a firm receives this year, for example 0.944. "Unsold goods carried" is a cost of the same size as the shortfall, which keeps the firm's price where it was.
 
 ### Settings
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `consumed` | 0.4 | The part of their earnings that owners spend on their own consumption | Our own choice |
 | `job_cost` | 4.0 | The cost of equipping one new job, in years of the wage | Our own choice |
-| `price_give` | 0.5 | The part of the unsold value that price-cutting sellers take out of their markups within a year | Our own choice |
-| `overhead` | 0.3 | The part of a price-keeping firm's costs and staff that does not fall when its sales fall | Our own choice |
-| `years` | 3 | The number of years of hiring and buying over which spending on expansion is averaged | Our own choice |
-| `floor` | 0.005 | The lowest markup an industry can have. It is the same figure as in the sabotage module. | A plain limit with no source |
+| `price_give` | 0.5 | The part of its loss that a firm outside the top 100 takes out of its price | Our own choice |
+| `held_back` | 1.0 | The fall in the hiring rate of a top-100 firm for each unit of the unsold part | Our own choice |
+| `buy_instead` | 1.0 | The employees a top-100 firm seeks by purchase for each job it holds back | Our own choice. The book gives the direction only. |
+| `hoarded` | 0.0 | The part of owners' money income that is never laid out on anything | Our own choice. A value above 0 is the reading of Kalecki and of Baran and Sweezy. |
+| `judged_over` | 5 | The number of years over which each condition of accumulation is judged | The 2014 paper shows its series as averages of five years. Using that span here is our own choice. |
+| `significant` | 0.01 | A fall smaller than this part of the level counts as steady | Our own choice. The paper speaks of "a significant violation" and gives no figure. |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 ### What it reads from other modules and what it gives them
 
 It reads:
 
-- `new_hires`, from the green-field module: the number of people hired last year
-- `merger_volume`, from the mergers module: the employees acquired last year, as a part of all employees
+- `jobs_created`, from the green-field module: the employees added last year by the firms that grew
+- `party_flows`, from the core: what wage earners, the government and every other party received and paid last year
+- `capital_share`, from the core
+- `household_debt_lent` and `household_debt_repaid`, from the household debt module, when it is on
 
 It publishes:
 
-- `sales_cut`: the dismissal rate of step 7, which the green-field module reads
-- `unsold`: the unsold part
-- `build_money_share`: the part of the money for expansion that paid for new capacity
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `sales_cut` | The rate of step 7 | The green-field module |
+| `bought_not_built` | The same rate, times `buy_instead` | The merger module |
+| `unsold` | The unsold part of all that was offered | Nobody |
+| `sold_part` | The part of priced earnings that owners received | Nobody |
+| `sales_account` | The whole account in money: what was offered, what each buyer had and bought, and what was unsold | Nobody. Check 14 tests it. |
+| `accumulation_differential` | 1 if the first condition holds, 0 if not | Nobody |
+| `accumulation_share` | 1 if the second condition holds, 0 if not | Nobody |
+| `crisis_of_capital` | 1 if either condition fails | Nobody |
 
-No module reads the last two. With this module off, the green-field module takes `sales_cut` as zero.
+With this module off, the green-field and merger modules take the two rates as zero. The sabotage module reads the "sales shortfall" part directly, so that its rule works on the markup that firms price for.
 
 ### What is known to be wrong or untested
 
-- **The unsold part is the same in every industry.** The model has no account of what buyers want. The theory rejects accounts of demand that rest on personal satisfaction, so one cannot simply be added.
-- **Small and large firms of one industry take the same proportional fall.** Step 6 works out the fall for the industry as a whole. A small firm in an industry that top-100 firms partly hold therefore carries some idle overhead, and a top-100 firm there has its price cut a little.
-- **Idle overhead never falls.** The rule has no recovery, so a cost entered in a slump stays in the firm's price for the rest of the run.
-- **People who sell their firms spend none of what they receive.** The rule treats them as owners who hold the money.
-- **Military orders do not count as spending.** With the organised force module also on, the two together cannot show the argument that military spending absorbs what cannot otherwise be sold.
-- **The capitalist share does not fall when industry is held back too far.** Figure 12.1 of the book shows the share falling at very high unemployment. In a run of 60 years from 300,000 firms, the share was 9 per cent while unemployment was near 5 per cent, and between 15 and 20 per cent while unemployment was above 20 per cent. The sabotage and stagflation modules both raise markups as unemployment rises, and they outweigh the fall in what can be sold.
-- **Unemployment stays very high after a slump.** In the same run, unemployment crept from 5.0 to 6.8 per cent over the first 40 years, during the wave of mergers. The run without the module stayed near 4.7 per cent. When the first bout of stagflation cut hiring, unemployment rose to 29 per cent. It was still 22 per cent when the run ended, at least five years after the bout, where the run without the module had fallen to 0.5 per cent. Popular resistance stood at its highest possible level throughout those last years. The dismissals fell on the top 100, as Means found: their part of all employees fell from 18.6 to 11.0 per cent. Differential capitalization ended at 3,982, against 8,121 without the module.
-- **A faster price cut makes the run unstable.** In a trial run that started with 60,000 firms, `price_give` was set to 1. The capitalist share fell to 7.5 per cent, but the run lurched from year to year and unemployment stayed above 40 per cent.
-- **Averaging over one year instead of three makes the run lurch** between selling everything and selling far too little.
+- **The main choice is ours and it decides the result.** By default owners as a class lay out all the money they receive, a year late. A single owner saves, but the money saved goes to somebody: the seller of a firm, a borrower, a builder. The model has no rule by which owners keep money idle for good. With `hoarded` above 0 they do, and the module becomes the underconsumption argument. In one run of 60 years from 30,000 firms with `hoarded` at 0.3, the capitalist share averaged 10 per cent in years with unemployment below 5 per cent, 16 per cent between 10 and 15 per cent, and 12 per cent above 25 per cent. That is the rise and fall of the book's Figure 12.1. With `hoarded` at 0.6 the run lurched, and in one year three quarters of what firms offered stayed unsold. With the default, the share goes on rising with unemployment through a bout of stagflation, so the falling side of Figure 12.1 does not appear.
+- **Owners as a class cannot raise their income, measured against the wage, in a year with no new jobs and no new lending.** What they price for beyond last year's income stays unsold. In such years the capitalist share can rise only because wages fall.
+- **The cost of a new job has no source, and much rests on it.** At 4 years of the wage, a year of ordinary hiring pays for far more than firms add to their priced earnings, so nothing is unsold while firms hire.
+- **Every firm loses the same part of its priced earnings.** The model has no account of what buyers want. The theory rejects accounts of demand that rest on personal satisfaction, so one cannot simply be added.
+- **Money paid for firms buys nothing and takes nothing away.** It passes from owners to owners. The same holds for what top-100 firms pay for public services, which the government uses to retire debt.
+- **Some money has no payer and is left out.** Costs other than the wage are in prices and are paid to nobody. The gain from burdens off the books (externalisation module) is not counted as money that owners have. Military orders (organised force module) have no recorded payer, so the goods made for them are counted like any others. People in public employment (privatisation module) are outside the account.
+- **The government's debt is a price and not a loan here.** The debt module puts a price on the government's interest. A rise in that price is not counted as borrowing, so the government spends only what it collects.
+- **Stagflation and the cost of unsold goods.** The stagflation module works out its price rise on a firm's markup and not on its costs, so a firm that carries unsold goods has its price raised by slightly less than intended.
+- **A second country.** The second country module runs in place of the merger module and does not read `bought_not_built`.
+- **Goods are unsold through a whole bout of stagflation.** During a bout firms raise prices every year and hire nobody. In a run of 60 years from 300,000 firms with this module alone, goods were unsold in 6 years, at most 5.6 per cent of what was offered. Top-100 firms cut their hiring rate by that much in each of those years. Unemployment peaked at 16.7 per cent, against 11.5 per cent without the module, and averaged 6.9 per cent over the last 20 years, against 4.4 per cent.
+- **Many people can be out of work while both conditions hold.** In the same run unemployment was above 10 per cent in 7 years. Differential capitalization fell in most of them, because top-100 firms book their whole loss, and the capitalist share held in all of them.
+- **Tested with default settings only,** in 505 mixes of optional modules from 30,000 firms and five mixes from 300,000. With this module on, mean unemployment over the last 20 years was 1.1 points higher than with it off. No run was stopped. In three mixes employment ended no higher than it began; all three had the proletarianization and boundary contest modules on.
 
-What should happen: while hiring keeps pace with the working population and markups are near normal, everything is sold and the module does nothing. A wave of mergers should leave a small unsold part every year, because some money for expansion buys firms and equips no new job. Unemployment should then creep up, which is the book's "creeping stagnation". When hiring stops, no money for expansion buys goods. Markups of small sellers should fall, top-100 firms should dismiss employees, and each fall should feed the next. The fall should stop by itself, because the unsold part shrinks as owners' earnings shrink.
+What should happen: while firms hire, everything is sold and the module does nothing. In a year when hiring stops and firms go on raising prices, some goods stay unsold. Owners receive less than they priced for, firms outside the top 100 cut prices, and top-100 firms hold back hiring and buy firms. The loss ends when prices have come down to what owners spend, or when hiring starts again. Both conditions of accumulation can hold throughout, with many people out of work.
 
 ---
 
@@ -1738,7 +1768,7 @@ It publishes:
 - **Force has no cost of its own.** Two costs arise in other modules. Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the cohesion of the top 100 in the compass, which limits the intensity of stagflation.
 - **Force does not add to price rises.** In trial runs that started with 60,000 firms, inflation was almost the same with and without the module. The book says that conflict contributes to inflation.
 - **Much of what the sources describe is missing.** Soldiers are not counted, so the armed forces take nobody out of the working population. Arms exports and buyers of arms abroad are not in the model, although Figure 17.2 measures exports. The destruction of war is not modelled. The module closes no boundary and slows no merger, although the 2006 paper says war harms the movement of capital. There is no popular resistance to war itself.
-- **Military orders do not count as spending in the optional module "What can be sold".** The two together cannot show the argument that military spending absorbs what cannot otherwise be sold.
+- **Nobody is recorded as paying for military orders.** The optional module "What can be sold" therefore counts the goods made for them like any other goods. The wages of the people hired add to what wage earners spend, and no tax or loan is set against them. The two modules together cannot show the argument that military spending absorbs what cannot otherwise be sold.
 - **With the coalitions module also on, the contractors grow beyond reason.** In a trial run their part of the top 100's capitalization reached 54 per cent, against 20 per cent with the coalitions module alone.
 - **Dismissals after one war may prepare the next bout.** In trial runs the contractors dismissed their extra employees over about 15 years after a bout. That kept unemployment up, which tightened the cohesion of the top 100 again and brought a second bout. A trial with repression alone gave no early second bout, and a trial with military hiring alone did. The full-size run described next ended ten years after its first bout, too soon to show this.
 - **What a full-size run shows.** In a run of 60 years from 300,000 firms, the first bout of stagflation looked like a war and not like a depression. In the figures printed every five years, unemployment peaked at 7.5 per cent, against 10.7 per cent without the module. It stood at 2.3 per cent while prices rose 7 per cent a year. Popular resistance peaked at 0.27, against 0.46. The top 100's part of all employees rose to 24 per cent during the bout, where without the module it fell to 17 per cent. Differential capitalization rose through the bout and ended at 9,859, against 8,121. After the bout unemployment stayed near 1.5 per cent, where the run without the module fell to 0.5 per cent, the lowest the model allows. With the coalitions module also on, differential capitalization ended at 7,917.
@@ -3121,11 +3151,13 @@ It reads:
 - `unemployment` and `concentration`, which the core publishes. `concentration` is the part of all employees who work for the 100 largest firms.
 - the wage, the normal rate of return, and each firm's employees, industry, earnings and price
 
-It publishes eleven numbers.
+It publishes thirteen numbers.
 
 | Name in the code | What it is | Who reads it |
 |---|---|---|
 | `household_debt_placation` | The number of step 9 | The resistance module (module 8) |
+| `household_debt_lent` | The money that lenders handed to wage earners in the year | The optional sales module |
+| `household_debt_repaid` | The money that wage earners paid back in the year | The optional sales module |
 | `household_debt` | The price of the debt, from step 10 | Nobody |
 | `household_debt_principal` | The money that households owe | Nobody |
 | `household_debt_pledged` | The year's interest as a part of the wage bill | Nobody |
@@ -3145,7 +3177,7 @@ The module owns the income named "household interest". The core fills it in from
 - **The model has no banks.** Step 7 therefore sends most of the interest to the industries where the largest firms are. Every firm of such an industry gains, including the small ones.
 - **Households stop borrowing ten years after a fall in the wage,** even if the wage never recovers, because the shortfall is measured against the best level of the last ten years.
 - **Di Muzio and Robbins are not Nitzan and Bichler.** Their account of money created as debt is used only to say that lending costs the lender nothing.
-- **Households do not spend what they borrow.** Borrowing and repayment change no income, so the module says nothing about what can be sold.
+- **What households borrow is spent only in the sales module's account.** Borrowing and repayment change no income here. The module publishes the money lent and the money repaid, and the optional sales module counts both in what wage earners have to spend. With that module off, nothing follows from them.
 - **Interest does not enter prices and does not force growth.** Di Muzio and Robbins hold that it does both.
 - **The debt is not traded.** It has no price apart from the published one.
 - **Debt does not discipline workers.** The optional organised labour module does not read how indebted wage earners are.

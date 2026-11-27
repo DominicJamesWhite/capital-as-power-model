@@ -66,6 +66,9 @@ class Mergers:
         open_sum = weight_sum = 0.0
         # a barrier that holds the dominant firms of a sector inside their own industry (optional module); 0 without it
         barred = np.broadcast_to(np.asarray(L.accounts.get("line_barrier", 0.0), dtype=float), n_sec)
+        # employees that a buyer seeks by purchase in place of jobs it held back for want of sales, as a
+        # fraction of its own (optional module); 0 without it
+        seek = self.base_rate + L.accounts.get("bought_not_built", 0.0)
         open_sector_all, open_nation_all = open_sector, open_nation
         for a in rng.permutation(top):
             i, s = ind[a], sec[a]
@@ -76,7 +79,7 @@ class Mergers:
                 weight_sum += n[a]
                 continue
             open_sum += n[a] * free / (free + held); weight_sum += n[a]
-            want = self.base_rate * n[a] * free / (free + held) * (1 - slow)
+            want = seek * n[a] * free / (free + held) * (1 - slow)
             want = want * appetite[s]      # a coalition's appetite for buying (optional module); 1 without it
             want = want * hyped
             want = want * (1 - L.accounts.get("eruption_stops_buying", 0.0))   # an eruption suspends the buying of firms (optional module); 0 without it

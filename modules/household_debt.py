@@ -117,8 +117,9 @@ costs the lender nothing.
 
 WHAT IS MISSING
 
-Repayment and new borrowing change no income in the model, and households do not spend what
-they borrow, so the module says nothing about what can be sold. Di Muzio and Robbins hold that
+Repayment and new borrowing change no income in the model. The module publishes the money lent
+and the money repaid in the year, and the optional sales module counts them in what wage
+earners have to spend; with that module off, nothing follows from them. Di Muzio and Robbins hold that
 the cost of interest forces growth and is passed into prices; the rule has neither. Household debt is
 not traded and has no price of its own apart from the published capitalized value. The
 discipline that debt imposes on an indebted worker does not reach the module for organised
@@ -137,10 +138,13 @@ class HouseholdDebt:
     supplies = ("household_debt", "household_debt_principal", "household_debt_pledged",
                 "household_debt_reach", "household_debt_shortfall", "household_debt_borrowing",
                 "household_debt_written_off", "household_debt_dominant", "household_debt_capital_share",
-                "household_debt_markup_part", "household_debt_placation")
+                "household_debt_markup_part", "household_debt_placation", "household_debt_lent",
+                "household_debt_repaid")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "household_debt": ("Household debt", "number", "Capitalized value of household interest, in money."),
         "household_debt_principal": ("Household debt owed", "number", "The money owed."),
+        "household_debt_lent": ("Money lent to households", "number", "What lenders handed to wage earners in the year."),
+        "household_debt_repaid": ("Money repaid by households", "number", "What wage earners paid back to lenders in the year."),
         "household_debt_pledged": ("Interest pledged from wages", "share", "Household interest as a part of the wage bill."),
         "household_debt_reach": ("Reach of household lending", "share", ""),
         "household_debt_shortfall": ("Shortfall of kept income", "share", ""),
@@ -198,6 +202,7 @@ class HouseholdDebt:
 
         # parts 3 and 4: borrowing and repayment
         borrowing = self.cover * self.reach * shortfall * wages
+        repaid = self.principal * self.repay
         self.principal = self.principal * (1 - self.repay) + borrowing
 
         # parts 5 and 6: the interest, its limit, and default
@@ -231,6 +236,8 @@ class HouseholdDebt:
             "household_debt_capital_share": float((base.sum() + interest) / (base.sum() + wages)),   # interest counted once
             "household_debt_markup_part": 1 / new,                                    # by industry; no module reads it
             "household_debt_placation": self.placate * borrowing / wages,             # part 9, read by the resistance module
+            "household_debt_lent": borrowing,                                         # the money that lenders handed to wage earners this year
+            "household_debt_repaid": repaid,                                          # the money that wage earners paid back to lenders this year
         }
         changes = [Publish(key, value, self.name) for key, value in out.items()]
 
