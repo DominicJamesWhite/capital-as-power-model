@@ -1,598 +1,1105 @@
-# Module rules
+# How each module works
 
-This file states, in words, the rule that each module of the model will follow. Nothing here has been built. Each module has the same five headings.
+This file describes every part of the model: what it does each year, which passage of the theory it rests on, and what is known to be wrong with it. `README.md` is the place to start if you have not seen the model before.
 
-- **Source** names the chapter and section of *Capital as Power* (2009) that the module rests on. The text of the book is in `data/bn_archives/casp_book/text/`.
-- **What the book says** gives the claim, with the book's own words where they are short.
-- **Rule** gives the simplest rule that does what the book says.
-- **Additions** lists every part of the rule that the book does not supply. The book gives directions and interactions. It gives no formulas and no rates, and it calls its own propositions "tentative". Every number in these rules is therefore an addition.
-- **Expected** says what the module should produce while dominant capital's rule holds, and what should happen when that rule loosens.
+The theory is set out in *Capital as Power: A Study of Order and Creorder* (2009) by Jonathan Nitzan and Shimshon Bichler. This file calls it "the book". Chapter and section names refer to it. It is free to read at [bnarchives.net](https://bnarchives.net).
 
-## Terms used in every module
+The book describes how owners behave and what follows. It gives no formulas and no rates. Every rule in this file is therefore our own way of writing down what the book describes, and almost every number is our own choice. Each section says which is which.
 
-A **claim** is one capitalized entity in the ledger. A claim carries four numbers: employees, earnings per employee, hype and risk. Its capitalization is employees times earnings per employee times hype, divided by risk times the normal rate of return.
+The file has three parts:
 
-An **envelope** is a boundary: an industry, a sector, a nation or the world. Each envelope has its own set of claims, its own average, its own currency, its own settings for each module, and a permeability that says how freely claims inside it can be bought from outside.
+1. the words used throughout, the starting position and what happens in one year
+2. the nine main modules, which always run
+3. the rules that all modules share: how a markup is recorded, how a price is worked out, and how payments such as taxes are recorded
 
-**Dominant capital** is measured by proxy as the hundred largest claims in an envelope, ranked by capitalization. The book defines dominant capital as "the leading corporate–government coalitions" and uses the top hundred firms only as an approximation (chapter 14, "Dominant capital").
+The optional modules follow after that.
 
-A **setting** is a number that belongs to an envelope and that a dated event can change.
+Every section on a module has the same six headings: what it is about, what the theory says, what the module does each year, its settings, what it reads from other modules and what it gives them, and what is known to be wrong or untested.
+
+## Words used in this file
+
+**Firm.** The model holds a list of firms. For each firm it records the number of employees, the industry it is in, its earnings for each employee, and two numbers called hype and risk. A firm in the model is a legal owner of earnings and nothing more. When one firm buys another, the two become one firm, so after many mergers one firm may stand for a whole group of companies.
+
+**Wage.** There is one wage for the whole economy. It starts at 1. Everything in money is measured against it.
+
+**Markup.** What a firm adds to its wage cost when it sets a price. If the wage is 100 and the markup is 0.10, the price is 110 and the firm earns 10 for each employee.
+
+**Capitalization.** What a firm is worth to its owners. The book's formula (chapter 11, equation 8) is:
+
+> capitalization = employees × earnings per employee × hype ÷ (risk × normal rate of return)
+
+A firm with 1,000 employees that earns 2 for each of them, with hype of 1, risk of 1 and a normal rate of return of 5 per cent, has a capitalization of 1,000 × 2 × 1 ÷ (1 × 0.05) = 40,000.
+
+**Hype.** How far owners' expectations run ahead of what the firm will really earn. The book defines it as "the ratio of expected future earnings to actual future earnings" (chapter 11). Hype of 1 means owners expect exactly what will come. Hype of 1.2 means they expect a fifth too much.
+
+**Risk.** How unsure owners are of their own forecast. The book says: "When capitalists are fully confident, δ is 1. Otherwise, δ is bigger than 1, and it increases as confidence decreases" (chapter 11, "The degree of confidence"; δ is the book's symbol for risk). The model follows this: if a rule would take a firm's risk below 1, the model sets it to 1.
+
+**Normal rate of return.** The rate of return that owners feel sure they can get. It is one number for the whole economy, 5 per cent, and none of the nine main modules changes it.
+
+**Dominant capital.** The book's name for the largest firms and the government bodies allied with them: "the leading corporate–government coalitions" (chapter 14, "Dominant capital"). The book measures it with "the top 100 corporations", which it uses "as a proxy for dominant capital" (chapter 14). The model does the same. In this file, dominant capital means the 100 firms with the highest capitalization in that year, and "small firms" means all the others. The list of 100 is drawn up afresh every year.
+
+**Differential capitalization.** The main result of the model. It is the average capitalization of the 100 largest firms divided by the average capitalization of all firms. A figure of 500 means that a typical top-100 firm is worth 500 times a typical firm.
+
+**Differential accumulation.** The book's name for growing faster than the average: "the ability of dominant capital to accumulate faster than the average" (chapter 1). In the model it is the yearly rise in differential capitalization.
+
+**Breadth and depth.** The book's two routes to differential accumulation (chapter 14, Table 14.2). Breadth is having more employees than the average firm. Depth is earning more for each employee than the average firm. The model reports both for the top 100. A breadth of 300 and a depth of 2 mean that a typical top-100 firm has 300 times the employees of a typical firm and earns twice as much for each of them. Differential capitalization always equals breadth × depth × the top 100's hype against the average ÷ their risk against the average.
+
+**Strategic sabotage.** The book's name, taken from Thorstein Veblen, for the way business earns by holding industry back: keeping prices up and limiting what is produced and who may produce it. Chapter 12 calls it "the strategic limitation of industry".
+
+**Creorder.** The book's word for a society seen as an order that is always being made and remade: "a creation of order, or creorder" (chapter 1).
+
+**Industry, sector and boundary.** Each firm is in one of 400 industries, and each industry is in one of 20 sectors. A top-100 firm can always buy firms in its own industry. Two boundaries limit what else it can buy: one around its sector and one around the rest of the economy, which this file calls the national boundary. Each boundary has an openness between 0 (closed) and 1 (fully open). At an openness of 0.3, a buyer can reach three tenths of the firms beyond that boundary. The book calls such a boundary an "envelope" (chapter 15, "Breaking the envelope").
+
+**Setting.** A number that a module uses, with a name in the code and a default value. You can change any setting when you run the model.
+
+**An addition.** A rule or a number that we made up because the book and the papers do not supply one.
+
+**Year labels.** A run starts in a year labelled 1890. The labels are only labels. The year labelled 1930 is the fortieth year of a run and has nothing to do with the real 1930.
+
+## The starting position
+
+A run has to start somewhere. The start is meant to resemble what the book calls "the golden age of 'free competition'" (chapter 12): many small firms of similar size and no large ones. All of these figures are our own choices.
+
+| What | Value at the start |
+|---|---|
+| Number of firms | 300,000. This was chosen to be about the number of corporations in the United States in the 1910s. That figure has not been checked against a source. |
+| Employees of each firm | Drawn at random. The middle firm has 100. About two thirds of firms have between 45 and 220. |
+| Industries and sectors | 400 industries in 20 sectors. Each firm is placed in an industry at random. |
+| Markup | 0.10 for every firm |
+| Hype | 1 for every firm |
+| Risk | 2 for every firm |
+| Wage | 1 |
+| Normal rate of return | 0.05 |
+| Unemployment | 5 per cent |
+| Growth of the working population | 1.7 per cent a year, for the whole run |
+| Sector boundary and national boundary | Both closed |
+
+## What happens in one year
+
+The list of firms does nothing by itself. Every change comes from a module. The part of the program that keeps the list and applies the changes is called the core (`core.py`).
+
+Each year goes like this:
+
+1. Every module looks at the same list of firms, as it stood at the end of the year before. It also reads the numbers that other modules published the year before. It then hands the core a list of the changes it wants. No module changes a firm directly.
+2. The core applies all changes to employees, hype, risk, markups and the wage together. It then works out every firm's earnings and price afresh.
+3. The core settles the year's payments, such as taxes and interest. "The record of transfers" below describes this.
+4. The core checks that no firm holds an impossible value. "Checks the model makes on itself" below describes this.
+5. The core works out how much of the year's change in differential capitalization each module caused.
+6. The core applies the year's mergers, then removes any firms that a module has dissolved, then adds newly founded firms.
+7. The core publishes the numbers that modules will read next year.
+
+Three things follow from this order.
+
+- **Modules talk to each other only through published numbers, one year late.** If the resistance module raises the level of resistance this year, the stagflation module sees the new level next year.
+- **The order in which modules are listed makes no difference.** Every module reads the same start-of-year list, and the core applies changes in the alphabetical order of the modules' names.
+- **Each module has its own supply of random numbers.** Switching one module on or off does not change the random draws of another.
+
+### What the core publishes
+
+The core has no behaviour, but it publishes five numbers each year that any module may read:
+
+| Name in the code | What it is |
+|---|---|
+| `unemployment` | The part of the working population that no firm employs |
+| `capital_share` | The earnings of all firms as a part of all income. The model calls this the capitalist share of income. |
+| `concentration` | The part of all employees who work for the top 100 firms |
+| `transfers` | For each kind of payment, how much was asked for and how much was paid last year |
+| `wage_earners_net` | What wage earners received in payments less what they paid, as a part of all wages |
+
+### How the year's gain is divided among the modules
+
+Each year the model reports how much of the change in differential capitalization came from each module. The change is measured as a logarithm, which for small changes is close to the percentage change divided by 100.
+
+For example, differential capitalization rises by about 5 per cent in a year, which is a change of 0.049. The report might read: mergers +0.060, green-field growth −0.015, stagflation +0.010, turnover −0.006. The four add up to 0.049 exactly. They always do, with nothing left over.
+
+Two entries in such a report are not modules. "Turnover" is the effect of firms entering and leaving the top 100 when the list is redrawn. "Risk floor" is the effect of the rule that no firm's risk can go below 1.
 
 ---
 
 ## 1. Business-as-usual sabotage
 
-**Source.** Chapter 12, "Pricing for power", "The capitalist norm", "The differential underpinnings of universal sabotage" and "In sum". Chapter 15, "Tobin's Q".
+Name in the model: `sabotage`
 
-**What the book says.** The routine methods of sabotage "operate not directly, but indirectly, through the fundamental unit of the capitalist order: price". Firms set a price that includes a markup toward a target rate of return, and "the specific level at which they set the price already embodies the power to incapacitate". The book adopts Kalecki's view that the markup measures power. It cites Gardiner Means's finding for the 1930s: in competitive industries prices fell heavily and output fell little, while in concentrated industries "prices declined slightly, while production and payroll collapsed". Even a competitive firm is told to "produce only if you expect to earn at least the normal rate of return". The overall level of unemployment is not anyone's aim. It is the "aggregate consequence" of owners' tactics against each other.
+### What it is about
 
-**Rule.** The rule has five parts and works industry by industry.
+This module sets the markup of every industry, and with it how fast firms hire. Think of two trades. In one, thousands of small builders compete, and any builder who charges too much is undercut. In the other, three cement makers supply the whole country, and they can keep the price up by not building new plants. The module gives the second kind of industry a higher markup and slower hiring. Nobody in the model aims at a level of unemployment. Unemployment is what is left when every industry has done this.
 
-1. A claim's price is its cost plus a markup. Its earnings per employee are the markup times the wage. Since 26 November 2026 the core works the price out from the wage, the markup and any named cost, and the module proposes no price of its own (see "How the price is worked out").
-2. In an industry that dominant capital does not hold, the markup falls when the industry's employment grows faster than the working population. The fall is in proportion to the excess.
-3. Small claims hire faster than the working population grows when their industry's markup is above a normal level, and more slowly when it is below.
-4. In an industry that dominant capital holds, the markup moves toward a target, and small claims' extra hiring and the founding of new claims are barred in proportion to the part of the industry that is held. Dominant claims hire no faster than the working population grows, and they give up some employment when they raise the markup.
-5. When unemployment is above a certain level, wages rise more slowly than prices and every markup rises. Below that level every markup falls. The level is a setting that stands for the strength of labour.
+### What the theory says
 
-Unemployment and the capitalist share of income are totals that the model reports. The share is the average markup divided by one plus the average markup.
+Chapter 12, "Pricing for power", "The capitalist norm", "The differential underpinnings of universal sabotage" and "In sum".
 
-**Additions.** Every rate is an addition: how fast growth wears a markup down, how strongly small claims respond, how fast a held industry approaches its target, how much employment a price rise costs, and how strongly unemployment bears on wages. The normal markup and the target markup are settings. The book reports that such targets exist and that they cannot be derived. The level of unemployment at which wages keep pace with prices is also a setting, and it fixes where unemployment comes to rest in the long run. All claims in an industry have the same markup, so a dominant claim gains from the industries it sits in and not from any advantage over its neighbours.
+- The routine methods of sabotage "operate not directly, but indirectly, through the fundamental unit of the capitalist order: price".
+- Firms set a price that includes a markup aimed at a target rate of return, and "the specific level at which they set the price already embodies the power to incapacitate".
+- The book reports Gardiner Means's finding for the 1930s. In competitive industries prices fell heavily and output fell little. In concentrated industries "prices declined slightly, while production and payroll collapsed".
+- Even a firm in a competitive industry is told to "produce only if you expect to earn at least the normal rate of return".
+- Nobody aims at the overall level of unemployment. It is the "aggregate consequence" of what owners do to each other.
+- Figure 12.1 sets "the utilization of industrial capacity on the horizontal axis against the capitalist share of income on the vertical axis". The share first rises as industry is held back and then falls when it is held back too far.
 
-**Replaced rule.** The first version of this module handed the model a hump-shaped curve of the capitalist share against unemployment and had owners steer unemployment to its top. That was dropped on 25 November 2026. It made owners into a class that finds an optimum, it worked through hiring and had no prices, and it produced unemployment at the model's floor for decades.
+A later paper, "Can Capitalists Afford Recovery?" (2014), reports that in the United States from 1947 to 2013 the capitalist share of income followed "the rate of unemployment three years earlier". The module has no such delay.
 
-**Expected.** Industries that dominant capital does not hold stay near the normal markup, because a higher markup brings hiring and entry and these wear it down. Industries that dominant capital holds earn more. As more of the economy is held, the capitalist share rises. Unemployment rises while concentration is increasing, because held industries hire less. The curve of Figure 12.1 is now something the model may or may not show. The rule cannot produce the left side of that curve, where the share falls at very high unemployment, because it has no account of how much can be sold.
+The book says that target markups exist and gives no way to work them out. Every rate in this module is our own.
+
+### What the module does each year
+
+The module works industry by industry. For each industry it first measures two things: the industry's average markup, and the part of the industry's employees who work for top-100 firms. This file calls that part "the part held by dominant capital".
+
+1. **Unemployment weakens wages.** When unemployment is above 5 per cent, wages lag behind prices and every markup rises. When it is below 5 per cent, every markup falls. The change is 0.2 times the gap. Popular resistance, which the resistance module publishes as a number between 0 and 1, raises the 5 per cent level by up to 5 points.
+2. **Small firms undercut each other.** In the part of an industry that dominant capital does not hold, the markup falls when the industry hired faster last year than the working population grew. It rises when the industry hired more slowly.
+3. **Dominant capital holds its markup towards a target.** In the part of an industry that dominant capital holds, the markup moves each year one tenth of the way towards a target of 0.30. Popular resistance weakens this: at full resistance the target is no higher than the normal markup of 0.10.
+4. **The new markup is the old one plus these three changes.** It cannot go below 0.005. Every firm in the industry has its markup raised or lowered in the same proportion.
+5. **Small firms hire more where the markup is high.** Small firms hire at the rate the working population grows, plus half of the gap between the industry's markup and the normal markup of 0.10. Where dominant capital holds part of an industry, that extra hiring is cut in proportion, because entry is barred. When the markup is below normal, small firms hire less, whoever holds the industry.
+6. **Top-100 firms never lead the hiring.** They hire no faster than the working population grows and no faster than small firms across the economy. They also give up some hiring when they raise their markup.
+
+**An example.** An industry has a markup of 0.12. Dominant capital holds 40 per cent of it. Unemployment is 7 per cent, there is no popular resistance, the industry hired 2.7 per cent more people last year, and the working population grows 1.7 per cent a year.
+
+- Step 1 adds 0.2 × (0.07 − 0.05) = 0.004.
+- Step 2 takes off 0.6 × (0.027 − 0.017) = 0.006.
+- Step 3 adds 0.4 × 0.1 × (0.30 − 0.12) = 0.0072.
+- The new markup is 0.12 + 0.004 − 0.006 + 0.0072 = 0.1252.
+- Small firms hire at 0.017 + 0.5 × (0.1252 − 0.10) × 0.6 = 2.5 per cent.
+- Top-100 firms hire at 0.017 − 0.5 × 0.0072 ÷ 1.1252 = 1.4 per cent, if small firms across the economy are hiring at 1.7 per cent or more.
+
+With only markups as income, the capitalist share of income is the average markup divided by one plus the average markup. An average markup of 0.25 gives a share of 20 per cent.
+
+### Settings
+
+All of these are our own choices. No source gives any of them.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `normal_markup` | 0.10 | The markup at which small firms hire neither more nor less than the working population grows |
+| `target_markup` | 0.30 | The markup that dominant capital holds an industry towards |
+| `erosion` | 1.0 | How much the markup falls for each point by which an industry's hiring outruns the working population (step 2) |
+| `response` | 0.5 | Extra hiring by small firms for each point of markup above normal (step 5) |
+| `hold` | 0.1 | The part of the gap to the target that a fully held industry closes each year (step 3) |
+| `volume_cost` | 0.5 | Hiring that top-100 firms give up for each point by which they raise their markup (step 6) |
+| `wage_weakness` | 0.2 | The rise in every markup for each point of unemployment above the level in the next row (step 1) |
+| `labour_holds_at` | 0.05 | The level of unemployment at which wages keep pace with prices. It stands for the strength of labour. |
+| `floor` | 0.005 | The lowest markup an industry can have. This is a plain limit with no source. |
+| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+
+One more number is fixed in the code and is not yet a setting you can change: `resistance_shift`, 0.05, the rise in `labour_holds_at` at full popular resistance.
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `unemployment`, from the core
+- `industry_growth`, from the green-field module: how fast each industry hired last year
+- `resistance`, from the resistance module: the level of popular resistance
+
+It gives the green-field module three numbers for each industry:
+
+- `hire_small`: the hiring rate of small firms
+- `hire_dominant`: the hiring rate of top-100 firms
+- `entry_open`: the part of the industry that dominant capital does not hold
+
+It owns the part of each firm's markup that the code calls the base. "How modules share a quantity" explains what that means.
+
+When optional modules are on, it also reads `second_country_held` and `foreign_held` (both add to the part held), `policy_rate_markup` (moves the normal markup), `protection_open` and `nature_open` (bar small firms' extra hiring), `labour_strength_by_industry` (takes the place of popular resistance in step 1), `second_country_labour` (raises the 5 per cent level), `currency_markup` (adds to every markup) and `eruption_frees_markups` (weakens step 3).
+
+### What is known to be wrong or untested
+
+- **A long slump raises markups without end.** Step 1 makes the yearly change of the markup depend on the level of unemployment. If unemployment stays at 15 per cent for forty years, markups rise every one of those years. Figure 12.1 of the book sets a level against a level.
+- **The falling side of Figure 12.1 is missing.** The module cannot make the capitalist share fall when industry is held back too far, because it has no account of how much can be sold. The optional sales module adds one, and even then the share does not fall.
+- **The lowest markup of 0.005 has no source.** It applies to the average of an industry, so a single firm can lie below it.
+- **Two changes to one markup in one year are multiplied.** If this module wants to raise a markup of 0.10 by 0.06 and another module wants to lower it by 0.05, the result is 0.10 × 1.6 × 0.5 = 0.08 and not 0.11.
+- **Three 5 per cent levels are separate settings.** `labour_holds_at` here and `usual_unemployment` in four other modules all default to 0.05. Changing one does not change the others.
 
 ---
 
 ## 2. Debt and equity
 
-**Source.** Chapter 12, "Equity versus debt", "Immaterial assets", "Material assets" and "The maturity of capitalism". Chapter 13, "The government bond" and "Government capitalized".
+Name in the model: `debt`
 
-**What the book says.** "Equity capitalizes the firm's differential ability to restrict industry for its own benefit, whereas debt capitalizes the average ability of all owners to limit industry at large." Interest is therefore the return on average sabotage and profit the return on differential sabotage. The ratio of interest to profit is read as a measure of how settled the institutions of power are. When they are settled, owners trust promised returns and debt grows. When they are shaken, owners fall back on equity. Figure 12.4 shows this ratio moving with unemployment in the United States from the 1930s. The government bond is "the first systematic capitalization of power, namely, the power of government to tax".
+### What it is about
 
-**Rule.** The module divides each envelope's capitalist income into interest and profit. The interest part moves slowly toward a level that rises with the envelope's unemployment rate, averaged over several years. The ledger holds a debt claim for the envelope's corporations taken together and a debt claim for its government. Each debt claim is capitalized from its interest stream with a risk of one, because the book treats a promised return as the confident case.
+This module keeps count of lending. It works out what part of owners' income is paid as interest, how much corporate debt that interest supports, and how large the government's debt is. It changes no firm. It is a set of running totals, like a page of accounts kept beside the list of firms.
 
-**Additions.** The speed of adjustment and the slope against unemployment are additions. Holding corporate debt as one pooled claim per envelope is an addition made for simplicity. The size of the government's interest stream is a setting, because the chapters read so far do not say what moves it.
+### What the theory says
 
-**Expected.** Over a long period of rising unemployment, the interest share of capitalist income rises, as in the United States from 1950 to 1980. When an event opens the envelope and unsettles its institutions, the ratio falls, as the book describes for the period after the middle of the 1980s. This module changes the make-up of capitalist income. It does not change differential capitalization among equity claims.
+Chapter 12, "Equity versus debt", "Immaterial assets", "Material assets" and "The maturity of capitalism". Chapter 13, "The government bond" and "Government capitalized".
+
+- "Equity capitalizes the firm's differential ability to restrict industry for its own benefit, whereas debt capitalizes the average ability of all owners to limit industry at large."
+- So "interest on debt represents average sabotage, while profit on equity denotes differential sabotage".
+- The book adds that "long-term swings in the ratio of interest to profit can be interpreted as a proxy for the 'maturity' of capitalism", by which it means "the strength and solidity of existing power institutions". When these are solid, owners trust promised returns and debt grows.
+- The government bond is "the first systematic capitalization of power, namely, the power of government to tax".
+
+Sandy Brian Hager's studies of the United States find that the public debt is concentrated in the hands of large owners and paid for by taxes levied broadly ("What Happened to the Bondholding Class?", 2013).
+
+The book gives no rule for how fast the interest part moves or how large the government's debt is.
+
+### What the module does each year
+
+1. It averages unemployment over the last five years.
+2. It sets a level for the interest part of owners' income: 10 per cent when unemployment has averaged 5 per cent, and 4 points more for each point of unemployment above that.
+3. It moves the interest part one tenth of the way from where it is to that level. The interest part starts at 20 per cent. It is kept between 0 and 90 per cent.
+4. It works out corporate debt as the value of that interest: the interest part × the earnings of all firms ÷ the normal rate of return. Debt is a promised return, so the module gives it a risk of 1.
+5. It works out the government's debt. The government's interest payments are taken to be 2 per cent of all income, and the debt is their value: 2 per cent of all income ÷ the normal rate of return.
+6. It adds what the government borrowed for bailouts and takes off what the government received from selling public services. Two optional modules publish these amounts. With those modules off, both are zero. If sales ever brought in more than the whole debt, the module would report no debt and set the rest against later borrowing.
+7. It reports the part of the government's debt held by dominant capital. This is taken to be the same as the top 100's part of all capitalization.
+
+**An example.** Unemployment has averaged 8 per cent. The level is 0.10 + 4 × 0.03 = 0.22. The interest part was 0.20, so it moves to 0.202. All firms together earn 1,000 and the normal rate of return is 5 per cent, so corporate debt is 0.202 × 1,000 ÷ 0.05 = 4,040. All income is 10,000, so the government pays interest of 200 and its debt is 200 ÷ 0.05 = 4,000. If the top 100 firms hold 30 per cent of all capitalization, they are taken to hold 1,200 of it.
+
+### Settings
+
+All of these are our own choices. No source gives any of them.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `base` | 0.10 | Interest as a part of owners' income when unemployment is at its usual level |
+| `slope` | 4.0 | The rise in that part for each point of unemployment above the usual level |
+| `usual_unemployment` | 0.05 | The usual level of unemployment |
+| `years` | 5 | The number of years over which unemployment is averaged |
+| `speed` | 0.1 | The part of the gap that the interest part closes each year |
+| `government_part` | 0.02 | The government's interest payments as a part of all income |
+| `start` | 0.20 | The interest part in the first year |
+
+The limits of 0 and 90 per cent in step 3 are written into the code without a name. They are plain limits with no source.
+
+### What it reads from other modules and what it gives them
+
+It reads `unemployment` from the core. When the optional risk shaping and privatisation modules are on, it reads `bailout_borrowing` and `privatisation_proceeds` from them.
+
+It publishes four numbers: `interest_share`, `corporate_debt`, `government_debt` and `government_debt_dominant`. None of the nine main modules reads them. The optional public debt module reads the government's debt and decides who is taxed for the interest and who receives it.
+
+### What is known to be wrong or untested
+
+- **Nobody pays the interest.** With only the nine main modules on, the module reports debts and charges nobody for them. In particular, when bailouts add to the government's debt and the public debt module is off, the cost of the bailouts is reported and falls on nobody.
+- **Bailout debt is never repaid.** It is a sum of money that stands for ever. In a run where all income falls in money, it weighs more every year.
+- **The link to unemployment is only one of the things the book describes.** The book says that debt grows when the institutions of power are solid. The module uses unemployment alone to stand for that.
+- **The rule has not been read against the book line by line.** It was written quickly and has only been checked for running correctly.
 
 ---
 
 ## 3. Green-field growth
 
-**Source.** Chapter 14, Table 14.2, "External Breadth". Chapter 15, "Green-field", "Running ahead of the pack" and "Running with the pack".
+Name in the model: `greenfield`
 
-**What the book says.** A firm can grow by hiring new employees. Large firms respond to overall growth by adding employees. Small firms respond by adding employees and also by multiplying in number, and "newborn firms, by their very nature, tend to be smaller than the average". So even when large and small firms grow at the same rate, the average size of a firm falls and the relative size of dominant capital rises. From 1926 to 2008 the number of United States corporations rose nearly sixteenfold while employment rose threefold. Leading the pack in new capacity is "suicidal", because it undermines the limitation of industry on which profit depends. The limit on green-field growth is "the extent of proletarianization".
+### What it is about
 
-**Rule.** Each envelope has a working population that grows at a rate given as a setting. Each claim hires at the rate that module 1 supplies for its industry: one rate for dominant claims and one for the others. Part of the hiring by small claims goes to newly founded claims in the same industry, each much smaller than the average claim, and less of it where entry is barred. Total employment cannot exceed the working population.
+This module does the hiring, and it founds new firms. "Green-field" is the book's word for growth by building new capacity and taking on new workers, as opposed to buying a firm that already exists. When a town's shops are doing well, the existing shops take on staff and new shops also open. The new shops are small. That is the point of the module: growth adds many small firms, so the average firm gets smaller, and the large firms look larger beside it without doing anything.
 
-**Additions.** The part of new employment that goes to new claims, and the size of a new claim, are additions. A new claim starts with the markup of the industry it enters.
+### What the theory says
 
-**Two corrections, 26 November 2026.** Both concern the founding of a claim. The settings of the module and their defaults did not change.
+Chapter 14, Table 14.2, "External Breadth". Chapter 15, "Green-field", "Running ahead of the pack" and "Running with the pack".
 
-1. *Who staffs a new claim.* The module works out how many new claims an industry should found from the part of its small claims' hiring that goes to new claims. That number is rarely whole, so the module rounds it up or down by chance. When it rounded up in an industry where small claims hired very little, the new claim needed more people than those claims had hired, and the module took the difference from the claims themselves. In one run a claim was left with fewer than no employees. The book's sentence settles what the rule should be: "Smaller companies, by contrast, respond by growing in number (through the birth of new firms) as well as in size (by hiring more workers)" (chapter 15, "Running with the pack"). The birth of a firm is one of the two forms that the growth of small firms takes. It is part of the year's new employment, and it takes nobody from a firm that exists. The module now follows this. In a year, an industry founds no more claims than the new employment of its small claims in that year can staff. When the rounding asks for more, the extra claims are not founded and the people stay with the claims that hired them. No number was added for this. The limit is the industry's own hiring.
+- Large firms respond to overall growth by adding employees. "Smaller companies, by contrast, respond by growing in number (through the birth of new firms) as well as in size (by hiring more workers)."
+- New firms are small: "newborn firms, by their very nature, tend to be smaller than the average".
+- "From 1926 to 2008, the number of corporations has risen nearly sixteenfold, whereas overall employment has grown only threefold."
+- For a large firm, hiring faster than everyone else is "suicidal", because it lowers prices and so loses more in depth than it gains in breadth.
+- The upper limit on green-field growth is "the extent of proletarianization", the book's term for how much of the population works for a wage. Growth of this kind is "a double-edged sword".
 
-2. *The markup a new claim starts with.* The module gave a new claim the average markup of its industry. That average included the premiums of claims that hold a protection, a size premium or a hold on what buyers want (see "How modules share a quantity"), and the core placed the whole of it in the new claim's base markup. A new claim therefore started with part of a premium although it held nothing that earns one. The module now gives a new claim the average, over the employees of its industry, of the part of the markup that stacks. Every other component of the new claim starts at its neutral value. With the nine modules alone there is no premium of this kind, and the rule gives the same figure as before. The book gives no rule for the markup of a newborn firm. Chapter 12 says only that a firm should "produce only if you expect to earn at least the normal rate of return", and chapter 16 says that final commodities "can often be protected through patents, copyrights and other exclusionary threats", which makes a protection something its holder has and a newcomer does not. The rule is therefore an addition.
+The book gives no figure for how much hiring goes to new firms, how large a new firm is, or what markup it starts with.
 
-**What these corrections leave open.** The first correction means that an industry whose small claims hire less in a year than one new claim employs founds no claim in that year, however many years this lasts. This happens only in industries that dominant capital holds almost wholly. The count of claims that were not founded for this reason is kept by the module and is reported under "Changes made while building". The second correction still gives a new claim the average of every stacking component of its industry. That average includes the lead that dominant claims gained from their own price rises during stagflation, and, in optional modules, premiums that stack, such as the war premium and the resource premium. A new claim made none of those gains. Item 41 of `backlog.md` records this. One more point was found and left as it was. The module fixes the new claim's earnings for each employee as an amount of money at the start of the year, and the claim is entered at the end of the year. In a year when the wage rises, the new claim's markup is therefore lower than its industry's by the size of the rise. Removing this would change the run of the nine modules from the first year of stagflation, and the book gives no guidance either way. Item 42 of `backlog.md` records it, with the figures of a trial.
+### What the module does each year
 
-**Expected.** With this module and module 1 together, steady growth raises the differential size of dominant capital, because the average falls. Where hiring in an industry outruns the growth of the working population, module 1 lowers that industry's markup. Growth therefore raises breadth and threatens depth, which is the book's statement that green-field growth is "a double-edged sword".
+1. **The working population grows** by 1.7 per cent.
+2. **Each firm gets a hiring rate.** It is the rate that the sabotage module published for the firm's industry: one rate for top-100 firms and one for small firms. If the stagflation module has published a cut in hiring, which this file calls the crisis, the module takes it off every firm's rate. A rate below zero means the firm lets people go.
+3. **Mergers slow hiring.** The mergers module publishes a number called the hiring drag. The module cuts all hiring by that proportion, because money spent on buying firms is not spent on building.
+4. **Hiring cannot outrun the working population.** If the firms together want more people than are available, every firm's hiring is cut in the same proportion. Unemployment cannot fall below 0.5 per cent.
+5. **Part of small firms' hiring founds new firms.** In each industry, 35 per cent of the hiring by small firms goes to new firms. Where dominant capital holds part of the industry, less does: the 35 per cent is multiplied by the part that dominant capital does not hold. Each new firm has 15 per cent of the employees of the average firm.
+6. **The number of new firms is rounded.** The sum rarely comes out whole, so the module rounds it up or down by chance. An industry never founds more firms than its small firms' hiring that year can staff. The people who are left over stay with the firms that hired them. Founding a firm takes nobody from an existing firm.
+7. **A new firm starts plain.** It gets the average markup of its industry, counting only the parts of the markup that any firm can have (see "How modules share a quantity"). It gets no part of a premium that rests on something it does not hold, such as a patent. Its hype is 1 and its risk is the average risk.
+
+**An example.** The small firms of an industry hire 1,000 people in a year. Dominant capital holds 30 per cent of the industry. So 1,000 × 0.35 × 0.7 = 245 people go to new firms. The average firm has 100 employees, so a new firm has 15. That makes 16.3 new firms. The module founds 16, or 17 with a chance of one in three. If it founds 16, they take 240 people and the other 5 stay where they were hired.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `new_claim_share` | 0.35 | The part of small firms' hiring that goes to new firms. (The name uses an old word for a firm.) | Our own choice |
+| `new_claim_size` | 0.15 | The size of a new firm, as a part of the average firm | Our own choice |
+| `floor` | 0.005 | The lowest unemployment the module allows | A plain limit with no source |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+The growth of the working population, 1.7 per cent, belongs to the starting position.
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `hire_small`, `hire_dominant` and `entry_open`, from the sabotage module
+- `crisis`, from the stagflation module: the cut in every hiring rate
+- `hiring_drag`, from the mergers module
+
+It publishes:
+
+- `industry_growth`: how fast each industry hired. The sabotage module reads it.
+- `new_hires`: the total hired. The run report uses it to compare buying with building.
+
+When optional modules are on, it also reads `sales_cut`, `force_hires`, `privatisation_jobs`, `public_workforce_change`, `protection_open` and `nature_open`.
+
+### What is known to be wrong or untested
+
+- **A new firm starts with gains that other firms made.** The average it is given includes what top-100 firms gained from their own price rises, and some premiums of optional modules. A new firm made none of those gains.
+- **A new firm's markup is a little low in a year when wages rise.** Its earnings are fixed in money at the start of the year and it is entered at the end. If the wage rises 3 per cent in between, its markup is 3 per cent lower than its industry's.
+- **An industry that hires very little founds no firms.** If the small firms of an industry hire fewer people in a year than one new firm employs, no firm is founded that year, however long this lasts. It happens only in industries that dominant capital holds almost wholly, and at 300,000 firms it stops a handful of foundings out of millions.
+- **The lowest unemployment of 0.5 per cent has no source.**
+- **The markup of a new firm is an addition.** The book gives no rule for it. Chapter 16 says only that final goods "can often be protected through patents, copyrights and other exclusionary threats", which makes a protection something its holder has and a newcomer does not.
 
 ---
 
 ## 4. Mergers and acquisitions
 
-**Source.** Chapter 14, Table 14.2, "Internal Breadth", and Propositions 3, 4 and 5. Chapter 15, "Mergers and acquisitions", "Differential advantage", "Three transformations" and "Breaking the envelope". Chapter 12, "Immaterial assets".
+Name in the model: `mergers`
 
-**What the book says.** Merger is "perhaps the most potent form of differential accumulation". It raises the relative size of the acquirer without adding capacity. It "indirectly helps to protect and possibly boost" earnings per employee, and it "reduces differential risk". A footnote adds that "the act of merger itself has no direct effect on depth". Merger also changes its own conditions in three ways. It uses up the pool of targets. It draws resources away from green-field growth, which slows the refilling of that pool. It runs into "roadblocks, contradictions and counter-forces". For these reasons merger moves in waves, and each new wave begins when dominant capital breaks out of its envelope into a wider one: from the industry to the sector, to the nation, to the world.
+### What it is about
 
-**Rule.** Each step, claims in dominant capital acquire other claims that they can reach. A claim can reach targets inside its own envelope, and targets in other envelopes to the extent that permeability allows. The volume of acquisition in a step is a base rate multiplied by the share of reachable employees that dominant capital does not already hold, and reduced by the current level of counter-force. When two claims merge, their employees and their earnings add together, and the capitalization of the merged claim equals the sum of the two. The risk of the merged claim is then lowered a little. The module also lowers the envelope's hiring rate in proportion to the volume of acquisition.
+In this module the top-100 firms buy other firms. A supermarket chain that buys a rival chain doubles its staff and its earnings in a day, and no new shop is built. That is why the book treats merger as the strongest way for a large firm to grow against the average. The module also makes buying run out: the more of their own patch the large firms already own, the less there is left to buy.
 
-**Additions.** The base rate, the size of the fall in risk, and the size of the drag on hiring are additions. The choice of which claims are acquired is an addition: the rule picks targets at random among reachable claims outside dominant capital. Any temporary rise in hype after a merger is left to the hype module.
+### What the theory says
 
-**Expected.** Inside a closed envelope, merger raises differential capitalization quickly at first and then slows as the pool of targets shrinks. It stalls when dominant capital holds most of what can be reached. A dated event that raises permeability starts a new wave. The ratio of acquired employees to newly hired employees rises over the long run and moves in waves around that rise. This ratio stands in for the book's buy-to-build indicator, which is measured in dollars. If no event ever opens a wider envelope, merger ends, and the model then shows what the book describes for South Africa under exchange controls.
+Chapter 14, Table 14.2, "Internal Breadth", and Propositions 3, 4 and 5. Chapter 15, "Mergers and acquisitions", "Differential advantage", "Three transformations" and "Breaking the envelope".
+
+- "Merger and acquisition activity perhaps is the most potent form of differential accumulation, serving to kill three birds with one stone: it directly increases differential breadth; it indirectly helps to protect and possibly boost differential depth (relative pricing power); and it reduces differential risk."
+- A footnote adds that "the act of merger itself has no direct effect on depth".
+- Merger changes its own conditions. It uses up the firms that can be bought. It draws money away from green-field growth. It runs into "roadblocks, contradictions and counter-forces".
+- So merger comes in waves. A new wave starts when "dominant capital has to break through its original 'envelope'" into a wider one: from the industry to the sector, to the nation, to the world.
+
+The book gives no rate of buying and no rule for which firms are bought.
+
+### What the module does each year
+
+1. **The top 100 firms are the buyers.** They take turns in a random order.
+2. **Each buyer counts what it can reach.** It can reach every firm in its own industry. It can reach firms in the rest of its sector as far as the sector boundary is open, and firms in the rest of the economy as far as the national boundary is open. Within that reach, some employees work for firms outside the top 100, which this file calls free, and the rest work for top-100 firms.
+3. **Each buyer decides how much to buy.** It seeks employees equal to 15 per cent of its own, multiplied by the free part of its reach. Roadblocks, a number between 0 and 1 from the resistance module, cut this in proportion.
+4. **It buys free firms picked at random within its reach** until it has what it sought. A buyer takes at most 200 firms in a year.
+5. **Buyer and bought firm become one firm.** Their employees add and their earnings add. The new firm's capitalization is the sum of the two. Then the buyer's risk is multiplied by 0.99.
+6. **The module publishes three numbers:** the year's merger volume (employees bought as a part of all employees), the hiring drag (twice the merger volume), and the part of dominant capital's reach that is still free.
+
+**An example.** A buyer has 10,000 employees. Both boundaries are closed. In its industry, 30,000 people work for free firms and 20,000 for top-100 firms, itself included. The free part of its reach is 0.6. Roadblocks stand at 0.2. It seeks 0.15 × 10,000 × 0.6 × 0.8 = 720 employees. If all buyers together take 1 per cent of all employees, the merger volume is 0.01 and the hiring drag is 0.02, so the green-field module cuts all hiring by 2 per cent next year.
+
+The run report prints the ratio of employees bought to employees hired. It stands in for the book's "buy-to-build" indicator, which is measured in money.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `base_rate` | 0.15 | The employees a buyer seeks in a year, as a part of its own, when everything in its reach is free | Our own choice |
+| `risk_cut` | 0.99 | What the buyer's risk is multiplied by after a merger | Our own choice |
+| `drag` | 2.0 | The cut in hiring for each unit of merger volume | Our own choice |
+| `counterforce` | 1.0 | How strongly roadblocks slow buying | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+One more number is fixed in the code and is not yet a setting you can change: `max_targets`, 200, the most firms one buyer can take in a year.
+
+### What it reads from other modules and what it gives them
+
+It reads `roadblocks` from the resistance module and the openness of the two boundaries, which the envelope module sets.
+
+It publishes:
+
+- `merger_volume`, read by the compass and resistance modules
+- `hiring_drag`, read by the green-field module
+- `pool_open`, the free part of dominant capital's reach, read by the envelope module
+
+When optional modules are on, it also reads `merger_hype`, `merger_appetite`, `line_barrier` and `eruption_stops_buying`.
+
+### What is known to be wrong or untested
+
+- **Mergers and stagflation do not clearly take turns.** The book says they do. In the model they do not yet do so clearly.
+- **Firms to buy are picked at random.** A real buyer chooses. The choice is an addition.
+- **A merger can leave an odd record.** The part of the buyer's markup called the base can end up lower than the base of either firm before the merger. "How modules share a quantity" explains the base. No earnings are wrong; only the record is odd.
+- **Hype does not respond.** A merger leaves hype alone unless the optional hype module is on.
+
+What should happen: inside closed boundaries, buying raises differential capitalization quickly and then slows as the free firms are used up. It picks up again when a boundary opens. If no boundary ever opened, buying would end. The book describes this for South Africa under exchange controls.
 
 ---
 
 ## 5. Cost cutting
 
-**Source.** Chapter 14, Table 14.2, "Internal Depth", and Proposition 6. Chapter 16, "Cost cutting", "'Productivity' gains" and "Input prices".
+Name in the model: `cost cutting`
 
-**What the book says.** Large firms pursue cost cutting "with much zeal" but "can rarely use it to get ahead". Production methods are "notoriously difficult to monopolize", and lower input prices "quickly tend to spill over to other firms". From 1954 to 1993 the sales per employee of the Fortune 500, relative to all corporations, rose by about a fifth, while differential profit per firm rose nineteenfold.
+### What it is about
 
-**Rule.** Each step, each claim draws a small random gain in earnings per employee. The gain is shared: over the following steps every other claim in the envelope receives the same gain. The size of the draw does not depend on the size of the claim.
+Every firm tries to cut its costs, and this module shows why that does not put large firms ahead. A haulage firm that finds a cheaper route earns more for a year or two. Then its rivals find the same route and the advantage is gone. The module gives every firm a small random gain or loss each year and then lets the difference fade. The size of the firm makes no difference to its luck.
 
-**Additions.** The size of the draws and the speed at which a gain spreads are additions.
+### What the theory says
 
-**Expected.** Differential earnings per employee of dominant capital stays flat on average. The module exists to show this. If a user sets the gains to spread slowly, or to favour large claims, cost cutting becomes a route to differential accumulation, and the model then departs from the book.
+Chapter 14, Table 14.2, "Internal Depth", and Proposition 6. Chapter 16, "Cost cutting", "'Productivity' gains" and "Input prices".
+
+- Large firms pursue cost cutting "with much zeal" but "can rarely use it to get ahead".
+- Production methods are "notoriously difficult to monopolize", and lower input prices "quickly tend to spill over to other firms".
+- Better ways of organising production "tend to proliferate easily, and this rapid spread quickly dilutes the initial advantage of whoever implemented them first".
+- The net effect "commonly is to meet the average rather than to beat it" (chapter 14).
+- From 1954 to 1993 the sales per employee of the largest United States firms, against all firms, rose by "a 20 per cent increase – miniscule when compared to the nineteenfold increase in differential profit per firm".
+
+The book gives no size for the gains and no speed for their spread.
+
+### What the module does each year
+
+1. **It works out the level of each industry.** This is the average markup of the industry's firms, counting only the parts of the markup that any firm can have. Premiums that rest on a hold on buyers, such as a patent, are left out.
+2. **Every firm draws a random gain or loss** of about 2 per cent of its markup. Two thirds of draws fall between a loss of 2 per cent and a gain of 2 per cent.
+3. **Every firm drifts back towards its industry.** Each year three tenths of the gap between the firm's markup and its industry's level disappears.
+4. **The draw changes the firm's cost and not its price.** A firm that gains has lower costs, earns more and charges what it charged before.
+5. **The drift back first removes the saving.** As methods spread, a firm that had lower costs loses that saving. If the drift is larger than the saving that is left, the rest of it moves the firm's price towards the prices of its industry.
+
+**An example.** The wage is 1. A firm and its industry both have a markup of 0.10, so the firm's price is 1.10. The firm draws a gain of 2 per cent. Its markup becomes 0.102 and its cost falls by 0.002, so its price is still 1.10. Next year, leaving aside the new draw, three tenths of the gap closes. The markup falls to 0.1014, the saving shrinks to 0.0014, and the price is still 1.10.
+
+Step 5 matters for a firm that stands above its industry for another reason. Top-100 firms gain from their own price rises during stagflation, and this module wears that gain away too. That wearing away is recorded as a fall of the firm's price against the wage and not as a rise in its costs.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `gain` | 0.02 | The typical yearly gain or loss of one firm against its neighbours | Our own choice |
+| `spread` | 0.3 | The part of any difference from the industry that disappears each year | Our own choice |
+| `wears_holds` | off | A switch kept for comparisons. When it is on, the drift back also wears down premiums that rest on a hold on buyers. | Our own choice. The book supports leaving it off (see below). |
+
+### What it reads from other modules and what it gives them
+
+It reads nothing that other modules publish, and it publishes nothing.
+
+It owns two parts of each firm's record: a part of the markup called the cost-cutting edge, and a cost called the cost difference. "How modules share a quantity" and "How the price is worked out" explain both.
+
+### What is known to be wrong or untested
+
+- **It wears away gains that have nothing to do with cost.** The drift back in step 3 also removes what a firm gained from price rises or from war. The book says that the gains of inflation "last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk"). It does not say that the spread of methods is what ends them.
+- **The split between cost and price in steps 4 and 5 is an addition.** Chapter 16 lists "lowering unit cost faster than the average" and "increasing unit price faster than the average" as separate routes, and gives no rule.
+- **A firm that cuts costs keeps its price.** The book also allows it to sell more for each employee. The model has no count of goods, so it cannot show that.
+- **The rule has not been read against the book line by line.**
+
+Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads apart from what is protected: "Unlike final commodities that can often be protected through patents, copyrights and other exclusionary threats, improvements in the social organization of production tend to proliferate easily". With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the optional protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.
+
+What should happen: the earnings per employee of the top 100, against the average, stay flat on account of this module. If you set the gains to spread slowly or to favour large firms, cost cutting becomes a way to beat the average, and the model then departs from the book.
 
 ---
 
 ## 6. Stagflation
 
-**Source.** Chapter 14, Table 14.2, "External Depth", and Proposition 7. Chapter 16, "Stagflation", "Winners and losers", "Accumulating through crisis" and "The hazards of inflation". Chapter 17, postscript.
+Name in the model: `stagflation`
 
-**What the book says.** Inflation is a struggle over distribution carried out through prices: "The crux of inflation is not that prices rise in general, but that they rise differentially." In the United States, rising inflation moved income from wages to profits and from small firms to large firms. A single seller that raises its price loses sales, but "a coalition of sellers" can gain, so inflation needs dominant capital to act in concert, and "previous corporate centralization" makes that easier. Inflation needs slack: growth undermines "the ability to coordinate", so inflation appears together with stagnation. The gains last only while inflation continues. Inflation raises risk, it is open for everyone to see, and the population "is almost always hostile" to it. It is therefore "more of a stop-gap". The direction of the redistribution is not fixed: where labour is strong, as in Germany and France, the effect on wages and profits "has been far less clear".
+### What it is about
 
-**Rule.** Each claim has its own price. The module has an intensity for each envelope, set by the compass (module 7). In each step the claims of dominant capital raise their prices by an amount that grows with the intensity. Other claims raise their prices by a part of that amount. Wages rise by another part. The earnings per employee of a claim rises when its own price rises faster than wages, and falls when its price rises more slowly. The module lowers the envelope's hiring rate while it is active, so unemployment rises. This fall in hiring is the crisis. The book says that the bottlenecks inflation needs "have to be actively created and instituted by the key players", and that buyers are forced to pay "by creating, imposing and maintaining various forms of social crisis, apparent or real". Crisis is therefore the routine sabotage of module 1 made more intense, and the model does not enter crises as events from outside. The risk of each claim in dominant capital rises with the rate of inflation and with the number of years it has lasted. The envelope's price level is reported as the average of all prices and is never set directly.
+Stagflation means rising prices together with unemployment. In this module the top-100 firms raise their prices together. Small firms follow, but not all the way, and wages follow less still. Whoever raises prices fastest gains at the expense of the rest. Picture a year in which the big energy and food companies raise prices 10 per cent, corner shops manage 6 per cent, and pay rises 5 per cent. The big companies have gained on both the shops and the workers. The module also cuts hiring while this goes on, and that cut is the crisis.
 
-**Additions.** The parts of the price rise that small claims and wages obtain are the central additions. They are settings of the envelope. A setting near one for wages represents strong labour. The link between intensity and price rises, the drag on hiring, and the rise in risk are also additions. Dominant capital can raise prices in concert only to the extent given by a cohesion setting, described under module 7.
+### What the theory says
 
-**Expected.** While the module is active, the differential earnings per employee of dominant capital rise, the capitalist share of income rises, growth slows and prices rise. When the intensity falls, the differential gain stops. In an envelope where wages keep pace with prices, the transfer from wages to profits disappears and only the transfer from small to large claims remains. If risk rises faster than earnings, differential capitalization falls even though differential earnings rise, which is the hazard the book describes. If cohesion fails while prices are falling, the module runs in reverse: large claims lose relative to the average. This is the deflation that the postscript treats as the point where the mode of power could break down.
+Chapter 14, Table 14.2, "External Depth", and Proposition 7. Chapter 16, "Stagflation", "Winners and losers", "Accumulating through crisis" and "The hazards of inflation". Chapter 17, postscript.
+
+- "The crux of inflation is not that prices rise in general, but that they rise differentially."
+- A single seller that raises its price loses sales, "but things are different for a coalition of sellers" (chapter 14). Inflation needs dominant capital to act together, and "previous corporate centralization" makes that easier.
+- Inflation needs slack. Growth works against it "by undermining the ability to coordinate and exercise organized power". So inflation tends to come with stagnation.
+- The conditions that inflation needs "have to be actively created and instituted by the key players". Buyers are made to pay "by creating, imposing and maintaining various forms of social crisis, apparent or real".
+- The gains do not last: "although differential earnings rise with inflation, the gains are always short-lived: they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
+- Inflation raises risk. The population "is almost always hostile" to it. It is therefore "more of a stop-gap".
+- Who gains is not fixed. It depends on "the relative power of the leading firms, capital in general and labour groups". In Germany and France the effect on wages and profits "has been far less clear".
+
+Crisis in the model is therefore the routine sabotage of module 1 made more intense. Nobody enters a crisis by hand. The book gives no sizes for any of this.
+
+### What the module does each year
+
+The compass module publishes an intensity between 0 and 1. At 0 this module does nothing.
+
+1. **The top-100 firms raise their prices** by 10 per cent times the intensity. This file calls that figure the push.
+2. **Small firms raise their prices by part of the push.** The part is 60 per cent, plus 3 points for each year the bout has lasted, up to the whole push. A bout is an unbroken run of years with an intensity above 0.
+3. **Wages rise by part of the push.** The part starts at 50 per cent. Popular resistance raises it: at full resistance wages get the whole push. Unemployment lowers it, by 2 points for each point of unemployment above 5 per cent.
+4. **Each firm's markup changes** so that its wage cost and its markup together have risen by exactly its price rise. A firm whose price rose faster than the wage ends with a higher markup. A markup cannot go below 0.0001.
+5. **Every hiring rate is cut** by 6 points times the intensity. The green-field module applies the cut next year.
+6. **The risk of each top-100 firm rises** by half of the push.
+
+**An example.** The intensity is 0.5, so the push is 5 per cent. It is the third year of the bout, unemployment is 7 per cent and popular resistance is 0.2.
+
+- Small firms raise prices by 5 × (0.60 + 0.09) = 3.45 per cent.
+- Wages get 0.50 + 0.50 × 0.2 − 2 × 0.02 = 56 per cent of the push, so they rise 2.8 per cent.
+- A top-100 firm with a markup of 0.20 ends with 1.20 × 1.05 ÷ 1.028 − 1 = 0.226. Its earnings for each employee rise 16 per cent.
+- A small firm with a markup of 0.10 ends with 1.10 × 1.0345 ÷ 1.028 − 1 = 0.107. Its earnings for each employee rise 10 per cent.
+- Every hiring rate is cut by 3 points, and the risk of each top-100 firm rises 2.5 per cent.
+
+The price level that the model reports is the average of all firms' prices, weighted by employees. No module sets it.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `max_rise` | 0.10 | The yearly price rise of top-100 firms at full intensity | Our own choice |
+| `small_part` | 0.6 | The part of that rise that small firms obtain at the start of a bout | Our own choice |
+| `catch_up` | 0.03 | How much that part grows for each year a bout lasts | Our own choice |
+| `wage_part` | 0.5 | The part that wages obtain with no resistance and usual unemployment | Our own choice |
+| `slack` | 2.0 | The fall in the wage part for each point of unemployment above usual | Our own choice |
+| `usual_unemployment` | 0.05 | The usual level of unemployment | Our own choice |
+| `crisis` | 0.06 | The cut in every hiring rate at full intensity | Our own choice |
+| `risk_rise` | 0.5 | The rise in a top-100 firm's risk for each unit of its price rise | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+The lowest markup of 0.0001 in step 4 is written into the code without a name. It is a plain limit with no source.
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `stagflation_intensity`, from the compass module
+- `resistance`, from the resistance module
+- `unemployment`, from the core
+
+It publishes:
+
+- `crisis`, the cut in hiring, read by the green-field module
+- `inflation_push`, the push, read by the resistance module
+
+It sets the wage. It owns a part of each firm's markup called the stagflation lead (see "How modules share a quantity").
+
+When optional modules are on, it also reads `conflict_spark`, `eruption_stops_price_rises` and `labour_strength`.
+
+### What is known to be wrong or untested
+
+- **Stagflation raises capitalization, where the book says it threatens it.** In the model a bout raises earnings and capitalization across the whole economy. The book says inflation is a hazard because risk rises with it. Here the rise in risk does not outweigh the rise in earnings.
+- **The timing of bouts is touchy.** A small change early in a run can move a bout by several years. Two runs compared in a single year can differ widely for that reason alone.
+- **Deflation is missing.** The book's postscript treats falling prices as the point where the rule of dominant capital could break down. The module can only raise prices or do nothing.
+- **A cost other than the wage is not allowed for.** Some optional modules give a firm such a cost. It rises with the wage and not with the firm's price, so that firm's price rises by slightly more or less than step 1 or 2 intended.
+- **The lowest markup of 0.0001 has no source and no name.**
+- **The rule has not been read against the book line by line.**
+
+What should happen: while a bout lasts, the top 100 gain on small firms and owners gain on wage earners. When the intensity falls, the gain stops and is then worn away. Where wages keep pace with prices, only the gain on small firms remains.
 
 ---
 
 ## 7. The differential compass
 
-**Source.** Chapter 12, "The differential underpinnings of universal sabotage". Chapter 14, "It's all relative" and Propositions 1, 2 and 8. Chapter 16, "Stop-gap". Chapter 17, "Amalgamation versus stagflation", "A new type of cycle" and "Out of bounds".
+Name in the model: `compass`
 
-**What the book says.** Capitalists aim "not to meet but to beat the average". For dominant capital as a group, merger is "the path of least resistance". When merger stalls, "dominant capital, seeing its differential accumulation undermined, moves reluctantly toward relying on inflationary redistribution". The two regimes tend to exclude each other, because "the power processes that support one type of differential accumulation tend to undermine the other". In the United States the two moved more and more closely in opposite directions: the correlation went from about zero in 1927 to minus 0.95 in 2007. The book insists that this is not a law: "there is nothing automatic or equilibrating about them", and if the grip of dominant capital loosens, "so will differential accumulation and its cycles of breadth and depth".
+### What it is about
 
-**Rule.** The compass holds two numbers for each envelope. The first is cohesion: the extent to which dominant capital can act in concert. Cohesion rises as dominant capital's share of the envelope rises, and it falls as resistance (module 8) rises. The second is the intensity of stagflation. Each step the compass looks at the rate of differential accumulation that dominant capital has obtained from breadth over recent years. When that rate is positive, the intensity of stagflation falls. When that rate is at or below zero, the intensity rises, up to a limit set by cohesion. The compass never switches merger off. Merger slows by its own rule in module 4.
+This module decides when the top-100 firms turn to raising prices. The book says large firms would rather grow by buying other firms, and fall back on price rises when buying dries up. The compass watches the volume of mergers. When buying has fallen below what the large firms have become used to, it turns the intensity of stagflation up. When buying recovers, it turns the intensity down. It never switches mergers off.
 
-**Additions.** This whole rule is an addition. The book describes conduct and gives no rule. The number of years the compass looks back, the speed at which intensity rises and falls, and the relation of cohesion to concentration are all additions. Treating dominant capital in an envelope as having one intensity is an addition that leaves out the coalitions inside it.
+### What the theory says
 
-**Expected.** With modules 3, 4, 6 and 7 together, a closed envelope should show merger first, then a stall, then stagflation. A dated event that opens the envelope should bring merger back and stagflation down. The alternation should be loose when dominant capital is small and cohesion is low, and tighter as concentration rises, as the book reports for the United States. The alternation is not built in as a cycle. If resistance lowers cohesion far enough, the compass cannot raise the intensity of stagflation, and dominant capital has no route left. The model must be able to show that outcome.
+Chapter 12, "The differential underpinnings of universal sabotage". Chapter 14, "It's all relative" and Propositions 1, 2 and 8. Chapter 16, "Stop-gap". Chapter 17, "Amalgamation versus stagflation", "A new type of cycle" and "Out of bounds".
+
+- "The primal drive of modern business enterprise is not to meet but to beat the average."
+- For dominant capital, mergers are "the path of least resistance".
+- When merger stalls, "dominant capital, seeing its differential accumulation undermined, moves reluctantly toward relying on inflationary redistribution".
+- "Temporary declines in mergers and acquisitions typically were 'compensated' for by sharp increases in stagflation; and when amalgamation resumed, with dominant capital breaking through its existing envelope and into a broader universe, stagflation promptly abated" (chapter 17).
+- The two exclude each other, because "the power processes that support one type of differential accumulation tend to undermine the other". In the United States their correlation went from "a positive 0.06 in 1927 (virtually no correlation) to a negative 0.95 in 2007".
+- This is not a law: "there is nothing automatic or equilibrating about them". If the grip of dominant capital loosens, "so will differential accumulation and its cycles of breadth and depth".
+- On acting together: "Consolidation makes it easier for firms to collude" (chapter 15), and crises "enable a consensus to emerge within dominant capital that inflation can be used with relative impunity" (chapter 16).
+
+The book describes this conduct and gives no rule. The whole rule below is an addition.
+
+### What the module does each year
+
+1. **It works out cohesion,** a number between 0 and 1 that says how far the top-100 firms can act together. It starts from the part of all employees who work for the top 100. Unemployment above 5 per cent raises it, by 20 per cent of itself for each point. Popular resistance lowers it in proportion: at full resistance cohesion is 0.
+2. **It compares recent mergers with the longer past.** It takes the average merger volume of the last 5 years and of the last 20 years.
+3. **It moves the intensity of stagflation.** If the 5-year average is below the 20-year average, the intensity rises by 0.15. Otherwise it falls by 0.10.
+4. **Cohesion caps the intensity.** The intensity cannot be above 4 times cohesion, or above 1, or below 0. Without the ability to act together there are no price rises in concert.
+
+For the first 20 years of a run the module has too little past to compare, and the intensity stays at 0.
+
+**An example.** The top 100 employ 20 per cent of all employees. Unemployment is 7 per cent and popular resistance is 0.3. Cohesion is 0.20 × (1 + 20 × 0.02) × (1 − 0.3) = 0.196. Over the last 5 years mergers took 0.4 per cent of employees a year, against 0.9 per cent over the last 20. So the intensity rises from 0.30 to 0.45. The cap is 4 × 0.196 = 0.78, so it does not bind.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `short` | 5 | The years over which recent mergers are judged | Our own choice |
+| `long` | 20 | The years that set what dominant capital has become used to | Our own choice |
+| `rise` | 0.15 | The yearly rise in intensity when recent mergers fall short | Our own choice |
+| `fall` | 0.10 | The yearly fall in intensity when they do not | Our own choice |
+| `slack` | 20.0 | The rise in cohesion for each unit of unemployment above usual | Our own choice |
+| `usual_unemployment` | 0.05 | The usual level of unemployment | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+The 4 in step 4 is written into the code without a name. It is a plain number with no source.
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `merger_volume`, from the mergers module
+- `concentration` and `unemployment`, from the core
+- `resistance`, from the resistance module
+
+It publishes:
+
+- `stagflation_intensity`, read by the stagflation module
+- `cohesion`, read by several optional modules
+
+When the optional proletarianization module is on, it also reads `breadth_cohesion`.
+
+Any module that publishes these two numbers can take the compass's place. Three optional compasses do so.
+
+### What is known to be wrong or untested
+
+- **Mergers and stagflation do not clearly move in opposite directions as the book reports.** This is the model's clearest disagreement with the theory. In tests with the three optional compasses, the two never moved in opposite directions, and no bout of stagflation ended because a boundary opened to new mergers.
+- **The rule looks back over fixed numbers of years.** A fixed window gives an echo when an old value drops out of it. Bouts of stagflation come about every 22 years in runs. A test with a compass that has no fixed memory still gave bouts every 22 to 24 years, so that rhythm does not come from the window.
+- **One intensity for all of dominant capital** leaves out the rival groups inside it. The optional coalitions module adds them.
+- **That resistance lowers cohesion is an addition.** So is the 4 in step 4.
+- **The rule has not been read against the book line by line.**
+
+What should happen: mergers first, then a stall, then stagflation, then mergers again when a boundary opens. The pattern should be loose while the top 100 are small and tighter as they grow. If resistance takes cohesion low enough, the compass cannot raise the intensity, and dominant capital has no route left. The model must be able to show that outcome, and it does not correct it.
 
 ---
 
 ## 8. Resistance
 
-**Source.** Chapter 11, "Risk and power" and "The degree of confidence". Chapter 14, "Creating order". Chapter 15, "Three transformations". Chapter 16, "The politics of inflation". Chapter 17, "Out of bounds" and postscript.
+Name in the model: `resistance`
 
-**What the book says.** "Power means the ability to impose order, and imposition presupposes resistance." The struggle over earnings "invites resistance; and resistance breeds volatility and uncertainty", which is why earnings and risk are tied together. Resistance differs by regime. The population is "impartial to breadth" and "almost always hostile to depth": under inflation it "starts to resist and fight back", demands higher wages, and the supremacy of capital can be "called into question". Merger meets resistance of another kind, from institutions that cannot adapt quickly. The patterns of accumulation hold only while the rulers remain confident that "those whom they command cannot resist". That confidence "can crumble".
+### What it is about
 
-**Rule.** Each envelope has a level of resistance. It rises in each step in proportion to the intensity of stagflation, and by a smaller amount in proportion to the volume of mergers and to the distance of unemployment from its usual level. It decays slowly when none of these is present. Other modules read the level. In module 4 it supplies the counter-force that slows merger. In module 6 it raises the part of each price rise that wages obtain. In module 7 it lowers cohesion. It also raises the risk of every claim in dominant capital.
+People push back. This module keeps two numbers for the whole society, each between 0 and 1. The first is popular resistance: anger at rising prices, at unemployment and at the size of the largest firms. Think of strikes and protests in a year of 10 per cent inflation. The second is roadblocks: the obstacles that mergers run into, such as competition law, courts and institutions that cannot change quickly. Other modules read the two numbers and are held back by them.
 
-**Additions.** Representing resistance as one number for an envelope is the largest simplification in the model. The book treats resistance as the activity of people, and says that no model can produce novelty. All the rates are additions. The starting level, and the strength of labour in an envelope, are settings.
+### What the theory says
 
-**Expected.** In ordinary runs, resistance is what brings a period of stagflation to an end and what makes each merger wave run into roadblocks. In an envelope that starts with strong labour, stagflation gives dominant capital less, as the book says of Germany and France. When resistance is high for long enough, cohesion falls, both regimes fail, and the rate of differential accumulation turns negative. The model reports this and does not correct it.
+Chapter 11, "Risk and power" and "The degree of confidence". Chapter 14, "Creating order". Chapter 15, "Three transformations". Chapter 16, "The politics of inflation". Chapter 17, "Out of bounds" and postscript.
+
+- "Power means the ability to impose order, and imposition presupposes resistance."
+- The struggle over earnings "invites resistance; and resistance breeds volatility and uncertainty". That is why earnings and risk are tied together.
+- The population is "impartial to breadth" and "almost always hostile to depth". Under inflation it "starts to resist and fight back", and the supremacy of capital can be "called into question".
+- Merger meets resistance of another kind: "roadblocks, contradictions and counter-forces".
+- The patterns of accumulation hold only while the rulers stay convinced that "those whom they command cannot resist". That conviction "can crumble".
+
+The book treats resistance as something people do. It quotes Nicholas Georgescu-Roegen: "no analytical model can deal with the emergence of novelty". Two numbers for a whole society is the largest simplification in the model, and every rate below is our own.
+
+### What the module does each year
+
+1. **Popular resistance rises** with three things: the push of price rises that the stagflation module published (0.6 for each unit), unemployment above 5 per cent (0.5 for each unit), and the part of all employees who work for the top 100 (0.02 for each unit).
+2. **Popular resistance fades** by 8 per cent of its level each year.
+3. **Roadblocks rise** with the year's merger volume (3 for each unit) and fade by 8 per cent of their level each year.
+4. **Both numbers are kept between 0 and 1.**
+5. **If popular resistance rose, the risk of each top-100 firm rises** by half of the rise.
+
+**An example.** Popular resistance stands at 0.20. The push is 5 per cent, unemployment is 8 per cent and the top 100 employ a quarter of all employees. Resistance rises by 0.6 × 0.05 + 0.5 × 0.03 + 0.02 × 0.25 = 0.05 and fades by 0.08 × 0.20 = 0.016. It ends at 0.234, and the risk of each top-100 firm rises by 1.7 per cent. Roadblocks stand at 0.10 and the merger volume is 1 per cent. They rise by 0.03 and fade by 0.008, and end at 0.122.
+
+### Settings
+
+All of these are our own choices, except `top`, which follows the book (chapter 14).
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `from_inflation` | 0.6 | The rise in popular resistance for each unit of the top 100's yearly price rise |
+| `from_unemployment` | 0.5 | The rise for each unit of unemployment above usual |
+| `from_power` | 0.02 | The rise for each unit of the part of employees that the top 100 hold |
+| `from_mergers` | 3.0 | The rise in roadblocks for each unit of merger volume |
+| `usual_unemployment` | 0.05 | The usual level of unemployment |
+| `fade` | 0.08 | The part of each level that fades each year |
+| `risk` | 0.5 | The rise in a top-100 firm's risk for each unit rise in popular resistance |
+| `start` | 0.0 | Popular resistance in the first year |
+| `top` | 100 | How many firms count as dominant capital |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `inflation_push`, from the stagflation module
+- `merger_volume`, from the mergers module
+- `unemployment` and `concentration`, from the core
+
+It publishes two numbers.
+
+| Number | Who reads it | What it does there |
+|---|---|---|
+| `resistance` (popular resistance) | Sabotage | Raises the unemployment at which wages keep pace with prices, and weakens dominant capital's hold on its target markup |
+| | Stagflation | Raises the part of each price rise that wages obtain |
+| | Compass | Lowers cohesion |
+| `roadblocks` | Mergers | Cuts how much each buyer seeks |
+| | Envelope | Keeps boundaries shut, and can close them |
+
+When optional modules are on, it also reads `protection_anger`, `energy_grievance` and `externalisation_grievance` (each adds to popular resistance), `repression`, `eruption_stays_force` and `household_debt_placation` (each wears it down) and `sovereign_relief` (wears roadblocks down).
+
+Any module that publishes these two numbers can take this module's place.
+
+### What is known to be wrong or untested
+
+- **Two numbers stand for everything people do.** The module cannot say who resists, how, or what new form the resistance takes.
+- **Wage earners' losses to tax and interest do not feed resistance.** Some optional modules make wage earners pay tax and interest. The core publishes what they lose, and this module does not read it.
+- **The rule has not been read against the book line by line.**
+
+Two levels are needed, and one is not enough. With a single level, anger at inflation keeps every boundary shut, which contradicts the book's statement that the population is "impartial to breadth".
+
+What should happen: resistance is what ends a bout of stagflation and what makes each wave of mergers run into obstacles. Where labour starts strong, stagflation gives dominant capital less, as the book says of Germany and France. If resistance stays high for long enough, cohesion falls, both routes fail and differential capitalization falls. The model reports this and does not correct it.
 
 ---
 
 ## 9. Breaking the envelope
 
-**Source.** Chapter 14, Proposition 5. Chapter 15, "Differential advantage", "Three transformations" and "Breaking the envelope", with the footnote to "Differential advantage". Chapter 14, "Historical paths".
+Name in the model: `envelope`
 
-**What the book says.** Dominant capital opens its own boundaries: "to take advantage of this broader pool, dominant capital has to break through its original 'envelope'". Merger "creorders the very conditions on which it is based", and mergers "create a strong drive toward 'jurisdictional integration'". A footnote criticises studies that treat changes such as deregulation "as external societal 'shocks' to which business 'responds' with amalgamation". The book also describes barriers being raised: the Glass-Steagall Act of 1933, the break-up of the Japanese holding groups after the war, and capital controls. Without the globalization of ownership, "dominant capital cannot break its national envelope; and if it cannot go global, its differential breadth is bound to collapse".
+### What it is about
 
-**Rule.** The permeability of each boundary is a number in the ledger that this module moves. Pressure on a boundary rises when dominant capital inside it holds most of what it can reach and its differential accumulation from breadth has stalled. The pressure is stronger when cohesion is high. Resistance pushes the other way. In each step permeability rises when pressure exceeds resistance, and it falls when resistance exceeds pressure by a wide margin. Module 4 then finds a larger or smaller pool of targets.
+This module opens and closes the two boundaries that limit what a top-100 firm can buy. A brewer that has bought every brewery in its region presses for the right to buy in the next region, and then abroad. The module lets a boundary give way when the large firms already own most of what they can reach, and lets roadblocks hold it shut. Nobody tells the model when a boundary opens.
 
-**Additions.** This whole rule is an addition, like the compass. The book says who opens the envelopes and why. It gives no rule for when. The measure of pressure, the comparison with resistance, and the speed of change are all additions. The order of the boundaries (industry, sector, nation, world) is taken from the book's account of the United States and is a setting.
+### What the theory says
 
-**Expected.** With modules 1, 3, 4, 6, 7, 8 and 9 together, the model should produce merger waves without being told when they start. A wave should end as its envelope fills. Stagflation should follow while pressure builds, and a new wave should begin when the boundary gives way. The dates in `history_us.md` are then a record to compare with, and the model can be wrong about them. Where resistance is strong, a boundary should stay closed for a long time or close again, as the book describes for the 1930s.
+Chapter 14, Proposition 5 and "Historical paths". Chapter 15, "Differential advantage" with its footnote, "Three transformations" and "Breaking the envelope".
 
-**A limit.** The book quotes Georgescu-Roegen: "no analytical model can deal with the emergence of novelty". This module can say that a boundary gave way and when. It cannot say what form the opening took: the trust, the conglomerate, the privatisation of state assets. Those descriptions stay in the history file.
+- Dominant capital opens its own boundaries: "to take advantage of this broader pool, dominant capital has to break through its original 'envelope'".
+- Merger "creorders the very conditions on which it is based", and mergers "create a strong drive toward 'jurisdictional integration'".
+- A footnote criticises studies that treat changes such as deregulation "as external societal 'shocks' to which business 'responds' with amalgamation".
+- Barriers are also raised. The book's examples include the Glass-Steagall Act of 1933 and the break-up of the Japanese holding groups after the war.
+- Without the globalization of ownership, "dominant capital cannot break its national envelope; and if it cannot go global, its differential breadth is bound to collapse".
+
+The book says who opens the boundaries and why. It gives no rule for when. The whole rule below is an addition.
+
+### What the module does each year
+
+1. **It works out the pressure on the boundaries.** Pressure is the part of dominant capital's reach that top-100 firms already hold. The mergers module publishes the part that is still free, and pressure is one minus that.
+2. **It sets pressure against roadblocks.** The net pressure is the pressure, less one half, less the level of roadblocks.
+3. **If the net pressure is above zero, a boundary opens.** Its openness rises by one fifth of the net pressure. The sector boundary opens first. The national boundary starts to open only when the sector boundary is fully open.
+4. **If roadblocks exceed pressure by more than 0.3, a boundary closes.** Its openness falls by one fifth of the excess over 0.3. The national boundary closes first, then the sector boundary.
+5. **Otherwise nothing moves.**
+
+**An example.** Top-100 firms already hold 80 per cent of what they can reach, so pressure is 0.8. Roadblocks stand at 0.1. The net pressure is 0.8 − 0.5 − 0.1 = 0.2. The sector boundary's openness rises by 0.04, say from 0.30 to 0.34. Next year each buyer can reach 34 per cent of the free firms in the rest of its sector.
+
+### Settings
+
+All of these are our own choices. No source gives any of them.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `threshold` | 0.5 | How much of its reach dominant capital must hold before a boundary starts to give |
+| `speed` | 0.2 | How far a boundary moves in a year for each unit of net pressure |
+| `close_margin` | 0.3 | How far roadblocks must exceed pressure before a boundary closes |
+
+The order of the boundaries, sector first and then nation, is fixed in the code. It follows the book's account of the United States.
+
+### What it reads from other modules and what it gives them
+
+It reads `pool_open` from the mergers module and `roadblocks` from the resistance module.
+
+It sets the openness of the sector boundary and the national boundary, which the mergers module uses. It publishes `pressure`.
+
+The optional boundary contest module can take this module's place.
+
+### What is known to be wrong or untested
+
+- **It cannot say what form an opening took.** The module can say that a boundary gave way and when. It cannot say whether the opening was a trust, a conglomerate or the sale of state assets.
+- **There is nothing beyond the nation.** The book's last envelope is the world. The model has one economy unless an optional module adds a second country.
+- **Opening a boundary has not been seen to end a bout of stagflation,** as the book says it should. This was looked for in tests with the three optional compasses.
+- **The rule has not been read against the book line by line.**
+
+What should happen: a wave of mergers ends as its envelope fills, stagflation follows while pressure builds, and a new wave starts when the boundary gives way. Where roadblocks are strong, a boundary should stay shut for a long time or close again, as the book describes for the 1930s.
 
 ---
 
-## Modules the book names but does not develop
+## What the nine main modules leave out
 
-Three later papers by the authors were read for these: "A CasP Model of the Stock Market" (2016), "Can Capitalists Afford Recovery?" (2014) and "Growing Through Sabotage" (2020). Their text is in `data/bn_archives/papers/`. None of the three measures hype or risk directly. The 2016 paper says of the period from the 1980s that it found "no discernable decline in earnings volatility" and draws no conclusion about risk.
+The nine main modules leave several things fixed that the theory treats as moving. An optional module covers each one.
 
-**Hype.** Chapter 11 says that hype returns to a long-run average of one, that forecasters "act as a herd", that hype moves in cycles several years long, and that "active insiders" can shape it. Chapter 14 says the book treats hype "only in passing". The later papers add no measure of it. The first build therefore holds hype at one for every claim. A simple rule can be added later as a labelled addition: hype moves in a slow cycle around one, with all claims in an envelope moving together, and a merger gives the acquirer a rise that fades.
+| What is fixed | What the theory says | Optional module |
+|---|---|---|
+| Hype stays at 1 for every firm. | Forecasters "act as a herd", and "active insiders" can shape hype (chapter 11). The book says it refers "to hype and risk only in passing" (chapter 14). | `hype` |
+| Risk has no rule of its own. Mergers lower it, and stagflation and resistance raise it. | Chapter 11 defines risk as the inverse of owners' confidence. The paper "A CasP Model of the Stock Market" (2016) found "no discernable decline in earnings volatility" and draws no conclusion about risk. | `risk_shaping` |
+| Owners never fear for the system as a whole. | The 2016 paper builds a "power index", share prices divided by the wage rate, and says that "sabotage elicits resistance". | `fear` |
+| The normal rate of return stays at 5 per cent. | The 2016 paper reports that from the early 1960s employment growth was "a nearly perfect five-year leading predictor for interest rates". It says that the earlier period needs "more research than we can offer here". | `policy_rate` |
+| The working population grows at a fixed 1.7 per cent. | The limit on green-field growth is "the extent of proletarianization" (chapter 14), which is itself a process of power. | `proletarianization` |
+| Dominant capital acts as one group. | Chapter 17 sets oil and arms firms against technology and merger firms, and says their analysis is "beyond the scope of this volume". | `coalitions` |
+| There is no war and no organised force. | Chapter 12 lists "the use of force, including military, for differential business ends" among the means of sabotage. Chapter 17 says the 1930s were "marked by the massive use of military force". | `force` |
+| Energy is not counted. | The paper "Growing Through Sabotage" (2020) divides the energy a society captures between livelihood and hierarchy. Its authors call the framework "too rudimentary" for further analysis. | `energy` |
 
-**Risk.** Chapter 11 defines the risk coefficient as the inverse of the confidence that owners have in their own forecasts. It is one when owners are fully confident and larger otherwise. Modules 4, 6 and 8 already move it, and it gets no rule of its own. The 2014 paper uses the year-to-year variation of the capitalist share of income as a stand-in for risk, and the model can report the same figure.
+Other optional modules add what can be sold, organised labour, household debt, the public debt, patents and other protections, the shaping of wants, a second country and currencies. Their sections follow.
 
-**Systemic fear.** The 2016 paper builds a "power index", which is the share price index divided by the wage rate. It reports that when this index is far above its historical average, owners stop pricing shares on expected earnings and price them on current earnings instead. The authors read this as fear for the survival of the system, and they explain the return of the index toward its average by saying that "sabotage elicits resistance". The model can report the power index from the first build, because it already holds capitalization and a wage. A rule for fear would be an extension of the resistance module and is left until that module has been examined. The paper calls itself "explorative and tentative".
+## Two rules the whole model keeps
 
-**The normal rate of return.** The 2016 paper reports that in the United States from the early 1960s, slow growth of employment was followed about five years later by a lower yield on ten-year government bonds, and that the relation ran the other way before 1939. The authors call the later pattern a policy cycle: more sabotage, then lower interest rates, then higher capitalization. This is the only relation found so far that could move the normal rate of return. It is not used in the first build, where the rate is a setting, because the authors say the reversal of 1939 needs "more research than we can offer here".
+**Every rule can be replaced.** Each module is a separate part with a stated job. It says which numbers it reads and which it publishes. A replacement has to publish the same numbers and may work them out in any way. The compass, resistance and envelope modules are almost wholly our own additions to the book, so they are the first that a better idea should replace.
 
-**The delay in module 1.** The 2014 paper reports that from 1947 to 2013 the capitalist share of income followed the unemployment rate of three years earlier, with both series smoothed over five years. In that period the relation was a rising line and showed no hump. Module 1 keeps the hump of chapter 12, because the 1930s and the war years lie on its two falling sides, and it adds a delay between unemployment and the share as a setting. The earlier work in this project on the same series found that the relation was carried by interest and not by profit, and that in unsmoothed yearly figures the delay was one year. That finding is a reason to build module 2 soon after module 1.
-
-**Energy and hierarchy.** The 2020 paper divides the energy a society captures into energy for livelihood and energy for hierarchy, and argues that sabotage itself uses energy. It contains no measure of sabotage and nothing on hype or risk. The authors call the framework "too rudimentary" for further analysis. It is the starting point for the later energy module and changes nothing in the eight modules above.
-
-**Coalitions inside dominant capital.** Chapter 17 sets oil and arms firms against technology and merger firms and says that their analysis is "beyond the scope of this volume". The model will carry a label on each claim so that coalitions can be defined later.
-
-## Modules set aside for later
-
-These are agreed as needed and are not part of the first build.
-
-- **Organised force and barriers.** The two world wars and the barrier of 1933 belong inside the theory. Chapter 12 lists "the use of force, including military, for differential business ends" among the means of sabotage. Chapter 17 says the depth regime of the 1930s was "marked by the massive use of military force" and shows inflation moving with the arms trade. The nine modules cannot yet tell a war from an ordinary period of stagflation, or a barrier won by resistance from a boundary that never opened.
-- **Coalitions inside dominant capital.** Described in the section above.
-- **Proletarianization.** The growth of the working population is a setting in the first build.
-- **Hype as a lever.** Coalitions that shape expectations, which is where the press findings of this project would enter.
-- **Household debt.** Chapter 9 treats bank loans to households as capitalized claims.
-- **Energy and externalisation.**
-- **Exchange rates,** needed once a second country is added.
-
-## What writing the rules showed
-
-Module 1 has to be built together with modules 3 and 4. The earlier build order placed it last. Green-field growth threatens earnings only through module 1, so without it growth would have no cost and merger would have no advantage over it.
-
-Modules 7 and 8 remain separate modules. Each holds a number that other modules read: cohesion and the intensity of stagflation in module 7, and the level of resistance in module 8.
-
-The stagflation module needs each claim to carry a price, and each envelope to carry a wage. These go into the core.
-
-## Every rule can be replaced
-
-Each module is a separate part with a stated job. The compass, resistance and the breaking of envelopes are almost wholly additions to the book, and they are the first candidates for replacement by a better theory. For that to work, each module states which numbers it reads and which numbers it supplies to the others. The compass supplies cohesion and the intensity of stagflation. Resistance supplies its level. A replacement has to supply the same numbers and may compute them in any way.
-
-## Nothing comes from outside
-
-The model treats nothing as an outside shock. Crises are intensified sabotage (module 6). Boundaries are opened and closed by the pressure of dominant capital against resistance (module 9). What the model is given is a starting position in 1890 and the settings of each envelope. These are also products of earlier power, and they are given only because the run has to start somewhere. The growth of the working population is still a setting in this plan. The book calls the limit on green-field growth "the extent of proletarianization", which is a process of power, so that setting is a candidate for a later module.
-
-## Changes made while building, 25 to 26 November 2026
-
-The sections above were written before the modules were built. The code now differs from them in the ways listed here. Where the two disagree, the code and this list are right. The reasons, and the passages behind them, are in `questions.md`.
-
-**Module 2, debt and equity.** The module keeps its own accounts and changes no equity claim. It reports the interest part of capitalist income, a pooled corporate debt claim, a government debt claim, and the part of the government's debt held by dominant capital. The last figure follows Sandy Brian Hager's finding that the United States public debt is concentrated among large owners.
-
-Since 26 November 2026 the module reads two numbers that optional modules publish, and both are zero when those modules are off. The risk shaping module publishes what the government borrows in a year to bail out dominant capital. The privatisation module publishes what dominant capital pays in a year for the public services it takes over. Module 2 keeps the first less the second as a stock of money and adds it to the government's debt. The debt cannot be less than nothing: if the proceeds ever exceeded the whole debt, the module would report no debt and set the rest against later borrowing. The run of the nine modules gives the same figures as before in every year. The reasons and the passages are under "The record of transfers" in the section "How modules share a quantity".
-
-**Module 5, cost cutting.** Each claim draws a small random gain or loss in earnings per employee each year, and each claim's earnings per employee drift back toward the level of its industry. The module holds no memory of its own. Since 26 November 2026 the drift is reckoned on the part of the markup that stacks, and the module changes only its own component (see "How modules share a quantity"). The module has a switch, `wears_holds`, which is off unless a run asks for it and exists only for comparisons. With it on, the drift is reckoned on the whole markup, premiums of an overlap group included. The comparison is under "The choices of the overlap group, tested" in that section, and it supports the rule as it stands.
-
-Since the same date the module also owns a cost component, the cost difference, because cutting a cost moves a claim's earnings and not its price (see "How the price is worked out").
-
-**Module 6, stagflation.** The parts of a price rise that small claims and wages obtain are no longer fixed. Wages obtain more where popular resistance is high and less where unemployment is high. Small claims obtain more for each year a bout lasts. The cut in hiring is published as a number called the crisis, and the green-field module subtracts it from every hiring rate.
-
-**Module 7, the compass.** The trigger changed. The compass now compares the volume of mergers over the last five years with the volume over the last twenty. When the recent volume is lower, the intensity of stagflation rises, and when it is higher the intensity falls. The first version compared differential accumulation with its own past. The book names the decline of mergers as what stagflation compensates for. Cohesion is the top hundred's part of all employees, raised when unemployment is above its usual level and lowered by popular resistance.
-
-**Module 8, resistance.** The module holds two levels and not one. Popular resistance rises with inflation, with unemployment above its usual level, and with the part of the economy that dominant capital holds. Roadblocks rise with the volume of mergers. Popular resistance acts on wages, on cohesion, on the grip of dominant capital over its markups, and on its risk. Roadblocks act on mergers and on boundaries. A first trial with one level failed: anger at inflation kept every boundary shut, which is the opposite of the book's statement that the population is "impartial to breadth".
-
-**Module 9, breaking the envelope.** Pressure on a boundary is the part of dominant capital's reach that it already holds, a figure the merger module supplies. A boundary opens while pressure exceeds one half plus the level of roadblocks.
-
-**Module 1, sabotage.** Popular resistance raises the level of unemployment at which wages keep pace with prices, and weakens the hold of dominant capital on its target markup.
-
-**Module 3, green-field growth, 26 November 2026.** Two faults in the founding of claims were corrected. The reasons and the passages are under "Two corrections" in the section on module 3. First, a new claim is now staffed only out of the year's new employment of the small claims of its industry, and no founding takes an employee from an existing claim. Second, a new claim now starts with the stacking part of its industry's markup and with no part of a premium that it does not hold. No setting was added and no default changed. The module now keeps two counts for reports: the claims it has founded, and the claims that the rounding asked for and the year's hiring could not staff. A tenth check in `checks.py` tests both corrections.
-
-The figures below compare runs before and after the corrections, from the same start and the same random streams.
-
-| Run | Before | After | Claims not founded for want of hiring |
-|---|---|---|---|
-| Stage 2 what-if run at 30,000 claims: the sector boundary opened by hand in year 40 | The core stopped the run in year 73. One claim had fewer than no employees. | The run completes 80 years. Differential capitalization ends at 99.0. Every figure is identical to the earlier run up to year 56. | 429 of 94,530 |
-| The same run at 300,000 claims | Completed. Differential capitalization 9,611 in year 80. | Identical in every year. | none |
-| Stage 2 runs A and B at 300,000 claims | 303 and 17,839 in year 80 | Identical in every year. | none |
-| The nine modules, 300,000 claims, 119 years | 24,060 in the last year | Identical in every year. | none |
-| Nine modules with `protections`, 300,000 claims, 60 years | 1,564 after 30 years and 7,771 after 60 | 1,546 and 7,755 | 3 of 2.1 million |
-| Nine modules with `leaders`, the same | 1,369 and 8,172 | 1,369 and 8,144 | 1 of 2.4 million |
-| Nine modules with `wants`, the same | 1,701 and 8,488 | 1,705 and 8,463 | none |
-| Nine modules with `leaders`, `protections` and `wants` together, the same | 1,803 and 7,986 | 1,816 and 7,971 | 6 of 2.1 million |
-| Nine modules with `household_debt`, with `nature`, or with `coalitions`, the same | 7,969, 7,317 and 8,412 after 60 years | Identical in every year. | none |
-
-The table shows three things. The fault that stopped the what-if run appeared only at the reduced count, where single industries become very small. At the full count the limit on founding was reached in at most a few claims out of millions. The runs with a premium of the overlap group moved by less than 2 per cent, because new claims in those runs no longer start with part of a premium. The figures quoted for the `protections`, `leaders` and `wants` modules in their own sections were measured before this correction and differ from present runs by amounts of that size. Modules whose markup components all stack, and modules that add an income, are unchanged, because for them the stacking part of the markup is the whole markup.
-
-**Modules 1, 5 and 6: what their components hold, 26 November 2026.** The sabotage, cost cutting and stagflation rules are unchanged, and so is every figure of the run of the nine modules. What changed is the record. The base markup, which the sabotage module owns, is now a level. The stagflation lead and the cost-cutting edge hold only what still stands of the gains and losses that those modules made. A fall of an industry's markup under the sabotage rule is first taken out of the leads and edges that stand in its claims, and only the rest lowers the base. The reasons, the passages and the figures are under "What a stacking component holds" in the section "How modules share a quantity".
-
-**Hype** is held at one for every claim, as planned.
+**Nothing comes from outside.** The model treats nothing as a shock from outside. A crisis is sabotage made more intense (module 6). Boundaries are opened and closed by the pressure of dominant capital against roadblocks (module 9). Government is part of the same order of power as the firms and is never set against them. The only things the model is given are the starting position and the settings. These too are the results of earlier power, and they are given only because a run has to start somewhere.
 
 ---
 
 ## How modules share a quantity
 
-This section was added on 26 November 2026. It describes a rule of the core that every module now follows. The whole rule is an addition to the literature, and the last paragraph of the section says so in detail.
+Several modules act on the same number: a firm's markup. This section describes how the core keeps their work apart, so that each module changes only its own part and the model can say afterwards who did what. It also covers three related things: what the record of a markup means, how a price is worked out, and how payments such as taxes are recorded.
 
-**The problem.** Several modules act on the earnings that a claim makes for each employee. Until this date each module proposed a multiplying factor, and the core multiplied all the factors of a year together. That is correct when the modules push independently of each other. It fails when two modules each try to set the level. Each of the two works out its factor from the value at the start of the year, and the product of the two factors goes too far. The price leaders module and the protections module could not run together for this reason. There was a second fault. Three modules added interest or other income to earnings per employee, and the sabotage module then read that income as a markup.
+The book gives no rule for any of this. The whole section describes additions of ours. The last part lists them.
 
-**Earnings per employee are worked out from parts.** No module changes earnings per employee directly any longer. The core works them out for every claim, after every change, from one formula:
+### Earnings are worked out from named parts
 
-    earnings per employee = wage x markup + other income per employee
+No module changes a firm's earnings directly. The core works them out for every firm, after every change, from one formula:
 
-The markup of a claim is the combination of its markup components. The other income of a claim is the sum of its income components. The core keeps the result for each claim, and the formula for capitalization uses it as before.
+> earnings per employee = wage × markup + other income per employee
 
-**A component.** A component is one number for each claim, and it has a name. A markup component is a multiplier, and its neutral value is 1. An income component is an amount of money for each employee, and its neutral value is 0. A cost component is a cost other than the wage, for each employee, counted in wages, and its neutral value is 0. A cost component enters the price of a claim and never its earnings (see "How the price is worked out" below). A component at its neutral value changes nothing.
+The markup and the other income are each built from named parts. The code calls a part a component. There are three kinds.
 
-**Ownership.** Each component belongs to one module. A module registers its components when the run starts. Only the owner may change a component, either by setting its values or by multiplying them. A module may still read everything in the ledger. The core stops the run with a message when a module tries to change a component that belongs to another module. It also stops the run when a module tries to multiply earnings per employee directly, and the message tells the builder to use a component.
+| Kind | What it is | Value that changes nothing | Example |
+|---|---|---|---|
+| Markup component | A number that multiplies into the firm's markup | 1 | A stagflation lead of 1.3 makes the markup three tenths higher |
+| Income component | Money for each employee that is not from a markup | 0 | Interest received from households |
+| Cost component | A cost other than the wage, for each employee, counted in wages | 0 | 0.03 is a cost of 3 per cent of the wage |
 
-**The components that exist.**
+A cost component enters the firm's price and never its earnings. "How the price is worked out" below explains why it exists.
 
-| Component | Kind | Owner | How it combines | What it holds |
-|---|---|---|---|---|
-| base | markup | sabotage (module 1) | stacks | A level: the markup the claim would have if no gain or loss stood on top of it. The sabotage rule moves the markup of a whole industry. A fall first takes away gains that stand in the components below, a rise first restores losses that stand there, and the rest of the movement stays in the base. |
-| stagflation lead | markup | stagflation (module 6) | stacks | The part of what the claim's price rises gained it over wages that still stands. A lead of 1.3 says that the claim's markup is three tenths higher than it would be without that gain. |
-| cost-cutting edge | markup | cost cutting (module 5) | stacks | What still stands of the claim's edge over its industry from its yearly draws, or of its lag behind it. |
-| unsold goods | markup | sales | stacks | The part of the markup given up for want of sales that has not been recovered since. A value of 0.8 says that a fifth of the markup is still given up. |
-| war premium | markup | coalitions | stacks | What still stands of the markup that the conflict coalition gained from violence. |
-| rival cost | markup | boundary contest | stacks | What still stands of the markup that dominant capital lost to new rivals when a boundary opened. |
-| resource premium | markup | nature | stacks | What still stands of the rise of a resource industry's markup toward the aim of its owners. |
-| size premium | markup | leaders | overlap group "hold on buyers" | The difference in markup between large and small claims of one industry while prices rise or fall. |
-| protection premium | markup | protections | overlap group "hold on buyers" | The premium of a claim that holds a protection. |
-| wants premium | markup | wants | overlap group "hold on buyers" | The premium of a claim that holds more of the buyers than of the capacity of its industry. |
-| public debt income | income | public_debt | adds; the core sets it from the module's transfers | Interest received on the public debt less the tax paid toward it. |
-| household interest | income | household_debt | adds; the core sets it from the module's transfer | Interest received from households. |
-| burdens off the books | income | externalisation | adds; income of its own | What the claim gains from burdens that it has shifted onto others. |
-| cost difference | cost | cost cutting (module 5) | adds to the cost in the price | The amount by which the claim's cost for each employee stands below the wage (a saving, below 0) or above it (a lag, above 0) as a result of its yearly draws. |
-| idle overhead | cost | sales | adds to the cost in the price | The overhead that a seller who kept its price has carried on goods it did not sell. It is the sum of the yearly amounts, and nothing is taken off it. |
-| outlay on wants | cost | wants | adds to the cost in the price | The outlay of the claim's industry on shaping wants, for each employee. |
+**Each component belongs to one module.** A module registers its components when the run starts. Only the owner may change a component. Any module may read any of them. The core stops the run with a message if a module tries to change a component it does not own, or tries to change earnings or a price directly.
 
-**Stacking.** A component that stacks multiplies with every other part of the markup. This is the old behaviour. It is right for pushes that do not depend on each other. An industry's base markup of 0.10, a stagflation lead of 1.2 and a cost-cutting edge of 1.05 give a markup of 0.10 x 1.2 x 1.05 = 0.126.
+### The components that exist
 
-**What a stacking component holds.** This part was added on 26 November 2026, for item 33 of `backlog.md`.
+| Component | Kind | Owner | What it holds |
+|---|---|---|---|
+| base | markup | sabotage | The markup the firm would have if no gain or loss stood on top of it. For a new firm this is the whole markup, for example 0.10. |
+| stagflation lead | markup | stagflation | What is left of the firm's gain over wages from its price rises. A lead of 1.3 says the markup is three tenths higher than it would be without that gain. |
+| cost-cutting edge | markup | cost cutting | What is left of the firm's edge over its industry from its yearly draws, or of its lag behind it |
+| unsold goods | markup | sales | The part of the markup given up for want of sales and not yet recovered. A value of 0.8 says a fifth is still given up. |
+| war premium | markup | coalitions | What is left of the markup that a group of firms gained from violence |
+| rival cost | markup | boundary contest | What is left of the markup that dominant capital lost to new rivals when a boundary opened |
+| resource premium | markup | nature | What is left of the rise in a resource industry's markup towards the aim of its owners |
+| size premium | markup, hold on buyers | leaders | The difference in markup between large and small firms of one industry while prices rise or fall |
+| protection premium | markup, hold on buyers | protections | The premium of a firm that holds a protection, such as a patent or a licence |
+| wants premium | markup, hold on buyers | wants | The premium of a firm that holds more of its industry's buyers than of its capacity |
+| public debt income | income | public_debt | Interest received on the public debt less the tax paid towards it. The core fills it in from the module's payments. |
+| household interest | income | household_debt | Interest received from households. The core fills it in from the module's payment. |
+| burdens off the books | income | externalisation | What the firm gains from burdens it has shifted onto others |
+| cost difference | cost | cost cutting | How far the firm's cost for each employee stands below the wage (a saving, below 0) or above it (a lag, above 0) as a result of its yearly draws |
+| idle overhead | cost | sales | The overhead that a seller who kept its price has carried on goods it did not sell |
+| outlay on wants | cost | wants | The outlay of the firm's industry on shaping what buyers want, for each employee |
 
-*The fault.* The sabotage rule, the stagflation rule and the sales rule each move a markup by an amount. A markup is a small number, so a movement of a few points is a large proportion of it. Each rule recorded its movement as a multiplying factor on its own component, and nothing was ever taken off that record. In a run with many modules one rule pushed markups up every year and another pushed them down every year. The markups stayed ordinary. The records did not. In the run of 28 optional modules over 60 years from 60,000 claims, the base markup of one claim reached ten to the power 20, the stagflation lead reached ten to the power 8, and the component for unsold goods fell to ten to the power minus 29. No reader could be told what such a number meant.
+The base, the stagflation lead, the cost-cutting edge and the cost difference belong to main modules and are always present. The rest appear only when their optional module is on. Three markup components are marked "hold on buyers". The next part explains why they are treated differently.
 
-*What the literature says.* The book treats the gain from inflation as something that stands for a time and is then lost. "Note that although differential earnings rise with inflation, the gains are always short-lived: they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk"). It treats the loss from poor sales as something that comes and goes with sales: firms reckon their price on "the cost at 'normal' levels of output" and keep it "stable in the face of cyclical variations in demand" (chapter 12, "The markup and the target rate of return"). It treats an edge from cost cutting in the same way: improvements "tend to proliferate easily, and this rapid spread quickly dilutes the initial advantage" (chapter 16, "'Productivity' gains"). Each of these is a gain or a loss that stands until something removes it. The book gives no rule for keeping such a record, and it does not say which gain is lost first when a markup falls. The rule below is therefore an addition to the literature.
+### How markup components combine
 
-*The rule.* The base markup is a level. Every other stacking component holds only the part of its owner's movements that still stands. A gain is a component above 1, and a loss is a component below 1.
+**Most multiply together.** The code says these components "stack". A base of 0.10, a stagflation lead of 1.2 and a cost-cutting edge of 1.05 give a markup of 0.10 × 1.2 × 1.05 = 0.126. This is right for pushes that do not depend on each other. This file calls the product of these components "the stacking part of the markup". It is the part that any firm can have.
 
-1. A gain stands until a later fall of the claim's markup takes it away.
-2. A loss stands until a later rise of the claim's markup restores it.
-3. The base holds the rest. It is the markup the claim would have if no gain and no loss stood.
+**Three do not, because they are holds on the same buyers.** A dominant position, a patent and a hold on what buyers want are three ways of holding the same customers. Two holds on the same customers do not strengthen each other without limit. The code puts the size premium, the protection premium and the wants premium in what it calls an overlap group, named "hold on buyers". The rule of the group is:
 
-The core applies the rule at the end of each year, claim by claim, after the year's gain in differential capitalization has been divided among its sources. It sets what pushes up against what pushes down. Three kinds of thing are set against each other: the gains that stand, the losses that stand, and the movement that the sabotage rule made to the base in that year. The smaller side is cancelled in full. The larger side keeps the difference, and each of its members keeps the same proportion of what it had. The reckoning is done in logarithms, so the product of the components is the same before and after. The core does the same once more after the year's mergers, because a merger averages the components of two claims and can leave a gain beside a loss.
+1. The largest premium counts in full.
+2. Each smaller premium counts for a set part of the amount by which it stands above 1. The part is a setting of the group. Its default is 0, so by default only the largest premium counts.
+3. A value below 1 is a discount and not a hold. Every discount counts in full.
 
-An example shows the rule. A claim has a base of 0.10, a stagflation lead of 1.50 and nothing else, so its markup is 0.15. In the next year the sabotage rule lowers the markup of its industry by a fifth, to 0.12. Before this date the record would have read: base 0.08, lead 1.50. Now the fall is taken out of the lead, and the record reads: base 0.10, lead 1.20. The markup is 0.12 in both cases. The new record says what a reader would say: the industry's markup is where sabotage left it, and three fifths of the gain from price rises has been worn away.
+**An example.** A firm has premiums of 1.5 and 1.2 and a discount of 0.9.
 
-*What the rule does not change.* It changes no claim's markup, earnings, price or capitalization, and it credits no gain to any module. The division of each year's gain among its sources is worked out before the netting and is the same as before. The cumulative gain credited to a module therefore still records everything that module did, and the component records only what is left of it. No module reads a stacking component of another module, so no rule behaves differently.
+- With the part at 0, the group gives 1.5 × 0.9 = 1.35.
+- With the part at one half, the smaller premium counts for half of its 0.2, and the group gives 1.5 × 1.1 × 0.9 = 1.485.
+- With the part at 1, all three multiply, and the group gives 1.62. A part of 1 is the same as plain multiplying.
 
-*What is added to the literature, and what is only a convention.* Three choices were made. First, a fall of the markup is taken out of standing gains before it lowers the base, and a rise restores standing losses before it raises the base. The book supports the direction, since it calls the gains of inflation "short-lived", and it gives no rule. Second, when several gains or several losses stand in one claim, each gives up the same proportion. The book gives no guidance on this. Third, every stacking component takes part, including the war premium, the rival cost and the resource premium of optional modules, because each is proposed in the same way, as a movement of the whole markup. None of the three choices affects any figure of the model other than the values of the components themselves. The core takes a setting, `netting`, which is on unless a run switches it off. With it off the core keeps the old gross record, and this is meant only for comparisons. It is a switch and not a number, and no number was added anywhere.
+The result of the group then multiplies with the stacking part of the markup. To set the part for a run, add `--overlap 0.5` or `--overlap 1` to the command.
 
-*What the runs showed.* All runs started from 300,000 claims with seed 0. Each was made twice, with the folder as it stood before the change and with the folder after it. In all three pairs every reported figure was the same to the last printed digit in every fifth year and in the last year: differential capitalization, unemployment, the capitalist share, the average markup, the markup of the top hundred and the number of claims. The table gives the lowest and the highest value that each component took in any claim in any year.
+Each of the three modules works out its premium against the stacking part of the firm's markup. A premium therefore does not depend on the other two, and no module chases a level that another module sets.
 
-| Run | Differential capitalization in the last year, before and after | Component | Range before | Range after |
-|---|---|---|---|---|
-| The nine modules, 119 years | 24,060.435478 and 24,060.435478 | base | 0.0013 to 0.62 | 0.077 to 0.62 |
-| | | stagflation lead | 1 to 188 | 1 to 3.0 |
-| | | cost-cutting edge | 0.47 to 1.70 | 0.73 to 1.59 |
-| Nine modules with `sales`, 60 years | 3,981.940878 and 3,981.940878 | base | 0.094 to 7.9 | 0.094 to 0.60 |
-| | | stagflation lead | 1 to 15 | 1 to 1.9 |
-| | | unsold goods | 0.0015 to 1 | 0.61 to 1 |
-| | | cost-cutting edge | 0.79 to 1.60 | 0.83 to 1.22 |
-| Nine modules with the 28 optional modules that take the place of no other, 60 years | 4,343.938162 and 4,343.938162 | base | 0.0000011 to 990,000,000,000,000,000 | 0.0042 to 1.8 |
-| | | stagflation lead | 1 to 280,000 | 1 to 7.6 |
-| | | unsold goods | 0.00000000000000000000000028 to 1 | 0.023 to 1 |
-| | | resource premium | 0.51 to 400,000 | 0.59 to 15 |
-| | | war premium | 0.45 to 5.1 | 0.95 to 2.1 |
-| | | cost-cutting edge | 0.12 to 3.7 | 0.53 to 1.61 |
+The book lists such forms of power side by side and gives no sum for them. Goodwill is "a catch-all term for the unsanctioned power to strategically limit industry for differential business gains" (chapter 12, "Immaterial assets"). "The relative effectiveness of these multiple forms of indirect power gets crystallized in the magnitude of differential profit per employee" (chapter 14, "Regimes of differential accumulation"). "Monopoly power, like every other form of power, can be known only by its consequences" (chapter 12, "The markup and the target rate of return"). The book also says that merger serves "to kill three birds with one stone", which suggests that sources of power overlap as much as they add up. It says neither that two holds multiply nor that the larger covers the smaller.
 
-Six further pairs of runs from 60,000 claims gave output files that were identical character for character, including the division of the gain among its sources in every period: the nine modules over 119 years, and the nine modules over 60 years with `sales`, with `nature`, with `coalitions` and `boundary_contest`, with `leaders`, `protections` and `wants`, and with the 28 optional modules.
+### What a stacking component holds
 
-The new record of the nine modules can be read against the book. In the run of the nine modules, the stagflation lead of the middle claim is 1.00 in every reported year up to 1930. It rises in each bout of stagflation and falls back afterwards: to 1.98 in the year labelled 1940 and back to 1.00 by 1945, to 2.44 in 1960 and back to 1.00 by 1970, to 2.66 in 1980 and back to 1.00 by 1990, and to 2.49 in 2005 and 1.67 in 2009, where the run ends. Between bouts the lead of most claims has been worn away, which is what the book says of the gains from inflation. Some claims keep part of a lead between bouts: the highest lead in any claim was still 1.5 in 1970 and 1.7 in 1990. The old record could not show either fact, because it kept every past gain for ever.
+A markup is a small number, so a change of a few points is a large proportion of it. If each module simply piled up its own changes, one module's record could grow without limit while another's shrank, and the markup itself stayed ordinary. No reader could say what a stagflation lead of 100 million meant. The core therefore keeps the record tidy.
 
-*The check.* An eleventh check in `checks.py` runs the nine modules with the 28 optional modules for 60 years from 3,000 claims. It tests three things. No claim ends a year with a gain standing beside a loss. The base markup of every claim lies inside the range of the markups seen in the run. No other stacking component stands further from 1 than the highest of those markups stands from the lowest. The check then repeats the run with the netting switched off. It confirms that every reported figure is the same in every year, and that the old gross record does not pass the test. Nothing in the model holds a component inside the tested range, so the check is a test and not a limit. Later on 26 November 2026 the second test was narrowed. It now requires only that no base lies above the highest markup seen. The requirement that no base lie below the lowest markup seen held in the run the check first made and is not a property of the model: a merger can leave the buyer with a base below the bases of both claims (item 48 of `backlog.md`). The check prints the lowest base and no longer tests it.
+**The rule.** The base is a level. Every other stacking component holds only the part of its owner's changes that still stands. A value above 1 is a gain, and a value below 1 is a loss.
 
-*What is still doubtful.* The rules themselves are as they were. The sabotage rule still raises every markup a little in each year of high unemployment, and the sales rule still lowers markups in each year in which goods are unsold. Two rules that push against each other for decades are a doubt about the rules, and the netting only keeps the record of them readable. The lower limits on a markup in the sabotage, stagflation and sales modules (0.005, 0.0001 and 0.005) are limits with no source, and they are still there. Items 44 to 46 of `backlog.md` record these points.
+1. A gain stands until a later fall of the firm's markup takes it away.
+2. A loss stands until a later rise of the firm's markup restores it.
+3. The base holds the rest. It is the markup the firm would have if no gain and no loss stood.
 
-**Overlap groups.** Some sources of a higher markup are holds on the same buyers. A dominant position, a patent and a hold on what buyers want are examples. Two holds on the same buyers may overlap, and they then do not strengthen each other without limit. The book says that merger "kills three birds with one stone", which suggests that sources of power overlap as much as they add up. A module may therefore place its component in a named overlap group. The rule for one group is this:
+**An example.** A firm has a base of 0.10 and a stagflation lead of 1.50, so its markup is 0.15. Next year the sabotage module lowers the markup of its industry by a fifth, to 0.12. The fall is taken out of the lead. The record now reads: base 0.10, lead 1.20. It says what a person would say: the industry's markup is where it was, and three fifths of the firm's gain from price rises has been worn away.
 
-1. The largest premium in the group counts in full.
-2. Each of the other premiums counts for a set part of the amount by which it stands above 1. The part is a setting of the group. It is 0 unless it is changed, and only the largest premium then counts.
-3. A value below 1 is a discount and not a hold. A discount always counts in full.
+**How the core does it.** At the end of each year, firm by firm, the core sets what pushes up against what pushes down. Three kinds of thing are set against each other: the gains that stand, the losses that stand, and the change that the sabotage module made to the base that year. The smaller side is cancelled in full. The larger side keeps the difference, and each of its members keeps the same proportion of what it had. The core does this once more after the year's mergers, because a merger can leave a gain beside a loss in one firm.
 
-An example with three members shows the rule. One claim has premiums of 1.5 and 1.2 and a discount of 0.9. When the part is 0, the group gives 1.5 x 0.9 = 1.35. When the part is one half, the smaller premium counts for half of its excess of 0.2, and the group gives 1.5 x 1.1 x 0.9 = 1.485. When the part is 1, the three values multiply, and the group gives 1.62. A part of 1 is therefore the same as plain stacking. The group's result then multiplies with the stacking components. The run script takes the part from the command line: `--overlap 1` makes the premiums of the group multiply, and `--overlap 0` is the default.
+**What it does not change.** It changes no firm's markup, earnings, price or capitalization. It credits no gain to any module. The division of each year's gain among the modules is worked out first and is not affected. So the gain credited to a module over a run still records everything that module did, and its component records only what is left.
 
-The one group that exists is called "hold on buyers". Its members are the size premium, the protection premium and the wants premium. Each of the three modules reckons its premium against the part of the claim's markup that stacks. A premium therefore does not depend on the other premiums of its group, and no module chases a level that another module sets.
+**What the record looks like.** In a run of the nine main modules over 119 years from 300,000 firms, the base of every firm stayed between 0.077 and 0.62, the stagflation lead between 1 and 3.0, and the cost-cutting edge between 0.73 and 1.59. The lead of the middle firm rose to between 2 and 2.7 in each bout of stagflation and fell back to 1 within five to ten years. This is what the book says of the gains from inflation: "they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
 
-**The choices of the overlap group, tested.** This part was added on 26 November 2026, for item 34 of `backlog.md`. Seven choices had been made for the group and none had been tried against its alternative. Each was tried here. No default was changed, because the literature decides none of them except the one about cost cutting, and there it supports the rule as it stands.
+**What is our own here.** The book supports the direction, since it calls the gains of inflation "short-lived". It gives no rule. Three choices are ours. A fall of the markup is taken out of standing gains before it lowers the base, and a rise restores standing losses before it raises the base. When several gains or several losses stand in one firm, each gives up the same proportion. Every stacking component takes part, including those of optional modules. None of the three affects any figure of the model except the values of the components themselves.
 
-*What the literature says.* The search covered the book for how separate forms of power over buyers combine. The book lists the forms side by side and gives no arithmetic for them. Chapter 12, "The differential underpinnings of universal sabotage", says: "The means of achieving this differential end are numerous", and it names "predatory pricing, formal and informal collusion, advertising and exclusive contracts" together with "patent and copyright laws" and "legal monopolies". Chapter 12, "Immaterial assets", says that the accountants record the result under one heading. Goodwill is "a catch-all term for the unsanctioned power to strategically limit industry for differential business gains", and "any institutional arrangement leading to higher profit expectations and lower risk perceptions – be it favourable political rearrangements, the creation of new consumer 'wants', the re-organization of collusion, or the weakening of competitors – will sooner or later lead to higher equity values backed by new 'goodwill'". The book holds that the forms differ in kind and are made one only in their result. Chapter 14, "Regimes of differential accumulation", says: "The relative effectiveness of these multiple forms of indirect power gets crystallized in the magnitude of differential profit per employee." Chapter 12, "The markup and the target rate of return", says of the markup: "Monopoly power, like every other form of power, can be known only by its consequences." Chapter 14, "The figurative identity", warns against reckoning the result from its sources: "The fact that a certain corporation was granted a patent, that it had the government move to its side, that it introduced a new technique, or that it acquired a competitor, cannot, in and of itself, tell us much about that company's rate of differential accumulation." The book therefore says neither that two holds multiply nor that the larger one covers the smaller. It gives no rule for a loss that two rules impose on the same small firm. On one choice it does speak. Chapter 16, "'Productivity' gains", sets what the spread of methods wears away apart from what exclusion protects: "Unlike final commodities that can often be protected through patents, copyrights and other exclusionary threats, improvements in the social organization of production tend to proliferate easily, and this rapid spread quickly dilutes the initial advantage of whoever implemented them first." Chapter 13 says what ends a protected gain, and it is the withdrawal of the protection: the earnings of the holder would then "drop sharply if not collapse altogether".
+The core has a switch, `netting`, which is on by default. With it off, the core keeps the full piled-up record. The switch is kept only for comparisons.
 
-*The switches.* Each alternative is a switch that is off unless a run asks for it. None of them is a number taken from a source, and none is meant for use outside comparisons.
+**What is doubtful.** Nobody has tested the order in which gains are worn away when a markup falls. And the tidy record hides a doubt about the rules themselves: two rules that push one markup in opposite directions for decades should be questioned, however readable the record.
 
-| Choice | The rule as it stands | The alternative, and its switch |
+### The choices of the overlap group, tested
+
+Seven choices were made for the holds on buyers. Each was tried against an alternative in runs of 60 years from 300,000 firms. Two runs that differ only in their random numbers differ by about 2 per cent, so smaller differences show nothing. Each alternative is a switch that is off by default. None has a source, and none is meant for use outside comparisons.
+
+| Choice | The rule as it stands | The alternative and its switch | What the comparison showed |
+|---|---|---|---|
+| How much of a smaller premium counts | Nothing | Half of its excess over 1, or all of it: `--overlap 0.5` or `--overlap 1` | It matters only where the protections and wants modules run together. There, counting everything gave 11 to 13 per cent more differential capitalization after 30 years, 4 per cent more after 40, and no clear difference after 60. |
+| Discounts | Every discount counts in full | The deepest discount counts in full and the others in part: `--discounts-overlap` | No measurable difference in differential capitalization |
+| Cost cutting and a hold on buyers | Cost cutting does not wear a premium down | It does: `wears_holds` in the cost cutting module | The largest effect: 9 to 17 per cent less differential capitalization after 30 years. The book supports the rule as it stands (see module 5). |
+| Differences that other modules left | The price leaders module sets its own difference by size and leaves others alone | Its premium also cancels differences by size left by other modules: `levels_others` in the price leaders module | No measurable difference |
+| What a protection premium multiplies | The firm's own markup | The premium is set so that the protected firm stands at one and a half times its unprotected neighbours: `against="neighbours"` in the protections module | No difference before the first bout of stagflation. About 3 to 5 per cent more after it, from one run only. |
+| The end of a wants premium | It ends in the year the hold is lost | It fades over years: `fade` in the wants module | 2 to 3 per cent less after 30 years and no difference later |
+| The three premiums form one group | Yes | Each multiplies separately, which is the same as `--overlap 1` | See the first row |
+
+In every run, with every switch, the year's gain divided among the modules with nothing left over.
+
+Four things are still doubtful.
+
+- **The group takes more from an industry's firms than it gives.** The price leaders rule and the wants rule each take from some firms of an industry exactly what they give to others. Inside the group, a firm's gains overlap and its losses do not. With both modules on, the group lowered the markup of the average employee's firm by up to 1.6 per cent.
+- **The part of a smaller premium that counts has no source.** The book gives no ground for 0, for 1 or for anything between. It is a choice for whoever uses the model.
+- **A protected firm pays for a hold on wants that adds nothing to its markup.** The wants module does not know whether its premium counts.
+- **Most comparisons used one set of random numbers.** The differences found after the first bout of stagflation need several before they can be relied on.
+
+### Mergers, new firms and dissolved firms
+
+**In a merger,** the employees and the earnings of the two firms add, and the capitalization of the new firm is the sum of the two.
+
+- Each income component and each cost component becomes the sum of the two firms' amounts, spread over the employees of both. The value of what the two firms sell is therefore the same before and after.
+- Each markup component other than the base becomes the average of the two firms' values, weighted by what each firm earns from its markup. A buyer that earns 300 from its markup with a lead of 1.5, and a bought firm that earns 100 with a lead of 1.0, give a lead of (300 × 1.5 + 100 × 1.0) ÷ 400 = 1.375.
+- The base is then set so that the new firm's earnings from its markup are exactly the sum of the two.
+
+**A new firm** takes the average base of its industry and the no-change value of every other component, unless the module that founds it says otherwise. The green-field module does say otherwise: it gives a new firm the average stacking part of its industry's markup, and that goes into the new firm's base. A new firm has no cost component unless the module that founds it gives one.
+
+**A dissolved firm** takes its components with it. A holding that the optional barriers module forces a firm to sell keeps every component of the seller, and so it keeps the seller's price.
+
+### How the gain of the overlap group is divided
+
+"What happens in one year" says that the model divides each year's gain among the modules exactly. For most changes this involves no choice. The change in a firm's earnings is split between its markup and each income component in proportion to the money each added. The change in the markup is split among the wage, each stacking component and the overlap group in proportion to how far each moved. The module that changed the wage is credited with the wage's part.
+
+A choice is needed only inside the overlap group, because its result depends on which premium is the largest. Each module is credited with the average of what its own change adds, taken over every order in which the year's changes to the group could have been applied. With two modules this is the average of two cases: the module's change applied first, and applied second. This way of sharing is known as the Shapley value. It treats every module alike, so the order in which modules are listed cannot matter.
+
+### How the capitalist share counts income
+
+The capitalist share is the earnings of all firms as a part of all income. The core counts each income once. A payment such as household interest has a payer whose income is already counted, so it adds nothing to all income. The gain from burdens off the books in the externalisation module is paid by nobody in the model, so it is added to all income.
+
+### How the price is worked out
+
+**A firm's price is its cost plus its markup.** No module changes a price. The core works out every price, after every change, from one formula:
+
+> cost per employee = wage × (1 + the sum of the cost components)
+>
+> price = cost per employee + wage × markup
+
+If the wage is 100 and the markup is 0.10, the price is 110. If the firm also has a cost component of 0.03, the price is 113.
+
+The price is the price of what one employee makes in a year. The model does not count goods.
+
+**What the theory says.** Chapter 16, "Depth: internal and external", says that "earnings per employee can be decomposed into three elements": "(1) unit price, (2) unit cost and (3) units per employee". Its equation 1 reads: earnings per employee = (unit price − unit cost) × units per employee. The chapter then treats "lowering unit cost faster than the average" and "increasing unit price faster than the average" as two different routes.
+
+Chapter 12, "The markup and the target rate of return", reports how firms say they set prices: "they started by calculating what they considered to be 'normal' unit cost (namely the cost at 'normal' levels of output); they tacked onto this cost a 'conventional' markup; and they kept the resulting price stable in the face of cyclical variations in demand". A footnote gives an example: "If the 'normal' volume is 100 million units and the 'normal' unit cost is $20, the firm needs to add a 10 per cent markup and set its unit price at $22." The next section, "Pricing and incapacitating", says that "the profit target and markup built into the price reflect the firm's power".
+
+So the book gives the relation: a price is a cost with a markup added, and earnings are the price less the cost. It gives no list of costs. It also warns that it uses "the concepts of 'productivity' and 'inputs' here from the what-you-see-is-what-you-get perspective of capitalist executives".
+
+The model holds the book's "units per employee" at one for every firm, because it has no account of productivity. The book says the productivity gains of dominant capital "were more or less the same as the social average" (chapter 16, "'Productivity' gains"). With that, the formula above is the book's equation 1 read backwards.
+
+**The rules that follow.**
+
+1. A module that raises a markup raises the price by exactly what the rise adds to earnings. It proposes no price.
+2. A premium that the overlap group does not count is not in the markup, and so it is not in the price.
+3. A module that wants to move a markup without moving the price must say what happened to cost. It does so by moving a cost component of its own the other way.
+4. A cost component is counted in wages, so the cost rises when the wage rises.
+5. Other income, such as interest, is not a receipt from sales and is no part of the price.
+6. A component that starts a run at a value other than its no-change value alters the opening prices. A module registers such a component in a step of its own, which the core runs for every module, in the alphabetical order of their names, before any module starts. Every module therefore reads the same opening prices. Only the wants module needs this.
+
+**Which changes move the price and which move the cost.**
+
+| Module | What it changes | Price or cost |
 |---|---|---|
-| How much of a smaller premium counts | Nothing: only the largest premium counts. | Half of its excess over 1, or all of it. The setting is the part of the group: `--overlap 0.5` or `--overlap 1` on the command line. |
-| Discounts | Every discount counts in full. | The deepest discount counts in full, and each other discount counts for the same part as a smaller premium does. The switch is `--discounts-overlap` on the command line (`discounts_overlap` in the core). |
-| Cost cutting and a hold on buyers | The drift back toward the industry is reckoned on the stacking part of the markup, so a premium of the group is not worn down. | The drift back is reckoned on the whole markup, premiums included (`wears_holds` in the cost cutting module). |
-| Differences that other modules left | The price leaders module sets its own difference by size and leaves other differences alone. | The premium also cancels the difference by size that stands in the stacking part of the markups, as the rule did before the named components (`levels_others` in the price leaders module). |
-| What a protection premium is reckoned against | The premium multiplies the claim's own markup. | The premium is set so that the protected claim stands at one and a half times the average of its unprotected neighbours, whatever its own gains and losses (`against="neighbours"` in the protections module). |
-| The end of a wants premium | The premium is set afresh each year, so it ends in the year the hold is lost. | The difference moves each year only part of the way to what the hold calls for, so it fades over years (`fade` in the wants module; 0.3 was tried, and no source gives a rate). |
+| sabotage | The markup of an industry | Price. Each firm's price moves with its own markup. |
+| stagflation | The wage, and the markup of each firm | Price. The new markup is the one at which the wage and the markup together have risen by the firm's price rise. |
+| cost cutting | The edge of each firm | Cost for the yearly draw. Cost for the part of the drift back that removes a saving or a lag that stands. Price for the rest of the drift back. |
+| sales | The markup of an industry | Price for sellers who cut prices. Cost, named "idle overhead", for sellers who keep them. |
+| leaders, protections | A premium of the overlap group | Price, and only as far as the markup counts the premium |
+| wants | A premium of the overlap group, and the outlay | Price for the premium. Cost, named "outlay on wants", for the outlay. |
+| coalitions, nature, boundary contest | A stacking premium or loss | Price |
+| public debt, household debt, externalisation | An income | Neither |
 
-The seventh choice is that the three premiums are placed in one group. A part of 1 is the same as placing each premium outside any group, so the first row tests it as well.
+**The three cost components.**
 
-*The runs.* Every run started from 300,000 claims and lasted 60 years, with the nine modules and the optional modules named. The seed was 0 unless stated. The figures are differential capitalization in the years labelled 1920, 1930 and 1950. The first bout of stagflation begins in 1932 or 1933 in every run, so the first two figures come before it and the third comes after it. Two measures show how much a difference means. First, the same run with seed 1 differs from the run with seed 0 by about 2 per cent in each of the three years. Second, a small change early in a run can lengthen or shorten the bout by a year, and the figure for 1950 then moves by several per cent for that reason alone (item 40 of `backlog.md`). A difference of 2 per cent before the bout, or of 5 per cent after it, therefore shows nothing.
+- **The cost difference** belongs to the cost cutting module. Module 5 describes it.
+- **The idle overhead** belongs to the sales module. Chapter 12 says that sellers work out their price on the cost "at 'normal' levels of output" and keep it "stable in the face of cyclical variations in demand". A seller who keeps its price while its sales fall therefore has a higher cost for each thing sold. Each year the module adds to this cost what its rule takes from the markup of sellers who keep their prices.
+- **The outlay on wants** belongs to the wants module. Chapter 9 says that estimates of advertising leave out "sales promoting expenditures buried in the 'cost of production'". Each year the module sets this cost, for every firm of an industry, to the industry's average outlay as a part of earnings, times the industry's markup.
 
-The runs without any switch gave the figures that were recorded before this work: 8,121 with the nine modules alone, 8,230 with `leaders`, 7,755 with `protections`, 8,463 with `wants`, 7,876 with `leaders` and `protections`, 8,488 with `leaders` and `wants`, 8,012 with `protections` and `wants`, and 8,051 with all three, each in 1950. The run of the nine modules over 119 years printed the same output as before, character for character.
+**What the price level shows.** With the nine main modules, the average price stays within 0.1 per cent of the wage times one plus the average markup. With the sales module on, it stands up to 3.9 per cent above that, which is the idle overhead. With the wants module on, it stands up to 11.6 per cent above, which is the outlay on wants.
 
-| Run | Part 0 (the rule): 1920, 1930, 1950 | Part one half | Part 1 (plain stacking) |
-|---|---|---|---|
-| `leaders` and `protections` | 1,546, 3,464 and 7,876 | 1,554, 3,543 and 7,839 | 1,562, 3,514 and 7,785 |
-| `leaders` and `wants` | 1,709, 3,829 and 8,488 | 1,706, 3,804 and 8,550 | 1,720, 3,833 and 8,637 |
-| `protections` and `wants` | 1,793, 3,891 and 8,012 | 1,891, 3,959 and 8,132 | 2,021, 4,024 and 8,056 |
-| All three | 1,808, 3,897 and 8,051 | 1,920, 3,987 and 8,323 | 2,044, 4,059 and 8,168 |
-| All three, seed 1 | 1,843, 3,947 and 7,861 | 1,947, 4,026 and 7,887 | 2,046, 4,085 and 7,965 |
-
-| Choice | Run | The rule: 1920, 1930, 1950 | The alternative |
-|---|---|---|---|
-| Discounts overlap | `leaders` and `wants` | 1,709, 3,829 and 8,488 | 1,711, 3,794 and 8,583 |
-| | All three | 1,808, 3,897 and 8,051 | 1,801, 3,880 and 8,170 |
-| | All three, seed 1 | 1,843, 3,947 and 7,861 | 1,854, 3,950 and 7,839 |
-| | All three, part one half | 1,920, 3,987 and 8,323 | 1,943, 4,002 and 7,649 |
-| Cost cutting wears down a hold | `leaders` | 1,377, 3,262 and 8,230 | 1,357, 3,261 and 8,218 |
-| | `protections` | 1,546, 3,441 and 7,755 | 1,401, 3,291 and 7,632 |
-| | `wants` | 1,704, 3,794 and 8,463 | 1,492, 3,438 and 8,144 |
-| | All three | 1,808, 3,897 and 8,051 | 1,505, 3,417 and 7,879 |
-| | All three, seed 1 | 1,843, 3,947 and 7,861 | 1,514, 3,441 and 7,845 |
-| The price leaders module cancels other differences | `leaders` | 1,377, 3,262 and 8,230 | 1,366, 3,260 and 8,194 |
-| | All three | 1,808, 3,897 and 8,051 | 1,812, 3,919 and 8,116 |
-| A protection premium reckoned against the neighbours | `protections` | 1,546, 3,441 and 7,755 | 1,532, 3,480 and 8,182 |
-| | All three | 1,808, 3,897 and 8,051 | 1,828, 3,944 and 8,268 |
-| A wants premium that fades (0.3) | `wants` | 1,704, 3,794 and 8,463 | 1,673, 3,760 and 8,435 |
-| | All three | 1,808, 3,897 and 8,051 | 1,756, 3,872 and 8,051 |
+**What is our own here.** The price is worked out for what one employee makes in a year, with no count of goods. A cost component is counted in wages. Each module decides whether its change to a markup is a change of price or of cost. The cost cutting module's drift back is split between cost and price. A merger adds the costs of the two firms. Nothing keeps a cost inside a range.
 
-*What each choice does.*
+**What is doubtful.**
 
-1. *Only the largest premium counts.* This choice matters, and it matters only where the protections and wants modules run together. In 1920, in the run of all three, 76 of the hundred largest claims held a protection. Their protection premium averaged 1.37 over the hundred, their wants premium 1.17 and their size premium 1.01. The rule gave the hundred a group value of 1.40. Plain stacking of the same premiums would have given 1.62. Differential capitalization in 1920 was 1,808 under the rule, 1,920 with a part of one half and 2,044 with plain stacking, which is 13 per cent more. The run with seed 1 gave 11 per cent more. The difference shrinks afterwards, to 4 per cent in 1930 and to nothing that can be told from chance in 1950. The reason is that the wants premium of the hundred largest claims falls as they come to hold most of their industries: it was 1.09 in 1930 and 1.01 in 1950. The capitalist share of income was the same under every part, 11.3 per cent in 1930. With the price leaders module and one other, the part changes nothing that can be measured. The size premium of the hundred largest stayed below 1.01 before the bout and reached 1.05 in it, so there was little to overlap. This confirms the one comparison made earlier for `leaders` and `protections`. The rule has one consequence that should be stated. Under it a protected claim gains nothing in markup from its hold on wants. It still lays out the same part of its earnings, and it still receives the relief of risk in part 7 of the wants rule.
-2. *A discount counts in full.* This choice moves nothing that can be measured in differential capitalization. With the price leaders and wants modules both on, between 39 and 54 per cent of all employees work for claims that carry two discounts, one for small size and one for a weak hold. None of the hundred largest claims ever carried two. The discounts are small, and differential capitalization differed by less than chance in every pair of runs before the bout. The run with a part of one half ended 8 per cent lower in 1950 because its bout lasted a year longer. The choice does have an effect on the claims of an industry taken together. The price leaders rule and the wants rule each take from some claims of an industry exactly what they give to others. The group does not: a claim's gains overlap and its losses do not, so the group takes more than it gives. With `leaders` and `wants`, the group lowered the markup of the average employee's claim by 0.03 per cent in 1930 and by 1.1 per cent at the height of the bout in 1935 and 1940, and by 1.6 per cent in its worst year. With the switch on it lowered it by 0.3 per cent at most. With plain stacking it raised it by 0.6 to 0.8 per cent in 1935 and 1940. Each of the two modules says in its own rule that it leaves the earnings of an industry unchanged, and under the rule of the group the two together do not. The amounts are small. No passage decides whether a small firm that is squeezed in two ways loses twice, so the default was left alone. This is recorded as item 61 of `backlog.md`.
-3. *Cost cutting does not wear down a hold on buyers.* This is the largest of the choices, and it is the one that the book supports. With the switch on, differential capitalization in 1920 was 9 per cent lower with `protections`, 12 per cent lower with `wants` and 17 per cent lower with all three, and both seeds agreed. With `leaders` alone nothing moved. The cost cutting module was credited with a loss of 0.43 over the 60 years with `protections` and 0.44 with `wants`, where under the rule it was credited with small gains of 0.06 and 0.05. The loss has no meaning as cost cutting. The premium of a protected claim stayed where the protections rule set it, and the module pushed the cost-cutting edge of the same claim down, drawing its whole markup back toward the level of its industry. The edges of its unprotected neighbours rose to match. With `protections` the edge of single claims lay between 0.60 and 2.54 over the run, where under the rule it lay between 0.74 and 1.59. A claim was thus recorded as having fallen behind in its methods because it held a patent. The passage from chapter 16 quoted above says the opposite: what exclusion protects is not diluted by the spread of methods. The rule stays as it is.
-4. *The price leaders module leaves other differences alone.* The choice moves nothing that can be measured. With the switch on, the module set a smaller size premium in the bout (1.03 for the hundred largest in 1936 against 1.05), because the lead from price rises had already set them apart, and their markup was 1 per cent lower in that year. Differential capitalization differed by 2 per cent or less in every year of the run.
-5. *A protection premium multiplies the claim's own markup.* Before the bout the choice moves nothing that can be measured. During and after the bout it does. Reckoned against the neighbours, the premium of the hundred largest was lower at the height of the bout (1.32 against 1.40 in 1935, with `protections` alone), because their own lead from price rises already stood above their neighbours and the alternative counts that lead as part of the one and a half times. It was higher afterwards (1.41 against 1.33 in 1950), because the alternative restores to a protected claim whatever its own markup has lost against its neighbours. Differential capitalization in 1950 was 5.5 per cent higher with `protections` alone and 2.7 per cent higher with all three, and differential earnings for each employee were 2.22 times the average against 2.11. One seed was run, and a difference of that size after a bout is not safe from chance. The book says nothing on the point. The rule as it stands lets a protected claim keep its own gains and bear its own losses, and it reads no markup of another claim.
-6. *A wants premium ends in the year a hold is lost.* The choice moves little. With the fading alternative, differential capitalization was 2 to 3 per cent lower in 1920 and the same from 1930 on. The gain credited to the wants module over 60 years was 0.81 against 0.89 with `wants` alone. The reason is that a hold already moves only one fifth of the way each year toward what the outlay supports, so no hold is lost in a single year, and a second slowness on top of the first adds little. The literature gives no rate for either.
-7. *The three premiums are one group.* The first point answers this. Placing the size premium in the group or outside it makes no difference that can be measured. Placing the protection premium and the wants premium in one group, and not side by side, takes about a tenth off differential capitalization during the merger wave.
+1. The idle overhead only ever rises. The sales rule gives nothing back when sales recover. After 60 years it averaged 0.044 of the wage with the sales module alone.
+2. The cost cutting rule wears away gains that have nothing to do with cost, and that wearing away is recorded as a fall of price.
+3. A cost component rises with the wage. For a firm that carries one, the price therefore rises by slightly less or more than the stagflation module intended. The book does not say what a cost other than the wage should follow.
+4. The outlay on wants is paid to nobody. It is worked out on the whole markup of an industry, premiums included. A firm founded during a year carries no outlay until the next year.
+5. The model has no count of goods. A firm that cuts its costs keeps its price here, where the book also allows it to sell more for each employee.
+6. A new firm's markup is still lower than its industry's by the year's rise in the wage (see module 3). Its price agrees with that markup.
+7. When two modules change one markup in one year, the core multiplies the two changes. With a markup of 0.10, a rise of 0.06 and a fall of 0.05 give 0.08 and not 0.11. The price follows the markup exactly, so the price is right for the markup that results. Whether that markup is what the two rules intended is a question about the rules.
 
-In every run, with every switch, the yearly gain in differential capitalization divided among its sources with nothing left over.
+### The record of transfers
 
-*What is still doubtful.* Four things are doubtful, and items 61 to 64 of `backlog.md` record them. First, the group takes more from the claims of an industry than it gives, as point 2 describes. Second, the part of a smaller premium that counts has no source, and it is worth about a tenth of differential capitalization during the merger wave when `protections` and `wants` run together. The book gives no ground for 0, for 1 or for any value between, so the value is a choice for whoever uses the model. Third, the wants module does not know whether its premium counts, so a protected claim goes on paying for a hold that adds nothing to its markup. Fourth, each comparison was made with one seed, and three of them with two. The differences found after the bout, in points 2 and 5, need several seeds before they can be relied on. The five switches added for these comparisons remain in the code, off.
+**A transfer is money that passes from a payer to a receiver and is not the price of anything.** A tax is a transfer, and so is interest. A markup is not: whoever buys pays it in the price. The core keeps a record of every transfer, and both sides are always named.
 
-**Mergers, new claims and dissolved claims.** In a merger the employees and the earnings of the two claims add, as before, and the total capitalization is kept. Each income component of the buyer becomes the sum of the two incomes, spread over the employees of both. Each cost component is treated in the same way, so the value of what the two claims sell is the same before and after. Each markup component of the buyer, other than the base, becomes the average of the two claims' values, weighted by the earnings that each claim draws from its markup. The base of the buyer is then set so that the buyer's earnings from its markup are exactly the sum of the two. A newly founded claim takes the average base of its industry and the neutral value of every other component, unless the module that founds it says otherwise. The green-field module does say otherwise. Since 26 November 2026 it gives a new claim the average of the stacking part of the markup of the industry it enters, and that value goes into the new claim's base. The new claim takes no part of a premium of an overlap group and no other income (see "Two corrections" under module 3). Before that date it gave the new claim the industry's whole average markup, premiums included. A new claim has no named cost unless the module that founds it gives one, and its price is worked out from its components like every other price. A holding that the barriers module forces a claim to sell keeps every component of the seller, its named costs included, and so it keeps the seller's price. A dissolved claim takes its components with it.
+None of the nine main modules proposes a transfer. Optional modules do.
 
-**The convention for dividing a gain.** The model reports how much of each year's change in the logarithm of differential capitalization came from each module. The division still adds up exactly, with nothing left over, and it still does not depend on the order in which modules are listed. It works in three steps. First, the change in a claim's earnings per employee is divided between the change in its markup earnings and the change in each income component, in proportion to the money each one added. Second, the change in the markup earnings is divided among the wage, each stacking component and each overlap group, in proportion to the change in the logarithm of each. The module that set the new wage is credited with the wage's part. These two steps involve no choice. Third, the change of an overlap group has to be divided among the modules whose premiums changed, and here a choice is needed, because the result of the group depends on which premium is the largest. The convention is fixed: each module is credited with the average of what its own change adds, taken over every order in which the year's changes to the group could be applied. With two modules this is the average of two cases: the module's change applied first, and the module's change applied second. The convention treats every module alike, so the listing order cannot matter. It is known as the Shapley value.
+**What the theory says about who pays.**
 
-**The capitalist share of income.** The core now counts each income once. Since 26 November 2026 household interest and the net income from the public debt are transfers, and every transfer has a payer whose income is already counted (see "The record of transfers" below). Total income therefore does not count them a second time. The gain from burdens off the books is paid by nobody in the ledger, so it is added to total income. The readouts now also give the average markup and the part of capitalist income that is other income.
+- On the public debt: the government bond "marks the first systematic capitalization of power, namely, the power of government to tax" (chapter 13, "The government bond"). The first lenders to kings received "a royal promise to augment his capital with future taxes" (chapter 13, "Absorbing power: state finance"). Whoever holds the bond is paid by whoever pays the tax.
+- Hager states the condition: "If the group that receives the interest payments on the public debt (that is, the public creditors) is not the same as the group that pays the taxes that finances those interest payments (that is, the taxpayers), then the public debt will serve as a mode of redistribution from the latter to the former" ("What Happened to the Bondholding Class?", 2013).
+- On bailouts, the book says only who receives them: "massive bailout packages for dominant capital" (chapter 17, postscript). The authors' earlier book, *The Global Political Economy of Israel* (2002), says how one was paid for: "the government stepped in with a massive bailout plan, which turned the banking stocks into government bonds for five years, redeemable at 60 per cent of their value one week before the crash" (chapter 4). It adds that the plan which followed brought "a significant wage erosion", and that "those who benefit from instability are often different from those who foot up the bill" (chapter 1).
+- Tim Di Muzio and Richard Robbins say that in 2007 and 2008 "the claims of capital or creditors were the first honored, even if that required taxpayer bailouts, or the taking of money from other public resources (e.g., education health and welfare) or from labor's share of the national income" (*Debt as Power*, 2016, chapter 1).
+- On privatisation, the book says that services are handed over by "giving/selling them to dominant capital" (chapter 17, footnote). The 2002 book says that state assets went to favoured owners "at bargain prices", that one buyer "ended up getting it for a song", and that the workers who had owned one group of firms "never saw a cent of the proceeds" (chapters 1 and 6).
 
-**How the price is worked out.** This part was added on 26 November 2026, for item 31 of `backlog.md`.
+The literature gives no rule for keeping such a record and no figure for any of these payments.
 
-*The fault.* Every claim carries a price. Until this date the price was a number that each module multiplied by a factor of its own. A module that raised a markup also reckoned by how much the price should rise, and nothing held the two together. Three things went wrong. First, when two premiums of one overlap group stood above 1 in the same claim, the markup counted only the larger, and the price still recorded both rises. Second, the movements of two modules in one year did not agree. Each module reckoned a factor for the markup and a factor for the price from the figures at the start of the year, and the core multiplied all the factors together. A markup is a small number, so two movements of it multiplied together differ a good deal from the two added together. A price is a large number beside its markup, so the same two movements of a price hardly differ from their sum. The price and the markup therefore parted a little further in every year in which two modules moved the same markup. Third, a module could move a markup and leave the price where it was, and no record said what had happened to cost. The cost cutting rule and the sales rule both did this. Over a long run the price level drifted away from the wage and the markups. The run of the nine modules with the sales module, from 300,000 claims, shows the size of it. After 60 years the price level stood 23 per cent above the wage times one plus the average markup. In the run with the 28 optional modules the price level stood at 2.7 times the wage in the year labelled 1935, while the average markup was 0.11. The price level there said one and a half times more than the wage and the markups together. The labour module and the household debt module compare the wage with the price level. They therefore read a fall in what the wage could buy that no markup had produced.
+**The rule.**
 
-*What the literature says.* The book relates price, cost and earnings in two places. Chapter 16, "Depth: internal and external", says that "earnings per employee can be decomposed into three elements", which are "(1) unit price, (2) unit cost and (3) units per employee". Its equation 1 reads: earnings per employee = (unit price - unit cost) x units per employee. The chapter then separates "lowering unit cost faster than the average" from "increasing unit price faster than the average" as two different routes. Chapter 12, "The markup and the target rate of return", reports how firms say they set prices: "they started by calculating what they considered to be 'normal' unit cost (namely the cost at 'normal' levels of output); they tacked onto this cost a 'conventional' markup; and they kept the resulting price stable in the face of cyclical variations in demand". A footnote gives an example: "If the 'normal' volume is 100 million units and the 'normal' unit cost is $20, the firm needs to add a 10 per cent markup and set its unit price at $22." The next section, "Pricing and incapacitating", says that "the profit target and markup built into the price reflect the firm's power". The book therefore gives the relation: a price is a cost with a markup added, and earnings are the price less the cost. It gives no list of costs and no rule for a model. It also warns about the terms. A footnote to the passage in chapter 16 says that the authors use "the concepts of 'productivity' and 'inputs' here from the what-you-see-is-what-you-get perspective of capitalist executives", and that these concepts cannot be defined in theory.
+1. A module proposes a transfer with a label, a payer, a receiver and an amount. The core refuses a transfer with a side it does not know.
+2. A side is either firms or a party that is not a firm. The core knows two such parties from the start: wage earners and the government. A module may name more when the run starts. The public debt module names two: the richest one per cent of households, and holders of public debt that the module does not follow.
+3. No payer pays more than it has in the year. A firm has its earnings of the year before any transfer. Wage earners have the year's wages. The government has what it received in earlier years and did not pay out, plus what it receives this year. A party that a module names can only receive, unless the module says that it holds money as the government does.
+4. A payer asked for more than it has pays each of its transfers in the same proportion. What a payer does not pay, the receiver does not get. So a government that collects less tax than it expected pays less interest.
+5. The core settles transfers after the year's hiring, markups and wage are known, and before the year's mergers. No firm can be charged more than it earned.
+6. What a firm receives in a year does not add to what it can pay in the same year. The result therefore does not depend on the order of the transfers.
+7. For each module, the core works out what each firm received less what it paid, and enters it in an income component that the module owns and cannot set by hand. The amount is replaced every year.
+8. The core keeps the year's record: every transfer with its payer, its receiver, the amount asked and the amount paid, and for every party what it received, what it paid and what it holds. Modules can read the amounts asked and paid the next year.
 
-*The rule.* No module changes a price any longer. The core works out the price of every claim, after every change, from one formula:
+**Examples.** A firm that is asked for 100 and has 40 pays 40. A government that is asked for 90 and has received 50 pays five ninths of each payment. Wage earners who are asked for more than the year's wages pay the year's wages.
 
-    cost for each employee = wage x (1 + the sum of the cost components)
-    price                  = cost for each employee + wage x markup
+The wage itself is not changed by a transfer. The government in this record is the body that taxes and pays. It is set against nobody, which follows the book's view that governments and corporations are parts of one order of power.
 
-The price is the price of what one employee makes in a year. The model does not count units of goods, and it holds the book's "units per employee" at one for every claim, because the model has no account of productivity. The book says of productivity that the gains of dominant capital "were more or less the same as the social average" (chapter 16, "'Productivity' gains"). With that, the formula is the book's equation 1 read backwards: the price less the cost is the earnings from the markup. Other income, such as interest, is not a receipt from sales, and it is no part of the price. Five points complete the rule.
+**Which modules use the record.**
 
-1. A movement of a markup is a movement of the price against the wage. A module that raises a markup raises the price by exactly what the rise adds to earnings. It proposes no price, and the core refuses a direct change of a price with a message, as it refuses a direct change of earnings.
-2. A premium that the overlap rule does not count is not in the markup, and so it is not in the price. This removes the first fault.
-3. A module that moves a markup without moving the price has to say what happened to cost. It does so with a cost component. A cost component is a named cost other than the wage. It is counted in wages for each employee, so 0.03 means a cost of three per cent of the wage. It belongs to one module, and only that module may change it. A cost component enters the price and never the earnings, so no gain in differential capitalization is credited to anybody for it. This removes the second fault, because every difference between a price and the wage is now either a markup or a named cost.
-4. In a merger each cost component of the buyer becomes the sum of the two claims' costs, spread over the employees of both. The value of what the two claims sell is therefore the same before and after. A new claim has no named cost unless the module that founds it gives one.
-5. A component that opens at a value other than its neutral one changes the opening prices. A module registers such a component in a step of its own, which the core runs for every module, in the alphabetical order of their names, before any module starts. Every module therefore reads the same opening prices, whatever the order in which the modules are listed. Only the wants module needs this step.
+| Module | What it records |
+|---|---|
+| public debt | Six transfers. Firms and wage earners pay the tax to the government. The government pays the interest to firms, to wage earners (for the households outside the richest one per cent), to the richest one per cent of households, and to the holders that the module does not follow. |
+| household debt | One transfer: wage earners pay the interest and firms receive it. |
+| risk shaping | No transfer of its own. It publishes what a bailout is worth, which is the capitalization that the bailout adds. Module 2 adds that amount to the government's debt. |
+| privatisation | No transfer of its own. Dominant capital pays a part of what the takeover is worth, and module 2 takes that amount off the government's debt. |
 
-*Which movements are movements of price, and which are movements of cost.* The table lists every module that moves a markup or keeps a cost.
+Bailouts and takeovers do not appear as transfers of their own. In the literature a bailout is paid for with bonds, and the proceeds of a sale go to the government. Both change what the government owes. What the government owes is then paid for, year after year, by the tax for its interest, and the public debt module records that tax and that interest.
 
-| Module | What it moves | Price or cost | Compared with the rule before this date |
-|---|---|---|---|
-| sabotage (module 1) | the markup of an industry | Price. Each claim's price moves with its own markup. | Before, every claim of an industry had its price multiplied by the same factor. |
-| stagflation (module 6) | the wage, and the markup of each claim | Price. The new markup is the one at which the wage and the markup together have risen by the claim's price rise. | The same, except for a claim with a named cost: that cost rises with the wage and not with the price. |
-| cost cutting (module 5) | the edge of each claim | Cost for the yearly draw. Cost for the part of the drift back that removes a cost difference that stands. Price for the rest of the drift back. | Before, no movement of this module moved a price. The rule and the reason are below. |
-| sales | the markup of an industry | Price for sellers who cut prices. Cost, named "idle overhead", for sellers who keep them. | The same split. The cost is now a named record. |
-| leaders, protections | a premium of the overlap group | Price, and only as far as the markup counts the premium. | Before, each module multiplied the price by its own factor, whether or not its premium counted. |
-| wants | a premium of the overlap group, and the outlay | Price for the premium. Cost, named "outlay on wants", for the outlay. | Before, the premium moved no price, and only changes of the outlay part moved the price. |
-| coalitions, nature, boundary contest | a stacking premium or loss | Price. | The same. |
-| public debt, household debt, externalisation | an income | Neither. The income is no part of the price. | The same. |
+**What is our own here.** A firm can pay out of its earnings of the year and not out of what it received the same year. A payer who cannot pay in full pays every transfer in the same proportion. The households outside the richest one per cent are counted as wage earners. A bailout is taken to be worth the rise in capitalization it brings. The bailout debt stands for ever, where the Israeli bonds ran for five years. The part of its worth that dominant capital pays for a takeover is a plain setting with no source (`price_part` in the privatisation module, one half).
 
-*The three cost components.*
+One number in the core is an allowance for rounding and not a rule. A firm that pays out all it has keeps one part in a million million of its earnings, because the sum that divides the year's gain among the modules cannot handle earnings of exactly nothing.
 
-The cost difference belongs to the cost cutting module. Chapter 16 treats cost cutting as a route of its own, apart from raising prices, so a claim that draws a gain has lower costs and the same price. The module therefore lowers the claim's cost by the amount the draw added to its markup, and raises it for a loss. The drift back toward the industry is divided. It first removes the cost difference that stands: a claim whose costs are below those of its industry loses the saving as methods spread, which is the book's "this rapid spread quickly dilutes the initial advantage" (chapter 16, "'Productivity' gains"). The drift removes no more saving than the claim has. Whatever the drift moves beyond that is a movement of the claim's price toward the prices of its industry. The division matters for a claim that stands above its industry for another reason. The largest claims gain a lead from price rises in a bout of stagflation, and the cost cutting rule wears that lead away. That wearing away is now a fall of the claim's price against the wage. Before this date it was recorded as nothing at all, and the price stayed up after the markup had gone. The book gives no rule for either choice, and both are additions.
+**What is doubtful.**
 
-The idle overhead belongs to the sales module. Chapter 12 says that sellers reckon their price on the cost "at 'normal' levels of output" and keep it "stable in the face of cyclical variations in demand". A seller who keeps its price while its sales fall therefore has a higher cost for each thing sold. The module adds to this cost, each year, the amount that the rule takes from the markup of sellers who keep their prices. The rule has no recovery of its own, so nothing is ever taken off this cost. That is a doubt about the rule, and it is listed below.
+1. With the public debt module off, the debt from bailouts is reported and nobody is taxed for it.
+2. The bailout debt is never repaid, and the worth of a bailout is counted again each year the bailout is renewed. In a run with 28 optional modules, where the crisis never ended, this debt passed a whole year's income.
+3. The price of a takeover has no source. The payment changes no firm, because the model does not follow who owns firms. Only the government's debt records it.
+4. The earnings on privatised employees are a markup and are paid in the price. The taxes that paid those employees before the takeover are not in the record.
+5. Three kinds of money still have a side missing: the gain from burdens off the books, the outlay on wants, and what the force and sovereign funds modules charge to nobody.
+6. A tax is worked out at the start of the year and collected at the end. When earnings change a great deal in between, the two differ, and the public debt module publishes the amounts asked for and not the amounts paid.
+7. A firm that pays all it has is left with almost no earnings, and its capitalization falls with them. No rule says what should happen to such a firm.
+8. Wage earners lose part of their wages to tax and interest, and nothing in the model responds. The core publishes the loss so that a later rule can use it.
 
-The outlay on wants belongs to the wants module. Chapter 9 says that estimates of advertising leave out "sales promoting expenditures buried in the 'cost of production'", and part 6 of the module's rule treats the outlay as such a cost. Each year the module sets the cost, for every claim of an industry, to the industry's average outlay part times the industry's markup. That is the industry's outlay for each employee, counted in wages. The cost is a level, so the customary outlay of one third of earnings is in the price from the first year. Before this date only changes of the outlay part moved the price.
+### What is added to the literature in this section
 
-*What is added to the literature.* The book gives the relation between price, cost and markup. The following are additions made for this model. The price is reckoned for what one employee makes in a year, with no count of units. A named cost is counted in wages, so it rises with the wage. Each module decides whether its movement of a markup is a movement of price or of cost. The cost cutting module's drift back is divided between cost and price in the way described above. A merger adds the costs of the two claims. No number was added and no setting was changed. Nothing holds a cost inside a range. The core's guard stops a run if the cost for each employee, the wage and the named costs together, is not above zero. That is a test for an impossible value and not a limit, and it was not reached in any run.
+Nitzan and Bichler give no rule for how several sources of power over the same buyers combine. All of the following are our additions:
 
-*What the runs showed.* All runs started from 300,000 claims with seed 0. Each was made twice, with the folder as it stood before the change and with the folder after it. The run of the nine modules lasted 119 years and every other run 60 years. The third column gives the largest distance, in any year, between the price level and the wage times one plus the average markup. That distance is what the price level says beyond the wage and the markups. After the change it is the average of the named costs and nothing else.
+- dividing the markup into named components
+- the choice of which components multiply and which overlap
+- the rule of the overlap group, its treatment of discounts, and the setting for the part of a smaller premium that counts
+- putting the three premiums in one group
+- the weights used in a merger
+- the way the gain of the group is divided among its members
+- the rule that cost cutting does not wear down a hold on buyers, which the book supports in direction only
+- keeping in each stacking component only what still stands
+- working out the price from the wage, the markup and named costs
+- the record of transfers and its rule for a payer who cannot pay in full
 
-| Run | Differential capitalization in the last year, before and after | Largest distance of the price level from wage and markup, before and after | Fastest rise of prices over five years, before and after |
-|---|---|---|---|
-| The nine modules, 119 years | 24,060 and 24,060, identical in every year | 1.6 per cent and 0.1 per cent | 8.4 and 8.5 per cent a year |
-| With `sales` | 3,982 and 3,982, identical in every year | 23.4 per cent and 3.9 per cent | 8.0 and 5.9 per cent a year |
-| With `protections` | 7,755 and 7,755, identical in every year | 0.8 per cent and 0.1 per cent | 7.8 and 8.0 per cent a year |
-| With `nature` | 7,317 and 7,317, identical in every year | 0.5 per cent and 0.1 per cent | 8.1 and 8.2 per cent a year |
-| With `coalitions` | 8,412 and 8,412, identical in every year | 0.9 per cent and 0.1 per cent | 8.3 and 8.5 per cent a year |
-| With `boundary_contest` | 4,714 and 4,714, identical in every year | 0.7 per cent and 0.1 per cent | 8.3 and 8.4 per cent a year |
-| With `plant` | 8,121 and 8,121, identical in every year | 0.9 per cent and 0.1 per cent | 8.0 and 8.2 per cent a year |
-| With `barriers` | 8,156 and 8,156, identical in every year | 0.9 per cent and 0.1 per cent | 8.0 and 8.2 per cent a year |
-| With `wants` | 8,463 and 8,463, identical in every year | 0.7 per cent and 11.6 per cent | 8.0 and 9.4 per cent a year |
-| With `leaders` | 8,144 and 8,230 | 0.8 per cent and 0.1 per cent | 8.0 and 8.2 per cent a year |
-| With `leaders`, `protections` and `wants` | 7,971 and 8,051 | 1.0 per cent and 11.9 per cent | 7.8 and 9.1 per cent a year |
-| With `labour` | 5,925 and 6,308 | 0.9 per cent and 0.1 per cent | 8.0 and 8.0 per cent a year |
-| With `household_debt` | 7,969 and 8,008 | 0.9 per cent and 0.0 per cent | 8.0 and 8.2 per cent a year |
-| With the 28 optional modules that take the place of no other | 4,344 and 2,475 | 150 per cent and 12.0 per cent | 9.9 and 2.5 per cent a year |
-
-The table shows five things.
-
-First, the nine modules give the same figures as before in every year, apart from the price level. No module of the nine reads a price, so a different price changes nothing else. The price level in the last year is 5.97 where it was 5.89. The earlier price level stood up to 1.6 per cent below the wage and the markups. In a bout of stagflation the sabotage rule and the stagflation rule both raise markups, and the two rises multiplied together gave a markup higher than the price recorded. The division of each year's gain among its sources is unchanged and still adds up to the last digit.
-
-Second, runs in which no module reads a price give the same differential capitalization as before in every year. These are the runs with `sales`, `protections`, `nature`, `coalitions`, `boundary_contest`, `plant`, `barriers` and `wants`. Only their price level moved.
-
-Third, runs with a module that reads a price moved a little. The price leaders module reads the yearly change of each industry's price. The labour and household debt modules compare the wage with the price level. Differential capitalization in the last year moved by 1 per cent with `leaders`, by 6 per cent with `labour` and by half of 1 per cent with `household_debt`. With `labour` the highest capitalist share was 30.8 per cent where it had been 31.4.
-
-Fourth, with `sales` the price level had drifted 23 per cent above the wage and the markups, and it now stands 3.9 per cent above them. What is left is the idle overhead, which averaged 0.044 of the wage in the last year and reached 0.47 in one claim. The rest of the old distance was the second fault: the sabotage rule raised markups and the sales rule lowered them in the same years, and the two movements multiplied together left a markup lower than the price recorded. A trial at 60,000 claims confirmed this. Over 60 years the markups of that run came out lower than the sum of the modules' movements by 0.22 of the wage in all, and the old price level stood 25 per cent above the wage and the markups where the new one stands 4 per cent above them. With `wants` the price level now stands up to 11.6 per cent above the wage and the markups. That is the outlay on wants, which was between 0.033 and 0.161 of the wage on average. It is highest in a bout of stagflation, because the outlay is a part of earnings and earnings are then high. Before the change the price counted only the changes of the outlay part and not the outlay.
-
-Fifth, the run with the 28 optional modules changed a great deal, and for a clear reason. Before the change its price level rose to 2.7 times the wage while the average markup stayed near 0.1. The wage divided by the price level, which is what the labour and household debt modules read, fell from 0.91 to 0.34. After the change it never falls below 0.79. The highest unemployment of the run is 27.4 per cent where it was 36.5. The highest capitalist share is 16.0 per cent where it was 36.9. Prices never rise faster than 2.5 per cent a year over five years where they rose at 9.9. Differential capitalization in the last year is 2,475 where it was 4,344, and in the year labelled 1920 it is 2,809 against 2,910. The figures of this run are still not believable (item 26 of `backlog.md`), and part of what made them unbelievable was the price level.
-
-In every run the cost difference of the cost cutting module stayed small. Its average over all employees was never further from zero than 0.002 of the wage. In single claims it lay between -0.24 and +0.15 in the runs with one optional module and between -0.18 and +0.33 in the run with 28. The price of a single claim lay between 1.0 and 4.1 times the wage in the run with 28 modules, where it had lain between 0.73 and 5.7.
-
-Two runs of 40 years from 20,000 claims, with the nine modules and `sales`, `wants`, `leaders`, `protections`, `nature`, `coalitions`, `labour` and `household_debt` listed in opposite orders, gave identical figures in every year: differential capitalization, the price level and the division of the gain. A first version failed this test. The wants module then registered its opening cost when it started, and a module listed before it read a lower opening price than a module listed after it. The step described in point 5 of the rule was added for that reason.
-
-The stage 2 runs at 300,000 claims gave the same differential capitalization as before in every reported year (303, 17,839 and 9,611 after 80 years), and the same price level. The printed output was the same character for character.
-
-*The check.* A twelfth check in `checks.py` tests the rule. It works one price out by hand: a claim with a wage of 2, premiums of 1.5 and 1.2 in one overlap group on a base markup of 0.1, and a named cost of 0.03 has a price of 2.36, so the price counts only the larger premium. It confirms that the core refuses a direct change of a price, that a change of a cost moves the price and no earnings, that a merger keeps the value of what the two claims sell, and that in a run of 21 modules over 30 years the price of every claim equals the formula in every year.
-
-*What is still doubtful.* Seven things are doubtful. Items 47 and 49 to 53 of `backlog.md` record the first five and the last, and item 42 records the sixth.
-
-1. The idle overhead only ever rises. The sales rule lowers the markup of sellers who keep their prices in every year in which goods are unsold, and it never gives anything back when sales recover. The cost that records this therefore stands for ever. In the run with 28 modules it averaged a tenth of the wage after 60 years. The doubt is about the sales rule and not about the record (see also item 45).
-2. The cost cutting rule wears away gains that have nothing to do with cost, such as the lead from price rises and the war premium of the coalitions module. This part calls that wearing away a fall of price. The book says that the gains of inflation "last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk") and does not say that the spread of methods is what ends them. The choice hardly moves the price level. In a trial at 60,000 claims with `sales`, entering the whole drift as cost gave a price level of 1.775 after 60 years against 1.777. It matters for the prices of single claims: in a trial at 3,000 claims with 28 optional modules the cost of one claim reached 5 times the wage when the whole drift was entered as cost, and stayed within 0.3 of the wage with the division. The module itself has not been examined (item 10).
-3. A named cost is counted in wages, so it rises when the wage rises. The stagflation module sets each claim's markup so that the wage and the markup together rise by the claim's price rise. For a claim that carries a named cost, the price that the core works out therefore rises by slightly less or more than the stagflation rule intended. The book gives no guidance on what a cost other than the wage should follow.
-4. The outlay on wants is paid to nobody (items 4 and 14). It is reckoned on the whole markup of an industry, premiums included. A claim founded during a year carries no outlay until the following year.
-5. The price is the price of what one employee makes in a year, and the price level weights each price by employees. The model has no count of goods. A claim that cuts its costs keeps its price here, where the book also allows it to sell more units for each employee.
-6. A new claim of the green-field module is still founded with earnings fixed in the money of the start of the year (item 42). Its price now follows from its markup and the new wage, so price and markup agree. The markup itself is still lower by the year's rise of the wage.
-7. The second fault described at the top of this part has gone from the price and is still in the markup. When two modules move the markup of one claim in one year, the core multiplies the two movements. With a markup of 0.10, a rise of 0.06 and a fall of 0.05 in the same year give 0.08 and not 0.11. The price now follows the markup exactly, so the price is right for the markup that results. Whether the markup that results is the one the two rules intended is a question about the rules.
-
-**The record of transfers.** This part was added on 26 November 2026, for items 4 and 36 of `backlog.md`.
-
-*The fault.* Several modules recorded a gain that nobody paid for. The risk shaping module bailed out dominant capital, and its own text said that the rule "does not say who pays for a bailout". The privatisation module handed public services to dominant capital, and its text said that "nothing is paid for the takeover". Two modules did name a payer, and the core did not know it. The public debt module worked out a tax and an interest payment for each claim and entered only the difference in the claim's earnings. The household debt module entered interest in the earnings of claims and declared that it came out of wages. In both cases the core held one number for each claim and no record of who paid. There was a second fault. Both modules fixed the amount for each employee from the figures at the start of the year. A claim that grew during the year therefore received more than the module had reckoned. A claim whose markup collapsed in the same year could have been charged more tax than it earned, and the public debt module carried a limit of its own against that (a setting named `floor`, of one half).
-
-*What the literature says about who pays.* On the public debt the book gives the principle. The government bond "marks the first systematic capitalization of power, namely, the power of government to tax" (chapter 13, "The government bond"). The same chapter describes the first lenders to kings as receiving "a royal promise to augment his capital with future taxes" ("Absorbing power: state finance"). Whoever holds the bond is therefore paid by whoever pays the tax. Hager states the condition: "If the group that receives the interest payments on the public debt (that is, the public creditors) is not the same as the group that pays the taxes that finances those interest payments (that is, the taxpayers), then the public debt will serve as a mode of redistribution from the latter to the former" ("What Happened to the Bondholding Class?", 2013). On bailouts the book says only who receives them: "massive bailout packages for dominant capital" (chapter 17, postscript). The 2002 book on Israel says how one was paid for: "the government stepped in with a massive bailout plan, which turned the banking stocks into government bonds for five years, redeemable at 60 per cent of their value one week before the crash" (chapter 4). The bailout was therefore paid for with public debt, which is a claim on taxes. The same passage says that the stabilisation plan which followed brought "a significant wage erosion", and chapter 1 of that book says that "those who benefit from instability are often different from those who foot up the bill". Di Muzio and Robbins say that in 2007 and 2008 "the claims of capital or creditors were the first honored, even if that required taxpayer bailouts, or the taking of money from other public resources (e.g., education health and welfare) or from labor's share of the national income" (*Debt as Power*, 2016, chapter 1). On privatisation the book says that services are handed over by "giving/selling them to dominant capital" (chapter 17, the footnote on government expenditure). The 2002 book says that state assets went to favoured owners "at bargain prices", that one buyer "ended up getting it for a song", and that the workers who had owned one group of firms "never saw a cent of the proceeds" (chapters 1 and 6). The literature gives no rule for keeping such a record and no figure for any of these payments.
-
-*The rule.* A transfer is money that passes in a year from a payer to a receiver and is not the price of anything. A tax is a transfer, and so is interest. A markup is not a transfer: it is paid in the price by whoever buys.
-
-1. A module proposes a transfer with a label, a payer, a receiver and an amount. Both sides must be named, and the core refuses a transfer with a side it does not know.
-2. A side is either claims of the ledger or a party that is not a claim. The core knows two parties from the start: wage earners and the government. A module may name a further party when the run starts. The public debt module names two: the richest one per cent of households, and the holders of public debt that the module does not follow.
-3. No payer pays more than it has in the year. A claim has its earnings of the year before any transfer. Wage earners have the wage bill of the year. The government has what it holds, which is what it received in earlier years and did not pay out, and what it receives in the same year. A party that a module names only receives, unless the module says that it holds money as the government does.
-4. A payer that is asked for more than it has pays each of its transfers in the same proportion. What a payer does not pay, the receiver does not get. A government that collects less tax than it reckoned on therefore pays less interest.
-5. The core settles the transfers after the year's hiring, markups and wage are known, and before the year's mergers. What a payer has is therefore reckoned on the figures of the end of the year, and no claim can be charged more than it earned.
-6. What a claim receives in a year does not add to what it can pay in the same year. The result therefore does not depend on the order in which transfers or modules are listed.
-7. For each module the core works out what each claim received less what it paid, and enters it in an income component that the module owns and cannot set by hand. The amount is money for each employee, reckoned on the employees the claim has after the year's hiring, so the money entered is exactly the money settled. The amount is replaced every year.
-8. The core keeps the record of the year: every transfer with its payer, its receiver, the amount asked and the amount paid, and for every party what it received, what it paid and what it holds. It makes the amounts asked and paid available to all modules in the following year, together with what wage earners received less what they paid, as a part of the wage bill.
-
-The wage in the ledger is not changed by a transfer. Wage earners are a party to the record and are still not a claim. The government is a party as well. This follows the book, which treats government organs and corporations as bodies of one mode of power: the government here is the body that taxes and pays, and it is set against nobody.
-
-*Which modules now use the record.*
-
-| Module | Before | Now |
-|---|---|---|
-| public debt | One number for each claim: interest less tax. A limit of its own kept a claim's earnings above half of its other earnings. | Six transfers. Claims and wage earners pay the tax to the government. The government pays the interest to claims, to wage earners (for the households outside the richest one per cent), to the richest one per cent of households, and to the holders that the module does not follow. The setting `floor` was removed: the rule that no payer pays more than it has takes its place. |
-| household debt | One number for each claim, declared as paid out of wages. | One transfer: wage earners pay the interest and the claims receive it. |
-| risk shaping | A bailout lowered the risk of dominant capital and nobody paid. | The module publishes what the guarantee is worth, which is the capitalization that the bailout adds. Module 2 adds that amount to the government's debt. The interest on the debt is then a tax, and the public debt module collects it and pays it out through the record. |
-| privatisation | Dominant capital took over public services and paid nothing. | Dominant capital pays a part of what the takeover is worth. Module 2 retires government debt with the proceeds, so less interest is owed and less tax is collected. |
-
-Bailouts and takeovers do not appear in the record as transfers of their own, and the reason should be stated. A bailout in the literature is paid for with bonds, and the proceeds of a sale go to the government. Both are changes in what the government owes, and what the government owes is paid for year after year by the tax for its interest. The model already had that channel: module 2 holds the government's debt, and the public debt module says who is taxed for it and who is paid. With the public debt module off, module 2 only reports the government's debt, as it always has, and the cost of a bailout is then reported and charged to nobody. That is a limit of this change, and item 54 of `backlog.md` records it.
-
-*What is added to the literature.* The literature says who pays and gives no rule. The following are additions. A claim can pay out of its earnings of the year and not out of what it received in the same year. A payer who cannot pay in full pays every transfer in the same proportion. The households outside the richest one per cent are counted as wage earners. The worth of a bailout is taken to be the rise in capitalization that it brings, which uses no number. The bailout debt stands for ever, where the Israeli bonds ran for five years. The part of its worth that dominant capital pays for a takeover is a plain setting with no source (`price_part` in the privatisation module, one half). One number was added to the core and it is not a setting of behaviour: a claim that pays out all it has keeps one part in a million million of its earnings. It is an allowance for rounding, because the division of the year's gain among its sources uses logarithms and earnings of exactly nothing have none.
-
-*What the runs showed.* All runs started from 300,000 claims with seed 0. Each was made twice, with the folder as it stood before the change and with the folder after it. The run of the nine modules lasted 119 years and the others 60.
-
-| Run | Differential capitalization after 30, 45 and 60 years, before | The same, after | Highest capitalist share, before and after |
-|---|---|---|---|
-| The nine modules, 119 years | 24,060 in the last year | Identical in every year. The printed output is the same character for character. | 28.2 per cent in both |
-| With `risk_shaping` | 1,379, 3,465 and 8,206 | Identical in every year. The printed output is the same character for character. | 26.2 per cent in both |
-| With `privatisation` | 1,631, 2,843 and 8,522 | Identical in every year. The printed output is the same character for character. | 27.1 per cent in both |
-| With `public_debt` | 1,379, 3,169 and 8,075 | 1,392, 3,184 and 8,174 | 28.6 per cent in both |
-| With `household_debt` | 1,362, 3,138 and 8,008 | 1,362, 3,140 and 7,974 | 30.2 per cent in both |
-| With `public_debt` and `risk_shaping` | 1,402, 3,598 and 8,272 | 1,396, 3,616 and 8,275 | 26.5 and 26.7 per cent |
-| With `public_debt` and `privatisation` | 1,646, 2,888 and 8,524 | 1,640, 2,882 and 8,674 | 27.6 per cent in both |
-| With those four together | 1,692, 3,590 and 9,792 | 1,695, 3,626 and 9,881 | 27.1 and 27.3 per cent |
-| With the 28 optional modules that take the place of no other | 2,809, 3,041 and 2,475 | 2,924, 3,205 and 2,743 | 13.8 and 13.7 per cent |
-
-The table and the record of the runs show six things.
-
-First, the run of the nine modules is unchanged, because none of the nine proposes a transfer and the numbers that module 2 reads are zero.
-
-Second, the runs with the risk shaping module alone and with the privatisation module alone are unchanged in every figure of the ledger. What changed is the government's debt that module 2 reports. With `risk_shaping` the debt stood at 39 per cent of a year's income until the first bout of stagflation. The bailouts of that bout added 4 per cent of a year's income by the year labelled 1935 and 13 per cent by 1940, and the debt stood at 54 per cent of a year's income in 1950. In the heaviest year the government borrowed 3.4 per cent of a year's income for bailouts. With `privatisation` the proceeds retired debt worth 2 per cent of a year's income over 60 years, and in the heaviest year dominant capital paid a quarter of one per cent of a year's income.
-
-Third, with the public debt module on, the cost of the bailouts falls on the payers of the tax. In the run with `public_debt` alone wage earners lost 1.6 per cent of the wage bill in every quiet year, and the claims together gained 0.8 per cent of all income. With `risk_shaping` added, wage earners lost 2.3 per cent of the wage bill in 1950 and the claims gained 1.2 per cent of all income, of which the hundred largest claims received about half. With `privatisation` added and no bailouts, the loss of wage earners in 1950 was 1.5 per cent of the wage bill, a little less than without it, because debt had been retired.
-
-Fourth, the figures of the public debt and household debt modules moved by about 1 per cent. The cause is the second fault described above. The amount for each employee is now reckoned on the employees that a claim has after the year's hiring, so a growing claim no longer receives more than its share.
-
-Fifth, in the runs with one to four optional modules no transfer was paid short: every payer had what it was asked for. The rule that no payer pays more than it has was reached only in the run with the 28 optional modules. In the years labelled 1939 to 1944 some claims earned less in the year than the tax that had been reckoned for them at its start. In the worst year the claims paid 99.6 per cent of the tax on earnings, the government therefore paid 99.95 per cent of the interest, and the risk shaping module granted 99.95 per cent of the next bailout. The limit is small there, and it shows that the rule holds without any limit written into a module.
-
-The same run shows the largest call on wage earners. Unemployment there stays near 20 per cent for decades, the risk shaping rule counts that as a lasting crisis, and the bailouts never stop. The debt added by bailouts stood at 17 per cent of a year's income in 1920, 35 per cent in 1930, 77 per cent in 1940 and 113 per cent in 1950. It kept rising against income after the yearly borrowing had become small, because the debt is a sum of money and all income in that run was falling in money. By 1950 the tax for interest took 4.7 per cent of all income where the debt of module 2 alone would have taken 2 per cent, and wage earners paid 4.3 of the 4.7. In the heaviest year wage earners paid 7.3 per cent of the wage bill in tax and household interest together. Differential capitalization in the last year was 2,743 where it had been 2,475, and the part of capitalist income that is not from a markup was 37 per cent where it had been 26. That run was already not believable (item 26 of `backlog.md`), and this change makes one more of its faults visible: a crisis that never ends is paid for by a debt that never stops growing.
-
-Sixth, runs with the modules listed in opposite orders give identical figures. The thirteenth check tests this with fifteen modules over 40 years.
-
-*The check.* A thirteenth check in `checks.py` tests the rule. It works a small case out by hand. A claim that is asked for 100 and has 40 pays 40. A government that is asked for 90 and has received 50 pays five ninths of each payment. Wage earners who are asked for more than the wage bill pay the wage bill, and the government holds what it does not pay out and can pay it in a later year. The check confirms that the core refuses a transfer with an unknown side, a payment by a party that only receives, a negative amount, and a change by hand of a component that records transfers. It fixes a tax before a markup falls by 95 per cent in the same year, which is the case that item 36 described, and confirms that the tax is paid only as far as the earnings reach. It then runs fifteen modules for 40 years in opposite orders and confirms that no transfer was paid above what was asked or above what its payer had, that the year's gain divides among its sources with nothing left over, and that every figure is identical in either order.
-
-*What is still doubtful.* Eight things are doubtful. Items 54 to 60 of `backlog.md` record them.
-
-1. With the public debt module off, the debt from bailouts is reported and nobody is taxed for it. Module 2 is one of the nine modules and changes no claim, and giving it a tax of its own would change the run of the nine modules.
-2. The bailout debt is never redeemed, and the worth of a bailout is counted again each year that the bailout is renewed. The debt is a sum of money, so it weighs more when all income falls in money. In a run where the crisis never ends the debt grows with no rule to stop it other than the growth of all income, and in the run with 28 modules it passed a whole year's income.
-3. The price of a takeover is a part of its worth that has no source. The payment changes no claim, because the model does not follow the owners of claims: only the government's debt records it.
-4. The earnings on privatised employees are a markup and are paid in the price. The literature also describes government organs going on paying the claims that run the services. The taxes that paid the public employees before the takeover, and any payments after it, are still not in the record.
-5. Three incomes still have no payer or no receiver: the gain from burdens off the books in the externalisation module, the outlay on wants in the wants module, and whatever the force and sovereign funds modules charge to nobody. They were not examined in this change.
-6. The tax is reckoned on the figures at the start of the year and collected at the end of it. In a year in which earnings change a great deal the two differ, and the published readouts of the public debt module describe the amounts asked for and not the amounts paid. In the runs with one to four optional modules they were the same.
-7. A claim that pays all it has is left with almost none of its earnings before transfers, and its capitalization falls with them. This happened to a few claims in six years of the run with 28 modules. A rule is needed for what happens to such a claim, which is the question that item 46 already asks about markups.
-8. Wage earners lose a part of the wage bill and nothing in the model responds to it. The household debt module reckons the wage that households keep from its own interest only, and the labour and resistance modules do not read the loss. The core now publishes it, so that a later rule can use it.
-
-**The guard.** After the changes of each year the core examines every claim. It stops the run with a message if any claim has employees that are negative or not a number, earnings per employee that are negative or not a number, hype or risk that is not a number or not above zero, a markup component that is not above zero, or a cost for each employee (the wage and the named costs together) that is not above zero. The message gives the year, the number of such claims and the names of the modules that changed those claims in that year. A run can no longer finish with missing figures and report no error.
-
-**What changed in the nine modules.** The sabotage, stagflation and cost cutting modules make the same changes as before, each to its own component, and the run of the nine modules gives the same figures as before in every reported year. The netting of the record, described above under "What a stacking component holds", changes the values held in the three components and leaves the markups as they were. One point needs stating. The cost cutting module draws every claim back toward the level of its industry. It now reckons that drift on the part of the markup that stacks, and it makes the whole change to its own component. It leaves the premiums of an overlap group and all other income alone. Before the change it wore those down as well, and the protections module restored its premium every year, so the two modules worked against each other. Chapter 16 gives the direction of this choice: improvements in production "tend to proliferate easily", "unlike final commodities that can often be protected through patents, copyrights and other exclusionary threats". The form of the choice is still an addition.
-
-**What is added to the literature here.** Nitzan and Bichler give no rule for how several sources of power over the same buyers combine. The following are all additions made for this model: the division of the markup into named components; the choice of which components stack and which overlap; the rule of an overlap group, including the treatment of discounts and the setting for the part that counts; the choice to put the three premiums in one group; the weighting used in a merger; the convention that divides the gain of a group among its members; and the rule that cost cutting does not wear down a hold on buyers. A different choice in any of these would give different results, and none of them has been tested against the record. On 26 November 2026 the choices of the overlap group were each tried against an alternative inside the model, and the part "The choices of the overlap group, tested" above gives the results. Two of them matter: how much of a smaller premium counts, and whether cost cutting wears down a hold on buyers. The book supports the second as it stands and is silent on the first.
-
-**What this rule does not do.** Until 26 November 2026 it did not record who pays for each income. The part "The record of transfers" above describes the remedy, and it lists the incomes that still have no payer. Until 26 November 2026 prices were not worked out from components: each module multiplied the price of a claim by its own factor, so a price could record a rise that the overlap rule left out of the markup. The part "How the price is worked out" below describes the remedy. Until the same date stacking components could drift to very large and very small values that cancelled each other in a run with many modules. The part "What a stacking component holds" above describes the remedy. Items 31 to 36 of `backlog.md` list the other doubts.
+A different choice in any of these would give different results. None has been tested against the historical record.
+
+## Checks the model makes on itself
+
+**The guard.** After each year's changes, and again after the year's mergers and foundings, the core examines every firm. It stops the run with a message if any firm has:
+
+- employees that are negative or not a number
+- earnings per employee that are negative or not a number
+- hype or risk that is not a number or not above zero
+- a markup component that is not above zero
+- a cost per employee, wage and cost components together, that is not above zero
+
+The message gives the year, how many firms are affected, and which modules changed those firms that year. The guard tests for impossible values. It does not hold any number inside a range.
+
+**The checks.** `checks.py` runs thirteen tests of the bookkeeping. All must pass.
+
+| Check | What it tests |
+|---|---|
+| 1. Stillness | With no modules, nothing changes. |
+| 2. Identity | Differential capitalization equals breadth × depth × hype ÷ risk, each measured for the top 100 against the average. |
+| 3. Attribution | The year's gain divides among the modules with nothing left over, in either order of listing. |
+| 4. Averages | Founding 1,000 small firms raises the differential capitalization of a top group that has not changed. |
+| 5. Formula | With fifteen modules on, earnings per employee equal wage × markup + other income for every firm. |
+| 6. Ownership | The core refuses a change to a component by a module that does not own it, and a direct change to earnings. |
+| 7. Overlap | The worked example of the overlap group above comes out at 1.35, 1.485 and 1.62. |
+| 8. Attribution with overlap | With two modules in the overlap group, the gain still divides with nothing left over, in either order of listing. |
+| 9. Guard | A change that makes employee counts negative stops the run. |
+| 10. Founding | The green-field module takes no employee from an existing firm, and a new firm starts without a premium it does not hold. |
+| 11. Levels | With the nine main modules and the optional ones on for 60 years, no firm ends a year with a gain standing beside a loss, and no base lies above the highest markup seen in the run. |
+| 12. Price | A firm with a wage of 2, a base of 0.1, premiums of 1.5 and 1.2 in the overlap group and a cost component of 0.03 has a price of 2.36. The core refuses a direct change to a price. Every price equals the formula in every year. |
+| 13. Transfers | The worked examples of transfers above come out as stated. No transfer is paid above what was asked or above what its payer had. Runs with modules listed in opposite orders give identical figures. |
 
 ---
 
