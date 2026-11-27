@@ -257,17 +257,27 @@ async function api(path, method, body) {
 function store(key, value) { try { localStorage.setItem("workbench:" + key, JSON.stringify(value)); } catch (e) { /* not needed */ } }
 function recall(key, fallback) { try { const v = localStorage.getItem("workbench:" + key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
 const STATUS = { finished: "done", running: "running", waiting: "waiting", stopped: "stopped", failed: "failed" };
+// A run records its modules, and their gain, under each module's own name (for example "risk
+// shaping"). The page knows optional modules by their name in registry.py ("risk_shaping"). Two
+// registry names can share one module ("compasses" and "compass_consensus"), so prefer the one
+// the run switched on.
+function keyFor(n, optional) {
+  if (MODS[n]) return n;
+  const keys = CAT.optional.filter(m => m.model_name === n).map(m => m.name);
+  return keys.find(k => optional.includes(k)) || keys[0] || n;
+}
+function keyedGain(gain, optional) { const out = {}; for (const [k, v] of Object.entries(gain || {})) out[keyFor(k, optional)] = v; return out; }
 function toRun(sm, old) {
   const r = old || { rows: [] };
   Object.assign(r, { id: sm.id, name: sm.name, claims: sm.claims, years: sm.years, seed: sm.seed, optional: sm.optional || [], settings: sm.settings || {},
     group: sm.experiment, srv: sm.status, status: STATUS[sm.status] || sm.status, message: sm.message || "", rowsCount: sm.rows_count || 0, created: sm.created });
-  r.modules = sm.modules && sm.modules.length ? sm.modules : [...CORE_ORDER, ...r.optional];
+  r.modules = sm.modules && sm.modules.length ? sm.modules.map(n => keyFor(n, r.optional)) : [...CORE_ORDER, ...r.optional];
   r.step = r.rows.length - 1;
   return r;
 }
 async function fetchRows(r) {
   const d = await api(`/api/runs/${encodeURIComponent(r.id)}?since=${r.rows.length}`);
-  for (const x of d.rows || []) if (x.year != null || x.step != null) r.rows.push({ year: x.year ?? (CAT.start_year || 1890) + x.step, v: x.values || {}, gain: x.gain || {} });
+  for (const x of d.rows || []) if (x.year != null || x.step != null) r.rows.push({ year: x.year ?? (CAT.start_year || 1890) + x.step, v: x.values || {}, gain: keyedGain(x.gain, r.optional) });
   r.step = r.rows.length - 1;
   r.errorYear = d.error_year; r.guard = d.guard;
 }
@@ -745,7 +755,7 @@ function draftMarks() {
   return out;
 }
 function activeNames(run, marks) {
-  const names = new Set(run ? run.modules : CORE_ORDER);
+  const names = new Set((run ? run.modules : CORE_ORDER).filter(n => MODS[n]));
   for (const n of marks.added) names.add(n);
   for (const n of [...names]) if (!marks.removed.has(n)) for (const r of (MODS[n] && MODS[n].replaces) || []) names.delete(r);
   return names;
