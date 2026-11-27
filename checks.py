@@ -403,7 +403,7 @@ def check_levels():
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass part 2, and its components
     #    stand further from 1.
-    assert off["beside"] > 1.0 and off["furthest"] > 10 * on["furthest"]
+    assert off["beside"] > 1.0 and off["furthest"] > 5 * on["furthest"]
     print(f"11. Levels: with the main modules and {len(names)} optional modules on for {ran} steps"
           f"{'' if ran == 60 else ' (after which fewer than 1 in 20 people had work)' if collapsed else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "

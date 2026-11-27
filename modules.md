@@ -298,18 +298,18 @@ The book gives no figure for how much hiring goes to new firms, how large a new 
 2. **Each firm gets a hiring rate.** It is the rate that the sabotage module published for the firm's industry: one rate for top-100 firms and one for small firms. If the stagflation module has published a cut in hiring, which this file calls the crisis, the module takes it off every firm's rate. A rate below zero means the firm lets people go.
 3. **Mergers slow hiring.** The mergers module publishes a number called the hiring drag. The module cuts all hiring by that proportion, because money spent on buying firms is not spent on building.
 4. **Hiring cannot outrun the working population.** If the firms together want more people than are available, every firm's hiring is cut in the same proportion. Unemployment cannot fall below 0.5 per cent.
-5. **Part of small firms' hiring founds new firms.** In each industry, 35 per cent of the hiring by small firms goes to new firms. Where dominant capital holds part of the industry, less does: the 35 per cent is multiplied by the part that dominant capital does not hold. Each new firm has 15 per cent of the employees of the average firm.
+5. **Part of small firms' hiring founds new firms.** In each industry, 35 per cent of the hiring by small firms goes to new firms. Where dominant capital holds part of the industry, less does: the 35 per cent is multiplied by the part that dominant capital does not hold. Each new firm has 15 per cent of the working population for each firm, which is what the average firm would employ if everybody had work. The measure is not the people whom existing firms employ now, because what it takes to enter an industry does not shrink when the firms in it dismiss people. In a slump a new firm is therefore larger beside the emptied firms, and the same hiring founds fewer firms.
 6. **The number of new firms is rounded.** The sum rarely comes out whole, so the module rounds it up or down by chance. An industry never founds more firms than its small firms' hiring that year can staff. The people who are left over stay with the firms that hired them. Founding a firm takes nobody from an existing firm.
 7. **A new firm starts plain.** It gets the average markup of its industry, counting only the parts of the markup that any firm can have (see "How modules share a quantity"). It gets no part of a premium that rests on something it does not hold, such as a patent. Its hype is 1 and its risk is the average risk.
 
-**An example.** The small firms of an industry hire 1,000 people in a year. Dominant capital holds 30 per cent of the industry. So 1,000 × 0.35 × 0.7 = 245 people go to new firms. The average firm has 100 employees, so a new firm has 15. That makes 16.3 new firms. The module founds 16, or 17 with a chance of one in three. If it founds 16, they take 240 people and the other 5 stay where they were hired.
+**An example.** The small firms of an industry hire 1,000 people in a year. Dominant capital holds 30 per cent of the industry. So 1,000 × 0.35 × 0.7 = 245 people go to new firms. There are 100 people in the working population for each firm, so a new firm has 15. That makes 16.3 new firms. The module founds 16, or 17 with a chance of one in three. If it founds 16, they take 240 people and the other 5 stay where they were hired.
 
 ### Settings
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
 | `new_firm_share` | 0.35 | The part of small firms' hiring that goes to new firms. | Our own choice |
-| `new_firm_size` | 0.15 | The size of a new firm, as a part of the average firm | Our own choice |
+| `new_firm_size` | 0.15 | The size of a new firm, as a part of the working population for each firm | Our own choice. The book says only that new firms are smaller than the average |
 | `floor` | 0.005 | The lowest unemployment the module allows | A plain limit with no source |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 

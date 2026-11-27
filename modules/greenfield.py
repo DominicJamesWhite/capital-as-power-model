@@ -27,7 +27,7 @@ class Greenfield:
 
     def __init__(self, new_firm_share=0.35, new_firm_size=0.15, floor=0.005, top=100):
         self.new_firm_share = new_firm_share   # part of small firms' new employment that goes to new firms
-        self.new_firm_size = new_firm_size     # size of a new firm, as a fraction of the average firm
+        self.new_firm_size = new_firm_size     # size of a new firm, as a fraction of the working population for each firm (the average firm if everybody had work)
         self.floor = floor                       # unemployment cannot fall below this
         self.top = top
         self.founded = 0      # new firms founded so far in this run
@@ -63,7 +63,10 @@ class Greenfield:
         entry = A["entry_open"] * A.get("protection_open", 1.0)   # protections bar entry too (optional module); 1 without it
         entry = entry * A.get("nature_open", 1.0)                 # owners of nature bar entry too (optional module); 1 without it
         to_new = np.where(up & ~dominant, jobs * self.new_firm_share * entry[ind], 0.0)
-        size = self.new_firm_size * employed / len(L)
+        # A new firm is measured against the working population for each firm, not against the people whom
+        # existing firms still employ: what it takes to enter an industry does not shrink when the firms
+        # in it dismiss people.
+        size = self.new_firm_size * workforce / len(L)
         wanted = np.bincount(ind, to_new, k) / size
         count = np.floor(wanted + rng.random(k)).astype(int)
         # The people who staff a new firm are people whom the small firms of its industry would
