@@ -162,6 +162,19 @@ class Externalisation:
                 "externalisation_on_later_years", "externalisation_stock", "externalisation_differential",
                 "externalisation_shifted", "externalisation_returned", "externalisation_struck",
                 "externalisation_struck_dominant", "externalisation_grievance")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "externalisation_burden_part": ("Burdens off the books", "share", "All burdens off the books, as a part of all earnings."),
+        "externalisation_on_employees": ("Burden on employees", "share", "Per employee, as a part of the wage."),
+        "externalisation_on_communities": ("Burden on communities", "share", "Per employee, as a part of the wage."),
+        "externalisation_on_later_years": ("Burden on later years", "share", "Per employee, as a part of the wage."),
+        "externalisation_stock": ("Built-up burden", "number", "Burden on later years per employee, in years of the wage."),
+        "externalisation_differential": ("Differential burden", "times", "Burden per employee of the top 100 divided by the average."),
+        "externalisation_shifted": ("Burden shifted off the books", "share", "In the year, per employee, as a part of the wage."),
+        "externalisation_returned": ("Burden returned to the books", "share", "In the year, per employee, as a part of the wage."),
+        "externalisation_struck": ("Firms struck by disaster", "number", "Number in the year."),
+        "externalisation_struck_dominant": ("Top 100 firms struck by disaster", "number", "Number in the year."),
+        "externalisation_grievance": ("Grievance from burdens", "number", ""),
+    }
 
     def __init__(self, attempt=0.0015, ceiling=0.015, open_to_all=0.3, labour_helpless_at=0.10,
                  return_rate=0.2, focus=1.0, return_risk=1.0, hazard=0.05, largest_chance=0.05,

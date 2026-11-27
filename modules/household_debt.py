@@ -138,6 +138,18 @@ class HouseholdDebt:
                 "household_debt_reach", "household_debt_shortfall", "household_debt_borrowing",
                 "household_debt_written_off", "household_debt_dominant", "household_debt_capital_share",
                 "household_debt_markup_part", "household_debt_placation")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "household_debt": ("Household debt", "number", "Capitalized value of household interest, in money."),
+        "household_debt_principal": ("Household debt owed", "number", "The money owed."),
+        "household_debt_pledged": ("Interest pledged from wages", "share", "Household interest as a part of the wage bill."),
+        "household_debt_reach": ("Reach of household lending", "share", ""),
+        "household_debt_shortfall": ("Shortfall of kept income", "share", ""),
+        "household_debt_borrowing": ("New household borrowing", "share", "New borrowing as a part of the wage bill."),
+        "household_debt_written_off": ("Household debt written off", "share", "Defaulted principal as a part of the wage bill."),
+        'household_debt_dominant': ('Household interest to the top 100', 'share', "The top 100's part of household interest."),
+        "household_debt_capital_share": ("Capitalist share with household interest", "share", "Capitalist share of income, with the interest counted once."),
+        "household_debt_placation": ("Placation", "rate", "Fall in popular resistance from new borrowing, as a part of its level."),
+    }
 
     def __init__(self, start_reach=0.10, extend=0.20, memory=10, cover=0.5, repay=0.10,
                  rate_multiple=2.0, ceiling=0.15, lender_weight=5.0, placate=2.0,

@@ -151,6 +151,15 @@ class Labour:
     reads = ("unemployment",)
     supplies = ("labour_strength", "labour_strength_by_industry", "labour_organisation", "labour_organisation_held",
                 "strike_activity", "labour_grievance", "labour_militancy", "real_wage")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "labour_strength": ("Strength of labour", "index", "Average strength over industries, weighted by employees."),
+        "labour_organisation": ("Organised employees", "share", "Part of all employees who are organised."),
+        "labour_organisation_held": ("Organised employees in top 100 industries", "share", "Organised part of the employees of industries the top 100 mostly hold."),
+        "strike_activity": ("Strike activity", "share", "Part of employees on strike in the year."),
+        "labour_grievance": ("Grievance", "index", "Shortfall of the real wage from its best in 10 years, scaled, and never more than 1."),
+        "labour_militancy": ("Militancy", "index", "Grievance times one minus discipline."),
+        "real_wage": ("Real wage", "number", "The wage divided by the average price."),
+    }
 
     def __init__(self, start=0.03, memory=10, full_grievance=0.05, organise=0.05, small_units=0.3, fade=0.03,
                  dilution=5.0, discipline_at=0.25, quiet_part=0.5, cooption=0.5, strike_risk=1.0, top=100):

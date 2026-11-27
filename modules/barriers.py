@@ -131,6 +131,15 @@ class Barriers:
     reads = ("pressure", "roadblocks", "resistance")
     supplies = ("line_barrier", "barrier_bargain", "barrier_level", "barrier_highest", "barrier_lowest", "barrier_sectors_selling",
                 "barrier_outside_part", "barrier_sales")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "barrier_bargain": ("Bargain", "index", "A running level of forced sales, times a rate."),
+        "barrier_level": ("Average barrier", "index", "Average barrier as the top 100 meet it."),
+        "barrier_highest": ("Highest barrier", "index", ""),
+        "barrier_lowest": ("Lowest barrier", "index", "Lowest barrier among sectors that have a top 100 firm."),
+        "barrier_sectors_selling": ("Sectors under forced sale", "number", ""),
+        'barrier_outside_part': ('Top 100 employees in outside holdings', 'share', "Part of the top 100's employees in outside holdings."),
+        'barrier_sales': ('Forced sales', 'rate', "The year's forced sales as a part of all employees."),
+    }
 
     def __init__(self, raise_rate=0.3, full_exposure=0.01, popular_part=0.5, wear_rate=0.05, sell_above=0.5,
                  sell_part=0.25, bargain_rate=1.0, bargain_keep=0.8, top=100):

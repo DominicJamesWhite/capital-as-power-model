@@ -136,6 +136,15 @@ class Proletarianization:
     reads = ("unemployment",)
     supplies = ("outside_population", "proletarianization_drive", "proletarianization_barrier",
                 "proletarianization_rate", "falling_back_rate", "workforce_growth_made", "breadth_cohesion")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "outside_population": ("Outside population", "share", "People outside wage employment, as a part of all people."),
+        "proletarianization_drive": ("Drive to draw people in", "index", "One minus unemployment divided by the sufficient reserve."),
+        "proletarianization_barrier": ("Barrier to drawing people in", "index", "Twice popular resistance, and never more than 1."),
+        "proletarianization_rate": ("People drawn in", "rate", "Planned drawing in, as a part of the working population."),
+        "falling_back_rate": ("People falling back", "rate", "Planned falling back, as a part of the working population."),
+        "workforce_growth_made": ("Growth of the working population", "rate", "The growth rate the module sets."),
+        "breadth_cohesion": ("Loosening of cohesion", "times", "Multiplies the cohesion of the top 100 while people are drawn in."),
+    }
 
     def __init__(self, start_outside=1.0, natural_increase=0.010, draw_rate=0.02, sufficient_reserve=0.08,
                  stall=2.0, falls_back=0.2, loosen=40.0):

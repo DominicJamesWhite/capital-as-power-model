@@ -146,6 +146,26 @@ class ConcentrationMeasures:
     name = "concentration_measures"
     reads = ()
     supplies = KEYS
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "conc_claims": ("Number of firms", "number", ""),
+        "conc_number_ratio": ("Top 100 as a part of all firms", "share", ""),
+        "conc_share_cap": ("Top 100 share of capitalization", "share", ""),
+        "conc_share_earnings": ("Top 100 share of earnings", "share", ""),
+        "conc_share_employees": ("Top 100 share of employees", "share", ""),
+        "conc_diff_cap": ("Differential capitalization", "times", ""),
+        "conc_diff_earnings": ("Differential earnings", "times", ""),
+        "conc_gini_cap": ("Gini index of capitalization", "index", ""),
+        "conc_gini_earnings": ("Gini index of earnings", "index", ""),
+        "conc_hh_cap": ("Herfindahl index of capitalization", "index", ""),
+        "conc_hh_earnings": ("Herfindahl index of earnings", "index", ""),
+        "conc_hh_equal_claims": ("Equal firms equivalent", "number", "1 divided by the Herfindahl index of capitalization."),
+        "conc_change_share": ("Change in top 100 share", "rate", "Yearly change, on a log scale."),
+        "conc_change_diff": ("Change in differential capitalization", "rate", "Yearly change, on a log scale."),
+        "conc_change_number": ("Change in top 100 as a part of all firms", "rate", "Yearly change, on a log scale."),
+        "conc_years_share_down_diff_up": ("Years the share fell as the differential rose", "number", ""),
+        "conc_years_share_up_diff_down": ("Years the share rose as the differential fell", "number", ""),
+        "conc_years_apart_employees": ("Years employees and the differential moved apart", "number", ""),
+    }
 
     def __init__(self, top=100):
         self.top = top            # number of firms in the dominant group: the book's "top 100"

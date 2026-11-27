@@ -162,6 +162,13 @@ class Wants:
     reads = ()
     supplies = ("wants_outlay_part", "wants_outlay_small", "wants_lead", "wants_premium",
                 "wants_risk_relief")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "wants_outlay_part": ("Outlay on wants", "share", "Outlay of all firms as a part of all earnings."),
+        "wants_outlay_small": ("Outlay on wants outside the top 100", "share", "Average outlay part of firms outside the top 100."),
+        "wants_lead": ("Lead of the top 100 on buyers", "number", "Average lead of the top 100 in their hold on buyers."),
+        "wants_premium": ("Markup gap from wants", "number", "Difference in markup that the rule calls for in the top 100."),
+        'wants_risk_relief': ('Risk relief from wants', 'rate', "The year's fall in the top 100's risk, on a log scale."),
+    }
 
     def __init__(self, customary=1 / 3, ceiling=0.5, step=0.10, ease=0.05, reach=1.25, build=0.2,
                  tilt=0.2, most_lead=1.0, steady=0.1, floor=0.005, top=100, fade=1.0):

@@ -142,6 +142,16 @@ class Eruptions:
     reads = ("resistance",)
     supplies = ("eruption", "eruption_frees_markups", "eruption_stops_price_rises", "eruption_stops_buying",
                 "eruption_stays_force", "systemic_fear", "eruption_strain", "eruption_count")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "eruption": ("Eruption", "index", "Level of the eruption, from 0 to 1."),
+        'eruption_frees_markups': ('Grip on markups removed', 'index', "Part of the top 100's grip on target markups removed by the eruption."),
+        "eruption_stops_price_rises": ("Price rises stopped", "index", "Part of the intensity of stagflation removed by the eruption."),
+        "eruption_stops_buying": ("Buying stopped", "index", "Part of the buying of firms stopped by the eruption."),
+        "eruption_stays_force": ("Repression stayed", "index", "Part of repression stayed by the eruption."),
+        "systemic_fear": ("Systemic fear", "index", "The level of the eruption, as the hype and risk shaping modules read it."),
+        "eruption_strain": ("Years of strain", "number", "Years in a row with popular resistance at or above the threshold."),
+        "eruption_count": ("Eruptions so far", "number", ""),
+    }
 
     def __init__(self, threshold=0.4, chance=0.1, lasts=3, restore=0.5, least=0.05,
                  frees_markups=1.0, stops_price_rises=1.0, stops_buying=1.0, stays_force=1.0, fear_risk=0.5):

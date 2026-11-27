@@ -48,6 +48,7 @@ class CostCutting:
     name = "cost cutting"
     reads = ()
     supplies = ()
+    figures = {}           # nothing it supplies is a single yearly figure
 
     def __init__(self, gain=0.02, spread=0.3, wears_holds=False):
         self.gain = gain        # typical yearly gain or loss of one firm against its neighbours

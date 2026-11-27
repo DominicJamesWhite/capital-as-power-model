@@ -139,6 +139,18 @@ class Owners:
     supplies = ("owners_indirect", "owners_indirect_top", "owners_wide", "owners_income_direct",
                 "owners_income_wage_funds", "owners_income_profit_funds", "owners_top_percent_cap",
                 "owners_top_percent_income", "owners_reach", "owners_placed")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "owners_indirect": ("Held through funds", "share", "Part of all capitalization held through institutional investors."),
+        'owners_indirect_top': ('Top 100 held through funds', 'share', "Part of the top 100's capitalization held through institutional investors."),
+        "owners_wide": ("Fund holdings fed from wages", "share", "Part of institutional holdings in funds fed from wages."),
+        "owners_income_direct": ("Earnings to direct owners", "share", "Part of all capitalist earnings that goes to direct owners."),
+        "owners_income_wage_funds": ("Earnings to funds fed from wages", "share", "Part of all capitalist earnings that goes to funds fed from wages."),
+        "owners_income_profit_funds": ("Earnings to funds fed from profits", "share", "Part of all capitalist earnings that goes to funds fed from capitalist earnings."),
+        "owners_top_percent_cap": ("Capitalization owned by the richest 1%", "share", "Part of all capitalization that belongs in the end to the richest 1%."),
+        "owners_top_percent_income": ("Income to the richest 1% as owners", "share", "Part of all income that reaches the richest 1% as owners."),
+        "owners_reach": ("Employees in fund-controlled firms", "share", "Part of all employees in firms where funds together hold a controlling block."),
+        'owners_placed': ('Fund money placed', 'share', "Part of the funds' new money that found shares to buy."),
+    }
 
     def __init__(self, listed_one_in=500, sell_rate=0.05, control_block=0.10, save_wages=0.03,
                  save_earnings=0.20, rich_direct=0.513, rich_wage_funds=0.153, rich_profit_funds=0.47,

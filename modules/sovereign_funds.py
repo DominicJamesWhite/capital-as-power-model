@@ -142,6 +142,17 @@ class SovereignFunds:
     supplies = ("sovereign_relief", "sovereign_verdict", "sovereign_part", "sovereign_stake_top",
                 "sovereign_dk", "sovereign_rank", "sovereign_reserve", "sovereign_dependence",
                 "sovereign_income_from_shares")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "sovereign_relief": ("Wearing down of roadblocks", "index", ""),
+        'sovereign_verdict': ('Fund verdict', 'rate', "Growth of the fund's holdings less growth of the average, over the year."),
+        'sovereign_part': ("Fund's share of capitalization", 'share', 'The fund as a part of all capitalization.'),
+        'sovereign_stake_top': ("Fund's stake in the top 100", 'share', "The fund's part of the top 100."),
+        'sovereign_dk': ("Fund's differential capitalization", 'times', "The fund's value divided by the average capitalization of a firm."),
+        'sovereign_rank': ("Fund's rank", 'number', 'The rank the fund would have if it were a firm.'),
+        'sovereign_reserve': ("Fund's reserve", 'share', 'The reserve as a part of all capitalization.'),
+        'sovereign_dependence': ('Dependence on shares', 'share', "Part of the organ's assets held as shares."),
+        'sovereign_income_from_shares': ('Income from shares', 'share', "Part of the organ's yearly income that comes from its shares."),
+    }
 
     def __init__(self, levy=0.003, lure=0.10, stake_cap=0.05, index_size=100, judged_over=5,
                  full_shortfall=0.05, relief=0.3):

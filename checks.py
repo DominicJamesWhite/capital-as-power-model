@@ -6,6 +6,7 @@ firms. Check 11 tests that every stacking component holds a level that means som
 long run with many modules. Check 12 tests that the price of every firm is worked out from the
 wage, the markup and the named costs. Check 13 tests the record of transfers: every transfer has
 a payer and a receiver, and no payer pays more than it has.
+Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
     python checks.py
@@ -166,8 +167,32 @@ def check_ownership():
         assert np.array_equal(m.L.e, before)
     assert "belongs to 'owner'" in messages[0] and "belongs to 'owner'" in messages[1]
     assert "cannot be scaled directly" in messages[2]
+    # A module names only the numbers it publishes. Every key in a module's `figures` is in its `supplies`, and
+    # every unit is one the workbench knows. Every number the core names is a readout, or is listed with its source.
+    import importlib
+    import registry
+    from full import all_modules
+    from core import CORE_FIGURES, CORE_FIGURES_ELSEWHERE, FIGURE_UNITS
+    classes = [type(m) for m in all_modules()]
+    classes += [getattr(importlib.import_module(path), name) for path, name in registry.OPTIONAL.values()]
+    classes = list(dict.fromkeys(classes))            # two registry names can point at one class
+    named = 0
+    for cls in classes:
+        figures = getattr(cls, "figures", {})
+        for key, (label, unit, note) in figures.items():
+            assert key in cls.supplies, f"{cls.__name__} names {key!r}, which it does not supply"
+            assert unit in FIGURE_UNITS, f"{cls.__name__} gives {key!r} the unknown unit {unit!r}"
+            assert label and isinstance(note, str), key
+        named += len(figures) if "figures" in cls.__dict__ else 0
+    keys = set(readouts(make_ledger(300)))
+    for key, (label, unit, note) in CORE_FIGURES.items():
+        assert key in keys or key in CORE_FIGURES_ELSEWHERE, f"the core names {key!r}, which is not a readout"
+        assert unit in FIGURE_UNITS, key
+    assert keys <= set(CORE_FIGURES), sorted(keys - set(CORE_FIGURES))
     print("6. Ownership: the core refuses a change to a component by a module that does not own it, "
-          "and it refuses a direct scaling of earnings per employee.")
+          f"and it refuses a direct scaling of earnings per employee. The {named} figures that modules name are "
+          f"all numbers they supply, and the {len(CORE_FIGURES)} that the core names are all readouts or numbers "
+          f"it keeps.")
 
 
 def check_overlap():

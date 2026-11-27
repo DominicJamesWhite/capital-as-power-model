@@ -164,8 +164,9 @@ A module is one Python file in `modules/` that holds one class. Look at `modules
 2. List the numbers it uses from other modules in `reads`, and the numbers it publishes in `supplies`.
 3. Put every setting in the class's `__init__`, with a default value.
 4. Write a `propose` method. Each year it looks at the firms and returns a list of the changes it wants. The module never changes a firm directly.
-5. Add the module to `registry.py`, so that people can switch it on by name.
-6. Describe the module in `modules.md`.
+5. Optionally, name the numbers it publishes in `figures`. For each number in `supplies`, give a label, a unit and one sentence that says what it measures. The unit is one of `share`, `rate`, `times`, `index` or `number`. The workbench uses these to name and scale charts, and lists them under "Add a chart" before anyone has run the module. Look at `modules/labour.py` for an example.
+6. Add the module to `registry.py`, so that people can switch it on by name.
+7. Describe the module in `modules.md`.
 
 ### What we ask of a module
 

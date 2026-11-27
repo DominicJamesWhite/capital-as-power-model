@@ -93,6 +93,11 @@ class Sales:
     name = "sales"
     reads = ("new_hires",)
     supplies = ("unsold", "sales_cut", "build_money_share")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "unsold": ("Unsold part", "share", "Part of the value offered that no spending comes back for."),
+        'sales_cut': ('Dismissals from unsold goods', 'rate', "Cut in the top 100's employees caused by unsold goods, overhead staff excepted."),
+        "build_money_share": ("Expansion money spent on building", "share", "Part of the money for expansion that was spent on new capacity."),
+    }
 
     def __init__(self, consumed=0.4, job_cost=4.0, price_give=0.5, overhead=0.3, years=3,
                  floor=0.005, top=100):

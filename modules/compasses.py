@@ -136,6 +136,11 @@ class TargetsCompass(_Replacement):
     name = "compass by targets"
     reads = ("concentration", "unemployment", "pool_open")
     supplies = ("cohesion", "stagflation_intensity", "breadth_dried")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "cohesion": ("Cohesion of the top 100", "index", "How far the top 100 can act in concert, from 0 to 1."),
+        "stagflation_intensity": ("Intensity of stagflation", "index", "How hard the top 100 push prices up, from 0 to 1."),
+        "breadth_dried": ("Reach already held", "share", "Part of its reach that the top 100 already hold."),
+    }
 
     def __init__(self, dry=0.5, **common):
         super().__init__(**common)
@@ -154,6 +159,11 @@ class AheadCompass(_Replacement):
     name = "compass by lead"
     reads = ("concentration", "unemployment", "merger_volume")
     supplies = ("cohesion", "stagflation_intensity", "breadth_lead")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "cohesion": ("Cohesion of the top 100", "index", "How far the top 100 can act in concert, from 0 to 1."),
+        "stagflation_intensity": ("Intensity of stagflation", "index", "How hard the top 100 push prices up, from 0 to 1."),
+        "breadth_lead": ("Lead of buying over growth", "rate", ""),
+    }
 
     def propose(self, L, rng):
         A = L.accounts
@@ -172,6 +182,11 @@ class ConsensusCompass(_Replacement):
     name = "compass by consensus"
     reads = ("concentration", "unemployment", "pool_open")
     supplies = ("cohesion", "stagflation_intensity", "impunity")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "cohesion": ("Cohesion of the top 100", "index", "How far the top 100 can act in concert, from 0 to 1."),
+        "stagflation_intensity": ("Intensity of stagflation", "index", "How hard the top 100 push prices up, from 0 to 1."),
+        "impunity": ("Impunity", "index", "Slack in the labour market times one minus popular resistance."),
+    }
 
     def __init__(self, dry=0.5, hesitant=0.02, full_slack=0.05, price_war=5.0, bicker=0.2, **common):
         super().__init__(**common)

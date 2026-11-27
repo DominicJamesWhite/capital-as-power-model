@@ -147,6 +147,15 @@ class Coalitions:
     supplies = ("conflict", "conflict_spark", "merger_appetite", "danger_zone",
                 "coalition_conflict_share", "coalition_takeover_share",
                 "coalition_conflict_top", "coalition_takeover_top")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "conflict": ("Level of conflict", "index", "Rises while the oil and arms coalition earns less per employee than the top 100."),
+        "conflict_spark": ("Spark from conflict", "index", "The level of conflict passed to the stagflation module."),
+        'danger_zone': ('Danger zone', 'share', "How far the oil and arms coalition's earnings per employee fall below the top 100's."),
+        'coalition_conflict_share': ("Oil and arms coalition's share of capitalization", 'share', 'Its part of all capitalization.'),
+        'coalition_takeover_share': ("Technology and takeover coalition's share of capitalization", 'share', 'Its part of all capitalization.'),
+        'coalition_conflict_top': ("Oil and arms coalition's share of the top 100", 'share', "Its part of the top 100's capitalization."),
+        'coalition_takeover_top': ("Technology and takeover coalition's share of the top 100", 'share', "Its part of the top 100's capitalization."),
+    }
 
     def __init__(self, conflict_sectors=(0, 1), takeover_sectors=(2, 3), rise=0.5, fall=0.15,
                  price_rise=0.06, fade=0.2, volume_cost=0.5, spark=0.5, concert=4.0, takeover_edge=0.5, top=100):

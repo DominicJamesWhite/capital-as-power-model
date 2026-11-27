@@ -125,6 +125,13 @@ class Force:
     name = "force"
     reads = ("stagflation_intensity",)
     supplies = ("force", "repression", "force_hires", "force_jobs", "force_contractors_top")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "force": ("Level of organised force", "index", "From 0 to 1."),
+        "repression": ("Repression", "rate", "Part of popular resistance removed in the year."),
+        "force_hires": ("Military hiring planned", "number", "Military hires planned for the year, in employees."),
+        "force_jobs": ("Military jobs", "share", "Military jobs as a part of the working population."),
+        'force_contractors_top': ("Arms contractors' share of the top 100", 'share', "The contractors' part of the top 100's capitalization."),
+    }
 
     def __init__(self, arms_sectors=(0, 1), lag=3.0, fade=0.15, military_part=0.15, top_part=0.67,
                  take=0.5, repress=0.15, hold=0.1, floor=0.005, top=100):

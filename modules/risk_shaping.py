@@ -166,6 +166,15 @@ class RiskShaping:
     reads = ("unemployment",)
     supplies = ("government_tie", "crisis_level", "risk_relief_routine", "risk_relief_bailout",
                 "protection_anger", "risk_differential", "bailout_borrowing")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        'government_tie': ('Tie to government', 'share', "Measured as the top 100's part of all capitalization."),
+        "crisis_level": ("Level of crisis", "index", ""),
+        'risk_relief_routine': ('Risk relief from routine protection', 'rate', "Yearly fall in the top 100's risk from routine protection, on a log scale."),
+        'risk_relief_bailout': ('Risk relief from bailouts', 'rate', "Yearly fall in the top 100's risk from bailouts, on a log scale."),
+        "protection_anger": ("Anger at bailouts", "number", "Rise in popular resistance caused by bailouts."),
+        "risk_differential": ("Differential risk", "times", "Risk of the top 100 divided by the risk of all firms."),
+        "bailout_borrowing": ("Bailout borrowing", "number", "What the government borrows to bail out the top 100, in money."),
+    }
 
     def __init__(self, routine=0.05, bailout=0.5, anger=1.0, usual_unemployment=0.05,
                  crisis_span=0.05, top=100):

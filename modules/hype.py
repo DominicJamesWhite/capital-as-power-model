@@ -235,6 +235,17 @@ class Hype:
     reads = ("merger_volume", "cohesion")
     supplies = ("hype_average", "hype_dominant", "hype_revealed", "hype_insiders", "merger_hype",
                 "hype_passed_year", "hype_passed", "hype_passed_dominant", "hype_shift")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "hype_average": ("Average hype", "times", "Expected earnings divided by earnings, for all firms."),
+        "hype_dominant": ("Hype of the top 100", "times", "Expected earnings divided by earnings, for the top 100."),
+        "hype_revealed": ("Hype revealed", "times", ""),
+        "hype_insiders": ("Position of insiders", "number", ""),
+        "merger_hype": ("Buying push from hype", "times", "Multiplies what the top 100 seek to buy when their firms are hyped above the rest."),
+        "hype_passed_year": ("Capitalization passed to insiders", "rate", "Part of all capitalization that passed from outsiders to insiders in the year."),
+        "hype_passed": ("Capitalization passed to insiders, total", "share", "Running sum of the yearly parts."),
+        'hype_passed_dominant': ('Capitalization passed to insiders, against the top 100', 'share', "Running sum, with each year measured against the top 100's capitalization."),
+        "hype_shift": ("Moved into direct holdings", "share", "With the owners module on, running sum of the yearly parts of capitalization moved into direct holdings."),
+    }
 
     def __init__(self, herd=0.5, own=0.2, trade=1.0, bound=0.10, lever=1.0, goodwill=0.5,
                  takeover=1.0, block=0.10, top=100):

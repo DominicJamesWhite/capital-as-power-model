@@ -20,6 +20,9 @@ class Greenfield:
     name = "greenfield"
     reads = ("hire_small", "hire_dominant", "entry_open")
     supplies = ("new_hires", "industry_growth")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "new_hires": ("New hires", "number", "Employees added by hiring in the year."),
+    }
 
     def __init__(self, new_firm_share=0.35, new_firm_size=0.15, floor=0.005, top=100):
         self.new_firm_share = new_firm_share   # part of small firms' new employment that goes to new firms

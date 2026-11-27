@@ -117,6 +117,20 @@ class Currencies:
                 "currency_flight_1", "currency_flight_2", "currency_buying_1", "currency_buying_2",
                 "currency_markup", "currency_dk_common", "currency_second_cap_part",
                 "currency_holding_gain")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "currency_second": ("Value of the second currency", "number", "In units of the first currency. It starts at 1."),
+        "currency_change": ("Change in the second currency", "rate", "Yearly change, on a log scale."),
+        "currency_inflow": ("Net inflow of owners", "number", "Net buying into the second country, divided by its employees."),
+        "currency_shortfall_second": ("Earnings shortfall, second country", "rate", "Growth of both countries together less growth of the second, when positive."),
+        "currency_shortfall_home": ("Earnings shortfall, first country", "rate", "Growth of both countries together less growth of the first, when positive."),
+        'currency_flight_1': ("Added chance of sale, first country's owners", 'share', ''),
+        'currency_flight_2': ("Added chance of sale, second country's owners", 'share', ''),
+        'currency_buying_1': ("Buying factor, first country's owners", 'times', ''),
+        'currency_buying_2': ("Buying factor, second country's owners", 'times', ''),
+        'currency_dk_common': ('Differential capitalization in one currency', 'times', "Top 100 of both countries, counted in the first country's currency."),
+        'currency_second_cap_part': ("Second country's share of capitalization", 'share', "Counted in the first country's currency."),
+        'currency_holding_gain': ('Gain on foreign holdings', 'rate', "The year's gain or loss on holdings in the second country, as a part of the first country's top 100 capitalization."),
+    }
 
     def __init__(self, sectors=2, sensitivity=2.0, max_move=0.5, window=3, flight_rate=10.0,
                  max_flight=0.5, cheapness=1.0, max_buying=3.0, pass_through=0.1, top=100):

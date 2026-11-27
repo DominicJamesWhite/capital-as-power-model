@@ -183,6 +183,17 @@ class Energy:
                 "energy_livelihood_per_head", "energy_hierarchy_share", "energy_dominant_share",
                 "energy_dominant_hierarchy", "energy_trajectory", "energy_trajectory_code",
                 "energy_grievance")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "energy_total_joules": ("Energy converted", "number", "All energy converted in the year, in joules."),
+        "energy_per_head": ("Energy per head", "number", "Gigajoules per member of the working population."),
+        "energy_hierarchy_per_head": ("Hierarchical energy per head", "number", "Gigajoules per member of the working population."),
+        "energy_livelihood_per_head": ("Livelihood energy per head", "number", "Gigajoules per member of the working population."),
+        "energy_hierarchy_share": ("Hierarchical energy share", "share", "Hierarchical energy as a part of all energy."),
+        "energy_dominant_share": ("Energy used by the top 100", "share", "Part of all energy converted inside the top 100."),
+        "energy_dominant_hierarchy": ("Hierarchical energy used by the top 100", "share", "Part of all hierarchical energy used inside the top 100."),
+        "energy_trajectory_code": ("Energy trajectory", "number", "1 expanding, 2 tentative crisis, 3 full crisis, 4 decline, 5 and 6 democratizing, 0 not yet known."),
+        "energy_grievance": ("Grievance from energy", "number", "Published when livelihood energy per head falls."),
+    }
 
     def __init__(self, coefficient=14.3, exponent=1.02, largest_size=3000.0, span=2.5,
                  managers_from=3, containment=1.0, window=5, grievance=0.5, top=100):

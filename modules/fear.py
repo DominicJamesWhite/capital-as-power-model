@@ -127,6 +127,15 @@ class Fear:
     name = "fear"
     reads = ()
     supplies = KEYS
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "power_index": ("Power index", "times", "Capitalization per employee of the top 100, divided by the wage."),
+        "power_index_100": ("Power index, mean 100", "number", "The power index with the mean of its readings set to 100."),
+        "power_distance": ("Distance from the mean", "number", "In standard deviations of the log of the power index."),
+        "power_ceiling_gap": ("Gap to the ceiling", "number", "The ceiling is 2 standard deviations above the mean."),
+        "power_fear": ("Fear passed to hype", "index", "0 at or below the mean, 1 at the ceiling."),
+        "fear_index": ("Fear index", "number", "Correlation of changes in price and earnings over the last 10 years."),
+        "power_years_at_ceiling": ("Years at the ceiling", "number", ""),
+    }
 
     def __init__(self, ceiling=2.0, calm=0.0, least_years=30, window=10, link=1.0, top=100):
         self.ceiling = ceiling          # standard deviations above the mean at which the power index meets its limit: the paper's "two standard deviations above the mean is the historical asymptote". Its use as a setting is an addition: the paper says "it seems", it describes three moments in the record of the United States, and the index here is the model's own, measured against the history of the run

@@ -20,6 +20,11 @@ class Mergers:
     name = "mergers"
     reads = ()
     supplies = ("merger_volume", "hiring_drag", "pool_open")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "merger_volume": ("Merger volume", "rate", "Employees bought by the top 100 in the year, as a part of all employees."),
+        "hiring_drag": ("Cut in hiring caused by mergers", "rate", "Fall in the hiring rate, because money spent on buying is not spent on building."),
+        'pool_open': ('Reach not yet held', 'share', "Part of the top 100's reach that it does not yet hold."),
+    }
 
     def __init__(self, base_rate=0.15, risk_cut=0.99, drag=2.0, counterforce=1.0, top=100):
         self.base_rate = base_rate    # employees a buyer seeks each year, as a fraction of its own, when targets are plentiful

@@ -135,6 +135,21 @@ class Plant:
     name = "plant"
     reads = ("industry_growth",)
     supplies = KEYS
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "plant_ratio": ("Capitalization against plant", "times", "All capitalization divided by plant at current cost."),
+        "plant_ratio_at_cost": ("Capitalization against plant at cost", "times", "All capitalization divided by plant at the prices paid."),
+        "plant_ratio_mean": ("Capitalization against plant, mean so far", "times", ""),
+        "plant_ratio_low": ("Capitalization against plant, lowest so far", "times", ""),
+        "plant_ratio_high": ("Capitalization against plant, highest so far", "times", ""),
+        "plant_record": ("Plant at current cost", "number", "In money."),
+        "plant_record_at_cost": ("Plant at cost", "number", "In money."),
+        "plant_built": ("Plant built", "number", "Building and replacement in the year, in money."),
+        "plant_idle": ("Idle plant", "share", "Part of the plant record that has no employee."),
+        "plant_growth_capitalization": ("Growth of capitalization", "rate", "Averaged over the last 10 years."),
+        "plant_growth_record": ("Growth of plant", "rate", "Averaged over the last 10 years."),
+        "plant_growth_correlation": ("Capitalization against plant growth", "number", "Correlation of the two growth rates over the last 30 years."),
+        "plant_buy_build_correlation": ("Ratio against buying", "number", "Correlation over the last 30 years between the ratio and employees bought for each employee hired."),
+    }
 
     def __init__(self, start_ratio=1.0, wear=0.05, smooth=10, window=30, smooth_ratio=5):
         self.start_ratio = start_ratio    # capitalization divided by the record in the first year (addition; 1 is the value the book says a mirror would give)

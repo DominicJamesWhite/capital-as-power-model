@@ -21,6 +21,10 @@ class Compass:
     name = "compass"
     reads = ("concentration", "merger_volume", "unemployment")
     supplies = ("cohesion", "stagflation_intensity")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "cohesion": ("Cohesion of the top 100", "index", "How far the top 100 can act in concert, from 0 to 1."),
+        "stagflation_intensity": ("Intensity of stagflation", "index", "How hard the top 100 push prices up, from 0 to 1."),
+    }
 
     def __init__(self, short=5, long=20, rise=0.15, fall=0.10, slack=20.0, usual_unemployment=0.05, top=100):
         self.short = short     # years over which the recent volume of mergers is judged

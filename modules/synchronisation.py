@@ -93,6 +93,16 @@ class Synchronisation:
     name = "synchronisation"
     reads = ("merger_volume", "unemployment")
     supplies = KEYS
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "sync_mergers_sectors": ("Merger synchronisation across sectors", "number", "Average correlation of merger volumes between pairs of sectors."),
+        "sync_prices_sectors": ("Price synchronisation across sectors", "number", "Average correlation of price rises between pairs of sectors."),
+        'sync_inverse_sectors': ('Mergers against prices within sectors', 'number', "Average correlation of a sector's merger volume with its own price rise."),
+        "sync_sectors_merging": ("Sectors with mergers", "share", "Part of the sectors in which any merger took place."),
+        'sync_breadth_depth': ('Breadth against depth', 'number', "The book's correlation between the stagflation and amalgamation indices."),
+        'sync_mergers_countries': ('Merger synchronisation across countries', 'number', "Correlation of the two countries' merger volumes."),
+        'sync_prices_countries': ('Price synchronisation across countries', 'number', "Correlation of the two countries' price rises."),
+        "sync_years": ("Years recorded", "number", ""),
+    }
 
     def __init__(self, window=30, smooth=5, least_index=1e-4):
         self.window = window            # years over which each correlation is taken: the book's "30-year moving correlation"

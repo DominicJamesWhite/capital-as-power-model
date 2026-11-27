@@ -126,6 +126,20 @@ class Hierarchy:
                 "hierarchy_top_pay_median", "hierarchy_top_pay_99", "hierarchy_top_pay_dominant",
                 "hierarchy_top_pay_highest", "hierarchy_power_dominant", "hierarchy_top_percent_share",
                 "hierarchy_top_percent_held", "hierarchy_gini", "hierarchy_tail_exponent")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "hierarchy_ranks_average": ("Ranks for the average employee", "number", "Ranks in the firm of the average employee."),
+        "hierarchy_ranks_dominant": ("Ranks in the top 100", "number", "Average number of ranks in the top 100 firms."),
+        "hierarchy_ranks_most": ("Most ranks in one firm", "number", ""),
+        "hierarchy_top_pay_median": ("Top pay in the median firm", "times", "Top-rank pay of the median firm, as a multiple of the wage."),
+        "hierarchy_top_pay_99": ("Top pay at the 99th percentile", "times", "Top-rank pay of the firm at the 99th percentile, as a multiple of the wage."),
+        "hierarchy_top_pay_dominant": ("Top pay in the top 100", "times", "Average top-rank pay in the top 100, as a multiple of the wage."),
+        "hierarchy_top_pay_highest": ("Highest top pay", "times", "Highest top-rank pay of any firm, as a multiple of the wage."),
+        "hierarchy_power_dominant": ("Hierarchical power in the top 100", "number", "Average hierarchical power of the top rank in the top 100."),
+        "hierarchy_top_percent_share": ("Pay to the best paid 1%", "share", "Part of all pay that goes to the best paid 1% of employees."),
+        "hierarchy_top_percent_held": ("Best paid 1% in the top 100", "share", "Part of the best paid 1% who work in the top 100."),
+        "hierarchy_gini": ("Gini index of pay", "index", "0 is equal pay."),
+        "hierarchy_tail_exponent": ("Tail exponent of pay", "number", "Power-law exponent for the best paid 1%. A smaller exponent means a fatter tail."),
+    }
 
     def __init__(self, span_a=1.2, span_b=0.125, pay_scaling=1.1, tail=0.01, largest_firm=1e10,
                  grid=4000, top=100):

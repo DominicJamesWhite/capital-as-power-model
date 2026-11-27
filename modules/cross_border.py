@@ -132,6 +132,29 @@ class CrossBorder:
                 "cb_foreign_earnings_top_home", "cb_foreign_earnings_top_second",
                 "cb_dk_home", "cb_dk_home_with_foreign", "cb_dk_second", "cb_dk_second_with_foreign",
                 "cb_open")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "cross_border_on": ("Cross-border buying on", "number", "1 while the module is on."),
+        "cross_border_inward": ("Buying into the second country", "rate", "Employees of second-country firms bought by foreign owners, as a part of all employees."),
+        'cross_border_outward': ('Buying into the first country', 'rate', "Employees of first-country firms bought by the second country's owners, as a part of all employees."),
+        "cb_gross_flow": ("Gross flow across the border", "rate", "As a part of all employees."),
+        "cb_net_flow": ("Net flow across the border", "rate", "As a part of all employees."),
+        "cb_gross_to_hiring": ("Gross flow against hiring", "times", "Gross flow divided by new hires."),
+        "cb_net_to_hiring": ("Net flow against hiring", "times", "Net flow divided by new hires."),
+        "cb_flow_from_home": ("Net buying by the first country", "rate", "Bought less sold, as a part of all employees."),
+        "cb_flow_from_second": ("Net buying by the second country", "rate", "Bought less sold, as a part of all employees."),
+        "cb_foreign_share": ("Foreign-owned capitalization", "share", "Part of all capitalization owned abroad."),
+        'cb_foreign_share_home': ('Foreign-owned, first country', 'share', "Part of the first country's capitalization owned abroad."),
+        'cb_foreign_share_second': ('Foreign-owned, second country', 'share', "Part of the second country's capitalization owned abroad."),
+        'cb_foreign_earnings_home': ('Foreign earnings, first country', 'share', "Foreign earnings as a part of all earnings of the first country's owners."),
+        'cb_foreign_earnings_second': ('Foreign earnings, second country', 'share', "Foreign earnings as a part of all earnings of the second country's owners."),
+        'cb_foreign_earnings_top_home': ('Foreign earnings of the top group, first country', 'share', "The same for the first country's dominant group alone."),
+        'cb_foreign_earnings_top_second': ('Foreign earnings of the top group, second country', 'share', "The same for the second country's dominant group alone."),
+        "cb_dk_home": ("Differential capitalization, first country", "times", ""),
+        "cb_dk_home_with_foreign": ("Differential capitalization with foreign holdings, first country", "times", ""),
+        "cb_dk_second": ("Differential capitalization, second country", "times", ""),
+        "cb_dk_second_with_foreign": ("Differential capitalization with foreign holdings, second country", "times", ""),
+        "cb_open": ("Openness of the border", "index", ""),
+    }
 
     def __init__(self, sectors=2, top_home=100, top_second=5, rate=0.02, retreat=0.05,
                  counterforce=1.0, open_alone=1.0):

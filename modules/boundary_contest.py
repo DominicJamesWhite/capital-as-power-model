@@ -88,6 +88,11 @@ class BoundaryContest:
     replaces = ("envelope",)      # full.py leaves the envelope module out when this one is switched on
     reads = ("pool_open", "concentration")
     supplies = ("pressure", "boundary_push", "boundary_hold")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "pressure": ("Pressure on boundaries", "share", "Part of its reach that the top 100 already hold."),
+        "boundary_push": ("Push on boundaries", "index", ""),
+        "boundary_hold": ("Hold on boundaries", "index", ""),
+    }
 
     def __init__(self, full_sway=0.25, hold=1.0, speed=0.3, close_margin=0.3, rival_cost=0.10, top=100):
         self.full_sway = full_sway        # the part of the government's debt dominant capital must hold for its sway to be complete

@@ -426,6 +426,51 @@ def top_positions(K, members, top):
     return members[part]
 
 
+# What the workbench calls each number the core reports every year: label, unit, note. The units
+# are the same as in a module's `figures`: "share" (a part of a whole, from 0 to 1), "rate" (a
+# change in a year), "times" (a multiple), "index" (a scale from 0 to 1) and "number".
+# Most keys are readouts (below). The rest are numbers the core keeps in L.shared or L.accounts,
+# or that the workbench works out from the readouts (inflation, mergers against hiring).
+CORE_FIGURES = {
+    "claims": ("Number of firms", "number", ""),
+    "dk": ("Differential capitalization", "times", "Average capitalization of a top 100 firm divided by that of the average firm."),
+    "breadth": ("Breadth", "times", "Employees of the average top 100 firm divided by those of the average firm."),
+    "depth": ("Depth", "times", "Earnings per employee of the top 100 divided by those of the average firm."),
+    "d_earnings": ("Differential earnings", "times", "Average earnings of a top 100 firm divided by those of the average firm."),
+    "d_hype": ("Differential hype", "times", "Hype of the top 100 divided by the hype of all firms."),
+    "d_risk": ("Differential risk", "times", "Risk of the top 100 divided by the risk of all firms."),
+    "top_share_employees": ("Top 100 share of employees", "share", ""),
+    "top_share_cap": ("Top 100 share of capitalization", "share", ""),
+    "capital_share": ("Capitalist share of income", "share", "Part of all income that goes to owners, each income counted once."),
+    "unemployment": ("Unemployment", "share", "Part of the working population without paid work."),
+    "price_level": ("Price level", "number", "Average price, weighted by employees. The wage at the start is 1."),
+    "other_costs": ("Costs other than the wage", "number", "Average, counted in wages."),
+    "power_index": ("Power index", "times", "Average capitalization of a top 100 firm, divided by the wage."),
+    "employment": ("Employment", "number", "Number of people employed."),
+    "markup": ("Average markup", "share", "Weighted by employees."),
+    "markup_top": ("Average markup of the top 100", "share", "Weighted by employees."),
+    "other_income_part": ("Other income", "share", "Other income as a part of capitalist income."),
+    "other_income_part_top": ("Other income of the top 100", "share", "Other income as a part of the top 100's capitalist income."),
+    "inflation": ("Inflation", "rate", "Change in the price level from the year before."),
+    "mergers_against_hiring": ("Mergers against new hiring", "times", "Employees bought by the top 100 for each new hire."),
+    "da": ("Differential accumulation", "rate", "Change in differential capitalization in the year, on a log scale."),
+    "concentration": ("Top 100 share of employees, as modules read it", "share", ""),
+    "wage_earners_net": ("Net transfers to wage earners", "number", "What wage earners received less what they paid, as a part of the wage bill."),
+    "wage": ("Wage", "number", "The wage at the start is 1."),
+    "workforce": ("Working population", "number", ""),
+    "workforce_growth": ("Growth of the working population", "rate", ""),
+    "nrr": ("Normal rate of return", "rate", ""),
+    "perm_sector": ("Opening of the sector boundary", "index", "How freely the top 100 can buy outside their industry but inside their sector."),
+    "perm_nation": ("Opening of the national boundary", "index", "How freely the top 100 can buy anywhere in the country."),
+}
+# Numbers in CORE_FIGURES that are not readouts: where each comes from.
+CORE_FIGURES_ELSEWHERE = {"inflation": "workbench", "mergers_against_hiring": "workbench", "da": "accounts",
+                          "concentration": "accounts", "wage_earners_net": "accounts", "wage": "shared",
+                          "workforce": "shared", "workforce_growth": "shared", "nrr": "shared",
+                          "perm_sector": "shared", "perm_nation": "shared"}
+FIGURE_UNITS = ("share", "rate", "times", "index", "number")
+
+
 def readouts(L, top=100, mask=None, group=None):
     """Differential measures for an envelope.
 

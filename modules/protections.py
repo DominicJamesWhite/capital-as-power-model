@@ -149,6 +149,15 @@ class Protections:
     reads = ()
     supplies = ("protection_open", "protected_share", "protected_top", "protection_tie_top",
                 "protection_premium", "protection_grants", "protection_renewals", "protection_lapses")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "protected_share": ("Employees in protected firms", "share", "Part of all employees who work for protected firms."),
+        "protected_top": ("Top 100 with a protection", "share", "Part of the top 100 that hold a protection."),
+        "protection_tie_top": ("Tie of the top 100", "index", "Average tie of the top 100."),
+        "protection_premium": ("Protection premium", "times", "Markup of protected firms against their unprotected neighbours."),
+        "protection_grants": ("Protections granted", "number", "Number granted in the year."),
+        "protection_renewals": ("Protections renewed", "number", "Number renewed in the year."),
+        "protection_lapses": ("Protections lapsed", "number", "Number lapsed in the year."),
+    }
 
     def __init__(self, premium=0.5, term=15, grant_any=0.002, grant_tied=0.10, renew=1.0,
                  tie_size=100.0, bar=1.0, volume_cost=0.5, top=100, against="own"):

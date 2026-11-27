@@ -167,6 +167,16 @@ class Nature:
     supplies = ("nature_open", "nature_cohesion", "nature_tightness", "nature_atmosphere",
                 "nature_markup", "nature_relative_price", "nature_differential_earnings",
                 "nature_share", "nature_top")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "nature_cohesion": ("Cohesion of resource owners", "index", "Average cohesion of the owners of resource industries."),
+        "nature_tightness": ("Tightness of resource ownership", "index", ""),
+        "nature_atmosphere": ("Atmosphere of crisis", "index", ""),
+        "nature_markup": ("Markup of resource industries", "number", "Markup of the resource industries taken together."),
+        "nature_relative_price": ("Relative price of resources", "times", "Their price divided by the price level of all firms."),
+        "nature_differential_earnings": ("Differential earnings of resources", "times", "Their earnings per employee divided by that of all firms."),
+        'nature_share': ("Resources' share of capitalization", 'share', 'Part of all capitalization.'),
+        'nature_top': ("Resources' share of the top 100", 'share', "Part of the top 100's capitalization."),
+    }
 
     def __init__(self, industries=(0, 20, 40), core_owners=7, free_flow_markup=0.10,
                  price_multiple=3.5, speed=0.25, alarm=1.0, diffusion=0.3, volume_cost=0.5,

@@ -96,6 +96,17 @@ class SecondCountry:
     supplies = ("merger_volume", "hiring_drag", "pool_open",
                 "second_country_held", "second_country_labour", "border_open", "second_conglomerate",
                 "second_roadblocks", "dk_home", "dk_second", "dk_both")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "merger_volume": ("Merger volume", "rate", "Employees bought in the year in both countries, as a part of all employees."),
+        "hiring_drag": ("Cut in hiring caused by mergers", "rate", "Fall in the hiring rate, because money spent on buying is not spent on building."),
+        'pool_open': ('Reach not yet held', 'share', "Part of the first country's top 100's reach that it does not yet hold."),
+        "border_open": ("Opening of the border", "index", ""),
+        'second_conglomerate': ("Second country's internal boundary", 'index', ''),
+        "second_roadblocks": ("Roadblocks in the second country", "index", ""),
+        "dk_home": ("Differential capitalization, first country", "times", ""),
+        "dk_second": ("Differential capitalization, second country", "times", ""),
+        "dk_both": ("Differential capitalization, both countries", "times", ""),
+    }
 
     def __init__(self, sectors=2, top=5, base_rate=0.15, risk_cut=0.99, counterforce=1.0,
                  from_mergers=3.0, fade=0.08, threshold=0.5, speed=0.2, close_margin=0.3,

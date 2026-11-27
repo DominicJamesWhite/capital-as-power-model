@@ -20,6 +20,10 @@ class Resistance:
     name = "resistance"
     reads = ("unemployment", "concentration")
     supplies = ("resistance", "roadblocks")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "resistance": ("Popular resistance", "index", "Resistance to rising prices, unemployment and the power of the top 100, from 0 to 1."),
+        "roadblocks": ("Roadblocks to mergers", "index", "How strongly institutions slow mergers and keep boundaries closed, from 0 to 1."),
+    }
 
     def __init__(self, from_inflation=0.6, from_mergers=3.0, from_unemployment=0.5, from_power=0.02, usual_unemployment=0.05,
                  fade=0.08, risk=0.5, start=0.0, top=100):

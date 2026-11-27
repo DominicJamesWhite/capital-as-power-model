@@ -35,6 +35,12 @@ class Debt:
     name = "debt"
     reads = ("unemployment",)
     supplies = ("interest_share", "corporate_debt", "government_debt", "government_debt_dominant")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "interest_share": ("Interest share", "share", "Part of capitalist income paid as interest."),
+        "corporate_debt": ("Corporate debt", "number", "Capitalized value of the interest that corporations pay, in money."),
+        'government_debt': ('Government debt', 'number', "Capitalized value of the government's interest payments, in money."),
+        'government_debt_dominant': ('Government debt held by the top 100', 'number', "Taken to equal the top 100's part of all capitalization, in money."),
+    }
 
     def __init__(self, base=0.10, slope=4.0, usual_unemployment=0.05, years=5, speed=0.1,
                  government_part=0.02, start=0.20):

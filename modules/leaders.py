@@ -104,6 +104,9 @@ class Leaders:
     name = "leaders"
     reads = ()
     supplies = ("leader_premium",)
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        'leader_premium': ('Markup gap by firm size', 'share', "Gap between the markups of the largest and smallest firms of an industry, as a part of the industry's markup."),
+    }
 
     # The cut-offs of the eight size groups in Nitzan (1992, chapter 9), each as a fraction of
     # the cut-off of the top group: 5, 10, 25, 50, 100 and 250 million dollars against 1 billion.

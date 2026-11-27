@@ -146,6 +146,16 @@ class Privatisation:
     supplies = ("privatisation_jobs", "public_workforce_change", "public_pool", "privatisation_door",
                 "privatisation_rate", "public_hiring_rate", "privatised_part_of_top",
                 "privatisation_proceeds")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "privatisation_jobs": ("Public jobs taken over", "number", "Takeover planned for the year, in employees."),
+        "public_workforce_change": ("Change in public employment", "number", "Planned takeover less planned public hiring, in employees."),
+        "public_pool": ("Public employment", "share", "Publicly run employment as a part of all working people."),
+        "privatisation_door": ("Door to privatisation", "index", "Cohesion of the top 100 times one minus the defence."),
+        "privatisation_rate": ("Privatisation rate", "rate", "Planned takeover as a part of the working population."),
+        "public_hiring_rate": ("Public hiring rate", "rate", "Planned public hiring as a part of the working population."),
+        'privatised_part_of_top': ('Top 100 employees from privatisation', 'share', "Part of the top 100's employees that came from the public pool."),
+        'privatisation_proceeds': ('Privatisation proceeds', 'number', "What the top 100 paid for the year's takeover, in money."),
+    }
 
     def __init__(self, start_part=0.05, absorb=0.3, defend=2.0, max_growth=0.25, build=0.1,
                  floor=0.005, price_part=0.5, top=100):

@@ -25,6 +25,7 @@ class Sabotage:
     name = "sabotage"
     reads = ("unemployment", "industry_growth")
     supplies = ("hire_small", "hire_dominant", "entry_open")
+    figures = {}           # nothing it supplies is a single yearly figure
 
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
                  hold=0.1, wage_weakness=0.2, labour_holds_at=0.05, volume_cost=0.5,

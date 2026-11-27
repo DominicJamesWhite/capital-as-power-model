@@ -19,6 +19,9 @@ class Envelope:
     name = "envelope"
     reads = ("pool_open",)
     supplies = ("pressure",)
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "pressure": ("Pressure on boundaries", "share", "Part of its reach that the top 100 already hold."),
+    }
 
     def __init__(self, threshold=0.5, speed=0.2, close_margin=0.3):
         self.threshold = threshold        # how much of its reach dominant capital must hold before a boundary gives

@@ -142,6 +142,14 @@ class PolicyRate:
     reads = ("resistance",)
     supplies = ("policy_rate", "policy_rate_force", "policy_rate_employment_growth",
                 "policy_rate_markup", "policy_rate_power_index", "policy_rate_power_index_customary")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "policy_rate": ("Policy rate", "rate", ""),
+        "policy_rate_force": ("Force of the practice", "index", ""),
+        "policy_rate_employment_growth": ("Lagged growth of employment", "rate", "The growth of employment that the rate follows."),
+        "policy_rate_markup": ("Markup factor from the rate", "times", "Multiplies the markup."),
+        "policy_rate_power_index": ("Power index", "times", "Average capitalization of the top 100 divided by the wage."),
+        "policy_rate_power_index_customary": ("Power index at the customary rate", "times", "Average capitalization of the top 100 divided by the wage, reckoned at the customary rate."),
+    }
 
     def __init__(self, slope=1.0, lag=5, window=10, established_at=0.3, materialize=20,
                  hiring=0.25, lowest=0.01, highest=0.20, top=100):

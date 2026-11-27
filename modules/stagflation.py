@@ -24,6 +24,10 @@ class Stagflation:
     name = "stagflation"
     reads = ("stagflation_intensity", "unemployment")
     supplies = ("crisis", "inflation_push")
+    figures = {                   # what the workbench calls each published number: label, unit, note
+        "crisis": ("Cut in hiring from stagflation", "rate", "The cut in every hiring rate in the year."),
+        'inflation_push': ('Price rise by the top 100', 'rate', "Yearly price rise by the top 100's firms."),
+    }
 
     def __init__(self, max_rise=0.10, small_part=0.6, wage_part=0.5, crisis=0.06, risk_rise=0.5,
                  catch_up=0.03, slack=2.0, usual_unemployment=0.05, top=100):
