@@ -3,13 +3,13 @@
 THE RULE IN PLAIN WORDS
 
 The nine modules give dominant capital two ways to add employees: hiring and buying other
-claims. This module adds a third. It holds a pool of publicly run employment: people who work
-for government organs and for no claim. Dominant capital takes over parts of that pool when it
+firms. This module adds a third. It holds a pool of publicly run employment: people who work
+for government organs and for no firm. Dominant capital takes over parts of that pool when it
 is able to act in concert, and popular resistance holds the pool shut and adds to it.
 
   1. The pool. The pool is a number of employees that the module keeps outside the ledger. No
-     claim earns anything from them, and they are not part of the working population that the
-     ledger counts, which is the population that works for claims or looks for work with them.
+     firm earns anything from them, and they are not part of the working population that the
+     ledger counts, which is the population that works for firms or looks for work with them.
      At the start of a run the pool is a fixed part of that working population. Each year the
      pool grows at the rate at which the working population grows.
   2. The door. Each year the module works out how far the door to the pool is open. The door
@@ -18,23 +18,23 @@ is able to act in concert, and popular resistance holds the pool shut and adds t
      shut. With popular resistance at one half or above the door is shut.
   3. The takeover. Dominant capital plans to take over, in the following year, a fixed part
      of the pool times the door. The plan is limited to a part of the employees that the
-     hundred largest claims already have. The module publishes the plan.
+     hundred largest firms already have. The module publishes the plan.
   4. Carrying out the plan. In the following year the planned number of employees leaves the
-     pool and goes onto the books of the hundred largest claims, to each in proportion to the
-     employees it already has. Each of those claims keeps its earnings per employee and its
+     pool and goes onto the books of the hundred largest firms, to each in proportion to the
+     employees it already has. Each of those firms keeps its earnings per employee and its
      price. The services were not sold before and are sold at a markup afterwards. The
      green-field module adds the same number of people to the working population of the
      ledger, because the people come with their jobs, and it sets the same number aside
-     before it lets other claims hire.
+     before it lets other firms hire.
   4a. The price. Dominant capital pays for what it takes over, and it pays less than the
      worth. The worth is the capitalization that the takeover adds to the hundred largest
-     claims: their capitalization times the employees taken over, divided by the employees
+     firms: their capitalization times the employees taken over, divided by the employees
      they had. The price is a set part of the worth. The module publishes the price as the
      proceeds of the year. Module 2 retires government debt with the proceeds in the
      following year. The government then owes less interest, and when the public debt module
      is on, less tax is collected and less interest is paid to the holders of the debt. No
-     claim's earnings change: the owners of the buying claims hand over bonds, or money that
-     retires bonds, and the ledger counts a claim's debt and equity together. With the part
+     firm's earnings change: the owners of the buying firms hand over bonds, or money that
+     retires bonds, and the ledger counts a firm's debt and equity together. With the part
      set to 0 the services are given away, and with 1 they are sold at their full worth.
   5. No new capacity. The takeover is not counted as growth of capacity in any industry. The
      sabotage module wears markups down where capacity grows faster than the working
@@ -66,7 +66,7 @@ WHAT IT RESTS ON
     infrastructure, education and security - typically takes the form of giving/selling them
     to dominant capital, which in turn contributes to differential accumulation in a manner
     similar to green-field investment." Part 4 gives the whole takeover to the hundred
-    largest claims because of the words "to dominant capital".
+    largest firms because of the words "to dominant capital".
   - Bichler and Nitzan, The Global Political Economy of Israel (2002), chapter 6. "The second
     pole was privatisation. Part of this involved the sale of government-owned enterprises,
     but there was a much bigger prize here, namely the privatisation of government itself."
@@ -83,7 +83,7 @@ WHAT IT RESTS ON
     proceeds" into a fund. The proceeds therefore go to the government. The literature
     gives no figure for the price.
   - Capital as Power, chapter 9. "Capitalization ... privatized and priced more and more
-    social activities." Part 4 lets the services carry a markup once a claim holds them.
+    social activities." Part 4 lets the services carry a markup once a firm holds them.
   - Chapter 15, "Green-field". Green-field growth "is no panacea for dominant capital",
     because new capacity threatens prices. Chapter 14 defines external breadth as "building
     new capacity and hiring new employees faster than the average". Privatisation hires
@@ -113,24 +113,24 @@ rule and no rate. Every number below is an addition. The starting pool of 5 per 
 addition, and the book's figure of 14 to 17 per cent of gross domestic product is for the
 world from the 1960s and is a record to compare with. Measuring the door by cohesion times one
 minus twice the resistance is an addition. The yearly part of the pool that can be taken and
-the limit on a year's takeover are additions. Giving each of the hundred largest claims a part
+the limit on a year's takeover are additions. Giving each of the hundred largest firms a part
 in proportion to its employees is an addition. Part 6 is wholly an addition. The literature
 says that the welfare state was built after the Great Depression and does not say what built
-it. Part 6 was added so that the pool has a source inside the model, and its rate can be set
+it. Part 6 gives the pool a source inside the model, and its rate can be set
 to zero. Letting the pool grow with the working population is an addition.
 
-Part 4a was added on 26 November 2026. The part of the worth that is paid is a plain setting
+In part 4a, the part of the worth that is paid is a plain setting
 with no source. Its default of one half is the middle between giving and selling at full
 worth, and nothing more. Using the proceeds to retire debt is an addition.
 
 WHAT IS MISSING
 
 The taxes that pay public employees are not recorded as transfers, so the module cannot show
-the payments that government organs go on making to the claims that now run the services.
+the payments that government organs go on making to the firms that now run the services.
 The earnings on privatised employees come from a markup, and whoever buys the services pays
 it in the price, as with every markup in the model. The
-sale of state-owned firms as whole claims is not modelled, only the takeover of employment.
-The pool has no industries: privatised employees take the industry of the claim that receives
+sale of state-owned firms as whole firms is not modelled, only the takeover of employment.
+The pool has no industries: privatised employees take the industry of the firm that receives
 them. The book places privatisation in a breadth phase, beside mergers, and this rule does not
 close the door during stagflation except through the resistance that stagflation provokes.
 Privatisation provokes no resistance of its own, which follows the book's remark that the
@@ -152,7 +152,7 @@ class Privatisation:
         self.start_part = start_part    # the pool at the start, as a part of the working population that the ledger counts
         self.absorb = absorb            # part of the pool that dominant capital takes over in a year when the door is fully open
         self.defend = defend            # part of the door that is shut per unit of popular resistance
-        self.max_growth = max_growth    # the most that one year's takeover may add to the employees of the hundred largest claims, as a part of those employees
+        self.max_growth = max_growth    # the most that one year's takeover may add to the employees of the hundred largest firms, as a part of those employees
         self.build = build              # part of the people out of work that government organs hire in a year at full popular resistance; 0 switches public hiring off
         self.floor = floor              # unemployment cannot fall below this (the same figure as in the green-field module)
         self.price_part = price_part    # part of the worth of a takeover that dominant capital pays to the government; a plain setting with no source: 0 gives the services away, 1 sells them at full worth
@@ -197,7 +197,7 @@ class Privatisation:
             changes.append(Scale("employees", factor, self.name))
         else:
             take = 0.0
-        # Part 4a: the price is a part of the capitalization that the takeover adds to the hundred largest claims.
+        # Part 4a: the price is a part of the capitalization that the takeover adds to the hundred largest firms.
         self.proceeds = float(self.price_part * K[top].sum() * take / held) if held > 0 else 0.0
         self.pool = self.pool * (1 + g) - take + built        # parts 1, 4 and 6
         self.taken = self.taken * (1 + g) + take

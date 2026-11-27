@@ -5,8 +5,8 @@ Dominant capital aims to beat the average. Merger is its usual route. The book s
 increases in stagflation", and that stagflation "promptly abated" when amalgamation resumed.
 So when the volume of mergers falls below the volume of recent decades, dominant capital turns
 toward raising prices, as far as it is able to act in concert. When mergers resume, it lets
-prices rest. (A first version compared differential accumulation with its own past. The book
-names the decline of mergers as the trigger, so that version was dropped.)
+prices rest. The book names the decline of mergers as the trigger, so the rule compares volumes
+of mergers and does not compare differential accumulation with its own past.
 
 The module supplies two numbers: cohesion (how far dominant capital can act in concert) and the
 intensity of stagflation. It never switches merger off.

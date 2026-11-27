@@ -4,30 +4,31 @@ THE RULE IN PLAIN WORDS
 
 A border runs through the ledger: the industries of the last few sectors lie in a second
 country, as in the second_country module. This module lets ownership cross that border and
-moves nothing else. Every claim carries one more number, which says whether the claim is owned
+moves nothing else. Every firm carries one more number, which says whether the firm is owned
 in the country where it sits (1) or by the dominant capital of the other country (2). A
-purchase across the border changes that number from 1 to 2. The claim keeps its employees, its
-industry, its price and its earnings per employee. No claim is merged and no employee moves.
+purchase across the border changes that number from 1 to 2. The firm keeps its employees, its
+industry, its price and its earnings per employee. No firm is merged and no employee moves.
 
-  1. Each year the dominant group of each country (the hundred largest claims of the first
-     country, the five largest of the second) seeks claims across the border. The employees
+  1. Each year the dominant group of each country (the hundred largest firms of the first
+     country, the five largest of the second) seeks firms across the border. The employees
      it seeks are a set fraction of its own employees, times the openness of the border, times
      the part of the other country that is still locally owned and outside that country's own
-     dominant group. Targets are drawn at random from those claims.
+     dominant group. Targets are drawn at random from those firms.
   2. The openness of the border is the number `border_open` when the second_country module
      supplies it. Without that module nothing in the model raises capital controls, and the
      border is taken to be open. In both cases buying is slowed by the roadblocks of both
      countries, and it follows the mood of the merger module (hype and eruptions) when those
      optional modules are on.
-  3. Foreign owners also sell back. Each year each foreign-owned claim returns to local owners
-     with a chance that is a set rate times the part of the border that is not open. A
-     foreign-owned claim that a local buyer absorbs in a merger also returns to local owners,
-     because core.py leaves the buyer's ownership in place for the whole merged claim.
+  3. Foreign owners also sell back. Each year each foreign-owned firm returns to local owners
+     with a chance that is a set rate times one minus the openness of part 2, which counts the
+     border, the roadblocks and the mood for mergers together. A
+     foreign-owned firm that a local buyer absorbs in a merger also returns to local owners,
+     because core.py leaves the buyer's ownership in place for the whole merged firm.
   4. Only dominant capital buys across the border, so all foreign earnings belong to the two
-     dominant groups. The module does not add those earnings to any single claim. It reports
+     dominant groups. The module does not add those earnings to any single firm. It reports
      them, and it reports differential capitalization for each dominant group twice: without
      its holdings abroad, and with them.
-  5. A foreign-owned claim is a part of dominant capital inside the industry where it sits. The
+  5. A foreign-owned firm is a part of dominant capital inside the industry where it sits. The
      sabotage module therefore counts the foreign-owned part of each industry as held by
      dominant capital: entry is barred there and the markup is held toward the target.
   6. The module reports the flow each way in employees. The flow from a country is what its
@@ -38,10 +39,10 @@ industry, its price and its earnings per employee. No claim is merged and no emp
      all capitalization and of each country's capitalization.
 
 With the second_country module on, this module takes over that module's purchases of small
-claims across the border, which were mergers that carried the employees into the buyer's
+firms across the border, which were mergers that carried the employees into the buyer's
 country. The second_country module reads two numbers from this module so that its roadblocks
 still rise with foreign purchases. It still handles the takeover of one of the five by a
-larger foreign claim.
+larger foreign firm.
 
 WHAT IT RESTS ON
 
@@ -83,12 +84,11 @@ WHAT IT RESTS ON
   - Nitzan and Bichler, The Global Political Economy of Israel (2002), chapter 6, on the
     report that invited foreign owners in: "there was complete silence on what would prevent
     foreign owners from cooperating with their domestic counterparts". Part 5 also rests on
-    this. Text in data/bn_archives/papers/gpe_israel_2002.
+    this.
   - Bichler and Nitzan, "New Imperialism or New Capitalism?" (2006). Foreign assets were 20 per
     cent of world output in 1900, "a mere 5%" in 1945 and 92 per cent in 2000. Chapter 15 says
     of the fall that "instability, depression, wars and capital controls hampered the movement
-    of capital". Parts 2 and 3 give that fall a form. Text in
-    data/bn_archives/papers/new_imperialism_or_new_capitalism_2006.
+    of capital". Parts 2 and 3 give that fall a form.
 
 WHAT IS ADDED
 
@@ -103,13 +103,13 @@ way this model already measures mergers against new hiring.
 
 WHAT IS MISSING
 
-A claim is owned wholly at home or wholly abroad, so portfolio holdings of a part of a claim
-are not shown. Foreign earnings are not credited to any single claim, so the ledger's own
+A firm is owned wholly at home or wholly abroad, so portfolio holdings of a part of a firm
+are not shown. Foreign earnings are not credited to any single firm, so the ledger's own
 differential capitalization does not include them; only the published readouts do. A direct
-credit was tried on paper and rejected, because the cost-cutting module pulls each claim's
+credit is not made, because the cost-cutting module pulls each firm's
 earnings per employee back toward its industry and would erase it. The merger modules do not
-know about ownership: a local dominant claim can absorb a foreign-owned claim like any other.
-The flow counted for such absorptions is the number of claims lost times their present average
+know about ownership: a local dominant firm can absorb a foreign-owned firm like any other.
+The flow counted for such absorptions is the number of firms lost times their present average
 size, and it is reported a year late. Debt does not cross the border. There is one currency.
 Without the second_country module the border has no controls behind it and no second set of
 settings, and the module then shows only what a change of owners does by itself.
@@ -117,7 +117,7 @@ settings, and the module then shows only what a change of owners does by itself.
 import numpy as np
 from core import Scale, Publish
 
-ATTRIBUTE = "owned_abroad"      # 1 when a claim is owned in the country where it sits, 2 when the other country's dominant capital owns it
+ATTRIBUTE = "owned_abroad"      # 1 when a firm is owned in the country where it sits, 2 when the other country's dominant capital owns it
 LOCAL, ABROAD = 1.0, 2.0
 
 
@@ -136,13 +136,13 @@ class CrossBorder:
     def __init__(self, sectors=2, top_home=100, top_second=5, rate=0.02, retreat=0.05,
                  counterforce=1.0, open_alone=1.0):
         self.sectors = sectors            # how many sectors (the last ones) lie in the second country; must match the second_country module
-        self.top_home = top_home          # the first country's dominant capital: its hundred largest claims, as in the book
-        self.top_second = top_second      # the second country's dominant capital: its five largest claims, as in the second_country module
+        self.top_home = top_home          # the first country's dominant capital: its hundred largest firms, as in the book
+        self.top_second = top_second      # the second country's dominant capital: its five largest firms, as in the second_country module
         self.rate = rate                  # employees a dominant group seeks across the border each year, as a fraction of its own, at an open border with everything still to buy
-        self.retreat = retreat            # yearly chance that a foreign-owned claim is sold back to local owners when the border is fully shut
+        self.retreat = retreat            # yearly chance that a foreign-owned firm is sold back to local owners when the border is fully shut
         self.counterforce = counterforce  # how strongly roadblocks slow buying across the border, as in the merger module
         self.open_alone = open_alone      # openness of the border when no second_country module supplies it
-        self.expected = None              # foreign-owned claims each group should hold at the next start of year, if none is absorbed
+        self.expected = None              # foreign-owned firms each group should hold at the next start of year, if none is absorbed
 
     def industries(self, L):
         """True for each industry that lies in the second country."""
@@ -150,7 +150,7 @@ class CrossBorder:
         return L.sector_of > last - self.sectors
 
     def start(self, L):
-        L.add_attribute(ATTRIBUTE, LOCAL, LOCAL)     # every claim, old or new, begins in the hands of owners of its own country
+        L.add_attribute(ATTRIBUTE, LOCAL, LOCAL)     # every firm, old or new, begins in the hands of owners of its own country
         out = {key: 0.0 for key in self.supplies}
         out["cross_border_on"] = 1.0
         out["foreign_held"] = np.zeros(L.sector_of.size)
@@ -159,7 +159,7 @@ class CrossBorder:
 
     def propose(self, L, rng):
         K, E, n, A = L.cap(), L.earnings(), L.n, L.accounts
-        in_second = self.industries(L)[L.ind]          # where each claim sits
+        in_second = self.industries(L)[L.ind]          # where each firm sits
         abroad = L.extra[ATTRIBUTE] > 1.5              # whether the other country's dominant capital owns it
         total = n.sum()
 
@@ -170,7 +170,7 @@ class CrossBorder:
         mood = float(A.get("merger_hype", 1.0)) * (1 - A.get("eruption_stops_buying", 0.0))
         openness = float(np.clip(p * slow * mood, 0.0, 1.0))
 
-        # the two countries: where their claims sit, their dominant groups, and what each group owns abroad
+        # the two countries: where their firms sit, their dominant groups, and what each group owns abroad
         sits = {1: ~in_second, 2: in_second}
         tops, owned = {}, {}
         for c, most in (1, self.top_home), (2, self.top_second):
@@ -186,7 +186,7 @@ class CrossBorder:
         expected = {}
         for c in (1, 2):
             other = 3 - c
-            # claims this group held abroad last year that are no longer there: absorbed by local buyers
+            # firms this group held abroad last year that are no longer there: absorbed by local buyers
             lost = 0.0
             if self.expected is not None and owned[c].size:
                 lost = max(0, self.expected[c] - owned[c].size) * float(n[owned[c]].mean())
@@ -197,7 +197,7 @@ class CrossBorder:
             want = want * A.get("currency_buying_%d" % c, 1.0)     # a cheap currency raises buying, flight lowers it (optional currencies module); 1 without it
             pool = rng.permutation(pool)
             run = np.cumsum(n[pool])
-            k = int(np.searchsorted(run, want, side="right"))      # claims that fit whole within what is sought
+            k = int(np.searchsorted(run, want, side="right"))      # firms that fit whole within what is sought
             if k < pool.size:                                      # the next one is bought with a chance equal to the part that fits
                 left = want - (run[k - 1] if k else 0.0)
                 if rng.random() < left / n[pool[k]]:
@@ -224,7 +224,7 @@ class CrossBorder:
 
         out = {}
         for c, label in (1, "home"), (2, "second"):
-            mine = np.flatnonzero(sits[c] & ~abroad)             # claims of this country that its own owners hold
+            mine = np.flatnonzero(sits[c] & ~abroad)             # firms of this country that its own owners hold
             t, f = tops[c], owned[c]
             out["cb_foreign_share_" + label] = part(K[sits[c] & abroad].sum(), K[sits[c]].sum())   # part of this country's capitalization owned abroad
             out["cb_foreign_earnings_" + label] = part(E[f].sum(), E[mine].sum() + E[f].sum())      # foreign earnings as a part of all earnings of this country's owners
@@ -237,8 +237,8 @@ class CrossBorder:
         n_ind = np.maximum(np.bincount(L.ind, n, k_ind), 1e-12)
         out.update(
             cross_border_on=1.0,
-            cross_border_inward=bought_n[1] / total,       # employees whose claims foreign owners bought in the second country, as a part of all employees
-            cross_border_outward=bought_n[2] / total,      # the same for claims the second country's five bought in the first country
+            cross_border_inward=bought_n[1] / total,       # employees whose firms foreign owners bought in the second country, as a part of all employees
+            cross_border_outward=bought_n[2] / total,      # the same for firms the second country's five bought in the first country
             foreign_held=np.bincount(L.ind[abroad], n[abroad], k_ind) / n_ind,   # part 5: the foreign-owned part of each industry
             cb_flow_from_home=flow[1] / total, cb_flow_from_second=flow[2] / total,
             cb_gross_flow=gross / total, cb_net_flow=net / total,

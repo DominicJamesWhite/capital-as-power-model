@@ -26,13 +26,13 @@ ordinary years.
          second number. At a full eruption there are no concerted price rises and no cut in
          hiring.
        - The merger module multiplies the employees that each buyer seeks by one minus the
-         third number. At a full eruption nobody buys a claim.
+         third number. At a full eruption nobody buys a firm.
        - The resistance module multiplies the repression that the organised force module
          publishes by one minus the fourth number. At a full eruption force wears down no
          resistance. This number matters only when the organised force module is on.
-  5. Fear. The risk of every claim is multiplied by 1 plus a setting times the level. The
+  5. Fear. The risk of every firm is multiplied by 1 plus a setting times the level. The
      module removes last year's rise before it applies this year's, so the rise lasts only as
-     long as the eruption. Every claim is treated alike, so the rise lowers all capitalization
+     long as the eruption. Every firm is treated alike, so the rise lowers all capitalization
      and leaves differential capitalization nearly unchanged. The module also publishes the
      level under the name "systemic_fear", which the optional hype and risk shaping modules
      already read.
@@ -101,7 +101,7 @@ WHAT IT RESTS ON
     institution of capitalization was put into question, so even if future earnings could
     somehow be predicted, it didn't seem certain that future ownership claims on these
     earnings could be priced and transacted". The third number of part 4, the stop to the
-    buying of claims, rests on the last sentence.
+    buying of firms, rests on the last sentence.
   - Chapter 11, "The degree of confidence". The risk coefficient expresses, inversely, "the
     degree of confidence capitalists have in their own predictions", and "when capitalists
     are fully confident" it is 1. Part 5 rests on this.
@@ -121,12 +121,12 @@ latent drive toward autonomy by the same number that measures resistance inside 
 The 2020 paper says that the two forms are "clearly distinct conceptually" and "can coexist
 in actual struggles", and the model holds only one level of popular resistance. Third, the
 book says that the population is "impartial to breadth", and the rule still stops the buying
-of claims during an eruption, on the ground of the 2010 paper.
+of firms during an eruption, on the ground of the 2010 paper.
 
 WHAT IS MISSING
 
 The module says nothing about what people do while the rules are suspended. It closes no
-boundary and breaks up no claim. It does not let an eruption end the rule of capital: the old
+boundary and breaks up no firm. It does not let an eruption end the rule of capital: the old
 rules always return, and they return unchanged, where the 2020 paper expects the returning
 hierarchy to stand higher than before. The module does not let an eruption be put down by
 force before it has run its course. It does not let the fear of an eruption act on the rulers
@@ -152,14 +152,14 @@ class Eruptions:
         self.least = least            # a level below this is put to zero
         self.frees_markups = frees_markups          # part of dominant capital's grip on its target markup that a full eruption removes (sabotage module)
         self.stops_price_rises = stops_price_rises  # part of the intensity of stagflation that a full eruption removes (stagflation module)
-        self.stops_buying = stops_buying            # part of the buying of claims that a full eruption stops (merger module)
+        self.stops_buying = stops_buying            # part of the buying of firms that a full eruption stops (merger module)
         self.stays_force = stays_force              # part of repression that a full eruption stays (resistance module, with the organised force module)
-        self.fear_risk = fear_risk    # rise in the risk of every claim at a full eruption
+        self.fear_risk = fear_risk    # rise in the risk of every firm at a full eruption
         self.level = 0.0              # the level of the eruption, from 0 to 1
         self.years_high = 0           # years in a row with resistance at or above the threshold
         self.years_left = 0           # years of full strength still to come
         self.count = 0                # eruptions so far
-        self.risk_applied = 1.0       # the factor now standing in the risk of the claims
+        self.risk_applied = 1.0       # the factor now standing in the risk of the firms
 
     def readouts(self):
         x = self.level

@@ -2,12 +2,12 @@
 
 THE RULE IN PLAIN WORDS
 
-Without this module no government organ owns any part of a claim. This module adds one
+Without this module no government organ owns any part of a firm. This module adds one
 government organ that holds a reserve of money and a fund of shares. The organ is an owner
 like any other. Each year its fund is judged against the average, and the verdict changes how
 the organ behaves toward the mergers of dominant capital. The module changes no price, no
 earnings, no employment and no capitalization directly. It changes one added number on each
-claim, and it publishes one number that the resistance module reads.
+firm, and it publishes one number that the resistance module reads.
 
   1. The reserve. The organ keeps a reserve of money. The reserve is parked in government
      bonds and earns the normal rate of return. Each year the reserve also receives a fixed
@@ -15,33 +15,33 @@ claim, and it publishes one number that the resistance module reads.
      The reserve therefore swells when income shifts toward capitalists, which in this model
      happens during a bout of stagflation.
   2. The lure. Each year the organ moves a fixed part of the reserve into the fund.
-  3. What the fund buys. The fund follows an index, which is the hundred largest claims. It
-     buys the same additional part of every claim in the index, so that it spends on each in
+  3. What the fund buys. The fund follows an index, which is the hundred largest firms. It
+     buys the same additional part of every firm in the index, so that it spends on each in
      proportion to its capitalization. It never holds more than a small minority stake in any
-     claim. Money that finds no room under that limit stays in the reserve.
-  4. What the fund sells. When a claim drops out of the index the fund sells its whole stake
+     firm. Money that finds no room under that limit stays in the reserve.
+  4. What the fund sells. When a firm drops out of the index the fund sells its whole stake
      in it, and the money returns to the reserve.
-  5. Mergers. When a claim in the index buys another claim, the fund's stake covers the whole
-     merged claim. (This is how core.py treats every added attribute.) The fund therefore
+  5. Mergers. When a firm in the index buys another firm, the fund's stake covers the whole
+     merged firm. (This is how core.py treats every added attribute.) The fund therefore
      gains from amalgamation exactly as the readout of differential capitalization does.
   6. The verdict. Each year the module compares two rates of growth over the year just ended.
      The first is the growth in the value of the shares that the fund held, with no new money
-     counted. The second is the growth of the average capitalization of all claims. The
+     counted. The second is the growth of the average capitalization of all firms. The
      verdict is the first less the second. A fund that grew by 5 per cent while the average
      grew by 8 per cent has failed. A fund that shrank by 2 per cent while the average shrank
      by 6 per cent has succeeded.
   7. The lock. The module averages the verdict over the last five years. When that average
      is below zero the organ is trailing the average. The organ then wears down the
-     roadblocks that stand in the way of mergers, because mergers are what lift the claims it
+     roadblocks that stand in the way of mergers, because mergers are what lift the firms it
      holds above the average. The yearly wearing down is a setting, times the part of the
      organ's assets that is held as shares, times how far the fund trails. A fund that trails
      by 5 per cent a year counts as trailing completely. A fund that beats the average does
      nothing. The resistance module subtracts this number, times the level of roadblocks,
      from the level of roadblocks. The number is 0 when this module is off.
   8. Readouts. The module publishes the verdict, the wearing down of roadblocks, the fund as
-     a part of all capitalization, the fund's part of the hundred largest claims, the fund's
+     a part of all capitalization, the fund's part of the hundred largest firms, the fund's
      own differential capitalization (its value divided by the average capitalization of a
-     claim), the rank the fund would have if it were a claim, the reserve as a part of all
+     firm), the rank the fund would have if it were a firm, the reserve as a part of all
      capitalization, the part of the organ's assets held as shares, and the part of the
      organ's yearly income that comes from its shares.
 
@@ -98,8 +98,7 @@ WHAT IT RESTS ON
     "effective control can be exercised with stakes as low as five percent". The limit on
     the fund's stake is set at that figure, so that the fund stays below control.
 
-The book and the papers on disk were searched, and one search of the web was made. Nothing beyond
-these passages was found on sovereign funds. The literature gives no rule.
+The literature gives no rule.
 
 WHAT IS ADDED
 
@@ -107,7 +106,7 @@ The literature says that governments became owners, that they follow indices and
 minority stakes, and that this locks them into the order of capital. It gives no rule for
 any of it. One number comes from the literature: the limit of 5 per cent on a stake. Every
 other number is an addition: the organ receives 0.3 per cent of capitalist earnings a year, it
-moves 10 per cent of its reserve a year, the index is the hundred largest claims, the verdict
+moves 10 per cent of its reserve a year, the index is the hundred largest firms, the verdict
 is averaged over five years, a shortfall of 5 per cent a year counts as complete, and a
 completely locked organ wears down 30 per cent of the roadblocks in a year. Feeding the
 reserve from capitalist earnings is an addition. The book speaks of foreign currency earned
@@ -115,26 +114,26 @@ by governments of countries that export oil and manufactures, and this model has
 and one currency by default. Part 7 as a whole is an addition. The book says that the organ
 is locked in and that its decisions would not differ from business as usual. It does not say
 which decisions of government change, and it does not name roadblocks. Judging the fund
-against the average of all claims, and not against the index that it follows, is a choice:
+against the average of all firms, and not against the index that it follows, is a choice:
 the index is the fund itself, and the book names the average as the test in the abstract.
 
 WHAT IS MISSING
 
-The money that the organ receives is not taken from any claim or from wages, because the
+The money that the organ receives is not taken from any firm or from wages, because the
 ledger holds no taxes, so the organ's income is reported and not paid by anybody. The fund's
 buying does not raise the price of shares. In the literature it would, and that rise is hype.
 There is one organ and one fund, so funds of different governments cannot be judged against
 each other. The fund does not cross a border even when the second country is switched on.
 When the module that traces owners is also on, the two modules do not know of each other,
 and the fund's stake should be read as a part of what that module calls institutional
-holdings. A merger gives the fund a stake in the absorbed claim without payment, as it gives
+holdings. A merger gives the fund a stake in the absorbed firm without payment, as it gives
 every owner of the buyer. The organ's reserve is not counted against the government debt that
 module 2 reports.
 """
 import numpy as np
 from core import Scale, Publish, top_positions
 
-ATTRIBUTE = "not_sovereign"     # the part of a claim that the government organ's fund does NOT hold
+ATTRIBUTE = "not_sovereign"     # the part of a firm that the government organ's fund does NOT hold
 
 
 class SovereignFunds:
@@ -148,25 +147,25 @@ class SovereignFunds:
                  full_shortfall=0.05, relief=0.3):
         self.levy = levy                      # part of all capitalist earnings that the organ's reserve receives each year
         self.lure = lure                      # part of the reserve that the organ moves into shares each year
-        self.stake_cap = stake_cap            # the largest part of any one claim that the fund holds. The value is an addition: 5 per cent is the lowest stake Baines and Hager report as giving control over a corporation, and neither they nor the book give it as a limit on the stakes of sovereign funds
-        self.index_size = index_size          # the index that the fund follows is this many of the largest claims
+        self.stake_cap = stake_cap            # the largest part of any one firm that the fund holds. The value is an addition: 5 per cent is the lowest stake Baines and Hager report as giving control over a corporation, and neither they nor the book give it as a limit on the stakes of sovereign funds
+        self.index_size = index_size          # the index that the fund follows is this many of the largest firms
         self.judged_over = judged_over        # years over which the verdict is averaged ("a long-term view")
         self.full_shortfall = full_shortfall  # a fund that trails the average by this much a year counts as trailing completely
         self.relief = relief                  # part of the roadblocks that a completely locked, completely trailing organ wears down in a year; 0 makes the module a readout only
         self.reserve = 0.0                    # the organ's money, parked in government bonds
         self.fund_after = 0.0                 # value of the fund after last year's buying and selling
-        self.mean_after = 1.0                 # average capitalization of a claim at that time
+        self.mean_after = 1.0                 # average capitalization of a firm at that time
         self.verdicts = []                    # the yearly verdicts so far
 
     def start(self, L):
-        L.add_attribute(ATTRIBUTE, 1.0, 1.0)      # the fund holds nothing of any claim, old or new, until it buys
+        L.add_attribute(ATTRIBUTE, 1.0, 1.0)      # the fund holds nothing of any firm, old or new, until it buys
         out = {key: 0.0 for key in self.supplies}
         out["sovereign_rank"] = float(len(L) + 1)
         return out
 
     def propose(self, L, rng):
         K, E = L.cap(), L.earnings()
-        held = np.clip(1.0 - L.extra[ATTRIBUTE], 0.0, 1.0)       # the fund's part of each claim
+        held = np.clip(1.0 - L.extra[ATTRIBUTE], 0.0, 1.0)       # the fund's part of each firm
         count = len(L)
         index = top_positions(K, np.arange(count), self.index_size)
         in_index = np.zeros(count, dtype=bool)
@@ -188,13 +187,13 @@ class SovereignFunds:
         income = from_shares + from_bonds + from_levy
         self.reserve += income
 
-        # part 4: the fund sells claims that dropped out of the index
+        # part 4: the fund sells firms that dropped out of the index
         new = held.copy()
         out_of_index = (held > 0) & ~in_index
         self.reserve += float((held[out_of_index] * K[out_of_index]).sum())
         new[out_of_index] = 0.0
 
-        # parts 2 and 3: the same additional part of every claim in the index, up to the limit
+        # parts 2 and 3: the same additional part of every firm in the index, up to the limit
         money = self.lure * self.reserve
         room = np.maximum(self.stake_cap - new[index], 0.0)
         Ki = K[index]
@@ -223,9 +222,9 @@ class SovereignFunds:
         out = {"sovereign_relief": relief,                                       # read by the resistance module
                "sovereign_verdict": verdict,                                     # growth of the fund's holdings less growth of the average, over the year just ended
                "sovereign_part": self.fund_after / float(K.sum()),               # the fund as a part of all capitalization
-               "sovereign_stake_top": float((new[index] * Ki).sum() / Ki.sum()), # the fund's part of the hundred largest claims
+               "sovereign_stake_top": float((new[index] * Ki).sum() / Ki.sum()), # the fund's part of the hundred largest firms
                "sovereign_dk": self.fund_after / mean_now,                       # the fund's own differential capitalization
-               "sovereign_rank": float(1 + (K > self.fund_after).sum()),         # the rank the fund would have if it were a claim
+               "sovereign_rank": float(1 + (K > self.fund_after).sum()),         # the rank the fund would have if it were a firm
                "sovereign_reserve": self.reserve / float(K.sum()),               # the reserve as a part of all capitalization
                "sovereign_dependence": dependence,                               # part of the organ's assets held as shares
                "sovereign_income_from_shares": from_shares / income if income > 0 else 0.0}

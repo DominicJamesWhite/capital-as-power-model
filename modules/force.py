@@ -13,9 +13,9 @@ that number from outside. It follows the depth regime that dominant capital itse
      gap each year, because arms contracts take about three years to become deliveries. While
      the call is below the level, the level closes a smaller part of the gap each year,
      because an apparatus of force outlasts the conflict that built it.
-  3. The arms contractors. The contractors are the claims of the top hundred that sit in the
-     arms sectors. If the coalitions module is on, the contractors are the claims of the top
-     hundred that carry its conflict label. No other claim receives a military order.
+  3. The arms contractors. The contractors are the firms of the top hundred that sit in the
+     arms sectors. If the coalitions module is on, the contractors are the firms of the top
+     hundred that carry its conflict label. No other firm receives a military order.
   4. Military orders. At full force, government organs spend a fixed part of all income on
      the military, and a fixed part of that spending goes to the contractors. The module
      turns that spending into a number of jobs on the contractors' books, as the same part
@@ -25,7 +25,7 @@ that number from outside. It follows the depth regime that dominant capital itse
      part of the people who are out of work. The contractors keep their markup while they
      grow, because military orders are not won by cutting prices.
   5. Room for the hiring. The green-field module sets the planned military hiring aside
-     before it lets other claims hire, so that employment cannot pass the working population.
+     before it lets other firms hire, so that employment cannot pass the working population.
   6. Repression. Organised force wears down popular resistance. The module publishes a
      yearly rate, in proportion to the level of force, and the resistance module removes that
      part of the level of popular resistance each year.
@@ -33,7 +33,7 @@ that number from outside. It follows the depth regime that dominant capital itse
      working population, and the contractors' part of the top hundred's capitalization.
 
 Force therefore does three things that an ordinary bout of stagflation does not do. It enlarges
-the arms contractors at the expense of every other claim, in the differential sense. It puts
+the arms contractors at the expense of every other firm, in the differential sense. It puts
 people to work while prices rise. It holds down the resistance that inflation provokes. The
 module gives force two costs, and both arise in other modules. Lower unemployment lets wages
 gain on prices in the sabotage module. Lower unemployment also loosens the concert of dominant
@@ -128,11 +128,11 @@ class Force:
 
     def __init__(self, arms_sectors=(0, 1), lag=3.0, fade=0.15, military_part=0.15, top_part=0.67,
                  take=0.5, repress=0.15, hold=0.1, floor=0.005, top=100):
-        self.arms_sectors = arms_sectors    # sectors whose claims can be arms contractors (the conflict sectors of the coalitions module)
+        self.arms_sectors = arms_sectors    # sectors whose firms can be arms contractors (the conflict sectors of the coalitions module)
         self.lag = lag                      # years from contract to delivery: the level of force closes one part in this many of a gap each year (chapter 17, footnote)
         self.fade = fade                    # part of the gap closed each year while the call for force is below the level
         self.military_part = military_part  # military spending as a part of all income at full force. The value is an addition: 15 per cent is the reading for the First World War and for Korea in one chart of United States spending, in which the Second World War reads 43 per cent, and the literature does not give it as the level that full force brings
-        self.top_part = top_part            # part of military orders that goes to the contractors of the top hundred. The value is an addition: 62 to 72 per cent is the part of prime contract awards that the hundred largest military contractors received from 1966 to 1991, which is a different group from the arms claims among the hundred largest claims, and 0.67 is the middle of that range
+        self.top_part = top_part            # part of military orders that goes to the contractors of the top hundred. The value is an addition: 62 to 72 per cent is the part of prime contract awards that the hundred largest military contractors received from 1966 to 1991, which is a different group from the arms firms among the hundred largest firms, and 0.67 is the middle of that range
         self.take = take                    # the most that one year's military hiring may take of the people out of work
         self.repress = repress              # part of popular resistance removed in a year at full force
         self.hold = hold                    # smallest part of its employees a contractor keeps in a year of dismissals

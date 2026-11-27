@@ -3,14 +3,16 @@ r"""All nine modules together, from the starting position of 1890.
 Nothing is entered by hand after the start. The model has to produce its own merger waves,
 its own periods of stagflation and its own openings of boundaries.
 
-Run from the project root:
-    .venv\Scripts\python.exe experiments\casp\model\full.py [claims] [years] [seed]
+Run from the folder that holds this file:
+    python full.py [firms] [years] [seed]
         [--with name,name]   optional modules, by their names in registry.py
         [--overlap part]     the part of a smaller premium's excess that counts in the overlap group
                              "hold on buyers": 0 (the default) means only the largest premium counts,
                              1 means the premiums multiply
         [--discounts-overlap] for comparisons only: the discounts of that group overlap as its premiums do
                              (left out, every discount counts in full)
+For example:
+    python full.py 30000 60 --with labour
 """
 import sys
 import numpy as np
@@ -37,7 +39,7 @@ def all_modules():
 def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, overlap=None, discounts_overlap=()):
     m = Model(starting_ledger(seed, count), modules or all_modules(), seed=seed, overlap=overlap,
               discounts_overlap=discounts_overlap)
-    head = ("year   claims unemp share       dk  breadth depth d_risk top_emp infl  merg/hire "
+    head = ("year    firms unemp share       dk  breadth depth d_risk top_emp infl  merg/hire "
             "stagfl resist roadbl sector nation interest markup other  gain by source over the period")
     if not quiet:
         print(head)
@@ -61,7 +63,7 @@ def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, ov
             prev = m.history[-1 - every]["price_level"] if len(m.history) > every else None
             infl = (r["price_level"] / prev) ** (1 / every) - 1 if prev else 0.0
             parts = ", ".join(f"{s} {v:+.2f}" for s, v in sorted(window.items()) if abs(v) >= 0.005)
-            print(f"{r['year']} {r['claims']:>8} {r['unemployment']:>5.1%} {r['capital_share']:>5.1%} "
+            print(f"{r['year']} {r['firms']:>8} {r['unemployment']:>5.1%} {r['capital_share']:>5.1%} "
                   f"{r['dk']:>8.0f} {r['breadth']:>8.0f} {r['depth']:>5.2f} {r['d_risk']:>6.2f} "
                   f"{r['top_share_employees']:>7.1%} {infl:>5.1%} {ratio:>9.2f} "
                   f"{A.get('stagflation_intensity', 0):>6.2f} {A.get('resistance', 0):>6.2f} {A.get('roadblocks', 0):>6.2f} "

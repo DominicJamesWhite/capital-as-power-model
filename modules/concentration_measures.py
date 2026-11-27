@@ -1,23 +1,21 @@
 r"""Optional module: other measures of concentration. A readout. It changes nothing.
 
 Each year the module measures the same ledger in four ways: the share of the hundred largest
-claims in the total, the differential measure, the Gini index and the Herfindahl-Hirschman
+firms in the total, the differential measure, the Gini index and the Herfindahl-Hirschman
 index. It publishes all four, for capitalization and for earnings, so that the reader can see
-them move apart. No module reads what it publishes, and it adds no attribute to the claims, so
+them move apart. No module reads what it publishes, and it adds no attribute to the firms, so
 a run with this module gives exactly the figures of the run without it.
 
-To print the table of measures, run from the project root:
-    .venv\Scripts\python.exe experiments\casp\model\modules\concentration_measures.py [claims] [years] [seed]
+To print the table of measures, run from the folder that holds full.py:
+    python modules/concentration_measures.py [firms] [years] [seed]
 
 SOURCE
 
 Capital as Power (2009), chapter 14, the sections "Dominant capital", "Aggregate concentration"
 and "Differential measures", with Equation (1), Table 14.1 and Figures 14.1 and 14.2. Chapter 15,
 "Green-field", for the remark that new firms are smaller than the average, and "Breaking the
-envelope" for the limit of merger. The papers in data/bn_archives/papers were searched for
-"Gini", "Herfindahl" and "aggregate concentration". The two 2001 papers on regimes repeat the
-argument of chapter 14 in one sentence each. The other papers use the Gini index only for the
-incomes of persons. The online archive was not searched.
+envelope" for the limit of merger. The two 2001 papers on regimes repeat the
+argument of chapter 14 in one sentence each.
 
 WHAT THE LITERATURE SAYS
 
@@ -60,23 +58,23 @@ WHAT THE LITERATURE SAYS
 
 RULE
 
-  1. The group. The dominant group is the hundred claims with the largest capitalization, ranked
+  1. The group. The dominant group is the hundred firms with the largest capitalization, ranked
      afresh each year, as in the book. The same group is used for every measure.
   2. The share. The share of the top hundred is the group's total divided by the total of all
-     claims. It is computed for capitalization, for earnings and for employees.
+     firms. It is computed for capitalization, for earnings and for employees.
   3. The differential measure. It is the average of the group divided by the average of all
-     claims. It is computed for capitalization and for earnings.
-  4. The number ratio. It is one hundred divided by the number of all claims. By Equation (1)
+     firms. It is computed for capitalization and for earnings.
+  4. The number ratio. It is one hundred divided by the number of all firms. By Equation (1)
      the share equals the differential measure times the number ratio. The module publishes the
      change over the last year in the logarithm of each of the three, so the first change is
      always the sum of the other two.
-  5. The Gini index. All claims are ranked by size. The index is 0 when every claim has the same
-     size and approaches 1 when one claim holds everything. It is computed for capitalization
+  5. The Gini index. All firms are ranked by size. The index is 0 when every firm has the same
+     size and approaches 1 when one firm holds everything. It is computed for capitalization
      and for earnings.
-  6. The Herfindahl-Hirschman index. It is the sum, over all claims, of the square of each
-     claim's share of the total. It is 1 divided by the number of claims when all are equal and
-     1 when one claim holds everything. It is computed for capitalization and for earnings. The
-     module also publishes 1 divided by the index, which is the number of equal claims that
+  6. The Herfindahl-Hirschman index. It is the sum, over all firms, of the square of each
+     firm's share of the total. It is 1 divided by the number of firms when all are equal and
+     1 when one firm holds everything. It is computed for capitalization and for earnings. The
+     module also publishes 1 divided by the index, which is the number of equal firms that
      would give the same index.
   7. The counts of years apart. The module counts the years so far in which the share of the
      top hundred in capitalization fell while differential capitalization rose, which is the
@@ -96,7 +94,7 @@ Equation (1) are the book's. Everything else is an addition:
   - applying the two integral indices to the whole ledger, across all industries. The
     Herfindahl-Hirschman index is commonly used inside one market. The book speaks of "the entire
     distributional pattern of companies", so the whole ledger is used here;
-  - the number of equal claims that would give the same index;
+  - the number of equal firms that would give the same index;
   - the share of employees, which the book does not chart;
   - the three counts of years in which measures moved in opposite directions.
 The module has no settings except the size of the dominant group, which is the book's hundred.
@@ -116,11 +114,11 @@ from core import Publish, top_positions
 
 NOTHING = float("nan")     # published while a reading cannot yet be computed
 
-KEYS = ("conc_claims", "conc_number_ratio",
+KEYS = ("conc_firms", "conc_number_ratio",
         "conc_share_cap", "conc_share_earnings", "conc_share_employees",
         "conc_diff_cap", "conc_diff_earnings",
         "conc_gini_cap", "conc_gini_earnings",
-        "conc_hh_cap", "conc_hh_earnings", "conc_hh_equal_claims",
+        "conc_hh_cap", "conc_hh_earnings", "conc_hh_equal_firms",
         "conc_change_share", "conc_change_diff", "conc_change_number",
         "conc_years_share_down_diff_up", "conc_years_share_up_diff_down", "conc_years_apart_employees")
 
@@ -150,7 +148,7 @@ class ConcentrationMeasures:
     supplies = KEYS
 
     def __init__(self, top=100):
-        self.top = top            # number of claims in the dominant group: the book's "top 100"
+        self.top = top            # number of firms in the dominant group: the book's "top 100"
         self.before = None        # last year's logarithms of the share, the differential measure and the number ratio
         self.down_up = 0          # years so far in which the share fell while the differential measure rose
         self.up_down = 0          # years so far in which the share rose while the differential measure fell
@@ -167,7 +165,7 @@ class ConcentrationMeasures:
         k = g.size
         out = {key: NOTHING for key in KEYS}
         out.update(
-            conc_claims=float(count),
+            conc_firms=float(count),
             conc_number_ratio=k / count,                          # part 4: n / N
             conc_share_cap=float(K[g].sum() / K.sum()),           # part 2
             conc_share_earnings=float(E[g].sum() / E.sum()),
@@ -177,7 +175,7 @@ class ConcentrationMeasures:
             conc_gini_cap=gini(K), conc_gini_earnings=gini(E),    # part 5
             conc_hh_cap=herfindahl(K), conc_hh_earnings=herfindahl(E))   # part 6
         if out["conc_hh_cap"] > 0:
-            out["conc_hh_equal_claims"] = 1.0 / out["conc_hh_cap"]
+            out["conc_hh_equal_firms"] = 1.0 / out["conc_hh_cap"]
 
         # parts 4 and 7: the yearly changes of Equation (1), and whether the two measures parted
         now = {"share": np.log(out["conc_share_cap"]), "diff": np.log(out["conc_diff_cap"]),
@@ -208,7 +206,7 @@ if __name__ == "__main__":
     print("Each line describes the ledger at the start of the year. The last three columns are the change")
     print("over the five years before in the logarithm of the share, the differential measure and the")
     print("number ratio (capitalization). The first always equals the sum of the other two.")
-    print("year   claims  share_K share_E share_n   diff_K   diff_E gini_K gini_E     hh_K equal_claims "
+    print("year    firms  share_K share_E share_n   diff_K   diff_E gini_K gini_E     hh_K  equal_firms "
           "  d_share   d_diff d_number  moved    d_share_n")
     rows = readout.rows
     for i in range(0, len(rows), every):
@@ -221,10 +219,10 @@ if __name__ == "__main__":
             tail = f"{ds:>+8.2f} {dd:>+8.2f} {dn:>+8.2f}  {'apart' if ds * dd < 0 else 'together':<8} {np.log(r['conc_share_employees'] / p['conc_share_employees']):>+8.2f}"
         else:
             tail = ""
-        print(f"{full.START + i} {int(r['conc_claims']):>8} {r['conc_share_cap']:>8.2%} {r['conc_share_earnings']:>7.2%} "
+        print(f"{full.START + i} {int(r['conc_firms']):>8} {r['conc_share_cap']:>8.2%} {r['conc_share_earnings']:>7.2%} "
               f"{r['conc_share_employees']:>7.2%} {r['conc_diff_cap']:>8.0f} {r['conc_diff_earnings']:>8.0f} "
               f"{r['conc_gini_cap']:>6.3f} {r['conc_gini_earnings']:>6.3f} {r['conc_hh_cap']:>8.5f} "
-              f"{r['conc_hh_equal_claims']:>12.0f} {tail}")
+              f"{r['conc_hh_equal_firms']:>12.0f} {tail}")
     last, n = rows[-1], len(rows) - 1
     print(f"Years in which the share of capitalization fell while the differential measure rose: "
           f"{int(last['conc_years_share_down_diff_up'])} of {n}")

@@ -6,25 +6,25 @@ Interest is the return on average sabotage and profit the return on differential
 The part of capitalist income paid as interest rises when the institutions of power are
 settled, which the book measures by unemployment averaged over several years.
 
-The module keeps its own accounts and does not change any equity claim: it divides the
-capitalist income of the envelope into interest and profit, and capitalizes two pooled debt
-claims, one for corporations and one for the government (the power to tax).
+The module keeps its own accounts and changes no entry in the ledger: it divides the
+capitalist income of the envelope into interest and profit, and puts a price on two running
+totals of debt, one for corporations and one for the government (the power to tax).
 
 Sandy Brian Hager's work on the ownership of the United States public debt finds that it is
 concentrated in the hands of large owners and paid for by taxes levied broadly. The module
 therefore reports the part of the government's debt held by dominant capital, taken to equal
-dominant capital's part of all capitalization. It does not yet pay that interest to those claims.
+dominant capital's part of all capitalization. It does not pay that interest to those firms.
 
 Two optional modules change the government's debt, and each publishes a number that this
-module reads. Both numbers are 0 when those modules are off, and the module then gives exactly
-the figures it gave before. The risk shaping module publishes what the government borrows to
+module reads. Both numbers are 0 when those modules are off, and they then change
+nothing. The risk shaping module publishes what the government borrows to
 bail out dominant capital. The privatisation module publishes what dominant capital pays for
 the public services it takes over, and the government retires debt with it. The module keeps
 the sum of the two as a stock of money and adds it to the debt. A government whose proceeds
 exceed its whole debt has no debt, and the rest of the proceeds is set against later borrowing.
 
 Additions to the book: the speed and slope of the interest share, pooling corporate debt into
-one claim, the government's interest stream as a fixed part of all income, and the stock that
+one total, the government's interest stream as a fixed part of all income, and the stock that
 bailouts add to the debt and proceeds take from it.
 """
 import numpy as np

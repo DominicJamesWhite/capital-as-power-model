@@ -20,7 +20,7 @@ breadth".
 
 The outcome. When the push exceeds the hold, the nearest closed boundary opens at a speed in
 proportion to the excess. When the hold exceeds the push by a margin, the widest open boundary
-closes again. In a year in which a boundary opens, every claim of dominant capital loses a
+closes again. In a year in which a boundary opens, every firm of dominant capital loses a
 little of its markup, in proportion to the opening, because the wider field brings new rivals.
 
 WHAT IT RESTS ON (Capital as Power, 2009, unless another source is named)
@@ -67,13 +67,13 @@ WHAT IS ADDED
 The literature says who opens a boundary, why, and what holds it. It gives no rule for the
 contest and no rates. The product of three numbers, the comparison with roadblocks, and every
 setting below are additions. Olson's own argument (that a wider jurisdiction breaks up the
-coalitions formed inside the narrower ones) is not in the texts on disk; the book borrows only
+coalitions formed inside the narrower ones) is not used here; the book borrows only
 his term, and the loss of markup follows the book's sentences, not his.
 
 WHAT IS MISSING
 
 The dismantling of the Zaibatsu and the unbundling of the South African groups were forced
-sales. The ledger does not record which of a claim's employees were acquired across which
+sales. The ledger does not record which of a firm's employees were acquired across which
 boundary, so this module cannot make dominant capital sell what a closed boundary forbids.
 A closing only stops further buying across the boundary.
 """

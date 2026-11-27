@@ -1,6 +1,6 @@
 """Module 1: business-as-usual sabotage (Capital as Power, chapter 12).
 
-Sabotage works through price. A claim's price is its cost plus a markup, and its earnings
+Sabotage works through price. A firm's price is its cost plus a markup, and its earnings
 per employee are the markup times the wage. The core works the price out from the wage and the
 markup (see "How the price is worked out" in modules.md), so a movement of the markup under
 this rule is a movement of the price against the wage, and the module proposes no price. Nobody steers the economy. Each industry follows its
@@ -10,9 +10,9 @@ The rule has five parts, each tied to a passage of the book (see modules.md):
   1. Earnings come from a markup.
   2. Where an industry is not concentrated, growth of capacity beyond the growth of the
      working population wears the markup down (sellers undercut each other).
-  3. Small claims expand while the markup is above the normal level and cut back below it.
+  3. Small firms expand while the markup is above the normal level and cut back below it.
   4. Where dominant capital holds an industry, entry is barred and the markup is held toward
-     a target. Raising the markup costs the dominant claims some volume.
+     a target. Raising the markup costs the dominant firms some volume.
   5. Unemployment weakens wages against prices, which raises markups everywhere.
 
 Every rate below is an addition to the book.
@@ -29,12 +29,12 @@ class Sabotage:
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
                  hold=0.1, wage_weakness=0.2, labour_holds_at=0.05, volume_cost=0.5,
                  floor=0.005, top=100):
-        self.normal_markup = normal_markup    # the markup at which small claims neither expand nor cut back
+        self.normal_markup = normal_markup    # the markup at which small firms neither expand nor cut back
         self.target_markup = target_markup    # the markup dominant capital holds an industry toward
         self.erosion = erosion                # fall in the markup per unit of capacity growth beyond the pack (part 2)
-        self.response = response              # extra hiring by small claims per unit of markup above normal (part 3)
+        self.response = response              # extra hiring by small firms per unit of markup above normal (part 3)
         self.hold = hold                      # yearly speed at which a fully held industry approaches the target (part 4)
-        self.volume_cost = volume_cost        # employment given up by dominant claims per unit of price rise (part 4)
+        self.volume_cost = volume_cost        # employment given up by dominant firms per unit of price rise (part 4)
         self.wage_weakness = wage_weakness    # rise in every markup per unit of unemployment above the level below (part 5)
         self.labour_holds_at = labour_holds_at  # unemployment at which wages keep pace with prices: the strength of labour
         self.floor = floor                    # a markup cannot fall below this
@@ -69,7 +69,7 @@ class Sabotage:
         return small, dominant
 
     def start(self, L):
-        # This module owns the base markup. The base is a level: the markup a claim would have if no
+        # This module owns the base markup. The base is a level: the markup a firm would have if no
         # gain or loss made by another rule stood on top of it. It stacks.
         L.add_component(BASE, self.name)
         n, held, markup = self.industry_state(L)
@@ -95,12 +95,12 @@ class Sabotage:
         new = np.maximum(markup + wages + undercut + held_rise, self.floor)
         small, dominant = self.hiring(L, held, new, np.maximum(held_rise, 0.0))
         # The rule moves the markup of the industry as a whole. The change is proposed to the base
-        # markup of every claim in the industry, in proportion. At the end of the year the core sets
-        # the movement against what stands in the other stacking components of each claim: a fall
+        # markup of every firm in the industry, in proportion. At the end of the year the core sets
+        # the movement against what stands in the other stacking components of each firm: a fall
         # first takes away standing gains (such as a lead from price rises), and a rise first
         # restores standing losses (such as what was given up for unsold goods). Only the rest
         # stays in the base. See Model._net in core.py and "What a stacking component holds" in
-        # modules.md. No claim's markup is changed by that reckoning.
+        # modules.md. No firm's markup is changed by that reckoning.
         return [ScaleComponent(BASE, (new / markup)[L.ind], self.name),   # the price follows: the core works it out
                 Publish("hire_small", small, self.name),
                 Publish("hire_dominant", dominant, self.name),

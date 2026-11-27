@@ -4,13 +4,13 @@ THE RULE IN PLAIN WORDS
 
 In the nine modules the working population grows every year at a rate that is typed in as a
 setting. This module produces that rate. It holds a second population: people who live outside
-wage employment (on the land, in households, in other countries). Claims and government organs
+wage employment (on the land, in households, in other countries). Firms and government organs
 draw those people into the working population when few hands are idle, and the drawing slows
 as the outside population is used up. The ceiling on green-field growth is then a quantity
 inside the model: the number of people who are left to be drawn.
 
   1. The outside population. The module keeps a count of people outside wage employment. They
-     work for no claim, they are not in the ledger, and they are not part of the working
+     work for no firm, they are not in the ledger, and they are not part of the working
      population that the ledger counts. At the start of a run there is one such person for
      every person in the working population.
   2. Natural increase. Both populations grow each year by the same rate of natural increase.

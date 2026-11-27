@@ -4,36 +4,36 @@ THE RULE IN PLAIN WORDS
 
 The nine modules hold one number for all roadblocks against mergers. This module turns that
 number into barriers against particular groups. A barrier here is a prohibition that holds the
-dominant claims of one sector inside their own line of business. The line of business of a
-claim is its industry. The module keeps one barrier for each sector, a number between 0 and 1.
+dominant firms of one sector inside their own line of business. The line of business of a
+firm is its industry. The module keeps one barrier for each sector, a number between 0 and 1.
 
-  1. The record of what was bought. The ledger does not say what a claim bought across which
-     boundary. The module therefore keeps its own estimate. It gives every claim a number, so
-     that it can see which claims disappeared in the last year. Every claim that disappeared
-     was bought, because nothing else in the model removes a claim. The module does not know
-     which buyer took which claim. It divides the employees of the claims that disappeared
-     from each industry among last year's dominant claims, in proportion to the chance that
-     each of them was the buyer under the rule of the merger module. For each claim that has
+  1. The record of what was bought. The ledger does not say what a firm bought across which
+     boundary. The module therefore keeps its own estimate. It gives every firm a number, so
+     that it can see which firms disappeared in the last year. Every firm that disappeared
+     was bought, because nothing else in the model removes a firm. The module does not know
+     which buyer took which firm. It divides the employees of the firms that disappeared
+     from each industry among last year's dominant firms, in proportion to the chance that
+     each of them was the buyer under the rule of the merger module. For each firm that has
      been dominant, the module keeps the part of its employees that it bought in each
-     industry other than its own. These parts are the claim's outside holdings.
+     industry other than its own. These parts are the firm's outside holdings.
   2. What raises a barrier. The counter-force is the level of roadblocks plus a part of the
      level of popular resistance, and never more than 1. The exposure of a sector is the
-     outside holdings of the dominant claims seated in it, as a part of all employees in the
+     outside holdings of the dominant firms seated in it, as a part of all employees in the
      economy, divided by a setting, and never more than 1. Each year the barrier of a sector
      rises by a rate, times the counter-force, times the exposure. The barrier therefore
      rises fastest against the groups that hold most outside their own lines. A sector whose
-     dominant claims never left their own industries gets no barrier.
+     dominant firms never left their own industries gets no barrier.
   3. What a barrier does to buying. The merger module multiplies the openness of the sector
      boundary and of the national boundary, as a buyer seated in the sector sees them, by one
      minus the barrier. Buying inside the buyer's own industry is not touched.
-  4. Forced sales. While the barrier of a sector stands above a threshold, each dominant claim
+  4. Forced sales. While the barrier of a sector stands above a threshold, each dominant firm
      seated in the sector must sell a fixed part of each of its outside holdings every year.
-     When that part would be smaller than the average small claim, the whole holding is
-     sold. A holding that is itself smaller than the average small claim is not sold. Each
-     sold holding becomes a new claim in the industry where it was bought. The new claim
+     When that part would be smaller than the average small firm, the whole holding is
+     sold. A holding that is itself smaller than the average small firm is not sold. Each
+     sold holding becomes a new firm in the industry where it was bought. The new firm
      takes the seller's earnings per employee, price, hype and risk, so the sale changes who
-     holds the employees and does not change total capitalization. The new claims are free
-     to be bought again by dominant claims that are under no barrier.
+     holds the employees and does not change total capitalization. The new firms are free
+     to be bought again by dominant firms that are under no barrier.
   5. What wears a barrier down. Each year a barrier falls by a rate, times its own height,
      times the push of dominant capital on its boundaries. The push is the number that the
      boundary contest module publishes. Without that module it is the part of its reach that
@@ -45,7 +45,7 @@ claim is its industry. The module keeps one barrier for each sector, a number be
      proportion. The envelope module does not read the bargain.
   7. Readouts. The module publishes the barrier of each sector, the average barrier as
      dominant capital meets it, the highest barrier, the lowest barrier among sectors that
-     have a dominant claim, the number of sectors under forced sale, the part of dominant
+     have a dominant firm, the number of sectors under forced sale, the part of dominant
      capital's employees in outside holdings, the year's forced sales as a part of all
      employees, and the bargain.
 
@@ -73,7 +73,7 @@ WHAT IT RESTS ON
     barrier is specific to a sector, and it is triggered by how far amalgamation has gone
     there. This is the ground for the exposure in part 2.
   - Nitzan and Bichler, "Going Global: Differential Accumulation and the Great U-turn in South
-    Africa and Israel" (2001), downloaded for this module. Mergers are "inherently limited
+    Africa and Israel" (2001). Mergers are "inherently limited
     ... by societal and technological barriers on corporate concentration". In the new South
     Africa, "dominant capital accepts the need to unbundle its oligopolistic 'stranglehold'
     over the economy (selling parts of it to black entrepreneurs, including the unions) in
@@ -81,14 +81,14 @@ WHAT IT RESTS ON
     American "began to disentangle its complicated cross-ownership ties, divesting some of
     its holdings". The pact was made with the African National Congress and the unions. This
     is the ground for letting popular resistance add to the counter-force in part 2, for the
-    new claims of part 4, and for the bargain of part 6.
+    new firms of part 4, and for the bargain of part 6.
   - Bichler and Nitzan, The Global Political Economy of Israel (2002), chapter 6, on the Brodet
     Report of 1995. The banks were to "reduce their holdings in any 'real' company to 20 per
     cent or less". "The great octopus of domestic assets had to be first chopped down into
     vendible units." The committee "said nothing on how to prevent the divested companies
     from being re-amalgamated into different groupings", and its solutions "could be easily
     circumvented". "The real purpose of the report was never to lower concentration, but to
-    change its nature." Part 4 leaves the sold claims free to be bought again for this reason.
+    change its nature." Part 4 leaves the sold firms free to be bought again for this reason.
   - Capital as Power, chapter 15, "Breaking the envelope". "Amalgamation is simply too
     important to give up." The same section says that the de-conglomeration of the global
     wave "is bound to become exhausted, pushing dominant capital back toward conglomeration".
@@ -107,23 +107,23 @@ and every number below is an addition. Three choices need saying. First, the boo
 the population is "impartial to breadth", and the rule nevertheless lets popular resistance
 add to the counter-force, on the ground of the South African pact. The setting for this can be
 put to zero. Second, the footnote speaks of banks and of holding groups, and the rule applies
-one barrier to all the dominant claims seated in a sector. Third, the estimate in part 1 is a
+one barrier to all the dominant firms seated in a sector. Third, the estimate in part 1 is a
 reckoning of chances and not a record.
 
 WHAT IS MISSING
 
-A barrier bars the claims seated in a sector from buying outside their industry. It does not
+A barrier bars the firms seated in a sector from buying outside their industry. It does not
 bar outsiders from buying into the sector, although the separation of banking from industry
 worked in both directions. The dismantling of the Zaibatsu was carried out by an occupying
 power, and the rule has no place for one. The Brodet Report made room for foreign buyers, and
-the model has one country. The sold claims are not handed to particular new owners. A claim
+the model has one country. The sold firms are not handed to particular new owners. A firm
 that was once dominant and is later bought loses its record, and its outside holdings are then
 counted as part of its own industry.
 """
 import numpy as np
 from core import Scale, Found, Publish, top_positions
 
-ID = "barrier_claim_number"     # the added per-claim number that lets the module see which claims disappeared
+ID = "barrier_firm_number"     # the added per-firm number that lets the module see which firms disappeared
 
 
 class Barriers:
@@ -135,24 +135,24 @@ class Barriers:
     def __init__(self, raise_rate=0.3, full_exposure=0.01, popular_part=0.5, wear_rate=0.05, sell_above=0.5,
                  sell_part=0.25, bargain_rate=1.0, bargain_keep=0.8, top=100):
         self.raise_rate = raise_rate      # yearly rise of a barrier at full counter-force and full exposure
-        self.full_exposure = full_exposure   # a sector's exposure is complete when the outside holdings of its dominant claims reach this part of all employees
+        self.full_exposure = full_exposure   # a sector's exposure is complete when the outside holdings of its dominant firms reach this part of all employees
         self.popular_part = popular_part  # how much of popular resistance counts toward the counter-force beside roadblocks; 0 leaves roadblocks alone
         self.wear_rate = wear_rate        # part of a barrier that dominant capital wears away in a year at full push
-        self.sell_above = sell_above      # height of a barrier above which the sector's dominant claims must sell outside holdings
+        self.sell_above = sell_above      # height of a barrier above which the sector's dominant firms must sell outside holdings
         self.sell_part = sell_part        # part of each outside line sold in a year of forced sale
         self.bargain_rate = bargain_rate  # fall in the hold on the next boundary per unit of forced sales, as a part of dominant capital's employees
         self.bargain_keep = bargain_keep  # part of the running level of forced sales that carries over to the next year
         self.top = top
         self.barrier = None               # one barrier per sector
-        self.outside = {}                 # claim number -> the part of the claim's employees bought in each other industry
+        self.outside = {}                 # firm number -> the part of the firm's employees bought in each other industry
         self.sold_level = 0.0             # running level of forced sales, as a part of dominant capital's employees
         self.next_number = 1
-        self.prev = None                  # last year's claims and the chances that each dominant claim was a buyer
+        self.prev = None                  # last year's firms and the chances that each dominant firm was a buyer
 
     # ------------------------------------------------------------------ start
 
     def start(self, L):
-        L.add_attribute(ID, np.arange(1, len(L) + 1, dtype=float), -1.0)   # a new claim carries -1 until it is numbered
+        L.add_attribute(ID, np.arange(1, len(L) + 1, dtype=float), -1.0)   # a new firm carries -1 until it is numbered
         self.next_number = len(L) + 1
         n_sec = int(L.sector_of.max()) + 1
         self.barrier = np.zeros(n_sec)
@@ -163,8 +163,8 @@ class Barriers:
     # ------------------------------------------------------------------ part 1: who probably bought what
 
     def buyer_chances(self, L, top, dominant):
-        """For each dominant claim and each industry, a weight in proportion to the employees the
-        claim is expected to buy there this year, following the rule of the merger module."""
+        """For each dominant firm and each industry, a weight in proportion to the employees the
+        firm is expected to buy there this year, following the rule of the merger module."""
         n, ind, sec = L.n, L.ind, L.sector
         n_ind, n_sec = L.sector_of.size, int(L.sector_of.max()) + 1
         A = L.accounts
@@ -176,7 +176,7 @@ class Barriers:
         free_s = np.bincount(sec[~dominant], n[~dominant], n_sec)
         held_s = np.bincount(sec[dominant], n[dominant], n_sec)
         free_n, held_n = n[~dominant].sum(), n[dominant].sum()
-        left = np.bincount(ind[~dominant], minlength=n_ind).astype(float)       # free claims per industry
+        left = np.bincount(ind[~dominant], minlength=n_ind).astype(float)       # free firms per industry
         i, s = ind[top], sec[top]
         o_s, o_n = open_sector * (1 - barred[s]), open_nation * (1 - barred[s])
         free = free_i[i] + o_s * (free_s[s] - free_i[i]) + o_n * (free_n - free_s[s])
@@ -189,7 +189,7 @@ class Barriers:
         return np.where(total[:, None] > 0, want[:, None] * reach / np.maximum(total, 1e-300)[:, None], 0.0)
 
     def update_record(self, L, numbers):
-        """Divide last year's disappeared claims among last year's dominant claims."""
+        """Divide last year's disappeared firms among last year's dominant firms."""
         P = self.prev
         if P is None:
             return
@@ -209,7 +209,7 @@ class Barriers:
                 continue
             outside_gain = got.copy()
             outside_gain[P["top_ind"][row]] = 0.0                               # buying in the home industry is not an outside holding
-            before = max(L.n[pos] - got.sum(), 0.0)                             # the claim's employees before this year's buying
+            before = max(L.n[pos] - got.sum(), 0.0)                             # the firm's employees before this year's buying
             old = self.outside.get(number)
             if old is None and outside_gain.sum() <= 0:
                 continue
@@ -226,7 +226,7 @@ class Barriers:
         count, n_ind, n_sec = len(L), L.sector_of.size, int(L.sector_of.max()) + 1
         changes = []
 
-        # Number the claims that were founded last year.
+        # Number the firms that were founded last year.
         numbers = L.extra[ID].copy()
         fresh = np.flatnonzero(numbers < 0)
         if fresh.size:
@@ -250,7 +250,7 @@ class Barriers:
         in_force = self.barrier
         factor = np.ones(count)
         new_n, new_ind, new_from = [], [], []
-        smallest = L.n[~dominant].mean() if (~dominant).any() else 0.0          # a sold holding below the size of an average small claim stays where it is
+        smallest = L.n[~dominant].mean() if (~dominant).any() else 0.0          # a sold holding below the size of an average small firm stays where it is
         for pos, number, s in zip(top, numbers[top], sec_top):
             if in_force[s] <= self.sell_above or number not in self.outside:
                 continue
@@ -258,7 +258,7 @@ class Barriers:
             sold_total = 0.0
             for j in np.argsort(parts)[::-1]:                                  # largest outside line first
                 if parts[j] * L.n[pos] < smallest or parts[j] <= 0 or sold_total + parts[j] > 0.9:
-                    break                                                      # too small to make a claim (or the claim would sell itself away)
+                    break                                                      # too small to make a firm (or the firm would sell itself away)
                 sold = self.sell_part * parts[j]
                 if sold * L.n[pos] < smallest:
                     sold = parts[j]                                            # a small holding is sold whole
@@ -272,7 +272,7 @@ class Barriers:
         if new_n:
             src = np.array(new_from)
             changes.append(Scale("employees", factor, self.name))
-            # a holding that is sold keeps every component of the claim that sold it: markup, other income
+            # a holding that is sold keeps every component of the firm that sold it: markup, other income
             # and named costs. Its price is therefore the seller's, and the core works it out.
             changes.append(Found(np.array(new_n), None, L.h[src].copy(), L.d[src].copy(),
                                  np.array(new_ind, dtype=int), self.name,
@@ -292,7 +292,7 @@ class Barriers:
         self.sold_level = self.bargain_keep * self.sold_level + (sales / held if held > 0 else 0.0)
         bargain = float(min(1.0, self.bargain_rate * self.sold_level))
 
-        # Remember this year's claims and chances for next year's reckoning.
+        # Remember this year's firms and chances for next year's reckoning.
         self.prev = {"numbers": numbers.astype(np.int64), "n": L.n.copy(), "ind": L.ind.copy(),
                      "top_numbers": numbers[top].astype(np.int64), "top_ind": L.ind[top].copy(),
                      "chances": self.buyer_chances(L, top, dominant)}

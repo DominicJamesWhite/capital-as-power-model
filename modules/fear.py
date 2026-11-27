@@ -1,6 +1,6 @@
 """Optional module: the power index and systemic fear. A readout, with one optional link.
 
-The module changes no term of any claim. It measures two things that Bichler and Nitzan define in
+The module changes no term of any firm. It measures two things that Bichler and Nitzan define in
 "A CasP Model of the Stock Market" (2016), and it publishes one number that the optional hype
 module reads. With the hype module off, a run with this module gives exactly the figures of the
 run without it.
@@ -8,8 +8,8 @@ run without it.
 SOURCE
 
 Bichler and Nitzan, "A CasP Model of the Stock Market" (2016), sections 5.1, 5.3, 6.1, 6.2, 6.5
-and 6.6 (data/bn_archives/papers/stock_market_2016). Bichler and Nitzan, "Systemic Fear, Modern
-Finance and the Future of Capitalism" (2010) (data/bn_archives/papers/systemic_fear_2010), for
+and 6.6. Bichler and Nitzan, "Systemic Fear, Modern
+Finance and the Future of Capitalism" (2010), for
 the earlier way of measuring fear.
 
 WHAT THE LITERATURE SAYS
@@ -56,9 +56,9 @@ WHAT THE LITERATURE SAYS
 RULE
 
   1. The power index. The model has no shares. The price of a share is taken to be the
-     capitalization of dominant capital divided by its employees, because a claim that grows by
+     capitalization of dominant capital divided by its employees, because a firm that grows by
      merger adds employees much as a firm that pays for a merger in shares adds shares. The power
-     index is that price divided by the wage. Dominant capital is the hundred largest claims.
+     index is that price divided by the wage. Dominant capital is the hundred largest firms.
   2. Its own history. The module keeps every yearly reading of the index since the start of the
      run. It publishes the index with the mean of those readings set to 100. It publishes the
      distance of the index from its mean, counted in standard deviations of the logarithm of the
@@ -76,8 +76,8 @@ RULE
      of part 2 and is 1 at the ceiling. The hype module multiplies every change that the year
      would bring to a multiple by one minus the number. This covers the corrections of the herd,
      the push from mergers and the push of insiders, upward and downward alike. The multiple of
-     a claim is the earnings that owners expect divided by the earnings that have arrived. At
-     the ceiling the multiple stands still, so owners price each claim on its current earnings
+     a firm is the earnings that owners expect divided by the earnings that have arrived. At
+     the ceiling the multiple stands still, so owners price each firm on its current earnings
      alone and capitalization follows current earnings. The number has no effect on anything
      when the hype module is off.
 
@@ -88,7 +88,7 @@ WHAT IS ADDED
 
 The ratio, the normalisation to a mean of 100, the two standard deviations and the window of ten
 years are the paper's. Everything else is an addition:
-  - taking capitalization for each employee of the hundred largest claims as the share price;
+  - taking capitalization for each employee of the hundred largest firms as the share price;
   - using only the history of the run so far, where the authors look back over the whole record;
   - waiting for thirty readings before the distance is reported (with fewer, a slow early rise
     reads as a ceiling, because the index has hardly varied yet);
@@ -101,8 +101,8 @@ years are the paper's. Everything else is an addition:
     paper says that pricing "comes to depend on current rather than future earnings". It does
     not say that the corrections of forecasters stop. Holding the multiple still is the plainest
     way to make price depend on current earnings in a formula where the multiple is the only
-    forward-looking term. The read of "power_fear" in the hype module is the only change to an
-    existing module.
+    forward-looking term. The read of "power_fear" in the hype module is the only place where
+    another module depends on this one.
   - The hype module also reads a number named "systemic_fear", which the eruptions module
     supplies. This module publishes under a different name so that the two cannot collide.
 
@@ -134,7 +134,7 @@ class Fear:
         self.least_years = least_years  # readings needed before the mean and the standard deviation are used (addition)
         self.window = window            # years over which price and current earnings are correlated: the paper's ten-year average (its use on yearly changes is an addition)
         self.link = link                # part of the fear that is passed to the hype module; 0 leaves the module a pure readout (addition)
-        self.top = top                  # dominant capital is the hundred largest claims, as in the book
+        self.top = top                  # dominant capital is the hundred largest firms, as in the book
         self.index, self.price, self.earnings = [], [], []
         self.at_ceiling = 0
 

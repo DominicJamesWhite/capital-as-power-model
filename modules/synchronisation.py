@@ -1,10 +1,9 @@
-"""Optional module: synchronisation of regimes. A readout. It changes no term of any claim.
+"""Optional module: synchronisation of regimes. A readout. It changes no term of any firm.
 
 Sources. Capital as Power (2009), chapter 14, "Spread, integration, oscillation". Chapter 17,
 "Amalgamation versus stagflation", Figure 17.1 with its notes, and the endnote that reports a
-moving correlation. Nitzan and Bichler, The Global Political Economy of Israel (2002), chapter 2
-(data/bn_archives/papers/gpe_israel_2002). Bichler and Nitzan, "Francis' Buy-to-Build Estimates
-for Britain and the United States" (2013) (data/bn_archives/papers/buy_to_build_2013_download).
+moving correlation. Nitzan and Bichler, The Global Political Economy of Israel (2002), chapter 2. Bichler and Nitzan, "Francis' Buy-to-Build Estimates
+for Britain and the United States" (2013).
 
 What the literature says.
   - Chapter 14: the spread and the integration of differential accumulation "work to reinforce
@@ -33,12 +32,12 @@ What the literature says.
   of how closely sectors move together, and none for countries beyond two charts.
 
 Rule.
-  1. Every claim carries a serial number that belongs to this module. A claim that was in the
+  1. Every firm carries a serial number that belongs to this module. A firm that was in the
      ledger last year and is gone this year was absorbed in a merger. Its employees are counted as
      merger volume of the sector (and the country) in which it sat.
   2. Each year the module records, for every sector, the employees absorbed as a part of the
      sector's employees, and the rise in the sector's price level. The price level of a sector is
-     the average price of its claims, weighted by employees. If claims carry a country number, the
+     the average price of its firms, weighted by employees. If firms carry a country number, the
      module records the same two series for each country.
   3. Each year the module also records the two indices of Figure 17.1 for the whole ledger: the
      ratio of employees acquired to employees newly hired, and the average of standardized
@@ -50,7 +49,7 @@ Rule.
      a sector's own merger volume and its own price rise; the part of the sectors in which any
      merger took place; the book's correlation between the two indices for the whole ledger; and,
      with two countries, the correlation between the two countries' merger volumes and between
-     their price rises.
+     their price rises. It also publishes the number of years it has on record.
   Everything the module reports describes the year before, because a module sees only the ledger
   at the start of the step.
 
@@ -58,7 +57,7 @@ Additions. The window of thirty years and the smoothing over five years are the 
 of the correlation coefficient is the book's, for the whole economy. Applying it to pairs of
 sectors and to two countries is an addition. Counting a sector's price rise as its depth is an
 addition: the book's depth is stagflation, and the model holds no unemployment by sector.
-Counting a merger in the sector of the claim that was absorbed is an addition. Taking the trend
+Counting a merger in the sector of the firm that was absorbed is an addition. Taking the trend
 of the amalgamation index within the window, and not over the whole century, is an addition.
 The smallest value of the amalgamation index that the logarithm is given is an addition.
 The serial number is the one thing the module writes to the ledger. Nothing else reads it, and
@@ -67,7 +66,7 @@ no term of the capitalization formula depends on it.
 import numpy as np
 from core import Scale, Publish
 
-SERIAL = "synchronisation_serial"    # the added per-claim number that lets the module see which claims were absorbed
+SERIAL = "synchronisation_serial"    # the added per-firm number that lets the module see which firms were absorbed
 NOTHING = float("nan")               # published while a correlation cannot yet be computed
 
 KEYS = ("sync_mergers_sectors", "sync_prices_sectors", "sync_inverse_sectors", "sync_sectors_merging",
@@ -106,7 +105,7 @@ class Synchronisation:
         self.amalgamation, self.unemployment, self.inflation = [], [], []
 
     def start(self, L):
-        L.add_attribute(SERIAL, np.arange(1, len(L) + 1, dtype=float), -1.0)   # a new claim carries -1 until it is numbered
+        L.add_attribute(SERIAL, np.arange(1, len(L) + 1, dtype=float), -1.0)   # a new firm carries -1 until it is numbered
         self.next_number = float(len(L) + 1)
         return {k: NOTHING for k in KEYS}
 
@@ -128,7 +127,7 @@ class Synchronisation:
         count, n_sec = len(L), int(L.sector_of.max()) + 1
         changes = []
 
-        # part 1: number the claims that were founded last year
+        # part 1: number the firms that were founded last year
         numbers = L.extra[SERIAL].copy()
         fresh = np.flatnonzero(numbers < 0)
         if fresh.size:
@@ -142,7 +141,7 @@ class Synchronisation:
         sec, n = L.sector, L.n
         has_countries = "country" in L.extra            # set by the second country module
         cty = (L.extra["country"] > 1.5).astype(int) if has_countries else np.zeros(count, dtype=int)
-        # (a claim founded last year in the second country carries the first country's number for one year)
+        # (a firm founded last year in the second country carries the first country's number for one year)
         now = {"numbers": numbers, "sec": sec.copy(), "cty": cty, "n": n.copy(),
                "p_sec": self._price(sec, L.p, n, n_sec), "p_cty": self._price(cty, L.p, n, 2),
                "p_all": float((L.p * n).sum() / n.sum())}

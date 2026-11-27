@@ -6,7 +6,7 @@ Each entry maps a short name to the file and the class that hold the module:
 
 Switch modules on from the command line:
 
-    .venv\\Scripts\\python.exe experiments\\casp\\model\\full.py 100000 60 --with coalitions,force
+    python full.py 100000 60 --with coalitions,force
 """
 import importlib
 
@@ -41,7 +41,7 @@ OPTIONAL["second_country"] = ("modules.second_country", "SecondCountry")   # run
 OPTIONAL["cross_border"] = ("modules.cross_border", "CrossBorder")   # meant to run with second_country; alone it draws the same border
 OPTIONAL["currencies"] = ("modules.currencies", "Currencies")   # needs owners crossing the border: run with cross_border, or with second_country once its border opens
 OPTIONAL["sovereign_funds"] = ("modules.sovereign_funds", "SovereignFunds")   # the resistance module reads the number it publishes
-OPTIONAL["synchronisation"] = ("modules.synchronisation", "Synchronisation")   # a readout; it changes no term of any claim
+OPTIONAL["synchronisation"] = ("modules.synchronisation", "Synchronisation")   # a readout; it changes no term of any firm
 OPTIONAL["fear"] = ("modules.fear", "Fear")   # a readout; with the hype module on it also weakens upward pushes on hype
 OPTIONAL["plant"] = ("modules.plant", "Plant")   # a readout; it changes nothing and no module reads it
 OPTIONAL["concentration_measures"] = ("modules.concentration_measures", "ConcentrationMeasures")   # a readout; it changes nothing and no module reads it

@@ -10,7 +10,7 @@ units of the first. With two countries there is only one such number, and a fall
 currency is a rise of the other. The number starts at 1.
 
   1. The currency moves only as owners enter and leave. Each year the module takes the
-     employees of the claims that owners of the first country bought in the second country,
+     employees of the firms that owners of the first country bought in the second country,
      less those they sold back, and subtracts the same figure for the second country's owners
      in the first country. It divides the result by the employees of the second country. The
      currency rises by a set multiple of that number when it is positive and falls when it is
@@ -19,12 +19,12 @@ currency is a rise of the other. The number starts at 1.
      with the second country's earnings counted in the first country's currency. It takes the
      yearly growth of each over the last few years. The shortfall of a country is the growth of
      the two together less the growth of that country, when that is positive.
-  3. Foreign owners liquidate where earnings growth falls short. Each foreign-owned claim in a
+  3. Foreign owners liquidate where earnings growth falls short. Each foreign-owned firm in a
      country is sold back to local owners with an added yearly chance equal to a set multiple
      of that country's shortfall, up to a limit. The cross_border module carries out the sales,
      because it keeps the record of who owns what. While owners are leaving a country they buy
      less there.
-  4. A fallen currency makes claims cheap for owners who hold the other currency. The employees
+  4. A fallen currency makes firms cheap for owners who hold the other currency. The employees
      that a dominant group seeks across the border are multiplied by a power of the other
      currency's cheapness, up to a limit.
   5. A fall of the currency raises prices against wages in the country whose currency fell,
@@ -34,11 +34,11 @@ currency is a rise of the other. The number starts at 1.
      from the markups of the other country, weighted by the first country's part.
   6. The module publishes the value of the currency, its yearly change, the two shortfalls, the
      two added chances of sale, and three readouts counted in the first country's currency: the
-     differential capitalization of the hundred largest claims of both countries, the second
+     differential capitalization of the hundred largest firms of both countries, the second
      country's part of all capitalization, and the year's gain or loss on foreign holdings in
      the second country as a part of the capitalization of the first country's hundred.
 
-The module itself returns no change to any claim. It acts only through three numbers that the
+The module itself returns no change to any firm. It acts only through three numbers that the
 cross_border module reads and one that the sabotage module reads, all one year late. Without
 the cross_border module (or a second_country module whose border has opened) no owner crosses
 the border, the currency stays at 1, and a run is identical to a run without this module.
@@ -63,7 +63,7 @@ WHAT IT RESTS ON
   - Chapter 9. "What previously required military conquest can now be done through currency
     devaluation". Part 4 rests on this sentence and on the next source.
   - Jonathan Nitzan, "Asian Equities: Not for the Fainthearted" (The BCA Emerging Markets
-    Strategist, February 1998), text in data/bn_archives/papers/nitzan_asian_equities_1998.
+    Strategist, February 1998).
     Holdings are counted in the owners' currency: "With the Asian asset class having lost over
     50% in US$ terms since June 1997, the short-term upside for investors is significant".
     Earnings are compared with the world: Asian "earnings per share" are set "relative to the
@@ -78,10 +78,7 @@ WHAT IT RESTS ON
     1983 crash "investors, who expected an imminent exchange rate correction, naturally sold
     their stocks to buy dollars". The plan that followed "followed the standard IMF template
     of devaluation, tight monetary and fiscal policy and, of course, a significant wage
-    erosion". Parts 1 and 5 rest on these. Text in data/bn_archives/papers/gpe_israel_2002.
-  - Nitzan, "The 'Asian Miracle': How Close to Maturity?" (1997) was downloaded into
-    data/bn_archives/papers/nitzan_asian_miracle_1997. It is a scan with no readable text and
-    nothing in this module rests on it.
+    erosion". Parts 1 and 5 rest on these.
 
 WHAT IS ADDED
 
@@ -101,7 +98,7 @@ There are two countries and so one exchange rate; the spread of devaluation from
 peripheral country to the next, which chapter 17 describes, needs at least three. Debt does not
 cross the border, so the 1998 paper's point that a fallen currency makes foreign debt heavier
 cannot be shown. The paper says the "risk premium is now much higher" after the fall; this
-module does not change any claim's risk. It says "social unrest" follows; the model has one
+module does not change any firm's risk. It says "social unrest" follows; the model has one
 number for popular resistance in both countries, and this module does not raise it. No
 government organ defends the currency, and there are no reserves and no interest-rate spread.
 The ledger's own capitalization is not converted: only the three published readouts are
@@ -124,15 +121,15 @@ class Currencies:
     def __init__(self, sectors=2, sensitivity=2.0, max_move=0.5, window=3, flight_rate=10.0,
                  max_flight=0.5, cheapness=1.0, max_buying=3.0, pass_through=0.1, top=100):
         self.sectors = sectors            # how many sectors (the last ones) lie in the second country; must match the second_country and cross_border modules
-        self.sensitivity = sensitivity    # proportional rise of the currency when owners from abroad buy claims holding 1 per cent of the country's employees, per 1 per cent (part 1)
+        self.sensitivity = sensitivity    # proportional rise of the currency when owners from abroad buy firms holding 1 per cent of the country's employees, per 1 per cent (part 1)
         self.max_move = max_move          # the largest change of the currency in one year, as a change of its logarithm
         self.window = window              # years over which earnings growth is measured (part 2)
-        self.flight_rate = flight_rate    # added yearly chance that a foreign-owned claim is sold, per unit of shortfall in yearly earnings growth (part 3)
+        self.flight_rate = flight_rate    # added yearly chance that a foreign-owned firm is sold, per unit of shortfall in yearly earnings growth (part 3)
         self.max_flight = max_flight      # the largest added yearly chance of sale
         self.cheapness = cheapness        # how strongly a cheap currency raises buying from abroad: buying is multiplied by the cheapness to this power (part 4)
         self.max_buying = max_buying      # the largest multiple by which a cheap currency can raise buying
         self.pass_through = pass_through  # rise in the markup of a country per unit of fall of its currency, when the other country is nearly all of the world (part 5)
-        self.top = top                    # dominant capital: the hundred largest claims, as in the book
+        self.top = top                    # dominant capital: the hundred largest firms, as in the book
         self.value = 1.0                  # value of the second country's currency in units of the first
         self.levels = []                  # past earnings per employee (logarithms): second country, first country, both, in the first country's currency
         self.last_bought = (0.0, 0.0)     # the second_country module's running totals, used only when cross_border is off
@@ -169,8 +166,8 @@ class Currencies:
             g2, g1, g_all = [(now - then) / back for now, then in zip(self.levels[-1], self.levels[-1 - back])]
             short2, short1 = max(0.0, g_all - g2), max(0.0, g_all - g1)
 
-        # part 3: the added chance that a foreign-owned claim is sold. Group 1 (the first country's
-        # owners) holds claims in the second country, and group 2 holds claims in the first.
+        # part 3: the added chance that a foreign-owned firm is sold. Group 1 (the first country's
+        # owners) holds firms in the second country, and group 2 holds firms in the first.
         flight1 = min(self.max_flight, self.flight_rate * short2)
         flight2 = min(self.max_flight, self.flight_rate * short1)
 

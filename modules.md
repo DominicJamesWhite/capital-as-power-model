@@ -304,8 +304,8 @@ The book gives no figure for how much hiring goes to new firms, how large a new 
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `new_claim_share` | 0.35 | The part of small firms' hiring that goes to new firms. (The name uses an old word for a firm.) | Our own choice |
-| `new_claim_size` | 0.15 | The size of a new firm, as a part of the average firm | Our own choice |
+| `new_firm_share` | 0.35 | The part of small firms' hiring that goes to new firms. | Our own choice |
+| `new_firm_size` | 0.15 | The size of a new firm, as a part of the average firm | Our own choice |
 | `floor` | 0.005 | The lowest unemployment the module allows | A plain limit with no source |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
@@ -2218,7 +2218,7 @@ The wage itself is not changed. The core records what wage earners pay and recei
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `claims_part` | 0.52 | The part of the public debt that firms hold | Hager 2015, note 1: United States businesses in the 1950s. Holding it fixed is our own choice. The same note gives 23 per cent for 2009 to 2014. |
+| `firms_part` | 0.52 | The part of the public debt that firms hold | Hager 2015, note 1: United States businesses in the 1950s. Holding it fixed is our own choice. The same note gives 23 per cent for 2009 to 2014. |
 | `household_part` | 0.31 | The part that households hold directly | The same note, for the 1950s. Holding it fixed is our own choice. The note gives 9 per cent for 2009 to 2014. |
 | `rich_households` | 0.42 | The part of household holdings that belongs to the richest one per cent | Hager 2013, Table 2, for 2010. Holding it fixed is our own choice. The table gives 24.6 per cent for 1962. |
 | `flight_weight` | 1.83 | How many times more debt a unit of a top-100 firm's capitalization holds in a complete crisis | Our own working. Hager prints no such weight. It is the number that turns a part of 77 per cent into a part of 86 per cent, his readings for the 2,500 largest corporations in 2006 and 2010. That is one crisis and a different group of firms. |
@@ -2243,13 +2243,13 @@ It publishes thirteen numbers. Only the last one is read by another module.
 | Name in the code | What it is |
 |---|---|
 | `public_debt_dominant` | The top 100's part of the whole public debt |
-| `public_debt_dominant_of_claims` | The top 100's part of what firms hold |
+| `public_debt_dominant_of_firms` | The top 100's part of what firms hold |
 | `public_debt_tax_dominant` | The part of the tax that the top 100 pay |
 | `public_debt_tax_wages` | The part of the tax that is paid from wages |
 | `public_debt_relative_tax` | The top 100's tax rate as a part of the rate of others |
 | `public_debt_net_dominant` | The net gain of the top 100, as a part of their other earnings |
 | `public_debt_net_others` | The net gain of all other firms, as a part of their other earnings |
-| `public_debt_net_claims` | The net gain of all firms, as a part of all income |
+| `public_debt_net_firms` | The net gain of all firms, as a part of all income |
 | `public_debt_net_wages` | The interest paid to wage earners less the tax on wages, as a part of all wages |
 | `public_debt_rich_households` | The part of all interest paid directly to the richest one per cent of households |
 | `public_debt_flight` | How far unemployment stands above 5 per cent, on a scale where 10 per cent is 1 |
@@ -3226,7 +3226,7 @@ Both papers print the equations. Neither prints the values of a, b or r that Fix
 | `span_b` | 0.125 | The number b, which sets how fast the span of control widens toward the top | Our own choice. It is the middle of the range on the axis of the same chart, which runs from 0.075 to 0.175. |
 | `pay_scaling` | 1.1 | The number r, which sets how fast pay rises from rank to rank | Our own choice. Fix gives every firm its own value, and his charts draw it between 1.0 and 1.3. |
 | `tail` | 0.01 | The part of employees counted as the best paid | Fix uses the best paid one per cent |
-| `largest_claim` | 10,000,000,000 | The largest number of employees that the list of step 2 covers | A limit of the arithmetic, with no source |
+| `largest_firm` | 10,000,000,000 | The largest number of employees that the list of step 2 covers | A limit of the arithmetic, with no source |
 | `grid` | 4,000 | The number of entries in that list | A limit of the arithmetic, with no source |
 | `top` | 100 | How many firms count as dominant capital, which is the book's name for the largest firms | The book, chapter 14 |
 
@@ -4046,7 +4046,7 @@ It publishes 21 numbers.
 | `dk_home`, `dk_second`, `dk_both` | Differential capitalization of the first country, of the second country, and of the two together | Nobody |
 | `home_top_share`, `second_top_share` | The part of each country's employees who work for its largest firms | Nobody |
 | `home_depth`, `second_depth` | The earnings for each employee of each country's largest firms, divided by the average of the country | Nobody |
-| `second_claims` | The number of firms in the second country | Nobody |
+| `second_firms` | The number of firms in the second country | Nobody |
 | `second_part_of_employees` | The second country's part of all employees | Nobody |
 
 The sabotage module reads 0 for both of its numbers when this module is off.
@@ -4884,13 +4884,13 @@ It publishes eighteen numbers. No module reads any of them.
 
 | Name in the code | What it is |
 |---|---|
-| `conc_claims` | The number of firms |
+| `conc_firms` | The number of firms |
 | `conc_number_ratio` | 100 divided by the number of firms |
 | `conc_share_cap`, `conc_share_earnings`, `conc_share_employees` | The top 100's share of all capitalization, of all earnings and of all employees |
 | `conc_diff_cap`, `conc_diff_earnings` | The differential measure for capitalization and for earnings |
 | `conc_gini_cap`, `conc_gini_earnings` | The Gini index for capitalization and for earnings |
 | `conc_hh_cap`, `conc_hh_earnings` | The Herfindahl-Hirschman index for capitalization and for earnings |
-| `conc_hh_equal_claims` | 1 divided by the Herfindahl-Hirschman index for capitalization |
+| `conc_hh_equal_firms` | 1 divided by the Herfindahl-Hirschman index for capitalization |
 | `conc_change_share`, `conc_change_diff`, `conc_change_number` | The year's change in the logarithm of the share of capitalization, of the differential measure and of the number ratio |
 | `conc_years_share_down_diff_up` | The years so far in which the share of capitalization fell while the differential measure rose |
 | `conc_years_share_up_diff_down` | The years so far in which the share rose while the differential measure fell |

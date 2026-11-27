@@ -2,59 +2,58 @@
 
 THE RULE IN PLAIN WORDS
 
-Every claim lays out money each year to shape what buyers want: advertising, sales promotion
+Every firm lays out money each year to shape what buyers want: advertising, sales promotion
 and the restyling of goods. The outlay buys no earnings by itself. It buys a hold on buyers,
 and a hold counts only against the holds of the other sellers in the same industry. The
 module never changes the earnings of an industry as a whole. It moves earnings between the
-claims of one industry, it lowers the risk of the claims that hold more of the buyers than
+firms of one industry, it lowers the risk of the firms that hold more of the buyers than
 of the capacity, and it puts the outlay of the industry into the industry's price.
 
-  1. The outlay. Each claim lays out a part of its earnings. The customary part is one third,
-     which is the figure that follows from chapter 9 of the book. A claim whose markup stands
+  1. The outlay. Each firm lays out a part of its earnings. The customary part is one third,
+     which is the figure that follows from chapter 9 of the book. A firm whose markup stands
      below the markup of its industry raises its part by a step in that year. Every part
      above the customary one fades back toward it a little each year. The part is never below
-     the customary part and never above a ceiling. Nobody chooses a best outlay. A claim that
+     the customary part and never above a ceiling. Nobody chooses a best outlay. A firm that
      trails spends more, and that is all.
-  2. The weight of a campaign. The weight of a claim's campaign among the buyers of its
+  2. The weight of a campaign. The weight of a firm's campaign among the buyers of its
      industry is its outlay raised to a power above one. A large campaign therefore counts
-     for more than the same money divided among many small campaigns. The claim's part of the
+     for more than the same money divided among many small campaigns. The firm's part of the
      summed weights of its industry is its part of this year's persuasion.
-  3. The hold. Each claim carries a hold on the buyers of its industry. Each year the hold
-     moves a fixed part of the way toward the claim's part of this year's persuasion. A hold
-     is therefore built over years and lost over years. A newly founded claim starts with no
-     hold. A buyer in a merger keeps its own hold and does not receive the hold of the claim
+  3. The hold. Each firm carries a hold on the buyers of its industry. Each year the hold
+     moves a fixed part of the way toward the firm's part of this year's persuasion. A hold
+     is therefore built over years and lost over years. A newly founded firm starts with no
+     hold. A buyer in a merger keeps its own hold and does not receive the hold of the firm
      it buys.
-  4. The lead. The lead of a claim is its part of all the holds in its industry, divided by
-     its part of the industry's employees, minus one. A claim with a lead above zero holds
+  4. The lead. The lead of a firm is its part of all the holds in its industry, divided by
+     its part of the industry's employees, minus one. A firm with a lead above zero holds
      more of the buyers than of the capacity. The leads of an industry, weighted by employees,
-     add up to zero. When every claim of an industry has a hold in proportion to its size,
+     add up to zero. When every firm of an industry has a hold in proportion to its size,
      every lead is zero and nothing follows from all the outlay except its cost.
-  5. The markup. The module reckons, for each claim, the difference from its industry's markup
+  5. The markup. The module reckons, for each firm, the difference from its industry's markup
      that its lead and its outlay call for. The difference is a fixed fraction of the lead,
-     less the amount by which the claim's outlay part exceeds the average outlay part of its
-     industry. A claim that lays out more than is customary in its industry pays the excess
+     less the amount by which the firm's outlay part exceeds the average outlay part of its
+     industry. A firm that lays out more than is customary in its industry pays the excess
      out of its own earnings. The module owns one markup component, the premium from the
      hold on buyers, and each year it sets that premium to the difference reckoned here. It
-     changes no other part of any claim's earnings. What it adds to some claims it takes
-     from the other claims of the same industry. The premium is a member of the overlap
+     changes no other part of any firm's earnings. What it adds to some firms it takes
+     from the other firms of the same industry. The premium is a member of the overlap
      group "hold on buyers" (see "How modules share a quantity" in modules.md).
   6. The price. The average outlay of an industry is a cost that every seller puts into the
      price. The module owns one cost component, the outlay on wants. Each year it sets that
-     cost, for every claim of an industry, to the industry's average outlay part times the
+     cost, for every firm of an industry, to the industry's average outlay part times the
      industry's markup. The result is the industry's outlay for each employee, counted in
      wages. The core adds it to the wage and the markup when it works out the price. The price
-     of every claim in the industry therefore rises when the industry's outlay rises and falls
-     when it falls. Buyers pay for their own persuasion. (Before 26 November 2026 the module
-     multiplied the price by a factor of its own, and only changes of the outlay part moved
-     the price. The cost is now a level, so the customary outlay is in the price from the
-     first year, and the cost moves with the industry's markup as well as with the part.)
-  7. The risk. Buyers who are held are predictable. Each year a claim with a lead above zero
+     of every firm in the industry therefore rises when the industry's outlay rises and falls
+     when it falls. Buyers pay for their own persuasion. The cost is a level, so
+     the customary outlay is in the price from the first year, and the cost moves with the
+     industry's markup as well as with the outlay part.
+  7. The risk. Buyers who are held are predictable. Each year a firm with a lead above zero
      loses a part of the amount by which its risk stands above 1. The part is a rate times the
-     lead, and the lead counts for no more than 1 here. A claim without a lead gets no relief.
-  8. Readouts. The module publishes the outlay of all claims as a part of all earnings, the
-     average outlay part of the claims outside the hundred largest, the average lead of the
-     hundred largest claims, the difference in markup that the rule calls for in the hundred
-     largest claims, and the year's fall in the risk of the hundred largest claims from part 7.
+     lead, and the lead counts for no more than 1 here. A firm without a lead gets no relief.
+  8. Readouts. The module publishes the outlay of all firms as a part of all earnings, the
+     average outlay part of the firms outside the hundred largest, the average lead of the
+     hundred largest firms, the difference in markup that the rule calls for in the hundred
+     largest firms, and the year's fall in the risk of the hundred largest firms from part 7.
 
 Nothing comes from outside. The module reads only the ledger. It reads no account of another
 module, and no other module reads what it publishes.
@@ -81,7 +80,7 @@ WHAT IT RESTS ON
     direct limitations, such as predatory pricing, formal and informal collusion, advertising
     and exclusive contracts." "For the benefiting owner, the differential gain accrues because
     the necessary industrial limitation is borne by other owners." Parts 4 and 5 rest on this:
-    what one claim gains from its hold, the other claims of its industry lose.
+    what one firm gains from its hold, the other firms of its industry lose.
   - Chapter 12, "Strategic sabotage": with the modern corporation "open violence has been
     replaced by latent threats underwritten by hefty advertising budgets".
   - Chapter 12, "The markup and the target rate of return": firms reckon cost and add a
@@ -103,19 +102,19 @@ WHAT IT RESTS ON
     advertisers" and the restrictions on film making "that debilitate audiences while
     reducing the differential risk of the major studios".
   - David Troy Cochrane, "Differentiating Diamonds" (Working Papers on Capital as Power,
-    2017), downloaded for this module. "In order to beat the average, capitalists engage in a
+    2017). "In order to beat the average, capitalists engage in a
     struggle of differentiation. Advertising is part of that process." The ideal response to
     an advertisement "is a differential purchase. In other words, sellers wish for buyers to
     choose their product rather than another." Consumerism is best understood as one of "the
     emergent outcomes of the differential struggle among capitalists". The relative profit of
     De Beers declined until its national campaign of 1939 and gained for three decades after
     it, and advertising was "an important, but uncertain, piece" of that reversal.
-  - James McMahon, "Is Hollywood a Risky Business?" (2018), downloaded for this module. The
+  - James McMahon, "Is Hollywood a Risky Business?" (2018). The
     confidence of owners rises when the "broader social world of mass culture are ordered by
     capitalist power". The major studios "lowered [their] risk" after 1980 "both absolutely
     and differentially, relative to dominant capital", by making the behaviour of audiences
     "more predictable", and their earnings depend on "the habitual return of audiences".
-    Part 7 gives relief from risk to the claims with a lead, and not to all, because McMahon
+    Part 7 gives relief from risk to the firms with a lead, and not to all, because McMahon
     measures a differential fall.
 
 WHAT IS ADDED
@@ -125,27 +124,26 @@ buyers predictable, that predictability is capitalized, and that the limitation 
 is borne by other owners. It gives one figure, from which the customary outlay of one third
 is taken. It gives no rule. The form of every part is therefore an addition, and every other
 number is an addition. Four choices need saying. First, the power above one in part 2 is the
-only reason a large claim gains a lead from the same outlay part as a small one. No passage
+only reason a large firm gains a lead from the same outlay part as a small one. No passage
 states it. Without it every lead would be zero and the module would show only the cost.
-Second, the rule that a trailing claim raises its outlay is an addition. It applies the
+Second, the rule that a trailing firm raises its outlay is an addition. It applies the
 book's "not to maximize but to exceed" to this one tool. Third, part 6 lets the whole
 average outlay pass into price. Fourth, part 5 sets the module's own premium and leaves every
-other difference between the claims of an industry alone, so that it does not undo the lead
-that the stagflation module gives the hundred largest claims. A difference that the hold no
+other difference between the firms of an industry alone, so that it does not undo the lead
+that the stagflation module gives the hundred largest firms. A difference that the hold no
 longer supports disappears in the year the hold is lost, because the premium is set afresh
-each year. Before the change to named components (26 November 2026) the module added what
-was missing from the pattern and left it to the cost cutting module to wear a difference away.
+each year.
 
 WHAT IS MISSING
 
-The outlay is paid to nobody. The claims that sell persuasion are not told apart from other
-claims in the ledger, so the 5 per cent of corporate income that the book ascribes to them
+The outlay is paid to nobody. The firms that sell persuasion are not told apart from other
+firms in the ledger, so the 5 per cent of corporate income that the book ascribes to them
 does not appear. The general effect that the book describes, a whole population made
-predictable for all sellers, is left out, because the rule lets gains cancel when all claims
-do the same. The module does not make the markup of a claim steadier from year to year. The
+predictable for all sellers, is left out, because the rule lets gains cancel when all firms
+do the same. The module does not make the markup of a firm steadier from year to year. The
 relief of part 7 stands in for that. The hold does not bar entry into an industry: a new
-claim is founded as before and then earns less than its neighbours. A hold cannot be bought
-with the claim that built it. Fear and the news, which the book names as the second path
+firm is founded as it is without this module and then earns less than its neighbours. A hold cannot be bought
+with the firm that built it. Fear and the news, which the book names as the second path
 beside the promise of pleasure, are not in the rule.
 """
 import numpy as np
@@ -154,9 +152,9 @@ from core import Scale, SetComponent, Publish, top_positions, HOLD_ON_BUYERS
 PREMIUM = "wants premium"   # this module's markup component; a member of the overlap group "hold on buyers" (an addition)
 OUTLAY = "outlay on wants"  # this module's cost component: the industry's outlay for each employee, counted in wages
 
-HOLD = "wants_hold"      # the claim's hold on the buyers of its industry
+HOLD = "wants_hold"      # the firm's hold on the buyers of its industry
 KEPT = "wants_difference"  # only when the setting `fade` is below 1: the difference in markup that stood last year (stored as its exponential)
-PART = "wants_outlay"    # the part of its earnings that the claim lays out on shaping wants
+PART = "wants_outlay"    # the part of its earnings that the firm lays out on shaping wants
 
 
 class Wants:
@@ -171,28 +169,27 @@ class Wants:
                                      # which prints no such ratio. The book says that capitalists worldwide spend "up to $600 billion"
                                      # a year on advertising, and its "roughly 5 per cent" implies net corporate income of 1,800 billion.
                                      # It calls these sums "tentative". An upper estimate for the world in one year is used here as
-                                     # the usual level of every claim.
-        self.ceiling = ceiling       # the largest part of its earnings a claim will lay out (addition)
-        self.step = step             # proportional rise in a claim's outlay part in a year when its markup trails its industry's (addition)
+                                     # the usual level of every firm.
+        self.ceiling = ceiling       # the largest part of its earnings a firm will lay out (addition)
+        self.step = step             # proportional rise in a firm's outlay part in a year when its markup trails its industry's (addition)
         self.ease = ease             # yearly part of the outlay above the customary level that lapses (addition)
         self.reach = reach           # power to which an outlay is raised to give the weight of a campaign; above 1, a large
                                      # campaign counts for more than the same money in small campaigns (addition)
         self.build = build           # part of the way a hold moves each year toward this year's part of persuasion (addition)
         self.tilt = tilt             # difference from the industry's markup, as a fraction of it, per unit of lead (addition)
         self.most_lead = most_lead   # the largest lead the rule counts (addition)
-        self.steady = steady         # yearly part of a claim's risk above 1 that is removed per unit of lead (addition)
+        self.steady = steady         # yearly part of a firm's risk above 1 that is removed per unit of lead (addition)
         self.floor = floor           # a markup cannot fall below this (the same floor as in the sabotage module)
-        self.top = top               # the number of claims counted as dominant capital, as in the book
+        self.top = top               # the number of firms counted as dominant capital, as in the book
         self.fade = fade             # part of the way the difference in markup moves each year toward the difference that the
-                                     # hold and the outlay call for (addition; item 34 of backlog.md). 1 is the rule: the
+                                     # hold and the outlay call for (addition). 1 is the rule: the
                                      # difference is set afresh each year, so it ends in the year the hold is lost. A value
-                                     # below 1 is for comparisons: the difference then fades over years, as it did before the
-                                     # named components, when the cost cutting module wore it away. No source gives a rate.
+                                     # below 1 is for comparisons: the difference then fades over years. No source gives a rate.
 
     # ------------------------------------------------------------------ helpers
 
     def persuasion(self, L, part):
-        """Each claim's part of this year's persuasion in its industry (part 2)."""
+        """Each firm's part of this year's persuasion in its industry (part 2)."""
         k, ind = L.sector_of.size, L.ind
         logw = self.reach * np.log(np.maximum(part * L.earnings(), 1e-300))
         high = np.full(k, -np.inf)
@@ -201,7 +198,7 @@ class Wants:
         return w / np.bincount(ind, w, k)[ind]
 
     def register(self, L):
-        # The outlay is in the price from the first year: every claim lays out the customary part.
+        # The outlay is in the price from the first year: every firm lays out the customary part.
         # The core calls this before the start() of any module, so that every module reads the
         # same opening prices whatever the order in which the modules are listed.
         n_j = np.bincount(L.ind, L.n, L.sector_of.size)
@@ -211,11 +208,11 @@ class Wants:
     def start(self, L):
         part = np.full(len(L), self.customary)
         L.add_attribute(PART, part, self.customary)
-        # Claims that exist at the start are established sellers: their hold is what their outlay supports.
-        # A claim founded later starts with a hold that is nil for every purpose (it must be above 0 to be scaled).
+        # Firms that exist at the start are established sellers: their hold is what their outlay supports.
+        # A firm founded later starts with a hold that is nil for every purpose (it must be above 0 to be scaled).
         L.add_attribute(HOLD, self.persuasion(L, part), 1e-12)
         L.add_component(PREMIUM, self.name, group=HOLD_ON_BUYERS)
-        if self.fade < 1:            # for comparisons only: remember each claim's difference from year to year
+        if self.fade < 1:            # for comparisons only: remember each firm's difference from year to year
             L.add_attribute(KEPT, 1.0, 1.0)
         return {"wants_outlay_part": self.customary, "wants_outlay_small": self.customary,
                 "wants_lead": 0.0, "wants_premium": 0.0, "wants_risk_relief": 0.0}
@@ -228,18 +225,18 @@ class Wants:
         E = L.earnings()
         n_j = np.bincount(ind, n, k)
         safe = np.maximum(n_j, 1e-12)
-        m = L.markup()                                                # each claim's markup
+        m = L.markup()                                                # each firm's markup
         M = np.maximum(np.bincount(ind, n * m, k) / safe, 1e-12)      # each industry's markup
         # The premium is reckoned against the part of the markup that stacks, so it does not depend on
         # any other premium in the same overlap group.
-        rest = L.stacking_markup()                                    # each claim's markup apart from every hold on buyers
+        rest = L.stacking_markup()                                    # each firm's markup apart from every hold on buyers
         M_rest = np.maximum(np.bincount(ind, n * rest, k) / safe, 1e-12)
 
-        # part 1: a claim that trails its industry lays out more next year; outlay above the customary level lapses
+        # part 1: a firm that trails its industry lays out more next year; outlay above the customary level lapses
         raised = np.where(m < M[ind] * (1 - 1e-9), part * (1 + self.step), part)
         new_part = np.clip(self.customary + (raised - self.customary) * (1 - self.ease), self.customary, self.ceiling)
 
-        # parts 2 and 3: the hold moves toward the claim's part of this year's persuasion
+        # parts 2 and 3: the hold moves toward the firm's part of this year's persuasion
         new_hold = (1 - self.build) * hold + self.build * self.persuasion(L, part)
 
         # part 4: the lead is the part of the industry's holds over the part of its employees, minus one
@@ -251,13 +248,13 @@ class Wants:
         E_j = np.maximum(np.bincount(ind, E, k), 1e-300)
         avg_part = np.where(n_j > 0, np.bincount(ind, E * part, k) / E_j, self.customary)   # the industry's average outlay part
         x = self.tilt * lead - (part - avg_part[ind])
-        x = x - (np.bincount(ind, n * x, k) / safe)[ind]              # what one claim gains the others lose
+        x = x - (np.bincount(ind, n * x, k) / safe)[ind]              # what one firm gains the others lose
         if self.fade < 1:                                             # for comparisons: the difference fades over years
             kept = np.log(L.extra[KEPT])
             x = kept + self.fade * (x - kept)
             x = x - (np.bincount(ind, n * x, k) / safe)[ind]
         # The module sets its own component and nothing else: the premium adds this difference to
-        # the claim's markup apart from every hold on buyers.
+        # the firm's markup apart from every hold on buyers.
         premium = 1 + M_rest[ind] * x / rest
         premium = np.maximum(premium, np.minimum(1.0, self.floor / rest))
 

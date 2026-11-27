@@ -23,19 +23,19 @@ conduct in part 2 is produced by popular resistance.
      growth of employment is therefore followed, five years later, by a lower normal rate of
      return, and faster growth by a higher one. The rate is kept between a lowest and a
      highest level.
-  4. The rate bears on hiring. The sabotage module has a markup at which small claims neither
+  4. The rate bears on hiring. The sabotage module has a markup at which small firms neither
      expand nor cut back. The module publishes a number that multiplies that markup. The
      number is 1 at the customary rate. It rises above 1 by a set part of the proportion by
      which the normal rate of return stands above the customary rate, and it falls below 1 in
-     the same way. A higher rate therefore makes small claims hire less, and a lower rate
+     the same way. A higher rate therefore makes small firms hire less, and a lower rate
      makes them hire more. This is the only change to an existing module, and the number is 1
      when this module is off.
   5. Readouts. The module publishes the rate, the force of the practice, the lagged growth of
      employment that the rate follows, the number of part 4, the power index (the average
-     capitalization of the hundred largest claims divided by the wage), and the same power
+     capitalization of the hundred largest firms divided by the wage), and the same power
      index reckoned at the customary rate.
 
-The module changes the ledger only by setting the shared number "nrr". Every claim's
+The module changes the ledger only by setting the shared number "nrr". Every firm's
 capitalization is divided by the same normal rate of return, so the change raises or lowers
 all capitalization in one proportion. Differential capitalization is a ratio of two
 capitalizations and is not changed by part 3. Only part 4 can reach the differential measures.
@@ -96,14 +96,12 @@ no rule and no slope.
   - The lag of five years and the average of ten years are the paper's (Figure 12).
   - The direction of the slope is the paper's: "the lower the rate of growth of employment
     (and therefore the greater the strategic sabotage), the lower the subsequent rate of
-    interest". The size of the slope has no source. The book and the papers on disk give no
+    interest". The size of the slope has no source. The book and the 2016 paper give no
     figure for how far the rate moves, and they describe no relation from which the model
     could work one out. The slope is therefore a plain setting. Its default is 1, which means
     one point of the rate for one point of employment growth. The value 1 was chosen only
-    because it is the simplest one, and it makes no claim about any country or period. Until
-    26 November 2026 the default was 4, a figure taken from a straight line drawn through the
-    United States record for 1961 to 2015 in the authors' workbook. That figure was removed
-    because no setting of the model may be fitted to the record.
+    because it is the simplest one, and it makes no claim about any country or period.
+    No setting of the model is fitted to the historical record.
   - The twenty years of part 2 are the distance from 1939 to "the early 1960s". The equal
     yearly steps are an addition.
   - The paper says the mode of power was re-ordered after the crisis of the 1930s. It does
@@ -114,7 +112,7 @@ no rule and no slope.
   - Taking the starting rate as the customary rate is an addition.
   - The lowest rate of 1 per cent and the highest of 20 per cent are plain settings with no
     source. They exist because capitalization is divided by the rate, so the rate must stay
-    above zero. With the slope at 1 neither was reached in any test run.
+    above zero.
   - The form of part 4 and its strength of one quarter are additions. The book says that
     activity is conditional on the normal rate of return, and the paper says that tighter
     policy may lower employment growth. Neither gives a rule.
@@ -131,7 +129,7 @@ instrument had "its own 'benchmark' and 'normal rate of return'". The bond marke
 appear as a set of holders who push the rate; the rule states the outcome and not the
 contest. The paper's finding that the power index moved with employment growth before 1939
 and against it afterwards is an outcome to look for and is not built in. The paper's link
-from sabotage to systemic fear is left to a later module. The debt module reckons the
+from sabotage to systemic fear is not in this module. The debt module reckons the
 government's debt as a fixed interest payment divided by the normal rate of return, so a
 lower rate enlarges that debt without changing the interest paid on it.
 """
@@ -152,9 +150,9 @@ class PolicyRate:
         self.window = window                  # years over which employment growth is averaged (2016 paper, Figure 12: ten)
         self.established_at = established_at  # level of popular resistance at which government organs take up the practice (addition)
         self.materialize = materialize        # years from the change of conduct until the practice has its full force. The value is an addition: twenty years is the distance from 1939 to the early 1960s in the 2016 paper's account of the United States, which is one episode, and the paper gives no general length
-        self.hiring = hiring                  # proportional change in the markup at which small claims neither expand nor cut back, per unit of proportional change in the rate (addition)
-        self.lowest = lowest                  # the normal rate of return cannot fall below this (a plain setting with no source; not reached with the slope at 1)
-        self.highest = highest                # the normal rate of return cannot rise above this (a plain setting with no source; not reached in any test run)
+        self.hiring = hiring                  # proportional change in the markup at which small firms neither expand nor cut back, per unit of proportional change in the rate (addition)
+        self.lowest = lowest                  # the normal rate of return cannot fall below this (a plain setting with no source)
+        self.highest = highest                # the normal rate of return cannot rise above this (a plain setting with no source)
         self.top = top
         self.customary = None                 # the rate in the ledger at the start of the run
         self.force = 0.0                      # 0 before the change of conduct, 1 when the practice is complete

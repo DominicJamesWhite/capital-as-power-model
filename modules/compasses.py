@@ -4,8 +4,8 @@ WHY
 
 The compass decides when dominant capital turns from mergers to raising prices. The rule in
 compass.py compares the volume of mergers over the last five years with the volume over the
-last twenty. The full run then showed bouts of stagflation about every twenty-two years, and a
-rule with a twenty-year memory can produce such a rhythm by itself. The three rules below use
+last twenty. A rule with a twenty-year memory can produce a rhythm of about twenty years by
+itself, whatever else happens in the model. The three rules below use
 no window of years at all. The only thing each remembers is the present intensity of
 stagflation, and (for two of them) last year's total employment.
 
@@ -18,7 +18,7 @@ THE THREE RULES IN PLAIN WORDS
    The merger module reports the part of its reach that dominant capital does not yet hold.
    While dominant capital holds more than a set part of its reach, the gains from breadth have
    dried up and the intensity of stagflation rises each year. While it holds less, because a
-   boundary has opened or new claims have refilled the pool, the intensity falls each year.
+   boundary has opened or new firms have refilled the pool, the intensity falls each year.
 
 2. AheadCompass (--with compass_ahead). The turn depends on this year's figures only. The rule
    compares the rate at which dominant capital grew by buying (employees acquired, as a

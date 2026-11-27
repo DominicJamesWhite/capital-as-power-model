@@ -2,29 +2,29 @@
 
 THE RULE IN PLAIN WORDS
 
-Every year the claims offer goods at their going prices. The value offered is the wage bill plus
-the earnings that the claims price for. The module adds up the money that comes back to buy
+Every year the firms offer goods at their going prices. The value offered is the wage bill plus
+the earnings that the firms price for. The module adds up the money that comes back to buy
 those goods, by who spends it:
 
   1. Wages are all spent.
   2. Capitalists spend a fixed part of their income on their own consumption.
   3. The rest of capitalist income is money for expansion. It buys goods only when it is spent
      on new capacity, and new capacity costs a fixed number of years of wages for each new job.
-     Money that pays for existing claims (mergers) buys no goods, and neither does money for
+     Money that pays for existing firms (mergers) buys no goods, and neither does money for
      which there is no new job to equip.
 
 The part of the value offered that no money comes back for is the unsold part. It is never
 negative, because nobody in this account spends more than an income. The unsold part then
-falls on the claims in two different ways, following Gardiner Means:
+falls on the firms in two different ways, following Gardiner Means:
 
   - In the part of an industry that dominant capital does not hold, sellers cut prices. The
     markup and the price fall, and employment is left to the sabotage rule.
-  - In the part that dominant capital holds, prices are kept. The claims of dominant capital
+  - In the part that dominant capital holds, prices are kept. The firms of dominant capital
     dismiss employees in proportion to the unsold part, except for the overhead staff, who
     cannot be dismissed in step with sales. Because the overhead cost stays, earnings per
     employee fall there too, although the price does not.
 
-Dismissals lower the wage bill, and lower markups stop small claims from hiring, so less is
+Dismissals lower the wage bill, and lower markups stop small firms from hiring, so less is
 built the next year and still less money comes back. A fall can therefore feed on itself. It
 ends because the unsold part shrinks with capitalist income: when markups are low there is
 little unspent capitalist income left.
@@ -64,19 +64,19 @@ addition, taken from the argument of Kalecki as the authors report it, and joine
 distinction between building and buying. Every number is an addition: the part of their income
 that capitalists consume, the cost of equipping a new job, the part of the unsold value that
 sellers take out of their prices within a year, the part of costs that is overhead, and the
-number of years of hiring and buying over which spending on expansion is reckoned. (Reckoning
-it on one year made the model lurch between selling everything and selling far too little.) The
+number of years of hiring and buying over which spending on expansion is reckoned. (Reckoned
+on one year alone, the model lurches between selling everything and selling far too little.) The
 unsold part is taken to be the same in every industry, because the model has no account of
 what buyers want and must not have one that rests on utility. The money paid for acquired
-claims is reckoned at the average capitalization per employee of the claims outside dominant
-capital. Sellers of acquired claims are capitalists, and the rule treats what they receive as
+firms is reckoned at the average capitalization per employee of the firms outside dominant
+capital. Sellers of acquired firms are capitalists, and the rule treats what they receive as
 unspent.
 """
 import numpy as np
 from core import ScaleComponent, SetComponent, Publish, top_positions
 
 # This module's markup component: the part of the markup given up for want of sales that has not
-# been recovered since. A later rise of the claim's markup, from any rule, restores this component
+# been recovered since. A later rise of the firm's markup, from any rule, restores this component
 # first (see Model._net in core.py). It stacks.
 UNSOLD = "unsold goods"
 
@@ -85,7 +85,7 @@ UNSOLD = "unsold goods"
 # their price on "the cost at 'normal' levels of output" and keep it "stable in the face of
 # cyclical variations in demand", so a fall in sales raises their cost and not their price. The
 # component is the running sum of the yearly rises. The rule has no recovery of its own, so
-# nothing is taken off it (backlog items 45 and 47).
+# nothing is taken off it.
 OVERHEAD = "idle overhead"
 
 
@@ -99,7 +99,7 @@ class Sales:
         self.consumed = consumed      # part of capitalist income spent on capitalists' own consumption ("save most of it")
         self.job_cost = job_cost      # money spent on new capacity for each new job, in years of the wage
         self.price_give = price_give  # part of the unsold value that price-cutting sellers take out of their markups within a year
-        self.overhead = overhead      # part of a price-holding claim's costs that does not fall when its sales fall
+        self.overhead = overhead      # part of a price-holding firm's costs that does not fall when its sales fall
         self.years = years            # years of hiring and buying over which spending on expansion is reckoned
         self.floor = floor            # a markup cannot fall below this (the same floor as in the sabotage module)
         self.top = top
@@ -156,13 +156,13 @@ class Sales:
         after_price = np.maximum(markup - price_cut, np.minimum(markup, self.floor))
         # The core works the price out from the wage, the markup and the costs. The whole fall of
         # the markup would therefore lower the price. The part that comes from overhead is a rise of
-        # cost at a kept price, so it is entered as a cost of the same amount. Each claim's markup
+        # cost at a kept price, so it is entered as a cost of the same amount. Each firm's markup
         # moves in the proportion of its industry's, and so does its cost.
         carried = L.markup() * ((after_price - new) / markup)[L.ind]
         return [ScaleComponent(UNSOLD, (new / markup)[L.ind], self.name),
                 SetComponent(OVERHEAD, L.components[OVERHEAD] + carried, self.name),
                 Publish("unsold", float(x), self.name),
-                # dominant claims dismiss in proportion to the unsold part, overhead staff excepted;
+                # dominant firms dismiss in proportion to the unsold part, overhead staff excepted;
                 # the green-field module subtracts this from their hiring rate next year
                 Publish("sales_cut", float(x * (1 - self.overhead)), self.name),
                 Publish("build_money_share", float(share), self.name)]

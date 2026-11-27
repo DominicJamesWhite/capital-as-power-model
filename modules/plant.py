@@ -11,9 +11,8 @@ Capital as Power (2009), chapter 10, "Capitalization: fiction, mirror or distort
 sections "Tobin's Q: adding intangibles", "Boom and bust: adding irrationality" and "The gods must
 be crazy", with Figures 10.2, 10.3 and 10.4 and the endnote on deflated series. Chapter 12, the
 passage on book value. Chapter 15, the section "Tobin's Q" with Figure 15.3, and the last note of
-the Data Appendix. The papers in data/bn_archives/papers were searched for "Tobin" and
-"replacement cost". The 2001 regimes paper and the 2002 book on Israel repeat the argument of
-chapter 15, and no other paper adds to it.
+the Data Appendix. The 2001 regimes paper and the 2002 book on Israel repeat the argument of
+chapter 15.
 
 WHAT THE LITERATURE SAYS
 
@@ -59,7 +58,7 @@ RULE
   2. Building. Each year the module counts the employees newly hired in every industry that grew
      in the year before. The plant built for them costs their number, times the cost of plant
      for one employee, times the price level. The price level is the average price of all
-     claims, weighted by employees. A merger builds nothing, so it adds nothing to the record.
+     firms, weighted by employees. A merger builds nothing, so it adds nothing to the record.
   3. Wear. Each year a fixed part of the plant wears out. The worn plant of employees who are
      still employed is replaced at current prices. Plant that has no employee, because its
      employees were dismissed, wears out and is not replaced.
@@ -88,20 +87,20 @@ The ratio, the current-cost basis, the ten-year smoothing and the five-year smoo
   - a fixed cost of plant for one employee. The book denies that plant has a material quantity.
     The model counts employees and nothing else, so the record is a count of employees hired,
     stated in money;
-  - pricing plant at the average price of all claims;
+  - pricing plant at the average price of all firms;
   - the yearly rate of wear, and the replacement of worn plant only where employees remain;
   - counting hiring industry by industry, so that dismissals in one industry do not cancel
     building in another, and building new plant for every hire even when idle plant stands
     elsewhere;
-  - taking the capitalization of all claims as "stocks and bonds". The debt module divides the
-    same earnings into interest and profit, so the claims in the ledger already capitalize both;
+  - taking the capitalization of all firms as "stocks and bonds". The debt module divides the
+    same earnings into interest and profit, so the firms in the ledger already capitalize both;
   - the correlation coefficient and the window of thirty years. The book shows a chart and
     reports no coefficient. Thirty years is the length it gives for one wave.
 
 WHAT IS MISSING
 
-The record is one number for the whole ledger. A merged claim keeps only the buyer's value of an
-added attribute, so a record held claim by claim would lose the plant of every acquired claim.
+The record is one number for the whole ledger. A merged firm keeps only the buyer's value of an
+added attribute, so a record held firm by firm would lose the plant of every acquired firm.
 The module therefore cannot show the book's comparison of Microsoft with General Motors, or the
 ratio of dominant capital alone. Employees hired by the force module and employees who arrive
 through privatisation are not counted as building.

@@ -2,14 +2,14 @@
 
 THE RULE IN PLAIN WORDS
 
-Without this module dominant capital is one body. This module gives every claim a coalition
+Without this module dominant capital is one body. This module gives every firm a coalition
 label and lets two coalitions inside dominant capital follow different routes.
 
-  1. Labels. Every claim carries a label that it takes from its sector. The claims of some
+  1. Labels. Every firm carries a label that it takes from its sector. The firms of some
      sectors carry the label of the conflict coalition. These sectors stand for oil and arms.
-     The claims of some other sectors carry the label of the takeover coalition. These sectors
-     stand for civilian technology and corporate takeovers. All other claims carry no label.
-     A coalition, in the rule below, is the claims of the top hundred that carry its label.
+     The firms of some other sectors carry the label of the takeover coalition. These sectors
+     stand for civilian technology and corporate takeovers. All other firms carry no label.
+     A coalition, in the rule below, is the firms of the top hundred that carry its label.
   2. The danger zone. Each year the module compares the earnings per employee of the conflict
      coalition with the earnings per employee of the top hundred as a whole. While the
      coalition earns less than that average, it is in the danger zone, and a level of conflict
@@ -19,18 +19,18 @@ label and lets two coalitions inside dominant capital follow different routes.
   3. Violence. The violence of a year is the level of conflict or the intensity of
      stagflation, whichever is higher, because the book says that every period of stagflation
      was "accompanied by heightened conflict and violence".
-  4. What violence does for the conflict coalition. Its claims raise their prices by an extra
+  4. What violence does for the conflict coalition. Its firms raise their prices by an extra
      amount in proportion to the violence. They give up some employees for each price rise.
-     No other claim receives this rise. What a claim of the coalition earns per employee
-     above the other claims of the top hundred is its war premium. In a year without
-     violence the claim loses a fixed part of that premium. The coalition therefore drifts
+     No other firm receives this rise. What a firm of the coalition earns per employee
+     above the other firms of the top hundred is its war premium. In a year without
+     violence the firm loses a fixed part of that premium. The coalition therefore drifts
      back toward the average in quiet years, and it can fall into the danger zone again.
   5. The spark. The level of conflict is passed to the stagflation module as a spark. The
      spark is scaled down while the top hundred hold little of the economy. The stagflation
      module then acts as if the intensity of stagflation were at least as high as the spark.
      The conflict coalition can therefore start a bout of stagflation that dominant capital
      as a whole did not start.
-  6. What quiet does for the takeover coalition. In a year without violence the claims of the
+  6. What quiet does for the takeover coalition. In a year without violence the firms of the
      takeover coalition seek to buy more than other buyers do. The advantage shrinks in
      proportion to the violence and is gone at full violence. The module passes this to the
      merger module as a number for each sector.
@@ -115,8 +115,8 @@ addition, and the two coalitions start with the same number of sectors so that n
 ahead. The papers compare rates of return on equity. The ledger has no equity on the books,
 so the rule compares earnings per employee, which is the book's measure of depth. Measuring
 which coalition has primacy by its part of the top hundred's capitalization is an addition.
-Reckoning the war premium against the other claims of the top hundred is an addition, and it
-treats any advantage of the coalition over those claims as a premium that fades.
+Reckoning the war premium against the other firms of the top hundred is an addition, and it
+treats any advantage of the coalition over those firms as a premium that fades.
 Scaling the spark by the top hundred's part of all employees is an addition copied from the
 compass, which limits the intensity of stagflation in the same way. The extra appetite of the
 takeover coalition for acquisitions is an addition in its form: the literature says that this
@@ -138,7 +138,7 @@ from core import Scale, ScaleComponent, Publish, top_positions
 PREMIUM = "war premium"    # this module's markup component; it stacks
 
 NONE, CONFLICT, TAKEOVER = 0, 1, 2
-UNSET = -1          # a claim founded after the start; it takes the label of its sector
+UNSET = -1          # a firm founded after the start; it takes the label of its sector
 
 
 class Coalitions:
@@ -150,12 +150,12 @@ class Coalitions:
 
     def __init__(self, conflict_sectors=(0, 1), takeover_sectors=(2, 3), rise=0.5, fall=0.15,
                  price_rise=0.06, fade=0.2, volume_cost=0.5, spark=0.5, concert=4.0, takeover_edge=0.5, top=100):
-        self.conflict_sectors = conflict_sectors    # sectors whose claims carry the label of the conflict coalition (stand-ins for oil and arms)
-        self.takeover_sectors = takeover_sectors    # sectors whose claims carry the label of the takeover coalition (stand-ins for technology)
+        self.conflict_sectors = conflict_sectors    # sectors whose firms carry the label of the conflict coalition (stand-ins for oil and arms)
+        self.takeover_sectors = takeover_sectors    # sectors whose firms carry the label of the takeover coalition (stand-ins for technology)
         self.rise = rise                # yearly rise in the level of conflict in the danger zone, when the conflict coalition is the only coalition
         self.fall = fall                # yearly fall in the level of conflict outside the danger zone
-        self.price_rise = price_rise    # extra yearly price rise of the conflict coalition's claims at full violence
-        self.fade = fade                # part of a claim's war premium that is lost in a year without violence
+        self.price_rise = price_rise    # extra yearly price rise of the conflict coalition's firms at full violence
+        self.fade = fade                # part of a firm's war premium that is lost in a year without violence
         self.volume_cost = volume_cost  # employees given up per unit of that price rise (the same figure as in the sabotage module)
         self.spark = spark              # part of the level of conflict that reaches the stagflation module when the top hundred hold much
         self.concert = concert          # the spark is complete when the top hundred hold one part in this many of all employees (as in the compass)
@@ -170,7 +170,7 @@ class Coalitions:
         return lab
 
     def labels(self, L):
-        """The coalition label of every claim."""
+        """The coalition label of every firm."""
         lab = L.extra["coalition"]
         return np.where(lab == UNSET, self.sector_labels(L)[L.sector], lab)
 
@@ -228,8 +228,8 @@ class Coalitions:
             mine = np.zeros(len(L), dtype=bool)
             mine[m["members"]] = True
             markup = L.markup()
-            # The war premium: what a coalition claim's markup holds above the markup of the
-            # other claims of the top hundred. It fades in a year without violence.
+            # The war premium: what a coalition firm's markup holds above the markup of the
+            # other firms of the top hundred. It fades in a year without violence.
             rest = m["top"][~mine[m["top"]]]
             usual = (L.n[rest] * markup[rest]).sum() / L.n[rest].sum() if rest.size else np.inf
             premium = np.where(mine, np.maximum(markup - usual, 0.0), 0.0)

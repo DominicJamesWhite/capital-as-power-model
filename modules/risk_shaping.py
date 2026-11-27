@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-The risk term of a claim is the book's risk coefficient. It is 1 when owners are fully
+The risk term of a firm is the book's risk coefficient. It is 1 when owners are fully
 confident of the earnings they expect, and larger when they are less confident. The nine
 modules raise the risk of dominant capital under inflation and under resistance, and only a
 merger lowers it. This module adds what the book says the largest owners do about their own
@@ -10,21 +10,21 @@ risk: they shape it, through their fusion with government organs. Nothing in the
 from outside the model. The tie, the crisis and the resistance are all produced by other rules.
 
   1. The tie. The module measures how far dominant capital is fused with government organs
-     by the part of all capitalization that the hundred largest claims hold. The tie is 0 when
+     by the part of all capitalization that the hundred largest firms hold. The tie is 0 when
      they hold nothing and 1 when they hold everything.
   2. The crisis. The level of crisis in a year is the largest of three numbers, each between
      0 and 1: unemployment above its usual level, where five points above counts as complete;
-     the intensity of stagflation; and the level of systemic fear, if the hype module is on.
+     the intensity of stagflation; and the level of systemic fear, if the eruptions module is on.
   3. The hold of the population. Government organs protect dominant capital less when popular
      resistance is high. The protection is multiplied by one minus the level of popular
      resistance.
-  4. Routine protection. Each year every claim of dominant capital loses a small part of the
+  4. Routine protection. Each year every firm of dominant capital loses a small part of the
      amount by which its risk stands above 1. The part is a routine rate, times the tie,
      times the number of part 3. This stands for regulation, policy and stabilisation that
      the fused bodies set for themselves.
-  5. Guarantees and bailouts. In a crisis every claim of dominant capital loses a further
+  5. Guarantees and bailouts. In a crisis every firm of dominant capital loses a further
      part of the amount by which its risk stands above 1. The part is a bailout rate, times
-     the level of crisis, times the tie, times the number of part 3. No other claim receives
+     the level of crisis, times the tie, times the number of part 3. No other firm receives
      this protection.
   5a. Who pays for the bailout. A bailout is a guarantee by the government, and the government
      backs it with bonds. The module works out what the guarantee is worth: the amount by
@@ -32,7 +32,7 @@ from outside the model. The tie, the crisis and the resistance are all produced 
      It publishes that amount as the government's borrowing for the bailout. Module 2 adds
      it to the government's debt in the following year. The interest on that debt is then
      paid from taxes for as long as the debt stands. When the public debt module is on, it
-     collects the tax from wage earners and from claims and pays the interest to the holders
+     collects the tax from wage earners and from firms and pays the interest to the holders
      of the debt, and the core records both sides. When it is off, module 2 only reports the
      debt, as it does for all government debt.
   5b. A guarantee is worth what the taxes behind it are worth. The public debt module
@@ -48,7 +48,7 @@ from outside the model. The tie, the crisis and the resistance are all produced 
      capital as it does for any rise in resistance.
   7. Readouts. The module publishes the tie, the level of crisis, the yearly fall in the risk
      of dominant capital from routine protection and from bailouts, the anger, the risk
-     of dominant capital divided by the risk of all claims, and the borrowing of part 5a.
+     of dominant capital divided by the risk of all firms, and the borrowing of part 5a.
 
 The module changes only the risk term, through Scale. The core does not let risk fall below 1.
 
@@ -111,7 +111,7 @@ WHAT IT RESTS ON
     and that the stabilisation plan which followed brought "a significant wage erosion".
   - Capital as Power, chapter 13, "The government bond". The bond "marks the first systematic
     capitalization of power, namely, the power of government to tax". Parts 5a and 5b rest
-    on this: what the government borrows is a claim on taxes, and it is worth what the
+    on this: what the government borrows is a right to future taxes, and it is worth what the
     taxes are worth.
   - Tim Di Muzio and Richard H. Robbins, Debt as Power (2016), chapter 1: in the contraction
     of 2007 and 2008 "the claims of capital or creditors were the first honored, even if
@@ -142,7 +142,7 @@ intensity of stagflation and systemic fear is an addition. The literature contai
 sentence that says bailouts raise popular resistance. Part 6 applies the general statements
 about power and resistance to bailouts, and it is the least supported part of the rule.
 
-Parts 5a and 5b were added on 26 November 2026. The literature says that the government pays
+On part 5a, the literature says that the government pays
 for a bailout with bonds and that taxpayers and wage earners bear it. It gives no rule for
 the amount. Taking the amount to be the rise in capitalization that the bailout brings is an
 addition. It uses no number. Leaving the bailout debt standing for ever is an addition: the
@@ -151,9 +151,9 @@ Israeli bonds ran for five years. Part 5b is an addition with no passage of its 
 WHAT IS MISSING
 
 The bailout debt is never redeemed. With the public debt module off, nobody is taxed for
-it and it is only reported. The rule does not pass risk on to smaller claims, although the Israeli case suggests that smaller
-owners were left with the losses. The rule protects all hundred claims alike, and holds no
-single claim to be more closely tied to government than another. The rule lowers the risk
+it and it is only reported. The rule does not pass risk on to smaller firms, although the Israeli case suggests that smaller
+owners were left with the losses. The rule protects all hundred firms alike, and holds no
+single firm to be more closely tied to government than another. The rule lowers the risk
 coefficient directly. It does not lower the year-to-year variation of earnings, which is what
 Figure 13.1 measures.
 """
@@ -169,12 +169,12 @@ class RiskShaping:
 
     def __init__(self, routine=0.05, bailout=0.5, anger=1.0, usual_unemployment=0.05,
                  crisis_span=0.05, top=100):
-        self.routine = routine     # yearly part of a dominant claim's risk above 1 that routine protection removes, at a complete tie and with no resistance (addition)
+        self.routine = routine     # yearly part of a dominant firm's risk above 1 that routine protection removes, at a complete tie and with no resistance (addition)
         self.bailout = bailout     # further yearly part removed in a complete crisis, at a complete tie and with no resistance (addition)
         self.anger = anger         # rise in popular resistance per unit fall in the logarithm of dominant capital's risk that bailouts bring (addition)
         self.usual_unemployment = usual_unemployment   # unemployment that counts as no crisis; the same setting as in the resistance module (addition)
         self.crisis_span = crisis_span   # points of unemployment above the usual level that count as a complete crisis; copied from the consensus compass (addition)
-        self.top = top             # the number of claims counted as dominant capital, as in the book
+        self.top = top             # the number of firms counted as dominant capital, as in the book
 
     def start(self, L):
         return {"government_tie": 0.0, "crisis_level": 0.0, "risk_relief_routine": 0.0,
@@ -183,7 +183,7 @@ class RiskShaping:
 
     @staticmethod
     def _risk(EH, d, idx):
-        """The risk of a group of claims, reckoned as the core's readouts reckon it."""
+        """The risk of a group of firms, reckoned as the core's readouts reckon it."""
         return EH[idx].sum() / (EH[idx] / d[idx]).sum()
 
     def propose(self, L, rng):

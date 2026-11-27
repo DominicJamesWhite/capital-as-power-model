@@ -1,9 +1,9 @@
-"""The core of the model: a ledger of capitalized claims.
+"""The core of the model: a ledger of firms, each with its capitalization.
 
-The core holds the claims, applies the changes that modules propose, and reports
+The core holds the firms, applies the changes that modules propose, and reports
 differential measures. It has no behaviour of its own. With no modules, nothing changes.
 
-Capitalization of a claim (Capital as Power, chapter 11, equation 8):
+Capitalization of a firm (Capital as Power, chapter 11, equation 8):
 
     K = employees * earnings_per_employee * hype / (risk * normal_rate_of_return)
 
@@ -14,7 +14,7 @@ components, and each component belongs to one module:
     markup                = the combination of the markup components
     other income          = the sum of the income components
 
-The price of a claim is not changed directly by any module either. The core works it out, for
+The price of a firm is not changed directly by any module either. The core works it out, for
 the output of one employee in a year, from the same parts (Capital as Power, chapter 16,
 equation 1: earnings are unit price less unit cost; chapter 12, "The markup and the target
 rate of return": a price is a cost with a markup "tacked onto" it):
@@ -33,20 +33,20 @@ counts for a declared part of its excess over 1; the part is a setting and is 0 
 A value below 1 is a discount and not a hold, and a discount always counts in full.
 (A switch for comparisons, `discounts_overlap`, lets the discounts of a group overlap as its premiums do.)
 
-What a stacking component holds. The base markup is a level: the markup the claim would have
+What a stacking component holds. The base markup is a level: the markup the firm would have
 if no gain or loss stood on top of it. Every other stacking component holds the part of its
 owner's movements of the markup that still stands. At the end of each year the core cancels,
-inside each claim, movements in opposite directions against each other (see Model._net). No
-claim's markup changes when this is done, and no gain is credited to anybody for it.
+inside each firm, movements in opposite directions against each other (see Model._net). No
+firm's markup changes when this is done, and no gain is credited to anybody for it.
 
 Transfers. A transfer is money that passes in a year from a payer to a receiver without being
 the price of anything: a tax, or interest. A module proposes a transfer with both sides named,
-and the core settles it (see Model._settle). The payer and the receiver are each either claims
+and the core settles it (see Model._settle). The payer and the receiver are each either firms
 of the ledger or a named party: wage earners, the government, or a party that a module
-registers. No payer pays more than it has in that year. A claim has its earnings of the year
+registers. No payer pays more than it has in that year. A firm has its earnings of the year
 before any transfer. Wage earners have the wage bill. The government has what it holds: what
 it received earlier and has not paid out, and what it receives in the same year. What a payer
-cannot pay, the receiver does not get. The net amount that each claim receives or pays under a
+cannot pay, the receiver does not get. The net amount that each firm receives or pays under a
 module's transfers is entered by the core in an income component of that module.
 
 ADDITION TO THE LITERATURE. Nitzan and Bichler give no rule for how several sources of power
@@ -57,8 +57,8 @@ among the stacking components are all additions made for this model. The record 
 is bookkeeping, and the rule that a payer who cannot pay in full pays every one of its
 transfers in the same proportion is an addition.
 
-Run scripts from the project root, for example:
-    .venv\\Scripts\\python.exe experiments\\casp\\model\\checks.py
+Run the scripts from the folder that holds this file, for example:
+    python checks.py
 """
 import zlib
 from dataclasses import dataclass
@@ -74,7 +74,7 @@ ATTR = {"employees": "n", "hype": "h", "risk": "d"}
 WAGE_EARNERS = "wage earners"      # a party to transfers: it has the wage bill of the year
 GOVERNMENT = "government"          # a party to transfers: it has what it holds and what it receives in the year
 
-# A claim that pays out all it has keeps this part of its earnings. It is an allowance for rounding and
+# A firm that pays out all it has keeps this part of its earnings. It is an allowance for rounding and
 # not a rule: without it a rounding error could leave earnings a hair below zero, and earnings of exactly
 # zero have no logarithm, which the division of the year's gain among its sources needs.
 ROUNDING = 1e-12
@@ -91,10 +91,10 @@ class LedgerError(RuntimeError):
 
 @dataclass
 class Scale:
-    """Multiply one term of some or all claims by a factor. Not for earnings per employee and not
+    """Multiply one term of some or all firms by a factor. Not for earnings per employee and not
     for the price: the core works both out from the wage and the components."""
     term: str            # "employees", "hype" or "risk", or the name of an added attribute
-    factor: object       # one number for all claims, or an array with one number per claim
+    factor: object       # one number for all firms, or an array with one number per firm
     source: str
 
 
@@ -102,7 +102,7 @@ class Scale:
 class SetComponent:
     """Replace the values of a component. Only the module that owns the component may do this."""
     name: str
-    values: object       # one number for all claims, or an array with one number per claim
+    values: object       # one number for all firms, or an array with one number per firm
     source: str
 
 
@@ -110,7 +110,7 @@ class SetComponent:
 class ScaleComponent:
     """Multiply a component by a factor. Only the module that owns the component may do this."""
     name: str
-    factor: object       # one number for all claims, or an array with one number per claim
+    factor: object       # one number for all firms, or an array with one number per firm
     source: str
 
 
@@ -126,26 +126,26 @@ class Merge:
 
 @dataclass
 class Found:
-    """Add new claims.
+    """Add new firms.
 
-    With `epe` left out, a new claim takes the average base markup of its industry and the
+    With `epe` left out, a new firm takes the average base markup of its industry and the
     default of every other component. With `epe` given, the base markup is set so that the new
-    claim has exactly those earnings per employee. `components` may give values for named
-    components; the others take their default. The price of a new claim is not given: the core
-    works it out from the wage and the new claim's components, as for every claim."""
+    firm has exactly those earnings per employee. `components` may give values for named
+    components; the others take their default. The price of a new firm is not given: the core
+    works it out from the wage and the new firm's components, as for every firm."""
     employees: np.ndarray
     epe: np.ndarray      # earnings per employee at founding, or None
     hype: np.ndarray
     risk: np.ndarray
     industry: np.ndarray
     source: str
-    extra: dict = None        # optional values for added per-claim attributes; others take their default
+    extra: dict = None        # optional values for added per-firm attributes; others take their default
     components: dict = None   # optional values for named components; others take their default
 
 
 @dataclass
 class Dissolve:
-    """Remove claims."""
+    """Remove firms."""
     positions: np.ndarray
     source: str
 
@@ -171,14 +171,14 @@ class Transfer:
     """Move money, in this year, from a payer to a receiver. Both sides are always named.
 
     payer     the name of a party (WAGE_EARNERS, GOVERNMENT, or a party registered with
-              Ledger.add_party), or an array with the money that each claim is asked to pay.
-    receiver  the name of a party, or an array with each claim's part of what is received
+              Ledger.add_party), or an array with the money that each firm is asked to pay.
+    receiver  the name of a party, or an array with each firm's part of what is received
               (the parts are divided by their sum).
-    amount    the money asked from a payer that is a party. Left out when claims pay: the amount
+    amount    the money asked from a payer that is a party. Left out when firms pay: the amount
               asked is then the sum of the array.
     The core pays out no more than the payer has (see Model._settle). The proposing module must
-    have registered an income component with transfers=True if claims pay or receive: the core
-    enters there, for each claim, what it received less what it paid, for each employee."""
+    have registered an income component with transfers=True if firms pay or receive: the core
+    enters there, for each firm, what it received less what it paid, for each employee."""
     label: str           # what the transfer is, in words; the record of the year lists it under this label
     payer: object
     receiver: object
@@ -193,7 +193,7 @@ class Component:
     kind: str                       # "markup", "income" or "cost"
     owner: str                      # the name of the one module that may change it (None: nobody yet)
     neutral: float                  # 1 for a markup component, 0 for an income or a cost component
-    default: float                  # the value a newly founded claim takes
+    default: float                  # the value a newly founded firm takes
     group: str = None               # None: the component stacks. Otherwise the name of its overlap group.
     paid_from_wages: bool = False   # income component only: the income is taken out of the wage bill,
                                     # so it is already counted in total income (used by the capitalist share)
@@ -208,7 +208,7 @@ def group_value(values, part, discounts_overlap=False):
     over 1. A value below 1 is a discount, and discounts multiply in full. With part = 1 the
     result is the plain product of all values; with one member it is that member's value.
 
-    discounts_overlap is a switch for comparisons (item 34 of backlog.md). With it on, the
+    discounts_overlap is a switch for comparisons. With it on, the
     discounts of the group are treated as its premiums are: the deepest discount counts in
     full, and each other discount counts for `part` of the amount by which it stands below 1."""
     if len(values) == 1:
@@ -241,13 +241,13 @@ class Ledger:
         if shared:
             self.shared.update(shared)
         self.accounts = {}
-        self.extra = {}          # added per-claim attributes, by name
+        self.extra = {}          # added per-firm attributes, by name
         self.extra_default = {}
         # Components of earnings per employee. At the start the whole markup is the base markup.
         base = np.broadcast_to(np.asarray(epe, dtype=float), size) / self.shared["wage"]
         self.components = {BASE: base.copy()}
         self.info = {BASE: Component("markup", None, 1.0, 1.0)}
-        # Parties to transfers other than claims. `holds` lists the parties that keep what they receive
+        # Parties to transfers other than firms. `holds` lists the parties that keep what they receive
         # until they pay it out, with the money each holds. A party in `parties` and not in `holds`
         # only receives: the ledger does not follow what it does with the money.
         self.parties = {WAGE_EARNERS, GOVERNMENT}
@@ -262,14 +262,14 @@ class Ledger:
     # ---- added attributes
 
     def add_attribute(self, name, values, default):
-        """Give every claim an extra attribute, such as a coalition label. A module calls this
-        in its start(). In a merger the buyer keeps its own value. A new claim takes `default`
+        """Give every firm an extra attribute, such as a coalition label. A module calls this
+        in its start(). In a merger the buyer keeps its own value. A new firm takes `default`
         unless the Found change supplies a value."""
         self.extra[name] = np.broadcast_to(np.asarray(values), self.n.size).copy()
         self.extra_default[name] = default
 
     def add_party(self, name, holds=False):
-        """Name a party to transfers that is not a claim, such as a group of households. A module
+        """Name a party to transfers that is not a firm, such as a group of households. A module
         calls this in its start(). With holds=False the party only receives. With holds=True it
         keeps what it receives and can pay it out later, as the government does."""
         self.parties.add(name)
@@ -288,9 +288,9 @@ class Ledger:
                 enters the price and never the earnings. A module that moves a markup without
                 moving the price says so by moving a cost component by the opposite amount.
         group   None if the component stacks; the name of an overlap group otherwise.
-        default the value a newly founded claim takes (the neutral value unless given).
+        default the value a newly founded firm takes (the neutral value unless given).
         transfers  income component only, and at most one for each module: the core sets it each
-                year to what each claim received less what it paid under the owner's Transfer
+                year to what each firm received less what it paid under the owner's Transfer
                 changes, for each employee. The owner cannot set it directly.
         The base markup exists from the start; registering it gives it its owner."""
         if kind not in ("markup", "income", "cost"):
@@ -340,17 +340,17 @@ class Ledger:
         return np.broadcast_to(np.asarray(out, dtype=float), self.n.size)
 
     def markup(self):
-        """Each claim's markup: the combination of its markup components."""
+        """Each firm's markup: the combination of its markup components."""
         return self.markup_from(self.components)
 
     def markup_with(self, name, values):
-        """Each claim's markup if one component had the given values and nothing else changed."""
+        """Each firm's markup if one component had the given values and nothing else changed."""
         comps = dict(self.components)
         comps[name] = np.broadcast_to(np.asarray(values, dtype=float), self.n.size)
         return self.markup_from(comps)
 
     def markup_without(self, name):
-        """Each claim's markup with one component at its neutral value."""
+        """Each firm's markup with one component at its neutral value."""
         return self.markup_with(name, self.info[name].neutral)
 
     def stacking_markup(self):
@@ -392,7 +392,7 @@ class Ledger:
         return self.shared["wage"] * (1.0 + self.costs()) if self.has_costs() else np.full(self.n.size, self.shared["wage"])
 
     def components_of(self, positions):
-        """A copy of every component's values for the given claims, to hand to a Found change."""
+        """A copy of every component's values for the given firms, to hand to a Found change."""
         return {name: values[positions].copy() for name, values in self.components.items()}
 
     def refresh(self):
@@ -412,7 +412,7 @@ class Ledger:
         return self.n * self.e
 
     def markup_earnings(self):
-        """The part of each claim's earnings that comes from its markup."""
+        """The part of each firm's earnings that comes from its markup."""
         return self.n * (self.shared["wage"] * self.markup()) if self.has_income() else self.n * self.e
 
     def cap(self):
@@ -420,7 +420,7 @@ class Ledger:
 
 
 def top_positions(K, members, top):
-    """Positions of the `top` largest claims by capitalization among `members`."""
+    """Positions of the `top` largest firms by capitalization among `members`."""
     k = min(top, members.size)
     part = np.argpartition(K[members], -k)[-k:]
     return members[part]
@@ -429,7 +429,7 @@ def top_positions(K, members, top):
 def readouts(L, top=100, mask=None, group=None):
     """Differential measures for an envelope.
 
-    mask selects the claims that make up the envelope (default: all claims).
+    mask selects the firms that make up the envelope (default: all firms).
     group fixes the top group by position (default: the `top` largest in the envelope).
     """
     K = L.cap()
@@ -458,7 +458,7 @@ def readouts(L, top=100, mask=None, group=None):
         total_income = E[members].sum() + wage * emp
         other_part = other_part_top = 0.0
     return {
-        "claims": members.size,
+        "firms": members.size,
         "dk": D["cap"] / A["cap"],                       # differential capitalization
         "breadth": D["employees"] / A["employees"],      # differential employees
         "depth": D["epe"] / A["epe"],                    # differential earnings per employee
@@ -498,7 +498,7 @@ class Model:
     5. the change in differential capitalization is divided among its sources.
 
     After step 2, and again after step 3, the record kept in the stacking components is netted
-    (see _net). This changes no claim's markup and is credited to no source.
+    (see _net). This changes no firm's markup and is credited to no source.
 
     The order in which modules are listed makes no difference to the result: changes are
     applied in the alphabetical order of their sources, and components are combined in the
@@ -566,7 +566,7 @@ class Model:
 
     def _guard(self, touched, stage):
         """Stop the run if the ledger holds an impossible value, and name the sources that
-        changed the offending claims in this step."""
+        changed the offending firms in this step."""
         L = self.L
         tests = [("employees that are negative or not finite", ~np.isfinite(L.n) | (L.n < 0)),
                  ("earnings per employee that are negative or not finite", ~np.isfinite(L.e) | (L.e < 0)),
@@ -586,15 +586,15 @@ class Model:
                 named = ", ".join(sources) if sources else "none (no change of this step touched them)"
                 raise LedgerError(
                     f"The run was stopped in step {len(self.history) + 1}, {stage}. "
-                    f"{int(np.sum(bad))} of {len(L)} claims have {what}. "
-                    f"Sources that changed these claims in this step: {named}.")
+                    f"{int(np.sum(bad))} of {len(L)} firms have {what}. "
+                    f"Sources that changed these firms in this step: {named}.")
 
     # ---- the record kept in the stacking components
 
     def _net(self, base_move=None):
-        """Cancel opposite movements among the stacking markup components of each claim.
+        """Cancel opposite movements among the stacking markup components of each firm.
 
-        THE CONVENTION (an addition). Several rules move the markup of a claim, and each records
+        THE CONVENTION (an addition). Several rules move the markup of a firm, and each records
         its movements in its own component. A rule that pushes up every year and a rule that
         pushes down every year would each pile up a record without limit, although the markup
         itself stays ordinary. The core therefore keeps, in every stacking component other than
@@ -602,15 +602,15 @@ class Model:
 
           - a gain stands until a later fall of the markup takes it away;
           - a loss stands until a later rise of the markup restores it;
-          - the base holds the rest: the markup the claim would have if no gain or loss stood.
+          - the base holds the rest: the markup the firm would have if no gain or loss stood.
 
-        Each year, in each claim, what pushes up is set against what pushes down. The things set
+        Each year, in each firm, what pushes up is set against what pushes down. The things set
         against each other are the standing gains (components above 1), the standing losses
         (components below 1), and this year's movement of the base by its owner (`base_move`, the
         change in its logarithm). The smaller side is cancelled in full. The larger side keeps
         the difference, and each of its members keeps the same proportion of what it had. The
         reckoning is in logarithms, so the product of the components, and with it the markup of
-        the claim, is the same before and after. Nothing is credited to any source for it.
+        the firm, is the same before and after. Nothing is credited to any source for it.
 
         Components of an overlap group are levels that their owners set, and income components
         are amounts of money. Neither takes part."""
@@ -678,7 +678,7 @@ class Model:
         K0 = L.cap()
         count = len(L)
         group = top_positions(K0, np.arange(count), self.top)
-        touched = {}                    # for the guard: which claims each source changed in this step
+        touched = {}                    # for the guard: which firms each source changed in this step
 
         def touch(source, mask):
             touched[source] = touched.get(source, np.zeros(len(L), dtype=bool)) | mask
@@ -829,20 +829,20 @@ class Model:
         r["attribution"] = attribution
         r["published"] = published
         r["transfers"] = self.settlement["transfers"]      # every transfer of the year: label, payer, receiver, asked, paid
-        r["parties"] = self.settlement["parties"]          # for each party that is not a claim: received, paid, and what it holds
+        r["parties"] = self.settlement["parties"]          # for each party that is not a firm: received, paid, and what it holds
         self.history.append(r)
         return r
 
     # ---- transfers
 
     def _settle(self, transfers, group):
-        """Settle the year's transfers and enter the claims' side in the components that record them.
+        """Settle the year's transfers and enter the firms' side in the components that record them.
 
         THE RULE. Every transfer has a payer and a receiver, and no payer pays more than it has.
 
-          - A claim has its earnings of the year before any transfer: its employees times the wage
+          - A firm has its earnings of the year before any transfer: its employees times the wage
             times its markup, plus its other income that is not a transfer. These are the figures
-            after the year's scalings, markups and wage, and before the year's mergers. (A claim
+            after the year's scalings, markups and wage, and before the year's mergers. (A firm
             that pays all it has keeps one part in a million million, as an allowance for rounding.)
           - Wage earners have the wage bill of the year.
           - The government, and any other party registered as holding money, has what it held at the
@@ -851,14 +851,14 @@ class Model:
 
         A payer that is asked for more than it has pays every one of its transfers in the same
         proportion (a convention, and an addition). What a payer does not pay, the receiver does
-        not get. What a claim receives in the year does not add to what it can pay in the same
+        not get. What a firm receives in the year does not add to what it can pay in the same
         year, so the result does not depend on any order among the transfers. Parties that hold
-        money are settled after the claims and the wage earners, and a party that is paid by
+        money are settled after the firms and the wage earners, and a party that is paid by
         another such party is settled after it.
 
-        The claims' side is entered as money for each employee, reckoned on the employees the claim
+        The firms' side is entered as money for each employee, reckoned on the employees the firm
         has after the year's scalings. The whole amount settled is therefore the amount that
-        changes the claims' earnings, to the last unit.
+        changes the firms' earnings, to the last unit.
 
         Returns the record of the year: one row for each transfer, and one for each party."""
         L = self.L
@@ -868,38 +868,38 @@ class Model:
             L.components[name] = np.zeros(count)
         L.refresh()
         wage_bill = L.shared["wage"] * L.n.sum()
-        means = np.maximum(L.n * L.e, 0.0) * (1.0 - ROUNDING)    # what each claim has: its earnings before any transfer
+        means = np.maximum(L.n * L.e, 0.0) * (1.0 - ROUNDING)    # what each firm has: its earnings before any transfer
 
         rows = []
         for t in transfers:
-            by_claims = not isinstance(t.payer, str)
-            to_claims = not isinstance(t.receiver, str)
-            for side in ([] if by_claims else [t.payer]) + ([] if to_claims else [t.receiver]):
+            by_firms = not isinstance(t.payer, str)
+            to_firms = not isinstance(t.receiver, str)
+            for side in ([] if by_firms else [t.payer]) + ([] if to_firms else [t.receiver]):
                 if side not in L.parties:
                     raise LedgerError(f"module '{t.source}' named '{side}' in the transfer '{t.label}', and no "
                                       f"such party exists. Register it in start() with L.add_party.")
-            if (by_claims or to_claims) and L.transfer_component(t.source) is None:
-                raise LedgerError(f"module '{t.source}' proposed the transfer '{t.label}', which claims pay or "
+            if (by_firms or to_firms) and L.transfer_component(t.source) is None:
+                raise LedgerError(f"module '{t.source}' proposed the transfer '{t.label}', which firms pay or "
                                   f"receive, and has no component to record it. Register one in start() with "
                                   f"L.add_component(name, owner, kind='income', transfers=True).")
-            if by_claims:
+            if by_firms:
                 ask = np.broadcast_to(np.asarray(t.payer, dtype=float), count)
                 asked = float(ask.sum())
             else:
                 if t.amount is None:
                     raise LedgerError(f"the transfer '{t.label}' of module '{t.source}' has a party as payer and no amount")
-                if not to_claims and t.payer == t.receiver:
+                if not to_firms and t.payer == t.receiver:
                     raise LedgerError(f"the transfer '{t.label}' of module '{t.source}' has '{t.payer}' on both sides")
                 if t.payer != WAGE_EARNERS and t.payer not in L.holds:
                     raise LedgerError(f"module '{t.source}' asked '{t.payer}' to pay the transfer '{t.label}'. That "
                                       f"party only receives: the ledger knows of nothing that it has.")
                 ask, asked = None, float(t.amount)
             parts = None
-            if to_claims:
+            if to_firms:
                 parts = np.broadcast_to(np.asarray(t.receiver, dtype=float), count)
                 if not np.all(np.isfinite(parts)) or (parts < 0).any() or (asked > 0 and parts.sum() <= 0):
                     raise LedgerError(f"the transfer '{t.label}' of module '{t.source}' divides what is received "
-                                      f"among claims in parts that are negative, missing or all zero")
+                                      f"among firms in parts that are negative, missing or all zero")
             if not np.isfinite(asked) or asked < 0 or (ask is not None and (ask < 0).any()):
                 raise LedgerError(f"the transfer '{t.label}' of module '{t.source}' asks for an amount that is "
                                   f"negative or not a number. A transfer in the other direction names the other payer.")
@@ -907,14 +907,14 @@ class Model:
 
         received = {p: 0.0 for p in L.parties}
         paid_out = {p: 0.0 for p in L.parties}
-        net = {}                                    # for each module, what each claim received less what it paid
+        net = {}                                    # for each module, what each firm received less what it paid
 
-        def give(row, total, paid_by_claims=None):
+        def give(row, total, paid_by_firms=None):
             t = row["t"]
             row["paid"] = float(total)
-            if paid_by_claims is not None:
-                net[t.source] = net.get(t.source, 0.0) - paid_by_claims
-                row["paid_top"] = float(paid_by_claims[group].sum())
+            if paid_by_firms is not None:
+                net[t.source] = net.get(t.source, 0.0) - paid_by_firms
+                row["paid_top"] = float(paid_by_firms[group].sum())
             else:
                 paid_out[t.payer] += float(total)
             if row["parts"] is not None:
@@ -924,12 +924,12 @@ class Model:
             else:
                 received[t.receiver] += float(total)
 
-        # 1. claims pay out of their earnings
-        asked_of_claims = np.zeros(count)
+        # 1. firms pay out of their earnings
+        asked_of_firms = np.zeros(count)
         for row in rows:
             if row["ask"] is not None:
-                asked_of_claims = asked_of_claims + row["ask"]
-        able = np.where(asked_of_claims > means, means / np.maximum(asked_of_claims, 1e-300), 1.0)
+                asked_of_firms = asked_of_firms + row["ask"]
+        able = np.where(asked_of_firms > means, means / np.maximum(asked_of_firms, 1e-300), 1.0)
         for row in rows:
             if row["ask"] is not None:
                 paid = row["ask"] * able
@@ -971,10 +971,10 @@ class Model:
         for row in rows:
             t = row["t"]
             record.append({"label": t.label, "source": t.source,
-                           "payer": t.payer if row["ask"] is None else "claims",
-                           "receiver": t.receiver if row["parts"] is None else "claims",
+                           "payer": t.payer if row["ask"] is None else "firms",
+                           "receiver": t.receiver if row["parts"] is None else "firms",
                            "asked": row["asked"], "paid": row["paid"],
-                           "paid_by_top": row.get("paid_top", 0.0),            # the part the hundred largest claims paid
+                           "paid_by_top": row.get("paid_top", 0.0),            # the part the hundred largest firms paid
                            "received_by_top": row.get("received_top", 0.0)})   # the part they received
         return {"transfers": record, "parties": parties}
 
@@ -1019,15 +1019,15 @@ class Model:
     def _merge(self, c, remove):
         """Buyers absorb targets. Employees, earnings and expected earnings add, so totals are kept.
         Each income component adds, and so does each cost component, so the value of what the two
-        claims sell is kept as well. Each markup component other than the base becomes the average
-        of the two claims' values, weighted by their earnings from the markup. The base markup is
+        firms sell is kept as well. Each markup component other than the base becomes the average
+        of the two firms' values, weighted by their earnings from the markup. The base markup is
         then set so that the buyer's markup earnings are exactly the sum of the two."""
         L = self.L
         b, t = np.asarray(c.buyers), np.asarray(c.targets)
         if t.size == 0:
             return
         assert np.unique(t).size == t.size, "a target was acquired twice"
-        assert not np.isin(t, b).any(), "a claim was both buyer and target"
+        assert not np.isin(t, b).any(), "a firm was both buyer and target"
         assert not remove[t].any() and not remove[b].any()
         nrr, wage = L.shared["nrr"], L.shared["wage"]
         K, E = L.cap(), L.earnings()
@@ -1061,7 +1061,7 @@ class Model:
         remove[t] = True
 
     def _found(self, c):
-        """Add new claims. Each component takes the value the Found change gives, or its default.
+        """Add new firms. Each component takes the value the Found change gives, or its default.
         The base markup takes the average of the industry entered, weighted by employees, unless
         the change gives earnings per employee; it is then set to produce exactly those earnings."""
         L = self.L

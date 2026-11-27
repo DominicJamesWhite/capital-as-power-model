@@ -1,6 +1,6 @@
 """Module 4: mergers and acquisitions (Capital as Power, chapters 14 and 15).
 
-Claims in dominant capital acquire claims they can reach. A claim can reach targets in its own
+Firms in dominant capital acquire firms they can reach. A firm can reach targets in its own
 industry, and targets in its sector and in the rest of the nation to the extent that those
 boundaries are open. The volume acquired falls as dominant capital comes to hold most of what
 it can reach, so a merger wave inside a closed envelope runs out by itself.
@@ -27,7 +27,7 @@ class Mergers:
         self.drag = drag              # fall in the hiring rate per unit of merger volume
         self.counterforce = counterforce   # how strongly resistance slows mergers
         self.top = top
-        self.max_targets = 200        # the most claims one buyer can absorb in a year
+        self.max_targets = 200        # the most firms one buyer can absorb in a year
 
     def start(self, L):
         return {"merger_volume": 0.0, "hiring_drag": 0.0, "pool_open": 1.0}
@@ -51,15 +51,15 @@ class Mergers:
         held_s = np.bincount(sec[dominant], n[dominant], n_sec)
         free_n, held_n = n[~dominant].sum(), n[dominant].sum()
 
-        # Free claims of each industry, in random order, so that a target can be drawn quickly.
+        # Free firms of each industry, in random order, so that a target can be drawn quickly.
         free_pos = rng.permutation(np.flatnonzero(~dominant))
         free_pos = free_pos[np.argsort(ind[free_pos], kind="stable")]
-        left = np.bincount(ind[free_pos], minlength=n_ind).astype(float)   # free claims left per industry
-        nxt = np.concatenate([[0], np.cumsum(left)[:-1]]).astype(int)      # next free claim per industry
+        left = np.bincount(ind[free_pos], minlength=n_ind).astype(float)   # free firms left per industry
+        nxt = np.concatenate([[0], np.cumsum(left)[:-1]]).astype(int)      # next free firm per industry
 
         buyers, targets, acquired = [], [], 0.0
         open_sum = weight_sum = 0.0
-        # a barrier that holds the dominant claims of a sector inside their own industry (optional module); 0 without it
+        # a barrier that holds the dominant firms of a sector inside their own industry (optional module); 0 without it
         barred = np.broadcast_to(np.asarray(L.accounts.get("line_barrier", 0.0), dtype=float), n_sec)
         open_sector_all, open_nation_all = open_sector, open_nation
         for a in rng.permutation(top):
@@ -74,7 +74,7 @@ class Mergers:
             want = self.base_rate * n[a] * free / (free + held) * (1 - slow)
             want = want * appetite[s]      # a coalition's appetite for buying (optional module); 1 without it
             want = want * hyped
-            want = want * (1 - L.accounts.get("eruption_stops_buying", 0.0))   # an eruption suspends the buying of claims (optional module); 0 without it
+            want = want * (1 - L.accounts.get("eruption_stops_buying", 0.0))   # an eruption suspends the buying of firms (optional module); 0 without it
             reach = np.where(L.sector_of == s, open_sector, open_nation)   # openness toward each industry
             reach[i] = 1.0
             got = 0.0

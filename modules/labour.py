@@ -41,8 +41,8 @@ dominant capital, weakens its hold on its markups, and raises its risk.
      of popular resistance when it sets the level of unemployment at which wages keep pace
      with prices. The stagflation module uses the strength in the whole economy in place of
      popular resistance when it sets the part of each price rise that wages obtain. Both read
-     popular resistance as before when this module is off.
-  9. The cost of strikes to owners. The risk of every claim in an industry is multiplied by 1
+     popular resistance when this module is off.
+  9. The cost of strikes to owners. The risk of every firm in an industry is multiplied by 1
      plus a rate times the strike activity of the industry. The rise lasts only as long as
      the strikes: each year the module removes last year's rise and applies this year's.
  10. Readouts. The module publishes the strength in each industry and in the whole economy,
@@ -143,7 +143,7 @@ has no laws. Co-option is a fixed discount and not a process.
 import numpy as np
 from core import Scale, Publish, top_positions
 
-PREMIUM = "labour_strike_premium"     # the added per-claim number: the rise in risk from strikes now inside the claim's risk
+PREMIUM = "labour_strike_premium"     # the added per-firm number: the rise in risk from strikes now inside the firm's risk
 
 
 class Labour:
@@ -164,7 +164,7 @@ class Labour:
         self.discipline_at = discipline_at    # unemployment at which the threat of the sack silences strikes altogether (addition)
         self.quiet_part = quiet_part          # part of an organisation that counts toward strength when it is not striking (addition)
         self.cooption = cooption              # part of that quiet strength lost in an industry wholly held by dominant capital (addition); 0 switches co-option off
-        self.strike_risk = strike_risk        # rise in the risk of a claim per unit of the part of its industry's employees on strike (addition); 0 switches it off
+        self.strike_risk = strike_risk        # rise in the risk of a firm per unit of the part of its industry's employees on strike (addition); 0 switches it off
         self.top = top
         self.org = None                       # organised part of employees, one number per industry
         self.wages = []                       # the real wage of recent years
@@ -229,7 +229,7 @@ class Labour:
         changes = [Publish(key, value, self.name)
                    for key, value in self.readouts(n, held, grievance, militancy, now).items()]
 
-        # Part 9: strikes raise the risk of the claims they hit, for as long as they last.
+        # Part 9: strikes raise the risk of the firms they hit, for as long as they last.
         if self.strike_risk > 0:
             factor = (1 + self.strike_risk * strikes)[L.ind] / L.extra[PREMIUM]
             if not np.allclose(factor, 1.0, rtol=0, atol=1e-12):

@@ -1,14 +1,14 @@
-"""Stage 2: sabotage, green-field growth and mergers together.
+"""Three modules alone: sabotage, green-field growth and mergers.
 
 Four runs from the same starting position, to see what each module adds.
-Each run of 80 years takes about two minutes at 300,000 starting claims.
+Each run of 80 years takes about two minutes at 300,000 starting firms.
   A. green-field growth and sabotage only;
   B. the same with mergers, every boundary beyond the industry closed;
   C. as B, with the sector boundary opened by hand in year 40 (a what-if run);
   E. as B, with the modules listed in the opposite order.
 
-Run from the project root:
-    .venv\\Scripts\\python.exe experiments\\casp\\model\\stage2.py
+Run from the folder that holds this file:
+    python stage2.py [firms]
 """
 import numpy as np
 from core import Ledger, Model, LedgerError
@@ -17,7 +17,7 @@ from modules.greenfield import Greenfield
 from modules.mergers import Mergers
 
 YEARS = 80
-COLUMNS = [("claims", "claims", "{:>7.0f}"), ("unemployment", "unemp", "{:>6.1%}"),
+COLUMNS = [("firms", "firms", "{:>7.0f}"), ("unemployment", "unemp", "{:>6.1%}"),
            ("capital_share", "share", "{:>6.1%}"), ("dk", "dk", "{:>7.1f}"),
            ("breadth", "breadth", "{:>7.1f}"), ("depth", "depth", "{:>6.2f}"),
            ("d_risk", "d_risk", "{:>6.2f}"), ("top_share_employees", "top_emp", "{:>7.1%}"),
@@ -28,7 +28,7 @@ COUNT = 300_000      # about the number of United States corporations in the 191
 
 
 def starting_ledger(seed=0, count=None, industries=400, sectors=20):
-    """Many small claims of similar size: the book's 'golden age of free competition'."""
+    """Many small firms of similar size: the book's 'golden age of free competition'."""
     count = count or COUNT
     rng = np.random.default_rng(seed)
     employees = rng.lognormal(np.log(100), 0.8, count)

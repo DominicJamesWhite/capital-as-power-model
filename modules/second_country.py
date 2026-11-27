@@ -1,13 +1,12 @@
 """Optional module: a second country behind capital controls.
 
-Sources. Capital as Power (2009), chapter 15: Proposition 5 and "Breaking the envelope", the
+Sources. Capital as Power (2009), chapter 14, Proposition 5; chapter 15, "Breaking the envelope", the
 section "Globalization", and the footnote on South Africa. Nitzan and Bichler, "Going Global:
 Differential Accumulation and the Great U-turn in South Africa and Israel" (2001), section 8.
 Nitzan and Bichler, The Global Political Economy of Israel (2002), chapters 2, 3, 4 and 6.
-The two later texts are in data/bn_archives/papers/going_global_2001 and gpe_israel_2002.
 
 What the literature says.
-  - A country is a boundary around a set of claims, the last of the "successive social
+  - A country is a boundary around a set of firms, the last of the "successive social
     'envelopes' - from the industry, to the sector, to the nation-state, to the world as a whole".
   - Capital crossing a border is a change of owner and nothing else: "the only thing that happens
     is a reshuffle of ownership claims, in which foreign capitalists acquire an asset from (or
@@ -21,36 +20,36 @@ What the literature says.
     it has "grown 'too big'" for its own economy: "the only way to continue and accumulate
     differentially is to break the domestic 'envelope'", and "if dominant capital were to expand
     beyond the country's border, capital movement had to be made free".
-  - When the border opens, ownership moves both ways. Foreign owners buy local claims, local
+  - When the border opens, ownership moves both ways. Foreign owners buy local firms, local
     dominant capital buys abroad, and a merger between a firm of a large country and a firm of a
     small country "is likely to be not 'a merger of equals', but a takeover of the latter by
     the former".
 
 Rule.
-  1. The claims of a few sectors form the second country. Every claim carries a country number
-     (1 for the first country, 2 for the second). A claim founded in an industry of the second
+  1. The firms of a few sectors form the second country. Every firm carries a country number
+     (1 for the first country, 2 for the second). A firm founded in an industry of the second
      country belongs to the second country.
   2. This module runs in place of the merger module. It applies the merger module's own rule
-     twice: once to the claims of the first country with the first country's settings and its
-     hundred largest claims, and once to the claims of the second country with the second
-     country's settings and its five largest claims. Neither group can reach the other
-     country's claims through this part of the rule.
+     twice: once to the firms of the first country with the first country's settings and its
+     hundred largest firms, and once to the firms of the second country with the second
+     country's settings and its five largest firms. Neither group can reach the other
+     country's firms through this part of the rule.
   3. Inside the second country the boundary between industries opens when the five largest
-     claims hold more than a set part of what they can reach, less the country's own roadblocks.
+     firms hold more than a set part of what they can reach, less the country's own roadblocks.
      This is conglomeration. The roadblocks of the second country rise with its own mergers.
   4. The border has a permeability between 0 (full controls) and 1. It starts at 0. It rises
-     only after the internal boundary is fully open, and only while the five largest claims
+     only after the internal boundary is fully open, and only while the five largest firms
      hold more than the set part of their whole country, less the roadblocks. It also rises
      when the first country's dominant capital has opened its own national boundary fully and
      holds more than the set part of its reach. It falls when roadblocks exceed the pressure by
      a margin.
-  5. While the border is partly open, claims change owners across it. The first country's
-     hundred largest claims buy small claims of the second country, the second country's five
-     largest claims buy small claims of the first country, and each year each of the five
-     may be absorbed whole by a larger claim of the first country's hundred. A purchase across
+  5. While the border is partly open, firms change owners across it. The first country's
+     hundred largest firms buy small firms of the second country, the second country's five
+     largest firms buy small firms of the first country, and each year each of the five
+     may be absorbed whole by a larger firm of the first country's hundred. A purchase across
      the border is slowed by the roadblocks of both countries.
   6. The module publishes, for the sabotage module, the part of each industry of the second
-     country that its five largest claims hold, and a shift in the strength of labour in the
+     country that its five largest firms hold, and a shift in the strength of labour in the
      second country. It publishes differential capitalization for each country and for both.
 
 Additions. The literature gives no rates and no rule for when controls are lifted. Every number
@@ -58,22 +57,22 @@ below is an addition except the count of five. The form of parts 3 to 5 copies t
 envelope module, which is itself an addition. All mergers are tagged "mergers", because the core
 divides a year's merger gain equally among the tags it finds.
 
-What is missing. The second country has its own claims, its own dominant group, its own merger
+What is missing. The second country has its own firms, its own dominant group, its own merger
 settings, its own roadblocks, its own permeability and its own strength of labour. It does not
 have its own wage, working population, unemployment, currency, compass, stagflation or popular
 resistance: those are still single numbers for both countries. The other modules still pick
-their hundred largest claims from both countries together. Employees of a claim bought across
-the border are counted in the buyer's industry afterwards, because a claim has one industry.
+their hundred largest firms from both countries together. Employees of a firm bought across
+the border are counted in the buyer's industry afterwards, because a firm has one industry.
 """
 import numpy as np
 from core import Merge, Scale, Publish, readouts
 from modules.mergers import Mergers
 
-HOME, SECOND = 1.0, 2.0      # the country numbers carried by each claim
+HOME, SECOND = 1.0, 2.0      # the country numbers carried by each firm
 
 
 class _View:
-    """The claims of one country, presented to the merger rule as if they were a whole ledger."""
+    """The firms of one country, presented to the merger rule as if they were a whole ledger."""
 
     def __init__(self, L, pos, K, shared, accounts):
         self.pos, self.n, self.ind, self._K = pos, L.n[pos], L.ind[pos], K[pos]
@@ -108,8 +107,8 @@ class SecondCountry:
         self.threshold = threshold          # part of its reach the dominant group must hold before a boundary gives
         self.speed = speed                  # yearly movement of a boundary per unit of net pressure
         self.close_margin = close_margin    # how far roadblocks must exceed pressure to close a boundary
-        self.permeability = start_permeability   # how freely claims are bought across the border; 0 is full controls
-        self.takeover = takeover            # yearly chance, at a fully open border, that one of the five is absorbed by a larger foreign claim
+        self.permeability = start_permeability   # how freely firms are bought across the border; 0 is full controls
+        self.takeover = takeover            # yearly chance, at a fully open border, that one of the five is absorbed by a larger foreign firm
         self.labour_shift = labour_shift    # added to the unemployment level at which wages keep pace with prices, in the second country only
         self.home = home or Mergers()       # the first country's merger settings
         # the second country's own merger settings: yearly appetite, fall in risk after a merger, effect of roadblocks
@@ -133,7 +132,7 @@ class SecondCountry:
 
     @staticmethod
     def _buy(buyers, wants, pool, n, rng, most):
-        """Each buyer takes claims from the pool, in random order, up to the employees it wants."""
+        """Each buyer takes firms from the pool, in random order, up to the employees it wants."""
         b_out, t_out, k, acquired = [], [], 0, 0.0
         pool = rng.permutation(pool)
         for j in rng.permutation(len(buyers)):
@@ -157,7 +156,7 @@ class SecondCountry:
         home_pos, sec_pos = np.flatnonzero(~second), np.flatnonzero(second)
         changes = []
 
-        # part 1: a claim founded last year in an industry of the second country takes its country number
+        # part 1: a firm founded last year in an industry of the second country takes its country number
         wrong = second & (L.extra["country"] < 1.5)
         if wrong.any():
             changes.append(Scale("country", np.where(wrong, SECOND / HOME, 1.0), self.name))
@@ -193,14 +192,14 @@ class SecondCountry:
         own["roadblocks"] = self.roadblocks
         stay = sec_pos[~gone[sec_pos]]
         pub2, b2, t2 = {}, np.zeros(0, int), np.zeros(0, int)
-        if stay.size:                                    # nothing to do once every claim of the country has been bought
+        if stay.size:                                    # nothing to do once every firm of the country has been bought
             pub2, b2, t2 = apply(self.local, stay, {"perm_sector": c, "perm_nation": c}, own)
         if t1.size:
             changes.append(Merge(b1, t1, "mergers", self.home.risk_cut))
         if t2.size:
             changes.append(Merge(b2, t2, "mergers", self.local.risk_cut))
 
-        # part 5, second half: small claims change owners across the border
+        # part 5, second half: small firms change owners across the border
         n_home, n_second = n[home_pos].sum(), n[sec_pos].sum()
         inward = outward = 0.0
         # the cross-border ownership module (optional) takes over these purchases and moves no employees; 0 without it
@@ -223,7 +222,7 @@ class SecondCountry:
         if cross_t:
             changes.append(Merge(np.array(cross_b), np.array(cross_t), "mergers", self.home.risk_cut))
         inward += absorbed_n
-        # employees whose claims changed owners across the border without a merger (optional module); 0 without it
+        # employees whose firms changed owners across the border without a merger (optional module); 0 without it
         inward += A.get("cross_border_inward", 0.0) * n.sum()
         outward += A.get("cross_border_outward", 0.0) * n.sum()
         self.bought_in += inward
@@ -257,7 +256,7 @@ class SecondCountry:
         n_ind = np.maximum(np.bincount(L.ind, n, k), 1e-12)
         held = np.where(ind_second, np.bincount(L.ind[dominant2], n[dominant2], k) / n_ind, 0.0)
         r1 = readouts(L, self.home.top, mask=~second)
-        empty = {"dk": 0.0, "top_share_employees": 0.0, "depth": 0.0, "claims": 0}
+        empty = {"dk": 0.0, "top_share_employees": 0.0, "depth": 0.0, "firms": 0}
         r2 = readouts(L, self.top, mask=second) if sec_pos.size else empty
         both = readouts(L, self.home.top)
         for key, value in (
@@ -277,7 +276,7 @@ class SecondCountry:
                 ("second_top_share", r2["top_share_employees"]),      # the five's part of their country's employees
                 ("home_top_share", r1["top_share_employees"]),
                 ("second_depth", r2["depth"]), ("home_depth", r1["depth"]),
-                ("second_claims", r2["claims"]),
+                ("second_firms", r2["firms"]),
                 ("second_part_of_employees", n_second / total)):
             changes.append(Publish(key, value, self.name))
         return changes

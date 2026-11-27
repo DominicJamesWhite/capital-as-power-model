@@ -1,15 +1,14 @@
 """Thirteen checks of the model's bookkeeping. They test arithmetic, not the theory.
 
-Checks 1 to 4 are the original checks of the ledger. Checks 5 to 9 were added with the named
-components of earnings per employee (26 November 2026). Check 10 tests the bookkeeping of the
-green-field module when it founds claims (26 November 2026). Check 11 tests that every stacking
-component holds a level that means something in a long run with many modules (26 November 2026).
-Check 12 tests that the price of every claim is worked out from the wage, the markup and the named
-costs (26 November 2026). Check 13 tests the record of transfers: every transfer has a payer and a
-receiver, and no payer pays more than it has (26 November 2026).
+Checks 1 to 4 test the ledger and its measures. Checks 5 to 9 test the named components of
+earnings per employee. Check 10 tests the bookkeeping of the green-field module when it founds
+firms. Check 11 tests that every stacking component holds a level that means something in a
+long run with many modules. Check 12 tests that the price of every firm is worked out from the
+wage, the markup and the named costs. Check 13 tests the record of transfers: every transfer has
+a payer and a receiver, and no payer pays more than it has.
 
-Run from the project root:
-    .venv\\Scripts\\python.exe experiments\\casp\\model\\checks.py
+Run from the folder that holds this file:
+    python checks.py
 """
 import numpy as np
 from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Transfer, LedgerError,
@@ -62,14 +61,14 @@ def check_identity():
 
 
 def check_attribution():
-    def alpha(L):      # raises earnings per employee of large claims, and merges a few claims
+    def alpha(L):      # raises earnings per employee of large firms, and merges a few firms
         big = L.n > np.quantile(L.n, 0.9)
         K = L.cap()
         order = np.argsort(K)
         return [ScaleComponent("alpha edge", np.where(big, 1.08, 0.99), "alpha"),
                 Merge(buyers=order[-5:], targets=order[100:105], source="alpha", risk_factor=0.95)]
 
-    def beta(L):       # changes hype and risk unevenly, and founds small claims
+    def beta(L):       # changes hype and risk unevenly, and founds small firms
         rng = np.random.default_rng(7)
         k = 200
         return [Scale("hype", rng.lognormal(0, 0.1, len(L)), "beta"),
@@ -113,13 +112,13 @@ def check_averages():
     assert after > before
     narrow = readouts(L, group=group, mask=L.sector == L.sector[group[0]])["dk"]
     assert not np.isclose(narrow, after)
-    print(f"4. Averages: founding 1,000 small claims raises the differential capitalization of an "
+    print(f"4. Averages: founding 1,000 small firms raises the differential capitalization of an "
           f"unchanged top group from {before:.2f} to {after:.2f}. "
           f"Against one sector alone the same group measures {narrow:.2f}.")
 
 
 def check_formula():
-    """Earnings per employee equal wage x markup + other income for every claim, with many modules on."""
+    """Earnings per employee equal wage x markup + other income for every firm, with many modules on."""
     import registry
     from stage2 import starting_ledger
     from full import all_modules
@@ -143,7 +142,7 @@ def check_formula():
         worst = max(worst, float(np.abs(L.e / by_hand - 1).max()))
     kinds = sorted(c)
     print(f"5. Formula: with fifteen modules on for 30 steps, earnings per employee equal wage x markup "
-          f"+ other income for every claim (largest relative difference {worst:.1e}). "
+          f"+ other income for every firm (largest relative difference {worst:.1e}). "
           f"The {len(kinds)} components are: {', '.join(kinds)}.")
 
 
@@ -187,7 +186,7 @@ def check_overlap():
     L.overlap["g"] = 0.5
     L.refresh()
     assert np.isclose(L.markup()[0], 0.1 * 2.0 * 1.485)
-    # The switch for comparisons (item 34 of backlog.md): the discounts of a group overlap as its premiums do.
+    # The switch for comparisons: the discounts of a group overlap as its premiums do.
     two = [np.array([1.5]), np.array([0.9]), np.array([0.8])]
     assert np.isclose(group_value(two, 0.0)[0], 1.5 * 0.9 * 0.8)            # the rule: every discount counts in full
     assert np.isclose(group_value(two, 0.0, True)[0], 1.5 * 0.8)            # the switch: only the deepest discount counts
@@ -202,7 +201,7 @@ def check_overlap():
 
 def check_overlap_attribution():
     """Two modules own premiums in one overlap group. The larger premium is the first module's for some
-    claims and the second module's for others, and it changes hands during the step."""
+    firms and the second module's for others, and it changes hands during the step."""
     def start_for(name):
         return lambda L: L.add_component(name + " premium", name, group=HOLD_ON_BUYERS)
 
@@ -259,14 +258,14 @@ def check_guard():
         message = str(stop)
     else:
         raise AssertionError("the guard let a negative employee count pass")
-    assert "3 of 3000 claims have employees that are negative" in message
+    assert "3 of 3000 firms have employees that are negative" in message
     assert "bystander, wrecker" in message
     print(f"9. Guard: a change that makes three employee counts negative stops the run. The message reads: \"{message}\"")
 
 
 def check_founding():
     """The green-field module, with its rounding forced upward in every industry. Industry 0 holds a
-    single small claim, which hires less in a year than one new claim employs. Half of all claims
+    single small firm, which hires less in a year than one new firm employs. Half of all firms
     hold a premium of 1.5 in the overlap group."""
     from modules.sabotage import Sabotage
     from modules.greenfield import Greenfield
@@ -291,8 +290,8 @@ def check_founding():
     changes = green.propose(m.L, RoundUp())
     scale = [c for c in changes if isinstance(c, Scale) and c.term == "employees"][0]
     found = [c for c in changes if isinstance(c, Found)][0]
-    assert (scale.factor >= 1.0 - 1e-9).all(), "a founding took employees from an existing claim"
-    assert not (found.industry == 0).any(), "a claim was founded that its industry's hiring could not staff"
+    assert (scale.factor >= 1.0 - 1e-9).all(), "a founding took employees from an existing firm"
+    assert not (found.industry == 0).any(), "a firm was founded that its industry's hiring could not staff"
     assert green.withheld >= 1
     k = L.sector_of.size
     stacking = np.bincount(L.ind, L.n * L.stacking_markup(), k) / np.bincount(L.ind, L.n, k)
@@ -304,8 +303,8 @@ def check_founding():
     assert (L.components["holder premium"][new] == 1.0).all()
     assert np.allclose(L.components["base"][new], stacking[L.ind[new]], rtol=1e-12)
     print(f"10. Founding: with the rounding forced upward, the green-field module takes no employee from an "
-          f"existing claim and founds nothing in an industry whose hiring cannot staff one new claim. A new claim "
-          f"in an industry where half the claims hold a premium of 1.5 starts at the stacking markup of "
+          f"existing firm and founds nothing in an industry whose hiring cannot staff one new firm. A new firm "
+          f"in an industry where half the firms hold a premium of 1.5 starts at the stacking markup of "
           f"{stacking[1]:.3f} and not at the average markup of {whole[1]:.3f}.")
 
 
@@ -335,7 +334,7 @@ def check_levels():
             X = np.log(np.stack([L.components[n] for n in others]))
             furthest = max(furthest, float(np.abs(X).max()))
             gains, losses = np.maximum(X, 0.0).sum(axis=0), -np.minimum(X, 0.0).sum(axis=0)
-            beside = max(beside, float(np.minimum(gains, losses).max()))     # a gain standing beside a loss in one claim
+            beside = max(beside, float(np.minimum(gains, losses).max()))     # a gain standing beside a loss in one firm
             base_low, base_high = min(base_low, L.components[BASE].min()), max(base_high, L.components[BASE].max())
         result[netting] = dict(low=low, high=high, furthest=np.exp(furthest), base_low=base_low,
                                base_high=base_high, beside=beside, history=m.history, components=len(others) + 1)
@@ -346,35 +345,33 @@ def check_levels():
             assert np.isclose(a[key], b[key], rtol=1e-9, atol=0.0), key
         for key in set(a["attribution"]) | set(b["attribution"]):
             assert np.isclose(a["attribution"].get(key, 0.0), b["attribution"].get(key, 0.0), rtol=1e-6, atol=1e-9), key
-    # 2. No claim ends a year with a gain standing beside a loss.
+    # 2. No firm ends a year with a gain standing beside a loss.
     assert on["beside"] < 1e-9
-    # 3. No component says more than the markups themselves do. The base of no claim lies above the highest
+    # 3. No component says more than the markups themselves do. The base of no firm lies above the highest
     #    markup seen in the run, and no other component stands further from 1 than the highest of those
     #    markups stands from the lowest.
-    #    Until 26 November 2026 this check also required that no base lay below the lowest markup seen. That
-    #    held in the run the check then made and it is not a property of the model. A merger gives the buyer
-    #    the average of the two claims' gains, weighted by earnings, and sets the buyer's base to whatever
-    #    then gives the right earnings. That base can lie below the bases of both claims (backlog item 48).
-    #    The lowest base is printed, and it is no longer tested.
+    #    The lowest base is printed and not tested, because a base may lie below the lowest markup seen.
+    #    A merger gives the buyer the average of the two firms' gains, weighted by earnings, and sets the
+    #    buyer's base to whatever then gives the right earnings. That base can lie below the bases of both firms.
     width = on["high"] / on["low"]
     assert on["base_high"] <= on["high"]
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass it.
     assert off["furthest"] > width and off["base_high"] > off["high"] and off["beside"] > 1.0
     print(f"11. Levels: with the nine modules and {len(names)} optional modules on for 60 steps, the stacking part of "
-          f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every claim stayed between "
+          f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
-          f"factor of {on['furthest']:.0f}. No claim ended a year with a gain standing beside a loss. The same run "
+          f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
           f"with the netting switched off gave the same figures in every year, and its record did not pass the "
           f"test: one component stood a factor of {off['furthest']:.1e} from 1 and one base markup reached "
           f"{off['base_high']:.1e}.")
 
 
 def check_price():
-    """The price of a claim is its cost plus its earnings from the markup, for every claim and at every
+    """The price of a firm is its cost plus its earnings from the markup, for every firm and at every
     time, and no module can move it in any other way."""
-    # 1. By hand. Two premiums of one overlap group stand above 1 in the same claim. The markup counts
-    #    only the larger, and so does the price (item 31 of backlog.md).
+    # 1. By hand. Two premiums of one overlap group stand above 1 in the same firm. The markup counts
+    #    only the larger, and so does the price.
     L = Ledger(employees=[10.0], epe=0.2, industry=[0], sector_of_industry=[0], shared={"wage": 2.0})
     assert np.isclose(L.p[0], 2.0 * (1 + 0.1))
     L.add_component("a", "A", group="g", values=1.5)
@@ -406,7 +403,7 @@ def check_price():
     assert r["da"] == 0 and all(v == 0 for v in r["attribution"].values())
     assert np.allclose(m.L.p - p0, 0.02 * m.L.shared["wage"], rtol=1e-12)
 
-    # 4. A merger keeps the value of what the two claims sell, and a founded claim's price follows its components.
+    # 4. A merger keeps the value of what the two firms sell, and a founded firm's price follows its components.
     def buyer(L):
         order = np.argsort(L.cap())
         k = 50
@@ -428,7 +425,7 @@ def check_price():
     assert np.isclose((L.p * L.n).sum() - (L.p * L.n)[new].sum(), sales0, rtol=1e-12)
     assert np.allclose(L.p[new], L.shared["wage"] + 0.5, rtol=1e-12)      # no named cost: the price is the wage and the earnings
 
-    # 5. In a run with many modules, the stored price of every claim equals the formula in every year.
+    # 5. In a run with many modules, the stored price of every firm equals the formula in every year.
     import registry
     from stage2 import starting_ledger
     from full import all_modules
@@ -445,19 +442,19 @@ def check_price():
         worst = max(worst, float(np.abs(L.p / by_hand - 1).max()))
         lowest, highest = min(lowest, float(costs.min())), max(highest, float(costs.max()))
     kinds = sorted(n for n, c in L.info.items() if c.kind == "cost")
-    print(f"12. Price: a claim with a wage of 2, a markup of 0.15 from premiums of 1.5 and 1.2 in one overlap group, "
+    print(f"12. Price: a firm with a wage of 2, a markup of 0.15 from premiums of 1.5 and 1.2 in one overlap group, "
           f"and a named cost of 0.03 has a price of 2.36, so the price counts only the larger premium, as the markup "
           f"does. The core refuses a direct scaling of the price. A change of a cost moves the price and no earnings. "
-          f"A merger keeps the value of what the two claims sell. With {len(names) + 9} modules on for 30 steps, the "
-          f"price of every claim equals wage x (1 + markup + costs) (largest relative difference {worst:.1e}). "
-          f"The cost components are: {', '.join(kinds)}. Their sum for one claim lay between {lowest:+.3f} and "
+          f"A merger keeps the value of what the two firms sell. With {len(names) + 9} modules on for 30 steps, the "
+          f"price of every firm equals wage x (1 + markup + costs) (largest relative difference {worst:.1e}). "
+          f"The cost components are: {', '.join(kinds)}. Their sum for one firm lay between {lowest:+.3f} and "
           f"{highest:+.3f} of the wage.")
 
 
 def check_transfers():
     """Every transfer has a payer and a receiver, and no payer pays more than it has."""
     def small():
-        # Three claims with a wage of 1 and a markup of 0.5: earnings of 50, 50 and 40, and a wage bill of 280.
+        # Three firms with a wage of 1 and a markup of 0.5: earnings of 50, 50 and 40, and a wage bill of 280.
         L = Ledger(employees=[100.0, 100.0, 80.0], epe=0.5, industry=[0, 0, 0], sector_of_industry=[0])
         return L
 
@@ -465,10 +462,10 @@ def check_transfers():
         L.add_component("levy income", "levy", kind="income", transfers=True)
         L.add_party("bystanders")
 
-    # 1. By hand. The third claim is asked for 100 and has 40. The government is asked for 90 and has 50.
+    # 1. By hand. The third firm is asked for 100 and has 40. The government is asked for 90 and has 50.
     def levy(L):
         return [Transfer("levy", payer=np.array([5.0, 5.0, 100.0]), receiver=GOVERNMENT, source="levy"),
-                Transfer("grant to claims", payer=GOVERNMENT, receiver=np.array([1.0, 0.0, 0.0]), source="levy", amount=60.0),
+                Transfer("grant to firms", payer=GOVERNMENT, receiver=np.array([1.0, 0.0, 0.0]), source="levy", amount=60.0),
                 Transfer("grant to wage earners", payer=GOVERNMENT, receiver=WAGE_EARNERS, source="levy", amount=30.0)]
 
     m = Model(small(), [Fixed("levy", levy, begin)], top=1)
@@ -476,12 +473,12 @@ def check_transfers():
     L = m.L
     rows = {t["label"]: t for t in r["transfers"]}
     assert np.isclose(rows["levy"]["asked"], 110.0) and np.isclose(rows["levy"]["paid"], 50.0)
-    assert np.isclose(rows["grant to claims"]["paid"], 50.0 * 60 / 90)
+    assert np.isclose(rows["grant to firms"]["paid"], 50.0 * 60 / 90)
     assert np.isclose(rows["grant to wage earners"]["paid"], 50.0 * 30 / 90)
-    assert np.allclose(L.n * L.e, [50 - 5 + 50 * 60 / 90, 50 - 5, 0.0])       # the third claim paid all it had and no more
+    assert np.allclose(L.n * L.e, [50 - 5 + 50 * 60 / 90, 50 - 5, 0.0])       # the third firm paid all it had and no more
     assert abs(L.holds[GOVERNMENT]) < 1e-9
     assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-12)
-    # Total income is unchanged by any transfer: the capitalist share is the claims' earnings over the same total.
+    # Total income is unchanged by any transfer: the capitalist share is the firms' earnings over the same total.
     assert np.isclose(r["capital_share"], (L.n * L.e).sum() / (140.0 + 280.0))
 
     # 2. Wage earners asked for more than the wage bill pay the wage bill. What the government does not
@@ -489,7 +486,7 @@ def check_transfers():
     def squeeze(L):
         if L.holds[GOVERNMENT] == 0:
             return [Transfer("poll tax", payer=WAGE_EARNERS, receiver=GOVERNMENT, source="levy", amount=1000.0)]
-        return [Transfer("grant to claims", payer=GOVERNMENT, receiver=np.ones(3), source="levy", amount=500.0)]
+        return [Transfer("grant to firms", payer=GOVERNMENT, receiver=np.ones(3), source="levy", amount=500.0)]
 
     m = Model(small(), [Fixed("levy", squeeze, begin)], top=1)
     r1, r2 = m.step(), m.step()
@@ -518,9 +515,9 @@ def check_transfers():
     except LedgerError as stop:
         assert "no component to record it" in str(stop)
     else:
-        raise AssertionError("the core accepted a transfer to claims with no component to record it")
+        raise AssertionError("the core accepted a transfer to firms with no component to record it")
 
-    # 4. A tax fixed at the start of a year in which the markup collapses (item 36 of backlog.md). The tax
+    # 4. A tax fixed at the start of a year in which the markup collapses. The tax
     #    asked is nine tenths of the earnings at the start of the year, and the markup falls by 95 per cent.
     def crash_start(L):
         begin(L)
@@ -546,10 +543,10 @@ def check_transfers():
         for _ in range(40):
             before = dict(L.holds)
             r = m.step()
-            claims_net = 0.0
+            firms_net = 0.0
             for t in r["transfers"]:
                 assert 0.0 <= t["paid"] <= t["asked"] * (1 + 1e-12)
-                claims_net += t["paid"] * ((t["receiver"] == "claims") - (t["payer"] == "claims"))
+                firms_net += t["paid"] * ((t["receiver"] == "firms") - (t["payer"] == "firms"))
                 count += 1
             gov = r["parties"][GOVERNMENT]
             assert gov["paid"] <= before[GOVERNMENT] + gov["received"] + 1e-9 * max(1.0, gov["received"])
@@ -562,7 +559,7 @@ def check_transfers():
         assert a["dk"] == b["dk"] and a["capital_share"] == b["capital_share"]
         for key in a["attribution"]:
             assert a["attribution"][key] == b["attribution"][key], key
-    print(f"13. Transfers: a claim asked for 100 that has 40 pays 40, and a government asked for 90 that has "
+    print(f"13. Transfers: a firm asked for 100 that has 40 pays 40, and a government asked for 90 that has "
           f"received 50 pays five ninths of each payment. Wage earners asked for more than the wage bill pay the "
           f"wage bill. The core refuses a transfer with an unknown side, a payment by a party that only receives, "
           f"a negative amount, and a direct change of a component that records transfers. A tax fixed before a "

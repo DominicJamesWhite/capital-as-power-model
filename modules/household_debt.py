@@ -4,7 +4,7 @@ THE RULE IN PLAIN WORDS
 
 The nine modules pay the whole wage bill to wage earners. This module pledges a part of the wage
 bill as interest on the debts of households. The interest becomes part of the earnings of the
-claims in the ledger, and most of all of the claims that sit in the industries that dominant
+firms in the ledger, and most of all of the firms that sit in the industries that dominant
 capital holds. Nothing in the rule comes from outside the model. Prices, wages and employment
 come from the other modules, and the debt grows out of them.
 
@@ -26,11 +26,11 @@ come from the other modules, and the debt grows out of them.
   7. Who receives the interest. Each industry receives interest in proportion to its earnings
      before interest, multiplied by a weight. The weight is 1 in an industry where dominant
      capital holds nothing and rises in proportion to a set multiple in an industry that the
-     hundred largest claims hold entirely. Every claim in an industry receives the same
+     hundred largest firms hold entirely. Every firm in an industry receives the same
      proportion of its other earnings.
   8. The change to the ledger. The module proposes one transfer: wage earners pay the year's
-     interest, and the claims receive it in the proportions of part 7. The core settles it
-     (see "The record of transfers" in modules.md) and enters what each claim receives in an
+     interest, and the firms receive it in the proportions of part 7. The core settles it
+     (see "The record of transfers" in modules.md) and enters what each firm receives in an
      income component that this module owns. Wage earners cannot pay more than the wage bill.
      The amount is replaced each year, so interest is never added twice. The interest is not a
      markup, and the core keeps it apart from the markup. No money is taken from the lenders
@@ -43,9 +43,9 @@ come from the other modules, and the debt grows out of them.
      pledged part of the wage bill, the reach, the shortfall, the new borrowing, the write-offs,
      the top hundred's part of the interest, and the capitalist share of income with the interest
      counted once. It also publishes, for each industry, the part of earnings that comes from
-     sources other than household interest. No module needs that number any longer.
+     sources other than household interest. No module reads that number.
 
-The wage in the ledger is not changed, because the ledger has no claim that stands for wage
+The wage in the ledger is not changed, because no entry in the ledger stands for wage
 earners. Wage earners are the payer of the transfer, so the core's own readout of the
 capitalist share counts the interest once in total income.
 
@@ -69,8 +69,8 @@ WHAT IT RESTS ON
     laid off)." Part 6 and the risk in the capitalized value of part 10 rest on this.
   - Chapter 13: in the early history of credit each type of instrument had "its own 'benchmark'
     and 'normal rate of return'". Part 5 gives household loans their own rate.
-  - Tim Di Muzio and Richard H. Robbins, Debt as Power (2016), downloaded from the authors'
-    archive into data/bn_archives/papers/di_muzio_robbins_debt_as_power_2016/. "Since the vast
+  - Tim Di Muzio and Richard H. Robbins, Debt as Power (2016).
+    "Since the vast
     majority of money is released into the economy as capitalized money bearing interest to the
     owners and managers of banks, this means that one way to expand earnings is by expanding the
     pool of debtors. One of the major inventions here was the creation and development of the
@@ -102,13 +102,13 @@ WHAT IT RESTS ON
 
 WHAT IS ADDED
 
-The literature says that a household loan is a capitalized claim on a part of the borrower's
+The literature says that a household loan is a capitalized right to a part of the borrower's
 working life, that lenders enlarge their earnings by enlarging the pool of debtors, that
 households borrow when wages stagnate, that the borrowing dampens resentment, and that the worth
-of the claim depends on the risk of lay-off. It gives no rule and no rate. The form of every
+of the loan depends on the risk of lay-off. It gives no rule and no rate. The form of every
 part is an addition, and every number below is an addition. Three choices need to be stated.
 The model has no banks, so part 7 places lending in the industries that dominant capital holds;
-every claim in such an industry gains, including the small ones, which is how the sabotage
+every firm in such an industry gains, including the small ones, which is how the sabotage
 module already treats the markup. Measuring the lag of wages by the best level of the last ten
 years is an addition, and it means that a lower level is forgotten as a grievance after ten
 years. Di Muzio and Robbins are not Nitzan and Bichler; they use the theory of capital as power
@@ -119,17 +119,15 @@ WHAT IS MISSING
 
 Repayment and new borrowing change no income in the model, and households do not spend what
 they borrow, so the module says nothing about what can be sold. Di Muzio and Robbins hold that
-the cost of interest forces growth and is passed into prices; the rule has neither. The claim is
+the cost of interest forces growth and is passed into prices; the rule has neither. Household debt is
 not traded and has no price of its own apart from the published capitalized value. The
 discipline that debt imposes on an indebted worker does not reach the module for organised
-labour. Mortgages, student loans and card debt are not told apart. A claim acquired from another
-industry carries the interest proportion of the industry it leaves, so its other earnings are
-slightly misread in the year of a merger across industries.
+labour. Mortgages, student loans and card debt are not told apart.
 """
 import numpy as np
 from core import Transfer, Publish, top_positions, WAGE_EARNERS
 
-INCOME = "household interest"   # this module's income component: interest from households, for each employee of the claim; the core sets it from the transfer below
+INCOME = "household interest"   # this module's income component: interest from households, for each employee of the firm; the core sets it from the transfer below
 INTEREST = "interest on household debt"
 
 
@@ -153,7 +151,7 @@ class HouseholdDebt:
         self.ceiling = ceiling                # the largest part of the wage bill that interest can take; principal above it is written off (addition)
         self.lender_weight = lender_weight    # interest received per unit of other earnings in an industry wholly held by dominant capital, as a multiple of an industry it does not hold (addition)
         self.placate = placate                # fall in popular resistance, as a part of its level, per unit of new borrowing measured as a part of the wage bill (addition); 0 switches it off
-        self.layoff_risk = layoff_risk        # rise in the risk of the pooled household-debt claim per unit of unemployment (addition); used in a readout only
+        self.layoff_risk = layoff_risk        # rise in the risk of household debt as a whole per unit of unemployment (addition); used in a readout only
         self.start_principal = start_principal   # principal at the start, as a part of the yearly wage bill (addition)
         self.top = top
         self.reach = float(start_reach)
@@ -201,16 +199,16 @@ class HouseholdDebt:
         dominant = top_positions(L.cap(), np.arange(len(L)), self.top)
         n = np.bincount(L.ind, L.n, k)
         held = np.bincount(L.ind[dominant], L.n[dominant], k) / np.maximum(n, 1e-12)
-        base_claim = L.earnings() - L.n * L.components[INCOME]                        # each claim's earnings before household interest
-        base = np.bincount(L.ind, base_claim, k)                                      # the same for each industry
+        base_firm = L.earnings() - L.n * L.components[INCOME]                        # each firm's earnings before household interest
+        base = np.bincount(L.ind, base_firm, k)                                      # the same for each industry
         weight = 1 + (self.lender_weight - 1) * held
         new = 1 + interest / (base * weight).sum() * weight
 
         # part 10: readouts
         risk = 1 + self.layoff_risk * A["unemployment"]
-        to_top = (base_claim[dominant] * (new[L.ind[dominant]] - 1)).sum()
+        to_top = (base_firm[dominant] * (new[L.ind[dominant]] - 1)).sum()
         out = {
-            "household_debt": interest / (risk * L.shared["nrr"]),                    # the pooled claim, capitalized
+            "household_debt": interest / (risk * L.shared["nrr"]),                    # the price put on the future interest of all household debt
             "household_debt_principal": self.principal,                               # the money owed
             "household_debt_pledged": self.pledged,                                   # interest as a part of the wage bill
             "household_debt_reach": self.reach,
@@ -219,13 +217,13 @@ class HouseholdDebt:
             "household_debt_written_off": written_off / wages,                        # defaulted principal as a part of the wage bill
             "household_debt_dominant": float(to_top / interest) if interest > 0 else 0.0,   # the top hundred's part of the interest
             "household_debt_capital_share": float((base.sum() + interest) / (base.sum() + wages)),   # interest counted once
-            "household_debt_markup_part": 1 / new,                                    # by industry, read by the sabotage and stagflation modules
+            "household_debt_markup_part": 1 / new,                                    # by industry; no module reads it
             "household_debt_placation": self.placate * borrowing / wages,             # part 9, read by the resistance module
         }
         changes = [Publish(key, value, self.name) for key, value in out.items()]
 
-        # part 8: wage earners pay this year's interest, and the claims receive it
+        # part 8: wage earners pay this year's interest, and the firms receive it
         if interest > 0:
-            changes.append(Transfer(INTEREST, payer=WAGE_EARNERS, receiver=(new[L.ind] - 1) * base_claim,
+            changes.append(Transfer(INTEREST, payer=WAGE_EARNERS, receiver=(new[L.ind] - 1) * base_firm,
                                     source=self.name, amount=interest))
         return changes

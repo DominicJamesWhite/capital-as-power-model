@@ -1,16 +1,16 @@
 """Module 3: green-field growth (Capital as Power, chapters 14 and 15).
 
-Claims hire at the rates that the sabotage module supplies for their industry: one rate for
-dominant claims and one for the rest. Part of the hiring by small claims goes to newly founded
-claims, each much smaller than the average, and less of it where entry to the industry is
-barred. The average size of a claim therefore falls as the economy grows.
+Firms hire at the rates that the sabotage module supplies for their industry: one rate for
+dominant firms and one for the rest. Part of the hiring by small firms goes to newly founded
+firms, each much smaller than the average, and less of it where entry to the industry is
+barred. The average size of a firm therefore falls as the economy grows.
 
-A new claim is staffed out of the year's new employment of the small claims of its industry and
-takes nobody from an existing claim. It starts with the part of its industry's markup that stacks
+A new firm is staffed out of the year's new employment of the small firms of its industry and
+takes nobody from an existing firm. It starts with the part of its industry's markup that stacks
 and with no premium or other income that it does not hold.
 
-Additions to the book: the part of new employment that goes to new claims, their size, and the
-markup at which a new claim starts.
+Additions to the book: the part of new employment that goes to new firms, their size, and the
+markup at which a new firm starts.
 """
 import numpy as np
 from core import Scale, Found, Set, Publish, top_positions
@@ -21,13 +21,13 @@ class Greenfield:
     reads = ("hire_small", "hire_dominant", "entry_open")
     supplies = ("new_hires", "industry_growth")
 
-    def __init__(self, new_claim_share=0.35, new_claim_size=0.15, floor=0.005, top=100):
-        self.new_claim_share = new_claim_share   # part of small claims' new employment that goes to new claims
-        self.new_claim_size = new_claim_size     # size of a new claim, as a fraction of the average claim
+    def __init__(self, new_firm_share=0.35, new_firm_size=0.15, floor=0.005, top=100):
+        self.new_firm_share = new_firm_share   # part of small firms' new employment that goes to new firms
+        self.new_firm_size = new_firm_size     # size of a new firm, as a fraction of the average firm
         self.floor = floor                       # unemployment cannot fall below this
         self.top = top
-        self.founded = 0      # new claims founded so far in this run
-        self.withheld = 0     # new claims that the rounding asked for and the year's hiring could not staff
+        self.founded = 0      # new firms founded so far in this run
+        self.withheld = 0     # new firms that the rounding asked for and the year's hiring could not staff
 
     def start(self, L):
         return {"new_hires": 0.0}
@@ -52,20 +52,20 @@ class Greenfield:
         if jobs[up].sum() > room:                                # hiring cannot exceed the working population
             jobs[up] *= max(room, 0.0) / jobs[up].sum()
 
-        # part of small claims' hiring founds new claims, less where entry is barred
+        # part of small firms' hiring founds new firms, less where entry is barred
         entry = A["entry_open"] * A.get("protection_open", 1.0)   # protections bar entry too (optional module); 1 without it
         entry = entry * A.get("nature_open", 1.0)                 # owners of nature bar entry too (optional module); 1 without it
-        to_new = np.where(up & ~dominant, jobs * self.new_claim_share * entry[ind], 0.0)
-        size = self.new_claim_size * employed / len(L)
+        to_new = np.where(up & ~dominant, jobs * self.new_firm_share * entry[ind], 0.0)
+        size = self.new_firm_size * employed / len(L)
         wanted = np.bincount(ind, to_new, k) / size
         count = np.floor(wanted + rng.random(k)).astype(int)
-        # The people who staff a new claim are people whom the small claims of its industry would
+        # The people who staff a new firm are people whom the small firms of its industry would
         # otherwise have hired this year: small firms grow "in number (through the birth of new
         # firms) as well as in size (by hiring more workers)" (chapter 15, "Running with the pack").
-        # A birth is part of the year's new employment and takes nobody from an existing claim. So an
-        # industry cannot found more claims in a year than its small claims' new employment can
-        # staff. Without this, the rounding above could found a claim in an industry whose small
-        # claims hired less than one new claim employs, and take the difference out of those claims.
+        # A birth is part of the year's new employment and takes nobody from an existing firm. So an
+        # industry cannot found more firms in a year than its small firms' new employment can
+        # staff. Without this, the rounding above could found a firm in an industry whose small
+        # firms hired less than one new firm employs, and take the difference out of those firms.
         hiring = np.bincount(ind, np.where(up & ~dominant, jobs, 0.0), k)
         staffed = np.floor(hiring / size).astype(int)
         self.withheld += int(np.maximum(count - staffed, 0).sum())   # a count kept for reports; nothing reads it
@@ -86,16 +86,16 @@ class Greenfield:
             EH = L.earnings() * L.h
             where = np.repeat(np.arange(k), count)
             total = int(count.sum())
-            # A new claim starts with the part of its industry's markup that stacks, averaged over
+            # A new firm starts with the part of its industry's markup that stacks, averaged over
             # the industry's employees. It takes no part of a premium that rests on a hold on buyers
             # (a protection, a size premium, a hold on wants) and no other income, because it holds
             # none of these. The module hands the core the earnings per employee that this markup
             # gives at the wage of the start of the year, and the core places them in the new
-            # claim's base markup. Every other component of the new claim takes its starting value.
-            # As before, the figure is an amount of money fixed at the start of the year: in a year
-            # when the wage rises, the new claim's markup is lower by the rise (backlog item 42).
-            # The core works out the new claim's price from the wage and that markup, so no price
-            # is handed over. A new claim starts with no named cost of any module.
+            # firm's base markup. Every other component of the new firm takes its starting value.
+            # The figure is an amount of money fixed at the start of the year: in a year
+            # when the wage rises, the new firm's markup is lower by the rise.
+            # The core works out the new firm's price from the wage and that markup, so no price
+            # is handed over. A new firm starts with no named cost of any module.
             stacking = n * (L.shared["wage"] * L.stacking_markup())   # earnings from the stacking part of the markup
             changes.append(Found(
                 employees=np.full(total, size),
