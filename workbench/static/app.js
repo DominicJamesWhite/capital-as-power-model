@@ -372,7 +372,7 @@ function openPop(anchor, kids, focus) {
   const b = anchor.getBoundingClientRect();
   pop.style.left = Math.max(8, Math.min(b.right - pop.offsetWidth, innerWidth - pop.offsetWidth - 8)) + "px";
   pop.style.top = (b.bottom + 4 + pop.offsetHeight > innerHeight ? Math.max(8, b.top - pop.offsetHeight - 4) : b.bottom + 4) + "px";
-  if (focus) { const first = pop.querySelector("button:not([aria-disabled=true])"); if (first) first.focus(); }
+  if (focus) { const first = pop.querySelector("button:not([aria-disabled=true])"); if (first) first.focus({ preventScroll: true }); }
 }
 function closePop() { pop.hidden = true; pop.classList.remove("wide"); }
 const mi = (label, fn, cls) => el("button", { class: "mi" + (cls ? " " + cls : ""), role: "menuitem", type: "button", text: label, onclick: e => { e.stopPropagation(); fn(); } });
@@ -1714,7 +1714,8 @@ $("new-btn").addEventListener("click", e => { e.stopPropagation(); closePop(); m
 document.addEventListener("click", e => { menu.hidden = true; $("new-btn").setAttribute("aria-expanded", "false"); if (!pop.hidden && !pop.contains(e.target)) closePop(); });
 $("m-run").addEventListener("click", () => openSetup(null, null));
 $("m-exp").addEventListener("click", () => openExpSetup(null));
-addEventListener("scroll", closePop, true);
+// Scrolling the page moves the anchor away from a pop-up, so close it; scrolling inside the pop-up does not.
+addEventListener("scroll", e => { if (!pop.hidden && !pop.contains(e.target)) closePop(); }, true);
 document.addEventListener("keydown", e => {
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
   if (e.key === "Escape") {
