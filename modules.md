@@ -1105,223 +1105,928 @@ The message gives the year, how many firms are affected, and which modules chang
 
 ## Optional module: What can be sold
 
-The module is in `modules/sales.py` and is switched on with `--with sales`.
+Name in the model: `sales`
 
-**Source.** Chapter 12, "Business as usual" with Figures 12.1 and 12.2, "From price taking to price making", "The markup and the target rate of return" and "In sum". Chapter 14, Proposition 3 and the footnote on excess capacity. Chapter 15, "Tobin's Q" and "From classical Marxism to monopoly capitalism". Chapter 17, the footnote on "the bifurcated experience of the 1930s". Bichler and Nitzan, "Nonlinearities of the Sabotage-Redistribution Process" (2014). Bichler and Nitzan, "Can Capitalists Afford Recovery?" (2014), section "Underconsumption".
+Switch it on by adding `--with sales` to the command.
 
-**What the literature says.** Sabotage can be overdone: "When business sabotage becomes excessive, pushing output toward the zero mark, the result is recession and low capitalist earnings." The 2014 note measures this for the United States before the war, when "sabotage was excessive and unemployment undermined the capitalist share of income (regression slope = –0.35)". The book reports Gardiner Means's finding on how the Depression fell on different sellers: "competitive industries saw massive declines in their market prices, but only moderate drops in their output and employment", while in concentrated industries "prices declined slightly, while production and payroll collapsed, sometimes by as much as 80 per cent". The book also reports how prices are set: firms reckon "the cost at 'normal' levels of output", add "a 'conventional' markup", and keep the price "stable in the face of cyclical variations in demand". A price reckoned in this way earns less than its markup when sales are below normal. On new capacity the book says that "glut means the disintegration of full-cost pricing; and if prices end up dropping faster than costs, the consequence is falling profit". It says that the shift "from building to buying" has "creeping stagnation" as its "broader consequence". The literature does not say how much can be sold. A footnote calls the notion of excess capacity "admittedly problematic". The 2014 paper reports the argument of Michal Kalecki without adopting it: workers "spend most if not all of that income on consumption", capitalists "save most of it", and so a higher capitalist share of income brings a greater "tendency toward deficient demand and stagnation". The authors say that their evidence "certainly seems consistent" with this argument.
+### What it is about
 
-**Rule.** The rule has two steps.
+The nine main modules assume that firms sell everything they offer. This module drops that assumption. Each year it adds up the money that comes back to buy goods. If less money comes back than the goods are priced at, some goods stay unsold, and firms respond.
 
-1. The module reckons how much of what is offered can be sold. The value offered in a year is the wage bill plus the earnings of all claims. Wages are all spent. Capitalists spend a fixed part of their earnings on their own consumption. The rest of their earnings is money for expansion. Money for expansion buys goods only when it is spent on new capacity, and new capacity costs a fixed number of years of wages for each new job of the last three years. Money that buys existing claims buys no goods. Money for which there is no new job to equip buys no goods. When building and buying together would take more money than there is, they share it in proportion. The part of the value offered that no spending comes back for is the unsold part. The unsold part is never negative, because nobody in this account spends more than an income.
-2. The unsold part falls on claims in two ways. In the part of an industry that dominant capital does not hold, sellers cut their prices, and the markup falls in proportion to the unsold part. In the part that dominant capital holds, prices stay where they are. The claims of dominant capital dismiss employees in proportion to the unsold part, except for overhead staff. Their earnings per employee fall by the overhead cost that is now spread over fewer sales.
+Think of a town where a few families own all the shops. The shop workers spend all their pay in the shops. The families spend only part of their profit there. The rest of the profit comes back to the shops only if the families spend it on building new shops. If they use it to buy each other's shops, or do nothing with it, some goods stay on the shelves.
 
-The module reads the hiring of earlier years and the volume of mergers. It publishes the unsold part, the dismissals by dominant capital, and the part of expansion money that was spent on new capacity. The green-field module subtracts the dismissals from the hiring rate of dominant claims in the following year. That subtraction is the only change to an existing module, and it is zero when this module is off.
+### What the theory says
 
-**Additions.** The whole account of spending is an addition. It is taken from Kalecki's argument as the authors report it, and it is joined to the book's distinction between building and buying. Every number is an addition. Capitalists consume 40 per cent of their earnings. A new job costs four years of wages to equip. Sellers who cut prices take half of the unsold value out of their markups within a year. Thirty per cent of the costs of a claim that holds its price are overhead. Spending on expansion is reckoned over three years. The unsold part is the same in every industry, because the model has no account of what buyers want and may not have one that rests on utility. The money paid for acquired claims is reckoned at the average capitalization per employee of the claims outside dominant capital. Sellers of acquired claims are treated as capitalists who do not spend what they receive on goods.
+Chapter 12, "Business as usual" with Figures 12.1 and 12.2, "From price taking to price making", "The markup and the target rate of return" and "In sum". Chapter 14, Proposition 3 and the footnote on excess capacity. Chapter 15, "Tobin's Q" and "From classical Marxism to monopoly capitalism". Chapter 17, the footnote on "the bifurcated experience of the 1930s". Two papers by Shimshon Bichler and Jonathan Nitzan from 2014: "Nonlinearities of the Sabotage-Redistribution Process" and "Can Capitalists Afford Recovery?", section "Underconsumption".
 
-**Expected.** While hiring keeps pace with the working population and markups are near the normal level, everything offered is sold and the module does nothing. A merger wave should leave a small unsold part every year, because some expansion money buys claims and equips no new job. Unemployment should then creep upward, which is the book's "creeping stagnation". A rise in the capitalist share without a rise in hiring should do the same, which is Kalecki's argument. When hiring stops, no expansion money is spent on goods. Markups in industries that are not held should then fall, dominant capital should dismiss employees, and each fall should feed the next. The fall should stop by itself, because the unsold part shrinks as capitalist earnings shrink. The capitalist share should fall while unemployment is very high, as on the left side of Figure 12.1.
+- Strategic sabotage is the book's name for the way business earns by holding industry back. It can be overdone: "When business sabotage becomes excessive, pushing output toward the zero mark, the result is recession and low capitalist earnings" (chapter 12).
+- The first 2014 paper measures this for the United States before the Second World War, when "sabotage was excessive and unemployment undermined the capitalist share of income (regression slope = –0.35)".
+- The book reports Gardiner Means's finding on the Depression of the 1930s. "Competitive industries saw massive declines in their market prices, but only moderate drops in their output and employment." In concentrated industries "prices declined slightly, while production and payroll collapsed, sometimes by as much as 80 per cent".
+- The book reports how large firms set prices. They work out "the cost at 'normal' levels of output", add "a 'conventional' markup", and keep the price "stable in the face of cyclical variations in demand". The aim is "a target rate of return at some standard capacity utilization". A price set in this way earns less than its markup when sales fall below normal, because some costs do not fall with sales.
+- On building too much capacity: "glut means the disintegration of full-cost pricing; and if prices end up dropping faster than costs, the consequence is falling profit" (chapter 15).
+- When large firms turn "from building to buying", the "broader consequence" is "creeping stagnation" (chapter 14, Proposition 3, and chapter 15).
+- The second 2014 paper reports an argument of the economist Michal Kalecki. Workers "spend most if not all of that income on consumption" and capitalists "save most of it". So the higher the capitalist share of income, the greater the "tendency toward deficient demand and stagnation". The authors say their evidence "certainly seems consistent" with this. They do not adopt the argument as their own.
 
-**What it showed.** These results come from one run at 60,000 starting claims over 60 years, compared with the same run without the module. During the merger wave the unsold part stayed between 0.2 and 0.7 per cent of the value offered, and unemployment crept from 5.0 to 6.8 per cent, where the run without the module stayed near 4.7 per cent. When the first bout of stagflation cut hiring, no expansion money was spent on new capacity, the unsold part rose to 12 per cent, and unemployment rose to 31 per cent and stayed at or above 25 per cent for twelve years. The dismissals fell on dominant capital, as Means found: the top hundred's part of all employees fell from 19.8 to 11.5 per cent. The capitalist share rose to 20 per cent while unemployment was rising, and it then fell to 14.5 per cent while unemployment stayed near 30 per cent. Without the module the share reached 29 per cent and unemployment then fell to the lowest level the model allows. With the module unemployment was still 14 per cent in the year labelled 1950, sixteen years after the bout ended, and it never came near that level. The left side of Figure 12.1 appeared only in part. The share at 30 per cent unemployment stayed above the share at 5 per cent, because the sabotage rule and the stagflation rule both raise markups as unemployment rises, and those two rules outweighed the fall in what could be sold. A trial in which sellers took the whole unsold value out of their markups within a year drove the share down to 7.5 per cent at 17 per cent unemployment, but that run lurched from year to year and unemployment stayed above 40 per cent. Prices rose throughout the collapse in both trials. That matches the book's remark that the 1930s were "clearly stagflationary" in concentrated industries, and it does not match the fall of the general price level in that decade.
+The book and the papers do not say how much can be sold. A footnote to chapter 14 calls the idea of excess capacity "admittedly problematic". The whole account of spending below is therefore an addition of ours. It joins Kalecki's argument, as the authors report it, to the book's distinction between building and buying.
 
-**Changed on 26 November 2026.** The module now owns a markup component named "unsold goods", which stacks, and it makes the fall in an industry's markup to that component (see "How modules share a quantity"). It reads the markup alone and no longer counts other income as markup. A run of 25 years gave the same figures as before the change. Later on the same date the record was restated: the component now holds only the part of the markup given up that has not been recovered since, and a later rise of a claim's markup restores it first (see "What a stacking component holds"). The rule of the module did not change. A run of 60 years from 300,000 claims gave the same figures as before, and the component stayed between 0.61 and 1 where the old record fell to 0.0015. Later again on the same date the module stopped multiplying prices. The core now works out every price from the wage, the markup and named costs (see "How the price is worked out"). The fall of the markup of sellers who cut prices lowers their price by itself. The fall of the markup of sellers who keep their prices is entered as a cost of the same amount, in a cost component named "idle overhead", so their price stays where it was. The rule did not change and neither did any figure except the price level. In the run of 60 years from 300,000 claims the price level in the last year is 1.81 where it was 2.16, and the fastest rise of prices over five years is 5.9 per cent a year where it was 8.0. The statement above that "prices rose throughout the collapse" was made with the old price level. The idle overhead never falls, because the rule has no recovery, and item 47 of `backlog.md` records this.
+### What the module does each year
+
+In the first year of a run the module does nothing, because there is no earlier hiring to read.
+
+1. **It adds up the value offered.** This is all wages plus the earnings of all firms.
+2. **It splits owners' earnings.** Wage earners spend all their wages. Owners spend 40 per cent of their earnings on their own consumption. The other 60 per cent is money for expansion.
+3. **It works out what building costs.** Money for expansion buys goods only when it pays for new capacity. Equipping one new job costs 4 years of the wage. The number of new jobs is the average yearly hiring of the last 3 years.
+4. **It works out what buying costs.** Money that buys existing firms buys no goods. The cost is the number of employees acquired, averaged over the last 3 years, times the average capitalization for each employee of the firms outside the top 100.
+5. **It finds the unsold part.** If the money for expansion covers both building and buying, all the building is paid for. If it does not, building and buying share the money in proportion. The money for expansion that paid for no new capacity is the value left unsold. The unsold part is that value divided by the value offered. It is never below zero, because nobody in this account spends more than an income.
+6. **It lowers the markup of every industry.** The module looks at the part of an industry's employees who work for top-100 firms. This follows Means's finding.
+   - For the rest of the industry, sellers cut their prices. The markup falls by half of the unsold part, times the industry's price.
+   - For the part that top-100 firms hold, sellers keep their prices. Their overhead, taken as 30 per cent of costs, is now spread over fewer sales. The markup falls by 30 per cent of the unsold part, times the industry's price. The module enters this fall as a cost, so the price does not move.
+   - Every firm in the industry takes the industry's fall in the same proportion. No markup goes below 0.005.
+7. **It tells top-100 firms to dismiss employees.** It publishes a rate equal to the unsold part less the 30 per cent of staff who are overhead. Next year the green-field module takes that rate off the hiring rate of every top-100 firm.
+
+**An example.** Wages are 1,000 and all firms together earn 150, so the value offered is 1,150. Owners consume 60 and have 90 for expansion. Hiring has averaged 1.5 per cent a year, which is 15 new jobs, and equipping them costs 15 × 4 = 60. Top-100 firms have bought 5 employees' worth of small firms a year, at a capitalization of 3 for each employee, which costs 15. Building and buying take 75 of the 90. The other 30 buys nothing, so the unsold part is 30 ÷ 1,150 = 2.6 per cent.
+
+Take an industry with a markup of 0.15, where top-100 firms employ 40 per cent of the employees. The price-cutting part lowers the markup by 0.6 × 0.5 × 0.026 × 1.15 = 0.0090. The price-keeping part lowers it by 0.4 × 0.3 × 0.026 × 1.15 = 0.0036. The industry's markup falls from 0.15 to 0.1374. Its average price falls only from 1.15 to 1.141, because the 0.0036 is carried as a cost. Next year every top-100 firm hires 0.026 × 0.7 = 1.8 points more slowly.
+
+**How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module, and a firm's price can also carry named costs. "How modules share a quantity" explains this. The sales module owns one part of the markup, named "unsold goods", and one cost, named "idle overhead". An "unsold goods" value of 0.9 says that a tenth of the firm's markup is still given up for want of sales. An "idle overhead" of 0.004 says that the firm carries a cost of 0.4 per cent of the wage on goods it did not sell.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `consumed` | 0.4 | The part of their earnings that owners spend on their own consumption | Our own choice |
+| `job_cost` | 4.0 | The cost of equipping one new job, in years of the wage | Our own choice |
+| `price_give` | 0.5 | The part of the unsold value that price-cutting sellers take out of their markups within a year | Our own choice |
+| `overhead` | 0.3 | The part of a price-keeping firm's costs and staff that does not fall when its sales fall | Our own choice |
+| `years` | 3 | The number of years of hiring and buying over which spending on expansion is averaged | Our own choice |
+| `floor` | 0.005 | The lowest markup an industry can have. It is the same figure as in the sabotage module. | A plain limit with no source |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `new_hires`, from the green-field module: the number of people hired last year
+- `merger_volume`, from the mergers module: the employees acquired last year, as a part of all employees
+
+It publishes:
+
+- `sales_cut`: the dismissal rate of step 7, which the green-field module reads
+- `unsold`: the unsold part
+- `build_money_share`: the part of the money for expansion that paid for new capacity
+
+No module reads the last two. With this module off, the green-field module takes `sales_cut` as zero.
+
+### What is known to be wrong or untested
+
+- **The unsold part is the same in every industry.** The model has no account of what buyers want. The theory rejects accounts of demand that rest on personal satisfaction, so one cannot simply be added.
+- **Small and large firms of one industry take the same proportional fall.** Step 6 works out the fall for the industry as a whole. A small firm in an industry that top-100 firms partly hold therefore carries some idle overhead, and a top-100 firm there has its price cut a little.
+- **Idle overhead never falls.** The rule has no recovery, so a cost entered in a slump stays in the firm's price for the rest of the run.
+- **People who sell their firms spend none of what they receive.** The rule treats them as owners who hold the money.
+- **Military orders do not count as spending.** With the organised force module also on, the two together cannot show the argument that military spending absorbs what cannot otherwise be sold.
+- **The capitalist share does not fall when industry is held back too far.** Figure 12.1 of the book shows the share falling at very high unemployment. In a run of 60 years from 300,000 firms, the share was 9 per cent while unemployment was near 5 per cent, and between 15 and 20 per cent while unemployment was above 20 per cent. The sabotage and stagflation modules both raise markups as unemployment rises, and they outweigh the fall in what can be sold.
+- **Unemployment stays very high after a slump.** In the same run, unemployment crept from 5.0 to 6.8 per cent over the first 40 years, during the wave of mergers. The run without the module stayed near 4.7 per cent. When the first bout of stagflation cut hiring, unemployment rose to 29 per cent. It was still 22 per cent when the run ended, at least five years after the bout, where the run without the module had fallen to 0.5 per cent. Popular resistance stood at its highest possible level throughout those last years. The dismissals fell on the top 100, as Means found: their part of all employees fell from 18.6 to 11.0 per cent. Differential capitalization ended at 3,982, against 8,121 without the module.
+- **A faster price cut makes the run unstable.** In a trial run that started with 60,000 firms, `price_give` was set to 1. The capitalist share fell to 7.5 per cent, but the run lurched from year to year and unemployment stayed above 40 per cent.
+- **Averaging over one year instead of three makes the run lurch** between selling everything and selling far too little.
+
+What should happen: while hiring keeps pace with the working population and markups are near normal, everything is sold and the module does nothing. A wave of mergers should leave a small unsold part every year, because some money for expansion buys firms and equips no new job. Unemployment should then creep up, which is the book's "creeping stagnation". When hiring stops, no money for expansion buys goods. Markups of small sellers should fall, top-100 firms should dismiss employees, and each fall should feed the next. The fall should stop by itself, because the unsold part shrinks as owners' earnings shrink.
 
 ---
 
 ## Optional module: Price leaders and followers within an industry
 
-The module is in `modules/leaders.py` and is switched on with `--with leaders`.
+Name in the model: `leaders`
 
-**Source.** Chapter 12, "From price taking to price making" and "The markup and the target rate of return". Chapter 16, "Small and large firms" with Figure 16.3, "Capitalization risk" and "The imperative of crisis". Jonathan Nitzan, "Inflation as Restructuring" (doctoral thesis, 1992), chapter 9, including Figures 9-12, 9-14 and 9-15 and the footnote to the discussion of Figure 9-15. The text of the thesis chapters is in `data/bn_archives/papers/nitzan_phd_1992/`.
+Switch it on by adding `--with leaders` to the command.
 
-**What the literature says.** Gardiner Means found "not one but two types of prices". Market prices are "relatively flexible" and are "prevalent in competitive industries". Administered prices are "relatively inflexible, changing only infrequently, responding slowly to market conditions and typical of concentrated industries". In the Depression "competitive industries saw massive declines in their market prices, but only moderate drops in their output and employment", while in concentrated industries "prices declined slightly, while production and payroll collapsed". The book adds that "modern firms, particularly the leading ones, begin with a long-term target rate of profit, and then back-calculate the markup". On inflation the book reports that the markup of the Fortune 500 was on average 1.6 times the markup of all business, and that "dominant capital tended to beat the average when inflation rose and trail it when inflation fell". It says that the largest firms "do not simply react passively; they take the initiative". It says that the gains "are always short-lived: they last only as long as the underlying bout of inflation continues". The thesis calls the large corporations "the modern inflation makers, while the smaller firms operate as inflation takers". It says that the first price rises come from the large firms and that "these initial inflationary increases may be subsequently followed by smaller firms". It says that the gains of smaller firms "are derived gains, crucially dependent on the inflation consensus among the large firms". The thesis sorts manufacturing corporations into eight groups by assets, with cut-offs at 5, 10, 25, 50, 100 and 250 million dollars and 1 billion dollars. It finds that "the relationship between inflation and the markup was much tighter for the largest firms than it was for the smaller ones". A footnote reports that when the markup of each group is treated as a straight-line function of inflation, "both the estimated slope coefficient and as its associated significance level rose with corporate size". The thesis also says that "direct firm-to-firm redistribution does not alter the labour share of income". The literature gives no rates. It does not say how much of the higher markup of large firms arises inside industries and how much arises from the industries in which large firms sit.
+### What it is about
 
-**Rule.** The rule has three parts and works inside each industry.
+This module lets large and small firms of the same industry have different markups. When an industry's prices are rising, it treats the large firms as the ones who raised them first, and gives them a higher markup than their small neighbours. When prices are falling, the large firms keep their prices and lose some sales, and the small firms cut theirs.
 
-1. The module sorts all claims into eight groups by capitalization. The top group is the hundred largest claims. The cut-offs of the seven groups below are fixed fractions of the capitalization of the smallest claim in the top group, in the proportions of the thesis. Each claim receives a standing between 0 and 1. The standing is 0 in the bottom group and 1 in the top group, and it rises by one seventh from each group to the next.
-2. When the average price of an industry rose over the last year, the module sets a difference between the markups of that industry's large and small claims. The difference between a top-group claim and a bottom-group claim, as a fraction of the industry's markup, is four times the rate at which the industry's price rose. A claim in a middle group receives the part of this difference that matches its standing. When the price stops rising, the difference returns to zero.
-3. When the average price of an industry fell over the last year, the large claims keep their prices and the small claims cut theirs. The module sets the difference between the price of a top-group claim and the price of a bottom-group claim equal to the fall. A claim that keeps its price above the falling price of its industry loses employees in that year. The loss is half of the price that the claim keeps, as a fraction of the industry's price.
+Think of three big cement makers and fifty small ones. When the price of cement goes up, the big three announced the rise and the small makers followed later and only in part. When the price goes down, the big three hold their price lists and sell less.
 
-The module moves earnings between the claims of one industry and leaves the earnings of the industry as a whole unchanged. It remembers the average price of each industry from the year before. It reads no number from another module, and no existing module was changed. It publishes the average difference that it set, for reporting.
+The module only moves earnings between the firms of one industry. What it gives the large firms it takes from the small ones.
 
-**Additions.** Every number in the rule is an addition. The proportions of the group cut-offs are taken from the thesis, and their use here is also an addition. The thesis reports them as the asset classes, in dollars, of one statistical report on manufacturing firms from 1973 to 1988. It does not give them as proportions of the size of the hundredth largest firm. The additions are the factor of four in part 2, the full holding of prices in part 3, the loss of half an employee for each unit of price kept, a limit of one on the difference as a fraction of the industry's markup, and the even steps of standing between the groups. The loss of employees uses the same figure as the sabotage module uses for a price rise. Placing the top group at the hundred largest claims follows the model's measure of dominant capital and not the thesis. The thesis measured size by assets, and the rule uses capitalization. The thesis compared markups with inflation in manufacturing as a whole, and the rule uses the price of each industry. Means compared concentrated industries with competitive industries, and the rule applies his finding to the large and the small claims of one industry. The rule gives large claims no advantage over their neighbours when prices are still, because no passage supports a figure for one. The rule sets the difference afresh each year. It therefore removes any difference between the size groups of an industry that another module left there in the year before. This includes part of the lead that the stagflation module gives the hundred largest claims. With this module on, the division of an inflationary gain between the large and the small claims of one industry follows this rule.
+### What the theory says
 
-**Expected.** While prices are still, the claims of an industry should have the same markup, as before. During a merger wave, the industries that dominant capital holds move toward the target markup, their prices rise slowly, and the large claims in them should earn slightly more than their neighbours. During a bout of stagflation the markups inside each industry should spread out by size, with the largest claims gaining most and the smallest claims losing. The spread should shrink as soon as inflation slows. The earnings per employee of the top hundred, relative to the average, should therefore rise more during a bout and fall back more after it. The capitalist share of income should change little, because the module only moves earnings between claims. When prices fall, the large claims should keep a markup above their neighbours and should lose employees.
+Chapter 12, "From price taking to price making" and "The markup and the target rate of return". Chapter 16, "Small and large firms" with Figure 16.3, "Capitalization risk" and "The imperative of crisis". Jonathan Nitzan, "Inflation as Restructuring" (doctoral thesis, 1992), chapter 9, with Figures 9-12, 9-14 and 9-15.
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 years, compared with the same run without the module. Before the first bout of stagflation the top hundred earned between 0.5 and 1 per cent more per employee than the other claims of their own industries. At the height of the bout, when prices rose 9 per cent a year, the markup of the top hundred was 1.25 times the markup of their neighbours in the same industries, against 1.16 without the module. Markups inside industries were then ordered by size: the bottom group stood at 0.91 of the industry's markup, the second at 0.95, the third at 1.00, the fourth at 1.02 and the fifth and sixth at 1.05. Without the module the middle groups lost ground during the bout, and the sixth group fell to 0.88. The difference shrank as inflation slowed and was 1.03 three years after the bout. The larger result did not change. Differential capitalization still fell during the bout, from 541 to 403, against a fall from 508 to 378 without the module, because the rise in the risk of dominant capital still outweighed its gain in earnings. During the years of falling prices after the bout, the top hundred kept a markup equal to that of their neighbours, where without the module they stood 4 to 5 per cent below them. A trial with the factor in part 2 set to eight raised the ratio at the height of the bout to 1.64, which is close to the book's average of 1.6 for the Fortune 500 against all business, and differential capitalization still fell. The capitalist share of income and unemployment followed the same course in both runs, apart from a shift of one year in the start of the bout. Two runs with the modules listed in opposite orders gave the same figures.
+- Gardiner Means found "not one but two types of prices". Market prices are "relatively flexible" and "prevalent in competitive industries". Administered prices are "relatively inflexible, changing only infrequently, responding slowly to market conditions and typical of concentrated industries" (chapter 12).
+- In the Depression "competitive industries saw massive declines in their market prices, but only moderate drops in their output and employment", while in concentrated industries "prices declined slightly, while production and payroll collapsed".
+- "Modern firms, particularly the leading ones, begin with a long-term target rate of profit, and then back-calculate the markup" (chapter 12).
+- The book reports that the markup of the 500 largest United States firms was on average 1.6 times the markup of all business, and that "dominant capital tended to beat the average when inflation rose and trail it when inflation fell" (chapter 16). Dominant capital is the book's name for the largest firms.
+- The largest firms "do not simply react passively; they take the initiative" (chapter 16).
+- Their gains "are always short-lived: they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
+- The thesis calls the large corporations "the modern inflation makers, while the smaller firms operate as inflation takers". The first price rises come from the large firms, and "these initial inflationary increases may be subsequently followed by smaller firms". The gains of smaller firms "are derived gains, crucially dependent on the inflation consensus among the large firms".
+- The thesis sorts manufacturing corporations into eight groups by the size of their assets. The cut-offs are 5, 10, 25, 50, 100 and 250 million dollars and 1 billion dollars. It finds that "the relationship between inflation and the markup was much tighter for the largest firms than it was for the smaller ones". A footnote adds that when the markup of each group is treated as a straight-line function of inflation, "both the estimated slope coefficient and as its associated significance level rose with corporate size".
+- The thesis also says that "direct firm-to-firm redistribution does not alter the labour share of income".
 
-**Changed on 26 November 2026.** The module now owns a markup component named "size premium", and each year it sets that component to the difference its rule calls for (see "How modules share a quantity"). It changes nothing else in a claim's earnings. The module no longer measures the differences that other modules have left between the size groups of an industry, and it no longer removes them. The statement under "Additions" that it removes them is no longer true: the lead that the stagflation module gives the hundred largest claims now stays in place beside this module's premium. The change was needed because a rule that removes every difference it did not set works against any other module that sets one, and this is why the module could not run with the protections module. The size premium is a member of the overlap group "hold on buyers". The figures under "What it showed" come from before the change. In a run at 60,000 starting claims over 60 years, differential capitalization in the year labelled 1950 was 1,668 after the change and 1,625 before it, and the capitalist share was 10.7 per cent against 10.9. The first bout of stagflation began about a year earlier than before.
+The book and the thesis give the direction of each effect and no rates. They do not say how much of the higher markup of large firms arises inside industries and how much comes from the industries that large firms are in.
 
-**Tested on 26 November 2026.** The choice not to remove the differences that other modules left was tried against the old behaviour (item 34 of `backlog.md`). The module has a switch for this, `levels_others`, which is off unless a run asks for it. With it on, the premium also cancels the difference by size that stands in the stacking part of the markups. In runs of 60 years from 300,000 claims the switch moved differential capitalization by 2 per cent or less in every year, which is no more than a different seed moves it. The results are under "The choices of the overlap group, tested" in the section "How modules share a quantity".
+### What the module does each year
+
+In the first year of a run the module does nothing, because it has no earlier price to compare with.
+
+1. **It sorts all firms into eight groups by size.** The top group is the 100 firms with the highest capitalization. The seven groups below are cut off at fixed fractions of the capitalization of the smallest top-100 firm: one half of one per cent, 1, 2.5, 5, 10 and 25 per cent. These are the proportions of the thesis's cut-offs to 1 billion dollars.
+2. **It gives each firm a standing.** The bottom group has a standing of 0 and the top group a standing of 1, with steps of one seventh between. The module then compares each firm's standing with the average standing in its industry.
+3. **It measures how each industry's average price moved over the last year.**
+4. **Where the price rose, large firms lead.** The module sets a difference between the markup of a top-group firm and the markup of a bottom-group firm in that industry. As a fraction of the industry's markup, the difference is 4 times the rate at which the price rose. A firm in a middle group gets the part that matches its standing. The difference is set afresh each year, so it shrinks when the rise slows and is gone when the price is still.
+5. **Where the price fell, large firms hold.** The module sets the difference between the price of a top-group firm and the price of a bottom-group firm equal to the fall. A firm that keeps its price above its industry's falling price loses employees that year. The loss is half of the amount by which its price stands above the industry's, as a fraction of the industry's price.
+6. **The difference has a limit.** It cannot be more than the whole of the industry's markup, and it cannot take a firm's markup below 0.005. In an industry whose firms are all in one size group, the module does nothing.
+
+**An example of a rise.** An industry has a markup of 0.20 and its price rose 5 per cent last year. The difference between top and bottom is 4 × 0.05 = 0.20 of the markup, which is 0.04. The average standing in the industry is 0.4. A top-group firm stands 0.6 above the average, so its markup becomes 0.20 + 0.6 × 0.04 = 0.224. A bottom-group firm stands 0.4 below, so its markup becomes 0.20 − 0.4 × 0.04 = 0.184.
+
+**An example of a fall.** The same industry's price, 1.20, fell 2 per cent. The difference in price between top and bottom is set at 2 per cent of 1.20, which is 0.024. The top-group firm keeps its price 0.6 × 0.024 = 0.0144 above the industry's, which is 1.2 per cent of the price. It loses 0.6 per cent of its employees.
+
+**How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module. "How modules share a quantity" explains this. The module owns one part, named "size premium". A size premium of 1.12 raises the firm's markup by 12 per cent, and one of 0.92 lowers it by 8 per cent. The size premium is one of three parts that the model treats as holds on the same buyers. The other two belong to the protections and wants modules. When a firm has more than one of them, only the largest counts in full.
+
+The module leaves alone any difference between large and small firms that another module made. For example, the lead that the stagflation module gives the top 100 stays in place beside the size premium.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `lead` | 4.0 | The difference between top-group and bottom-group markups, as a fraction of the industry's markup, for each unit of yearly price rise. A rise of 10 per cent gives a difference of 40 per cent of the markup. | Our own choice |
+| `hold` | 1.0 | The part of a fall in the industry's price that a top-group firm does not follow | Our own choice |
+| `volume_cost` | 0.5 | The employees lost for each unit of price kept above the industry's falling price. The sabotage module uses the same figure for a price rise. | Our own choice |
+| `most` | 1.0 | The largest difference the rule will set, as a fraction of the industry's markup | A plain limit with no source |
+| `floor` | 0.005 | The lowest markup the size premium can leave a firm with | A plain limit with no source |
+| `top` | 100 | How many firms are in the top group | The book, chapter 14 |
+| `levels_others` | off | A switch kept for comparisons. When on, the size premium also cancels differences by size that other modules left. | Our own choice |
+
+The seven cut-offs between the groups are fixed in the code as `CUTOFFS`. Their proportions come from the thesis, but the thesis does not use them this way. It reports them as classes of assets, in dollars, in one statistical report on manufacturing firms from 1973 to 1988. Using them as fractions of the size of the hundredth largest firm is our own choice.
+
+### What it reads from other modules and what it gives them
+
+It reads nothing that another module publishes. It reads prices, markups, employees and capitalization from the list of firms, and it remembers each industry's average price from the year before.
+
+It publishes `leader_premium`, the average difference it set across all industries. No module reads it.
+
+### What is known to be wrong or untested
+
+- **Every number in the rule is our own.** So are the even steps of standing between the groups.
+- **The rule measures things differently from its sources.** The thesis measured size by assets, and the rule uses capitalization. The thesis compared markups with inflation in manufacturing as a whole, and the rule uses the price of each industry. Means compared concentrated industries with competitive ones, and the rule applies his finding to large and small firms inside one industry.
+- **Large firms get no advantage when prices are still.** No passage supports a figure for one.
+- **The module takes slightly more from an industry than it gives when another hold on buyers is present.** A firm's gains from several holds overlap, and its losses do not. "The choices of the overlap group, tested" gives the size of this.
+- **The module does not change the larger result.** In a run of 60 years from 300,000 firms, differential capitalization ended at 8,230 with the module and 8,121 without. Different random numbers alone move it by about 2 per cent. At the start of the first bout of stagflation the top 100 earned 1.50 times the average for each employee, against 1.45 without the module. Differential capitalization still fell at the start of the bout, because the rise in the risk of the top 100 outweighed their gain in earnings. Unemployment and the capitalist share of income were the same in both runs.
+- **A higher `lead` brings the markup of the top 100 near the book's figure and changes little else.** In a trial run that started with 60,000 firms, `lead` was set to 8. At the height of a bout of stagflation, the markup of the top 100 was 1.64 times that of their neighbours in the same industries. The book's average for the 500 largest firms against all business is 1.6. Differential capitalization still fell during the bout.
+- **The `levels_others` switch makes no measurable difference.** In runs of 60 years from 300,000 firms it moved differential capitalization by 2 per cent or less in every year, which is no more than different random numbers do.
+
+What should happen: while prices are still, the module does nothing. During a wave of mergers, prices in the industries that top-100 firms hold rise slowly, and the large firms there should earn slightly more than their neighbours. During a bout of stagflation, which is a period of rising prices together with unemployment, markups inside each industry should spread out by size. The spread should shrink as soon as inflation slows. The capitalist share of income should change little, because the module only moves earnings between firms. When prices fall, large firms should keep a markup above their neighbours and lose employees.
 
 ---
 
 ## Optional module: The contest over a boundary
 
-The module is in `modules/boundary_contest.py` and is switched on with `--with boundary_contest`. It runs in place of module 9, the envelope module. The module carries a line that names the module it replaces, and `full.py` leaves the envelope module out of the run when this module is switched on. The two modules must not run together, because both move the same two boundaries. This module supplies the number called pressure, with the same meaning as in module 9, and it moves the same two permeabilities.
+Name in the model: `boundary_contest`
 
-**Source.** Chapter 14, "Dominant capital" and Propositions 2, 4 and 5. Chapter 15, "Differential advantage", "Three transformations", "Breaking the envelope" and "Globalization", with the footnotes on the Glass-Steagall Act, on South Africa and on studies that treat deregulation as a shock. Chapter 17, "Amalgamation versus stagflation" and "Coalitions". Jonathan Nitzan, "Regimes of differential accumulation: mergers, stagflation and the logic of globalization" (2001), the concluding section and notes 20 and 21. Sandy Brian Hager, "What Happened to the Bondholding Class?" (2013). The texts of the two papers are in `data/bn_archives/papers/`.
+Switch it on by adding `--with boundary_contest` to the command. It runs in place of main module 9, "Breaking the envelope", which is left out of the run. The two cannot run together, because both move the same two boundaries.
 
-**What the literature says.** Proposition 5 states the reason for the push: "For amalgamation to run ahead of overall growth, dominant capital must successively break its 'envelopes', spreading from the industry, to the sector, to the national economy, and ultimately to the world as a whole." The push begins when targets run out: dominant capital "is bound to reach its 'envelope', namely the boundaries of its own corporate universe with few or no takeover targets to speak of", and "amalgamation is simply too important to give up". The literature also says who pushes. Chapter 14 defines dominant capital as "the leading corporate–government coalitions". Chapter 15 says that mergers make the fused entities "increasingly intertwined with other larger firms and government bodies, and more involved in setting polices and regulations". Chapter 17 describes the opening of the 1990s as the work of an alliance of merger firms "backed by Third-Way governments", under which "capital controls gave way to deregulation". Hager reports the argument of Henry Carter Adams that "through concentrated ownership of government bonds, the bondholding class exerts control over the government apparatus". The literature says what holds a boundary. Amalgamation "is restricted by the ability of broader state institutions to quickly accommodate the new corporate formations", and "as amalgamation builds up momentum, it also generates higher and higher roadblocks, contradictions and counter-forces". A footnote gives the examples: "The 1933 Glass-Steagall Act, for instance, barred US banks from making industrial investments", and "similar transformational effects were brought on by the post-war dismantling of the Japanese Zaibatsu". The 2001 paper says that the Act "reversed an earlier diversification trend". The same paper expects that "the more immediate barrier on further global amalgamation will likely be regulatory", and it names "antitrust thresholds". A second footnote shows that the inner boundary gives way while the outer one holds: in South Africa under exchange controls, "with capital trapped at home, they gobbled up all available companies in their industries before acquiring companies in other sectors and becoming conglomerates". The literature also says that the push is not constant. Dominant capital "is often half-hearted about indiscriminate deregulation, particularly when such deregulation allows competitors to undermine its differential margins". Chapter 17 says that "the power processes that support one type of differential accumulation tend to undermine the other". Finally, the book says that an opening has a cost: mergers "create a strong drive toward 'jurisdictional integration', to use Olson's terminology (1982). Yet this very integration pits dominant capital against new rivals under new circumstances". The literature gives no rule for who wins the contest and no rates. The book says that "this merger-driven creordering of power is yet to be theorized and empirically investigated".
+### What it is about
 
-**Rule.** The rule has four parts.
+Two boundaries limit which firms a top-100 firm can buy: one around its sector and one around the rest of the economy. Module 9 opens a boundary when the large firms have bought most of what they can reach. This module treats the opening as a contest with two sides. On one side the large firms push, together with the parts of government they are tied to. On the other side roadblocks hold the boundary shut. Whichever is stronger moves the boundary.
 
-1. The module reckons the push on a boundary as the product of three numbers, each between 0 and 1. The first number is the part of its reach that dominant capital already holds, which the merger module supplies. The second number measures how far dominant capital and government organs act as one body. It is the part of the government's debt that dominant capital holds, divided by a setting, and it cannot exceed 1. The debt module supplies that part. The third number is one minus the intensity of stagflation, because dominant capital does not press for openings while it is gaining through prices.
-2. The module reckons the hold on a boundary as the level of roadblocks, which the resistance module raises with the volume of mergers. Popular resistance takes no part in the hold, because the book says the population is "impartial to breadth".
-3. When the push exceeds the hold, the sector boundary opens at a speed in proportion to the excess. The national boundary opens in the same way once the sector boundary is fully open. When the hold exceeds the push by a margin, the widest open boundary closes at a speed in proportion to the excess over the margin.
-4. In a year in which a boundary opens, every claim of dominant capital loses a small part of its markup, in proportion to the amount of the opening.
+Think of large banks pressing for a law that would let them buy insurers. How hard they press depends on how few banks are left to buy, on how much sway they have over government, and on whether they are busy making money another way. Whether the law passes depends on how much opposition earlier mergers have stirred up.
 
-The module reads the stagflation intensity, the roadblocks and the two debt figures only if another module supplies them. No existing module was changed. Two lines were added to `full.py` so that an optional module can take the place of a named module.
+### What the theory says
 
-**Additions.** The whole form of the contest is an addition: the multiplication of three numbers, the comparison of the product with the roadblocks, and the speed in proportion to the difference. Every number is an addition. The sway of dominant capital over government organs is complete when it holds 25 per cent of the government's debt. One unit of roadblocks holds back one unit of push. A boundary moves by 0.3 a year for each unit of difference. A boundary closes only when the hold exceeds the push by 0.3. A full opening of one boundary costs dominant capital 10 per cent of its markup. Measuring the tie between dominant capital and government by the ownership of the public debt is an addition that rests on Hager's report of Adams, and the debt module itself sets that ownership equal to dominant capital's part of all capitalization. The argument of Mancur Olson's own book is not in the texts on disk, so the loss of markup rests on the book's two sentences about new rivals and about margins and not on Olson. Three things in the literature are missing from the rule. The dismantling of the Zaibatsu and the unbundling of the South African groups were forced sales, and the ledger does not record what a claim acquired across which boundary, so a closing only stops further buying. The book describes two coalitions inside dominant capital with opposite interests in an opening, and the rule treats dominant capital as one body. The rule cannot say what form an opening or a closing takes.
+Chapter 14, "Dominant capital" and Propositions 2, 4 and 5. Chapter 15, "Differential advantage", "Three transformations", "Breaking the envelope" and "Globalization", with footnotes. Chapter 17, "Amalgamation versus stagflation" and "Coalitions". Jonathan Nitzan, "Regimes of differential accumulation: mergers, stagflation and the logic of globalization" (2001), the concluding section and notes 20 and 21. Sandy Brian Hager, "What Happened to the Bondholding Class?" (2013).
 
-**Expected.** Early in a run the boundary should stay shut, because dominant capital is small and has little sway. The sector boundary should begin to give way while the first merger wave is still running, as soon as the part of its reach that dominant capital holds outweighs the roadblocks. Each opening should enlarge the pool of targets, raise the volume of mergers, and so raise the roadblocks, which should slow the next opening. A bout of stagflation should remove the push and leave the roadblocks standing, so a boundary should close during a bout. When the bout ends, the push should return, the boundary should open again, and mergers should resume. The top hundred should come to hold more of the economy than they do with module 9.
+Dominant capital is the book's name for the largest firms and the government bodies allied with them. The book calls a boundary an "envelope" and calls merger "amalgamation".
 
-**What it showed.** These results come from one run at 60,000 starting claims over 60 years and one over 119 years, compared with the same runs with module 9. With module 9 the sector boundary opened by 0.03 in 60 years, and the first bout of stagflation began in the year labelled 1920. With this module the sector boundary began to open in 1907 and stood at 0.39 in 1938, the volume of mergers doubled from 0.7 to 1.5 per cent of all employees a year, acquisitions rose from 0.4 to 0.9 of new hiring, and the first bout did not begin until 1938. From about 1920 the push stayed within 0.03 of the hold, so the boundary opened at the pace at which the roadblocks let it. During the bout the push fell to zero while the roadblocks stood at 0.5, and the boundary closed completely by 1950, which is the pattern of the Glass-Steagall footnote and was not entered by hand. In the longer run the boundary began to open again after 1952 as the bout ended, the sector boundary was fully open by 1988, and the national boundary then opened to 0.86 by 2004, with further bouts near 1978 and 2005 that each stopped the opening. Two results count against the run. The top hundred came to hold 52 per cent of all employees by 1940 and 82 per cent by 2008, which is far beyond the record. From 1930 mergers lowered differential capitalization, because dominant capital "has grown so big it is the average", and the measure stood at 881 in 1940 against 1,069 with module 9. The second number of the push reached 1 by about 1910 and played no part after that, and a trial without the loss of markup in part 4 gave almost the same figures. In these runs the contest was therefore decided by the part of its reach that dominant capital held, by the roadblocks, and by stagflation. Two runs with the modules listed in opposite orders gave the same figures.
+Why the large firms push:
 
-**Changed on 26 November 2026.** The module now owns a markup component named "rival cost", which stacks, and it makes the loss of markup at an opening to that component (see "How modules share a quantity"). A run of 25 years gave the same figures as before the change.
+- "For amalgamation to run ahead of overall growth, dominant capital must successively break its 'envelopes', spreading from the industry, to the sector, to the national economy, and ultimately to the world as a whole" (chapter 14, Proposition 5).
+- Dominant capital "is bound to reach its 'envelope', namely the boundaries of its own corporate universe with few or no takeover targets to speak of" (chapter 15, "Three transformations").
+- "Amalgamation is simply too important to give up", and "to take advantage of this broader pool, dominant capital has to break through its original 'envelope'" (chapter 15, "Breaking the envelope").
+
+Who pushes:
+
+- Chapter 14 defines dominant capital as "the leading corporate–government coalitions".
+- Mergers make the merged firms "increasingly intertwined with other larger firms and government bodies, and more involved in setting polices and regulations" (chapter 15, "Differential advantage").
+- Chapter 17 describes the opening of the 1990s as the work of an alliance of merger firms "backed by Third-Way governments", under which "capital controls gave way to deregulation".
+- Hager reports the argument of Henry Carter Adams that "through concentrated ownership of government bonds, the bondholding class exerts control over the government apparatus".
+
+What holds a boundary:
+
+- Amalgamation "is restricted by the ability of broader state institutions to quickly accommodate the new corporate formations", and "as amalgamation builds up momentum, it also generates higher and higher roadblocks, contradictions and counter-forces" (chapter 15, "Three transformations").
+- A footnote gives examples: "The 1933 Glass-Steagall Act, for instance, barred US banks from making industrial investments", and "similar transformational effects were brought on by the post-war dismantling of the Japanese Zaibatsu". The 2001 paper says the Act "reversed an earlier diversification trend".
+- The 2001 paper expects that "the more immediate barrier on further global amalgamation will likely be regulatory", and names "antitrust thresholds".
+- A second footnote shows the inner boundary giving way while the outer one holds. In South Africa under exchange controls, "with capital trapped at home, they gobbled up all available companies in their industries before acquiring companies in other sectors and becoming conglomerates".
+- The people at large take no side over mergers. The book calls the population "impartial to breadth".
+
+Why the push is not constant, and what an opening costs:
+
+- Dominant capital "is often half-hearted about indiscriminate deregulation, particularly when such deregulation allows competitors to undermine its differential margins" (chapter 15, "Globalization").
+- "The power processes that support one type of differential accumulation tend to undermine the other" (chapter 17). Differential accumulation is the book's name for growing faster than the average. Its two types are buying other firms and raising prices.
+- Mergers "create a strong drive toward 'jurisdictional integration', to use Olson's terminology (1982). Yet this very integration pits dominant capital against new rivals under new circumstances" (chapter 15).
+- A footnote criticises studies that treat deregulation "as external societal 'shocks' to which business 'responds' with amalgamation".
+
+The book says who opens a boundary, why, and what holds it. It gives no rule for who wins and no rates. It says that "this merger-driven creordering of power is yet to be theorized and empirically investigated". The whole form of the contest below is an addition of ours.
+
+### What the module does each year
+
+1. **It works out the push.** The push is three numbers multiplied together. Each lies between 0 and 1.
+   - The need: the part of what top-100 firms can reach that they already hold.
+   - The sway: how far the top 100 and the government act as one. It is the part of the government's debt that the top 100 hold, divided by 0.25, and never more than 1.
+   - The commitment: one minus the intensity of stagflation. While the top 100 are gaining by raising prices, they do not press for openings.
+2. **It works out the hold.** The hold is the level of roadblocks, a number between 0 and 1 that the resistance module raises with the volume of mergers. Popular resistance plays no part.
+3. **If the push is larger than the hold, a boundary opens.** Its openness rises by 0.3 times the difference. The sector boundary opens first. The national boundary opens only when the sector boundary is fully open.
+4. **If the hold is larger than the push by more than 0.3, a boundary closes.** Its openness falls by 0.3 times the excess over 0.3. The national boundary closes first, then the sector boundary.
+5. **An opening costs the top 100 some markup.** In a year in which a boundary opens, every top-100 firm loses a part of its markup, because the wider field brings new rivals. A full opening of one boundary, from 0 to 1, costs 10 per cent of the markup. A smaller opening costs in proportion.
+
+**An example.** The top 100 hold 60 per cent of what they can reach, so the need is 0.6. They hold 30 per cent of the government's debt, so the sway is 1. The intensity of stagflation is 0.2, so the commitment is 0.8. The push is 0.6 × 1 × 0.8 = 0.48. Roadblocks stand at 0.2. The push is larger by 0.28, so the sector boundary's openness rises by 0.3 × 0.28 = 0.084, say from 0.30 to 0.384. Each top-100 firm loses 0.84 per cent of its markup: a markup of 0.200 becomes 0.198.
+
+Now a bout of stagflation reaches full intensity. The commitment is 0, so the push is 0. Roadblocks stand at 0.5. The hold is larger by 0.5, which is 0.2 more than the margin of 0.3. The boundary closes by 0.3 × 0.2 = 0.06 in that year.
+
+**How the module records the lost markup.** A firm's markup is kept as a product of named parts, each owned by one module. "How modules share a quantity" explains this. This module owns the part named "rival cost". A rival cost of 0.97 says that the firm still stands 3 per cent below where it would be, because of rivals let in by an opening.
+
+### Settings
+
+All of these are our own choices, except `top`. No source gives any of the others.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `full_sway` | 0.25 | The part of the government's debt that the top 100 must hold for their sway to be complete |
+| `hold` | 1.0 | How much push one unit of roadblocks holds back |
+| `speed` | 0.3 | How far a boundary moves in a year for each unit of difference between push and hold |
+| `close_margin` | 0.3 | How far the hold must exceed the push before a boundary closes |
+| `rival_cost` | 0.10 | The part of a top-100 firm's markup that is lost when a boundary opens fully |
+| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `pool_open`, from the mergers module: the part of their reach that the top 100 do not yet hold
+- `government_debt` and `government_debt_dominant`, from the debt module. If no debt is reported, the sway is worked out from `concentration`, the part of all employees who work for the top 100.
+- `stagflation_intensity`, from the compass
+- `roadblocks`, from the resistance module
+- `barrier_bargain`, from the optional barriers module, which lowers the hold. It is zero when that module is off.
+
+It sets the openness of the sector boundary and the national boundary, which the mergers module uses. It publishes `pressure`, which is the need of step 1 and has the same meaning as in module 9. It also publishes `boundary_push` and `boundary_hold`. The optional barriers module reads `boundary_push`.
+
+### What is known to be wrong or untested
+
+- **Measuring sway by ownership of the government's debt rests on one reported argument.** It follows Hager's report of Adams. In the model the debt module simply sets the top 100's part of the debt equal to their part of all capitalization, so the sway is really a measure of size.
+- **The sway stops mattering early in a run.** In trial runs that started with 60,000 firms it reached 1 after about 20 years and played no part after that.
+- **The lost markup makes almost no difference.** A trial without step 5 gave almost the same figures. The contest is decided by the need, the roadblocks and stagflation.
+- **The loss of markup does not rest on Mancur Olson's argument.** The book borrows only his term. His own book is not among the texts this model was built from, so step 5 rests on the book's two sentences about new rivals and about margins.
+- **A closing only stops further buying.** The break-up of the Japanese holding groups and of the South African groups were forced sales. The model does not record which of a firm's employees were acquired across which boundary, so it cannot make a firm sell what a closed boundary forbids.
+- **Dominant capital is treated as one body.** The book describes two groups inside it with opposite interests in an opening.
+- **The rule cannot say what form an opening or a closing takes,** such as a law, a trust or a sale of state assets.
+- **The top 100 grow far larger than with module 9.** In a run of 60 years from 300,000 firms, the sector boundary began to open after 25 to 30 years and stood at 0.32 after 55. Mergers ran at about twice the pace of the run with module 9. The top 100 came to employ 42 per cent of all employees, against 19 per cent. The first bout of stagflation came more than ten years later than with module 9. During it the push fell to zero and the boundary closed from 0.32 to 0.22 in five years. This is the pattern of the Glass-Steagall footnote, and nobody entered it by hand. Differential capitalization ended at 4,714, against 8,121, in a run that ended in the middle of the bout.
+- **Over a longer run the result is not believable.** In a trial run of 119 years that started with 60,000 firms, the national boundary also opened, and the top 100 came to employ 82 per cent of all employees. From about the fortieth year mergers lowered differential capitalization, because, in the book's words, dominant capital "has grown so big it is the average".
+
+What should happen: early in a run the boundary stays shut, because the top 100 are small and have little sway. The sector boundary should begin to give way during the first wave of mergers. Each opening enlarges the pool of targets, raises the volume of mergers and so raises the roadblocks, which should slow the next opening. A bout of stagflation removes the push and leaves the roadblocks standing, so a boundary should close during a bout, as the book describes for the Glass-Steagall Act. When the bout ends, the push should return and mergers should resume.
 
 ---
 
 ## Optional module: Alternative compasses
 
-The file `modules/compasses.py` holds three compasses. Each one runs in place of module 7, and only one may be switched on in a run. They are switched on with `--with compass_targets`, `--with compass_ahead` and `--with compass_consensus`. The name `--with compasses` switches on the third. Each one supplies cohesion and the intensity of stagflation, as module 7 does. Each one reckons cohesion exactly as module 7 does, so a comparison between compasses shows the effect of the trigger alone. No existing module was changed. The registry received four lines and not one, because the file holds three classes.
+Name in the model: `compasses`, which holds `compass_targets`, `compass_ahead` and `compass_consensus`
 
-**Source.** Chapter 14, Propositions 1, 2, 5, 7 and 8. Chapter 15, "Three transformations". Chapter 16, "The imperative of crisis", "The stagflation norm", "The politics of inflation" and "Stop-gap". Chapter 17, "Amalgamation versus stagflation" and "A new type of cycle". Jonathan Nitzan, "Regimes of differential accumulation: mergers, stagflation and the logic of globalization" (2001), the section on depth and the concluding section.
+The file `modules/compasses.py` holds three compasses. Switch one on by adding `--with compass_targets`, `--with compass_ahead` or `--with compass_consensus` to the command. `--with compasses` means the same as `--with compass_consensus`. Each runs in place of main module 7, "The differential compass", which is left out of the run. Only one may be on in a run.
 
-**What the literature says.** The literature names the motive for the turn. Inflation "is not the weapon of first choice. It is only when the gains from breadth dry up that dominant capital, seeing its differential accumulation undermined, moves reluctantly toward relying on inflationary redistribution". Proposition 7 calls inflation "a much more potent response to declining mergers and acquisitions". Proposition 8 says that "occasional discontinuities in the process" of amalgamation "push dominant capital toward an alternative regime of stagflationary redistribution". The literature says what makes the gains from breadth dry up: dominant capital "is bound to reach its 'envelope', namely the boundaries of its own corporate universe with few or no takeover targets to speak of". Proposition 5 gives the measure of success: "For amalgamation to run ahead of overall growth, dominant capital must successively break its 'envelopes'." The literature says what ends a bout: "when amalgamation resumed, with dominant capital breaking through its existing envelope and into a broader universe, stagflation promptly abated". The 2001 paper asks what happens otherwise: "if, after this merger wave ends, there is indeed no new universe to conquer, what will bring stagflation to an end?" The literature also says that a motive is not enough. The benefits of inflation "come with mounting 'risks' which the large owners and leading government officials are often hesitant to take". Buyers do not pay higher prices willingly: "they are forced. And the way to force them is by creating, imposing and maintaining various forms of social crisis, apparent or real". These crises have two effects: "On the one hand, they undermine the ability of most people to resist price increases. On the other hand, they enable a consensus to emerge within dominant capital that inflation can be used with relative impunity." The consensus is fragile. Dominant capital has to "cap overall growth", or else "coordination is bound to disintegrate into a price war, leading to disinflation or even outright deflation". Under inflation "the ruling class itself starts to bicker over the spoils of the process, over how to manage it and over whether or not to terminate it". Finally, the book denies that the alternation has a clock: "there is nothing automatic or equilibrating about them", and "there is no inherent reason why amalgamation and stagflation should be cyclical in the first place". The literature gives no rule, no threshold and no rate for any of this. It contains no statement that dominant capital compares recent years with earlier years.
+### What it is about
 
-**Rule.** None of the three compasses looks back over a window of years. Each one remembers only the present intensity of stagflation, and two of them remember the total employment of the year before. In all three, the intensity cannot exceed four times cohesion, as in module 7.
+A compass decides when the top-100 firms turn from buying other firms to raising prices together. The book says they prefer buying, and fall back on price rises when buying dries up. A period of such price rises, which comes with unemployment, is called a bout of stagflation. The compass sets one number between 0 and 1, the intensity of stagflation, and the stagflation module acts on it.
 
-1. *The compass that reads the pool of targets.* The merger module reports the part of its reach that dominant capital does not yet hold. While dominant capital holds more than half of its reach, the intensity of stagflation rises by 0.15 a year. While dominant capital holds less than half, the intensity falls by 0.10 a year.
-2. *The compass that reads this year's buying.* The compass divides the employees that dominant capital acquired in the last year by the employees it already had. It compares that rate with the growth of total employment over the same year. While buying enlarges dominant capital faster than total employment grows, the intensity falls by 0.10 a year. Otherwise the intensity rises by 0.15 a year.
-3. *The compass that needs a consensus.* The motive is the same as in the first compass. With the motive alone, the intensity rises by only 0.02 a year, because the large owners are hesitant. The rise approaches 0.15 a year as people lose the ability to resist. That inability is measured as unemployment above its usual level, where five points above counts as complete, multiplied by one minus popular resistance. Three things lower the intensity. Employment that grows faster than the working population lowers it by five times the excess. Popular resistance lowers it by 0.2 a year at full resistance. The loss of the motive lowers it by 0.10 a year. The slow rise itself cuts hiring through the stagflation module, so dominant capital makes the slack that lets its own consensus form.
+Module 7 decides by comparing the mergers of the last 5 years with those of the last 20. A rule with a 20-year memory can produce a rhythm of about 20 years by itself. The three compasses here use no such memory, so that the two kinds of rule can be compared. They differ in what makes the large firms turn:
 
-**Additions.** Every number in the three rules is an addition. The rise of 0.15, the fall of 0.10 and the limit of four times cohesion are copied from module 7, where they are also additions. The threshold of one half is copied from module 9. Reading "the gains from breadth dry up" from the pool of targets is an addition in the first and third compasses. Reading it from one year of buying against one year of employment growth is an addition in the second compass, and Proposition 5 supplies only the phrase "run ahead of overall growth". In the third compass, the measure of people's inability to resist, the slow rise of 0.02, and the three separate amounts that lower the intensity are additions. Three things in the literature are missing. The book's crises include war, reparations, default and oil embargoes, and these rules can see only unemployment. The book's consensus forms among particular coalitions, and these rules treat dominant capital as one body. The book says that the two regimes "tend to 'negate' one other", and no compass here makes stagflation hold mergers back.
+- **The compass that reads the pool of targets** turns when the top 100 already hold more than half of what they can reach.
+- **The compass that reads this year's buying** turns in any year in which buying does not make the top 100 grow faster than employment as a whole.
+- **The compass that needs a consensus** has the same motive as the first one. But the large owners hesitate, and prices rise fast only when people are too weak to resist.
 
-**Expected.** With the first compass, stagflation should begin as soon as dominant capital holds half of its reach, which is earlier than with module 7. The compass itself should never end a bout while the boundaries stay shut, so a bout should end only when resistance and the boom that follows remove cohesion. If the rhythm of about twenty-two years was produced by the twenty-year memory of module 7, it should disappear. With the second compass, there should be no stagflation for as long as buying outruns the growth of employment, and that should last until dominant capital is very large. A bout should then check itself, because the cut in hiring makes total employment grow more slowly than dominant capital buys. With the third compass, bouts should begin slowly, should be milder, and should be ended by resistance before they reach full intensity.
+### What the theory says
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 and 119 years, compared with the same runs with module 7. The rhythm did not disappear when the memory was removed. With the compass that reads the pool of targets, bouts began in the years labelled 1915, 1939, 1963, 1987 and 2009, which is every twenty-two to twenty-four years, where module 7 gave bouts in 1922, 1944 and 1993. That compass asked for stagflation in every year from about 1911, so the rhythm is made elsewhere. Each bout raises popular resistance, the boom that follows takes unemployment to the lowest level the model allows, cohesion falls to 0.01, and the next bout waits until unemployment and resistance have returned toward their usual levels. The twenty-year memory of module 7 is therefore not the source of the rhythm. The memory did produce the long quiet period from 1950 to 1990 in the run with module 7, because cohesion was high in those years and that compass did not ask for stagflation. With the compass that reads this year's buying, no bout occurred for almost eighty years, because dominant capital bought a larger part of its own size each year than the 1.7 per cent by which employment grew. The top hundred came to hold 56 per cent of all employees by 1970, their buying then fell behind the growth of employment, and short bouts followed, several of them six or seven years apart, with unemployment as high as 19 per cent. With the compass that needs a consensus, stagflation came as three long mild swells near 1925, 1960 and 2005. The intensity hardly passed 0.3, inflation stayed under 2.5 per cent a year, unemployment stayed between 2 and 11 per cent, and the capitalist share never passed 22 per cent, against 35 per cent with module 7. Differential capitalization fell in every sharp bout under module 7 and under the first two compasses, and it kept rising through the mild swells of the third. A trial of the third compass with the slow rise set to 0.05 gave one sharp bout in the 1920s and then steady inflation of about 2 per cent a year for sixty years. Two results did not change with the compass. The sector boundary never opened by more than 0.16, so no bout was ended by a return of mergers. In no run did mergers and stagflation move in opposite directions: over five-year averages the correlation between the volume of mergers and the intensity of stagflation was between 0.16 and 0.55, where the book reports a correlation near minus 0.95. Two runs of each compass with the modules listed in opposite orders gave the same figures.
+Chapter 14, Propositions 1, 2, 5, 7 and 8. Chapter 15, "Three transformations". Chapter 16, "The imperative of crisis", "The stagflation norm", "The politics of inflation" and "Stop-gap". Chapter 17, "Amalgamation versus stagflation" and "A new type of cycle". Jonathan Nitzan, "Regimes of differential accumulation: mergers, stagflation and the logic of globalization" (2001), the section on depth and the concluding section.
+
+Breadth is the book's name for growing by having more employees, mainly through mergers. Depth is its name for earning more for each employee, mainly through price rises. Dominant capital is its name for the largest firms.
+
+The motive for the turn:
+
+- Inflation "is not the weapon of first choice. It is only when the gains from breadth dry up that dominant capital, seeing its differential accumulation undermined, moves reluctantly toward relying on inflationary redistribution" (chapter 16, "Stop-gap").
+- Inflation is "a much more potent response to declining mergers and acquisitions" (chapter 14, Proposition 7).
+- "Occasional discontinuities in the process" of amalgamation "push dominant capital toward an alternative regime of stagflationary redistribution" (Proposition 8).
+- What dries up the gains: dominant capital "is bound to reach its 'envelope', namely the boundaries of its own corporate universe with few or no takeover targets to speak of" (chapter 15).
+- The measure of success: "For amalgamation to run ahead of overall growth, dominant capital must successively break its 'envelopes'" (Proposition 5).
+
+What ends a bout:
+
+- "When amalgamation resumed, with dominant capital breaking through its existing envelope and into a broader universe, stagflation promptly abated" (chapter 17).
+- The 2001 paper asks what happens otherwise: "if, after this merger wave ends, there is indeed no new universe to conquer, what will bring stagflation to an end?"
+
+Why a motive is not enough:
+
+- The benefits of inflation "come with mounting 'risks' which the large owners and leading government officials are often hesitant to take" (chapter 16, "Stop-gap").
+- Buyers do not pay higher prices willingly: "they are forced. And the way to force them is by creating, imposing and maintaining various forms of social crisis, apparent or real" (chapter 16, "The stagflation norm").
+- These crises work in two ways. "On the one hand, they undermine the ability of most people to resist price increases. On the other hand, they enable a consensus to emerge within dominant capital that inflation can be used with relative impunity."
+- The consensus is fragile. Dominant capital has to "cap overall growth", or else "coordination is bound to disintegrate into a price war, leading to disinflation or even outright deflation" (chapter 16, "The imperative of crisis").
+- Under inflation "the ruling class itself starts to bicker over the spoils of the process, over how to manage it and over whether or not to terminate it" (chapter 16, "The politics of inflation").
+
+No clock:
+
+- "There is nothing automatic or equilibrating about them", and "there is no inherent reason why amalgamation and stagflation should be cyclical in the first place" (chapter 17, "A new type of cycle").
+
+The book and the paper give no rule, no threshold and no rate for any of this. Nothing in them says that dominant capital compares recent years with earlier years.
+
+### What the module does each year
+
+All three compasses share two steps.
+
+- **Cohesion.** Each works out cohesion exactly as module 7 does. Cohesion is a number between 0 and 1 that says how far the top 100 can act together. It starts from the part of all employees who work for the top 100. Unemployment above 5 per cent raises it, and popular resistance lowers it.
+- **The limit.** The intensity of stagflation cannot be above 4 times cohesion, or above 1, or below 0.
+
+Between those two steps, each compass moves the intensity in its own way.
+
+**The compass that reads the pool of targets** (`compass_targets`)
+
+1. It reads the part of their reach that the top 100 already hold.
+2. If that part is above one half, the intensity rises by 0.15. If not, it falls by 0.10.
+
+For example, the top 100 hold 62 per cent of what they can reach. The intensity rises from 0.30 to 0.45. If a boundary opens next year and they hold only 40 per cent of the wider field, it falls to 0.35.
+
+**The compass that reads this year's buying** (`compass_ahead`)
+
+1. It divides the employees that the top 100 acquired last year by the employees they already had.
+2. It works out how fast total employment grew over the same year.
+3. If the first rate is higher, buying is running ahead and the intensity falls by 0.10. If not, the intensity rises by 0.15. In the first year of a run there is nothing to compare, and the intensity stays at 0.
+
+For example, the top 100 employ 20 per cent of all employees and bought firms with 0.5 per cent of all employees. Buying enlarged them by 2.5 per cent. Total employment grew 1.7 per cent. Buying is ahead, so the intensity falls.
+
+**The compass that needs a consensus** (`compass_consensus`)
+
+1. It checks the motive: do the top 100 hold more than half of what they can reach?
+2. It works out how unable people are to resist. This is a number between 0 and 1. It is unemployment above 5 per cent, counted as complete at 5 points above, times one minus popular resistance.
+3. With the motive, the intensity rises by 0.02 when people can resist fully, and by up to 0.15 when they cannot resist at all. Without the motive, it falls by 0.10.
+4. If employment grew faster than the working population, the intensity falls by 5 times the excess. This stands for coordination breaking into a price war.
+5. Popular resistance lowers the intensity by 0.2 times its level. This stands for the rulers bickering over whether to stop.
+
+The slow rise of step 3 itself cuts hiring, through the stagflation module. So the top 100 make the unemployment that lets their own consensus form.
+
+For example, the motive is present. Unemployment is 8 per cent and popular resistance is 0.25. People's inability to resist is (0.08 − 0.05) ÷ 0.05 × (1 − 0.25) = 0.45. Step 3 adds 0.02 + 0.13 × 0.45 = 0.079. Employment grew 2.0 per cent and the working population 1.7 per cent, so step 4 takes off 5 × 0.003 = 0.015. Step 5 takes off 0.2 × 0.25 = 0.05. The intensity rises by 0.014.
+
+### Settings
+
+All of these are our own choices. No source gives any of them.
+
+Settings of all three compasses:
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `rise` | 0.15 | The yearly rise in intensity. Module 7 uses the same figure. |
+| `fall` | 0.10 | The yearly fall in intensity. Module 7 uses the same figure. |
+| `concert` | 4.0 | The intensity cannot be more than this many times cohesion. Module 7 uses the same figure. |
+| `slack` | 20.0 | The rise in cohesion for each unit of unemployment above usual, as in module 7 |
+| `usual_unemployment` | 0.05 | The usual level of unemployment |
+
+Further settings of `compass_targets` and `compass_consensus`:
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `dry` | 0.5 | The part of their reach that the top 100 must hold before buying counts as dried up. Module 9 uses the same figure for the point at which a boundary starts to give. |
+
+Further settings of `compass_consensus`:
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `hesitant` | 0.02 | The yearly rise in intensity when there is a motive and people can resist fully |
+| `full_slack` | 0.05 | How far unemployment must stand above usual for people to be counted as wholly unable to resist |
+| `price_war` | 5.0 | The fall in intensity for each unit by which the growth of employment exceeds the growth of the working population |
+| `bicker` | 0.2 | The yearly fall in intensity at full popular resistance |
+
+### What it reads from other modules and what it gives them
+
+All three read `concentration` and `unemployment` from the core, and `resistance` from the resistance module. `compass_targets` and `compass_consensus` read `pool_open` from the mergers module. `compass_ahead` reads `merger_volume` from the mergers module.
+
+Each publishes `stagflation_intensity` and `cohesion`, as module 7 does. Each also publishes one number for reporting that no module reads:
+
+- `compass_targets` publishes `breadth_dried`, the part of their reach that the top 100 hold.
+- `compass_ahead` publishes `breadth_lead`, the amount by which buying runs ahead of the growth of employment.
+- `compass_consensus` publishes `impunity`, people's inability to resist.
+
+### What is known to be wrong or untested
+
+- **Mergers and stagflation do not move in opposite directions under any compass.** The book reports that in the United States the two came to mirror each other, with a correlation near minus 0.95. In trial runs that started with 60,000 firms, the correlation between the volume of mergers and the intensity of stagflation, over five-year averages, was between plus 0.16 and plus 0.55. The book says the two "tend to 'negate' one other", and no compass here makes stagflation hold mergers back.
+- **No bout was ended by a return of mergers.** In those trial runs the sector boundary never opened by more than 0.16.
+- **The rhythm of about 22 years does not come from the memory of module 7.** With the compass that reads the pool of targets, bouts came every 22 to 24 years in a trial run of 119 years, although that compass asked for stagflation in every year. The rhythm is made elsewhere. Each bout raises popular resistance. The boom that follows takes unemployment very low. Cohesion falls close to zero, and the next bout waits until unemployment and resistance have returned towards their usual levels.
+- **The compass that reads the pool of targets never ends a bout while the boundaries stay shut.** The 2001 paper asks the same question of the real world and leaves it open.
+- **The compass that reads this year's buying puts off stagflation until the top 100 are very large.** In a trial run no bout came for almost 80 years. By then the top 100 employed more than half of all employees.
+- **The compasses can see only one kind of crisis.** The book's crises include war, reparations, default and oil embargoes. These rules see only unemployment.
+- **Dominant capital is one body with one intensity.** The book's consensus forms among particular groups of firms and governments.
+- **The measures are ours.** Reading "the gains from breadth dry up" from the pool of targets is our own choice. So is reading it from one year of buying against one year of growth, for which Proposition 5 supplies only the phrase "run ahead of overall growth". So are the measure of people's inability to resist and the three separate amounts that lower the intensity.
+- **What full-size runs show.** These are runs of 60 years from 300,000 firms, read from figures printed every five years.
+  - Module 7 gave a first bout of stagflation after about 40 years. Differential capitalization ended at 8,121.
+  - The compass that reads the pool of targets gave a first bout about 8 years earlier and a second before the run ended. Differential capitalization ended at 5,516.
+  - The compass that reads this year's buying gave no stagflation at all. The top 100 came to employ 31 per cent of all employees, against 19 per cent with module 7. Differential capitalization ended at 8,836.
+  - The compass that needs a consensus gave one long mild swell. The intensity did not pass 0.2, inflation stayed under 2 per cent a year, and unemployment stayed between 2.5 and 5.4 per cent. The capitalist share peaked near 16 per cent, against 28 per cent with module 7. Differential capitalization rose throughout and ended at 8,697. With module 7 and with the compass that reads the pool of targets, it fell at the start of every bout.
+
+What should happen: with the compass that reads the pool of targets, stagflation should begin as soon as the top 100 hold half of their reach. With the compass that reads this year's buying, there should be no stagflation while buying outruns the growth of employment, and a bout should check itself, because the cut in hiring slows the growth of employment. With the compass that needs a consensus, bouts should begin slowly, be milder, and be ended by resistance before they reach full intensity.
 
 ---
 
 ## Optional module: Coalitions inside dominant capital
 
-The module is in `modules/coalitions.py` and is switched on with `--with coalitions`. It runs beside the nine modules and replaces none of them. Two existing modules received one optional read each. The merger module reads a number called the merger appetite, which is 1 for every sector when this module is off. The stagflation module reads a number called the conflict spark, which is 0 when this module is off. A run without this module gives exactly the figures it gave before.
+Name in the model: `coalitions`
 
-**Source.** Chapter 17, "The role of the Middle East", "Coalitions" with Figure 17.3, and the postscript. Jonathan Nitzan and Shimshon Bichler, "Bringing Capital Accumulation Back In: The Weapondollar-Petrodollar Coalition" (1995), sections 4 and 5. Shimshon Bichler and Jonathan Nitzan, "Putting the State in its Place" (1996). Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapters 5 and 6. The texts of the three works were downloaded from the authors' archive and are in `data/bn_archives/papers/`, in the folders `weapondollar_petrodollar_1995`, `putting_state_in_place_1996` and `gpe_israel_2002`.
+Switch it on by adding `--with coalitions` to the command. It runs beside the nine main modules and replaces none of them.
 
-**What the literature says.** Chapter 17 says that the history of differential accumulation "depends crucially on what happens within dominant capital. This process includes the inner conflicts between various corporate-state coalitions and alliances that comprise the nuclei of dominant capital". It names two groups. "During the depth phase of the 1970s and 1980s, differential accumulation was led by a 'Weapondollar-Petrodollar Coalition' made up of large oil companies, armament contractors and OPEC". That period "was accompanied by heightened conflict and violence", with "military conflict, especially in the Middle East, contributing to rising energy prices, and therefore to higher inflation". The challenge came from "a new 'Technodollar-Mergerdollar Alliance', a group based on civilian high-tech and corporate takeovers". Figure 17.3 measures each group by its "share of global market capitalization". The oil and arms firms held "nearly 14 per cent" in 1981 and "a meagre 4 per cent" in 2000, when the other alliance held 20 per cent. The postscript says that when mergers receded after 2000, "it was the brinkmanship of the Weapondollar-Petrodollar Coalition that saved the day. The coalition managed to put the Bush clan back in the White House, inflame the Middle East, raise the price of oil and provide the necessary spark for inflation". The 1995 paper gives the nearest thing to a rule. "As long as the Petro-Core's rate of return exceeds the big economy's average, the oil companies' performance will appear satisfactory or even superior, leading to a moderate stance on Middle Eastern affairs. When their performance falls below the 'normal', however, we enter the so-called 'danger zone': for the Petro-Core, the status quo of non-violent tension is no longer sufficient and open hostilities become increasingly appealing." The paper reports that from 1966 to 1991 "every 'danger zone' was followed by an outbreak of Middle East 'energy conflict'", that after each conflict "the Petro-Core's rate of return moved to surpass or at least match the Fortune 500 average", and that "no 'energy conflict' erupted without the Petro-Core first falling into a 'danger zone'". The paper says that the price of oil carries "'embargo effects' and 'war premiums'", and that when a crisis passed "the price began to stagnate or fall". The 2002 book adds a limit and an ending. Hostilities "were beneficial only up to a point", because "excessively high oil prices tended to encourage energy substitution, weaken profits in downstream operations, and lure entry from potential competitors". The mechanism "was by no means eternal. Indeed, after the 1990/91 Gulf War, a new 'danger zone' opened up - and yet this time there was no 'energy conflict' to close it". The book gives the reason: "By the early 1990s, civilian business offered much better ways to beat the average. Furthermore, the new civilian avenues required relative openness and stability, the very opposite of the conflict and stagflation with which the Weapondollar-Petrodollar Coalition fuelled the earlier depth regime." Chapter 6 of that book says that the prosperity of the new coalition "rested on three breadth-related poles", which were capital decontrols, privatisation and expansion into emerging markets. The literature gives directions and a hypothesis. It gives no rates, and the 1995 paper says of the war premium that its "precise magnitude" cannot "be easily determined". Chapter 17 says that an analysis of the coalitions "is beyond the scope of this volume".
+### What it is about
 
-**Rule.** The rule has seven parts.
+The nine main modules treat the 100 largest firms as one group with one interest. The book says they are not. It describes two rival groups among the largest firms. One, built around oil and arms, does well out of conflict and rising prices. The other, built around civilian technology and takeovers, does well out of calm and open markets.
 
-1. Every claim carries a label that it takes from its sector. The claims of two sectors carry the label of the conflict coalition, and these sectors stand for oil and arms. The claims of two other sectors carry the label of the takeover coalition, and these sectors stand for civilian technology and corporate takeovers. All other claims carry no label. In the parts below, a coalition means the claims of the top hundred that carry its label.
-2. Each year the module compares the earnings per employee of the conflict coalition with the earnings per employee of the top hundred as a whole. While the coalition earns less than the top hundred, it is in the danger zone, and a level of conflict rises. The level rises faster when the conflict coalition holds more of the top hundred's capitalization than the takeover coalition does, and more slowly when it holds less. While the coalition earns as much as the top hundred or more, the level of conflict falls.
-3. The violence of a year is the level of conflict or the intensity of stagflation, whichever is higher.
-4. The claims of the conflict coalition raise their prices by an extra amount in proportion to the violence, while wages stay as they are. They give up some employees for each price rise. No other claim receives this rise. In a year without violence, each claim of the coalition loses a part of whatever it earns per employee above the other claims of the top hundred.
-5. The module passes the level of conflict to the stagflation module as a spark. The spark is smaller while the top hundred hold little of the economy. The stagflation module acts as if the intensity of stagflation were at least as high as the spark.
-6. In a year without violence, the claims of the takeover coalition seek to buy more than other buyers do. This advantage shrinks in proportion to the violence and is gone at full violence.
-7. The module reports four readouts each year. Two are the parts of all capitalization held by the claims with each label, which is the measure of Figure 17.3. Two are the parts of the top hundred's capitalization held by each coalition, which is the measure of Figure 5.9 in the 2002 book.
+This module marks out two such groups and lets them pull in different directions. This file calls them the conflict coalition and the takeover coalition. When the conflict coalition earns less than the other large firms, a level of conflict rises. Conflict raises that coalition's prices and can help to start a bout of stagflation, which is a period of rising prices together with unemployment. In quiet years the takeover coalition buys more firms than other buyers do.
 
-The module never moves earnings from one coalition to the other. A coalition gains at the other's expense in the differential sense of the theory: its part of the total rises and the other's part falls.
+### What the theory says
 
-**Additions.** Every number in the rule is an addition. The level of conflict rises by 0.5 a year in the danger zone when the conflict coalition is the only coalition, and it falls by 0.15 a year outside the danger zone. At full violence the conflict coalition raises its prices by an extra 6 per cent a year. It gives up half a per cent of its employees for each per cent of that rise, which is the figure the sabotage module uses. In a year without violence a claim loses 20 per cent of its advantage in earnings per employee. Half of the level of conflict reaches the stagflation module, and less than half while the top hundred hold under a quarter of all employees. The takeover coalition seeks half as much again in acquisitions in a year without violence. The literature names oil, arms and civilian technology, and the ledger has sectors with numbers and no names, so the choice of two sectors for each coalition is an addition. The papers compare rates of return on equity, and the rule compares earnings per employee, because the ledger holds no book value of equity. Measuring which coalition has primacy by its part of the top hundred's capitalization is an addition. Treating every advantage of the conflict coalition over the rest of the top hundred as a premium that fades is an addition. The extra buying of the takeover coalition is an addition in its form, because the literature says only that this coalition was "based on" takeovers. Four things in the literature are missing. OPEC, the governments that imported arms and the governments that backed each coalition are not in the ledger. The cycle in which oil income pays for arms imports is not modelled. The book says that high technology was "firing up both investor's hype and the stock market", and hype is held at one in this model. The takeover coalition does not press for the opening of boundaries, although the 2002 book names capital decontrols as its first pole.
+Chapter 17, "The role of the Middle East", "Coalitions" with Figure 17.3, and the postscript. Jonathan Nitzan and Shimshon Bichler, "Bringing Capital Accumulation Back In: The Weapondollar-Petrodollar Coalition" (1995), sections 4 and 5. Shimshon Bichler and Jonathan Nitzan, "Putting the State in its Place" (1996). Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapters 5 and 6.
 
-**Expected.** During a merger wave the takeover coalition should gain a larger part of the top hundred's capitalization, because it buys faster than the rest. Whenever the conflict coalition earns less per employee than the top hundred, a short spell of conflict should follow and should lift the coalition back to the average or above it. During a bout of stagflation the conflict coalition should gain on the takeover coalition, because it receives the extra price rise on top of the general one and because the takeover coalition loses its advantage in buying. In quiet years after a bout the conflict coalition should drift back toward the average and should fall into the danger zone again. A spark from the conflict coalition might start a bout of stagflation that the compass did not ask for.
+Dominant capital is the book's name for the largest firms and the government bodies allied with them. Differential accumulation is its name for growing faster than the average. Depth is growing by earning more for each employee, mainly through price rises. Breadth is growing by having more employees, mainly through mergers.
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 and 119 years, compared with the same runs without the module and with a run in which the module only attached labels. With labels alone the two coalitions held steady parts of the top hundred's capitalization, close to 14.5 per cent for the conflict coalition and 8 per cent for the takeover coalition. With the module switched on, the takeover coalition's part rose from 8.0 to 14.3 per cent during the merger wave of the first twenty-five years, and for a few years it stood level with or above the conflict coalition. During the first bout of stagflation the conflict coalition's part rose from 14.3 to 20.0 per cent and the takeover coalition's part fell to 7.5 per cent, and during the second bout, near the year labelled 1998, the conflict coalition rose from 12.0 to 16.2 per cent while the takeover coalition fell from 10.3 to 9.4 per cent. The conflict coalition fell into the danger zone ten times in 119 years, each time for one year, and each time two or three years of conflict lifted it back above the average, which is the pattern the 1995 paper reports. No spark started a bout: the largest spark was 0.15, it raised inflation by well under one point a year, and the first bout began in the same year, 1920, with and without the module. Three results count against the run or remain doubtful. The takeover coalition's gain in the first wave was not repeated after 1950, when its part of the top hundred rose only from 8.6 to 10.4 per cent in forty years. A small second bout that the run without the module produced near 1945 did not occur with the module, and differential capitalization in 1950 was 1,427 against 1,564, and nothing in the rule was written to produce that difference. The danger zone was never left open, so the run did not show the case the 2002 book describes for the 1990s. Two runs with the modules listed in opposite orders gave the same figures to fourteen digits.
+The two groups:
 
-**Changed on 26 November 2026.** The module now owns a markup component named "war premium", which stacks, and it makes its changes to the markup of the conflict coalition's claims to that component (see "How modules share a quantity"). A run of 25 years gave the same figures as before the change.
+- The history of differential accumulation "depends crucially on what happens within dominant capital. This process includes the inner conflicts between various corporate-state coalitions and alliances that comprise the nuclei of dominant capital" (chapter 17, "Coalitions").
+- "During the depth phase of the 1970s and 1980s, differential accumulation was led by a 'Weapondollar-Petrodollar Coalition' made up of large oil companies, armament contractors and OPEC."
+- That period "was accompanied by heightened conflict and violence", with "military conflict, especially in the Middle East, contributing to rising energy prices, and therefore to higher inflation" (chapter 17, "The role of the Middle East").
+- The challenge came from "a new 'Technodollar-Mergerdollar Alliance', a group based on civilian high-tech and corporate takeovers".
+- Figure 17.3 measures each group by its "share of global market capitalization". The oil and arms firms held "nearly 14 per cent" in 1981 and "a meagre 4 per cent" in 2000, when the other alliance held 20 per cent.
+- When mergers fell away after 2000, "it was the brinkmanship of the Weapondollar-Petrodollar Coalition that saved the day. The coalition managed to put the Bush clan back in the White House, inflame the Middle East, raise the price of oil and provide the necessary spark for inflation" (chapter 17, postscript).
+
+The "danger zone", from the 1995 paper. The paper calls the large oil companies the "Petro-Core".
+
+- "As long as the Petro-Core's rate of return exceeds the big economy's average, the oil companies' performance will appear satisfactory or even superior, leading to a moderate stance on Middle Eastern affairs. When their performance falls below the 'normal', however, we enter the so-called 'danger zone': for the Petro-Core, the status quo of non-violent tension is no longer sufficient and open hostilities become increasingly appealing."
+- From 1966 to 1991 "every 'danger zone' was followed by an outbreak of Middle East 'energy conflict'". After each conflict "the Petro-Core's rate of return moved to surpass or at least match the Fortune 500 average". And "no 'energy conflict' erupted without the Petro-Core first falling into a 'danger zone'".
+- The price of oil carries "'embargo effects' and 'war premiums'". When a crisis passed, "the price began to stagnate or fall". The paper says the "precise magnitude" of such premiums cannot "be easily determined".
+
+A limit and an ending, from the 2002 book:
+
+- Hostilities "were beneficial only up to a point", because "excessively high oil prices tended to encourage energy substitution, weaken profits in downstream operations, and lure entry from potential competitors".
+- The pattern "was by no means eternal. Indeed, after the 1990/91 Gulf War, a new 'danger zone' opened up - and yet this time there was no 'energy conflict' to close it".
+- The reason: "By the early 1990s, civilian business offered much better ways to beat the average. Furthermore, the new civilian avenues required relative openness and stability, the very opposite of the conflict and stagflation with which the Weapondollar-Petrodollar Coalition fuelled the earlier depth regime."
+- Chapter 6 says that the prosperity of the new coalition "rested on three breadth-related poles". These were the lifting of controls on the movement of capital, the sale of state assets, and expansion into new markets.
+
+These sources give a hypothesis and the direction of each effect. They give no rates. Chapter 17 says that an analysis of the coalitions "is beyond the scope of this volume".
+
+### What the module does each year
+
+At the start of a run every firm is given a label. Firms in sectors 0 and 1 are labelled for the conflict coalition. These two sectors stand for oil and arms. Firms in sectors 2 and 3 are labelled for the takeover coalition. These stand for civilian technology and takeovers. Firms in the other 16 sectors have no label. A firm keeps its label for good, a new firm takes the label of its sector, and a merged firm has the label of the buyer. In the steps below, a coalition means the top-100 firms that carry its label.
+
+1. **It checks whether the conflict coalition is in the danger zone.** It compares the coalition's earnings for each employee with those of the top 100 as a whole. If the coalition earns less, it is in the danger zone.
+2. **It moves the level of conflict,** a number between 0 and 1. In the danger zone the level rises. The rise is 0.5 times the conflict coalition's weight, which is its capitalization divided by the capitalization of both coalitions together. Outside the danger zone the level falls by 0.15.
+3. **It works out the year's violence.** This is the level of conflict or the intensity of stagflation, whichever is higher.
+4. **Violence raises the conflict coalition's prices.** At full violence its firms raise their prices by an extra 6 per cent in the year, while wages stay as they are. At lower violence the rise is in proportion. They give up half a per cent of their employees for each per cent of this rise. No other firm gets the rise.
+5. **Quiet wears the gain away.** The module looks at how far each conflict firm's markup stands above the average markup of the other top-100 firms. In a year with no violence the firm loses 20 per cent of that excess. With some violence it loses less, in proportion.
+6. **It passes a spark to the stagflation module.** The spark is half the level of conflict. It is smaller while the top 100 employ less than a quarter of all employees. The stagflation module acts as if the intensity of stagflation were at least as high as the spark.
+7. **Quiet lets the takeover coalition buy more.** In a year with no violence, top-100 firms in the takeover sectors seek to buy half as much again as other buyers. The advantage shrinks in proportion to the violence and is gone at full violence.
+8. **It reports the size of each coalition:** the part of all capitalization held by firms with each label, which is the measure of Figure 17.3, and the part of the top 100's capitalization held by each coalition.
+
+The module never moves earnings from one coalition to the other. One gains on the other in the book's differential sense: its part of the total rises and the other's part falls.
+
+**An example.** The conflict coalition holds 15 per cent of the top 100's capitalization and the takeover coalition 10 per cent. The conflict coalition's weight is 15 ÷ 25 = 0.6. It earns less for each employee than the top 100 as a whole, so the level of conflict rises from 0 to 0.5 × 0.6 = 0.30. The intensity of stagflation is 0.1, so the year's violence is 0.30.
+
+- A conflict firm has a markup of 0.20. The other top-100 firms average 0.18. Its excess is 0.02, and it loses 0.2 × (1 − 0.30) × 0.02 = 0.0028 of it.
+- Its price then rises by 6 × 0.30 = 1.8 per cent. Its price for each unit of wage goes from 1.1972 to 1.2187, so its new markup is 0.2187.
+- It gives up 0.9 per cent of its employees.
+- The top 100 employ 20 per cent of all employees. The spark is 0.5 × 0.30 × (4 × 0.20) = 0.12.
+- Top-100 firms in the takeover sectors seek 1 + 0.5 × (1 − 0.30) = 1.35 times the usual amount of buying.
+
+**How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module. "How modules share a quantity" explains this. This module owns the part named "war premium". A war premium of 1.2 says that the firm's markup still stands a fifth higher because of what it gained from violence.
+
+### Settings
+
+All of these are our own choices, except `top`. No source gives any of the others.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `conflict_sectors` | 0 and 1 | The sectors whose firms are labelled for the conflict coalition |
+| `takeover_sectors` | 2 and 3 | The sectors whose firms are labelled for the takeover coalition |
+| `rise` | 0.5 | The yearly rise in the level of conflict in the danger zone, when the conflict coalition is the only coalition |
+| `fall` | 0.15 | The yearly fall in the level of conflict outside the danger zone |
+| `price_rise` | 0.06 | The extra yearly price rise of the conflict coalition's firms at full violence |
+| `volume_cost` | 0.5 | The employees given up for each unit of that price rise. The sabotage module uses the same figure. |
+| `fade` | 0.2 | The part of a firm's excess markup that is lost in a year with no violence |
+| `spark` | 0.5 | The part of the level of conflict that reaches the stagflation module |
+| `concert` | 4.0 | The spark is complete when the top 100 employ one part in this many of all employees. The compass uses the same figure. |
+| `takeover_edge` | 0.5 | The extra buying that the takeover coalition seeks in a year with no violence. 0.5 means half as much again. |
+| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+
+### What it reads from other modules and what it gives them
+
+It reads `concentration` from the core, which is the part of all employees who work for the top 100, and `stagflation_intensity` from the compass.
+
+It publishes:
+
+- `conflict_spark`, which the stagflation module reads. It counts as zero when this module is off.
+- `merger_appetite`, one number for each sector, which the mergers module and the optional barriers module read. It counts as 1 when this module is off.
+- `conflict`, the level of conflict, which the optional organised force and ownership of nature modules read
+- `danger_zone`, the amount by which the conflict coalition falls short of the top 100, for reporting
+- `coalition_conflict_share`, `coalition_takeover_share`, `coalition_conflict_top` and `coalition_takeover_top`, the four sizes of step 8
+
+The organised force module also reads the labels.
+
+### What is known to be wrong or untested
+
+- **The sectors are numbers, not industries.** The sources name oil, arms and civilian technology. The model's sectors have no names, so the choice of two sectors for each coalition is ours. Each coalition starts with the same number of sectors so that neither starts ahead.
+- **The comparison is of earnings for each employee.** The papers compare rates of return on owners' equity. The model does not record equity.
+- **Any advantage of a conflict firm counts as a gain from violence that fades.** Step 5 does not ask where the advantage came from.
+- **The measure of the coalitions' weight is ours.** So is making the spark smaller while the top 100 are small.
+- **The takeover coalition's extra buying is ours in its form.** The sources say only that this coalition was "based on" takeovers.
+- **Much of what the sources describe is missing.** OPEC, the governments that imported arms and the governments that backed each coalition are not in the model. The cycle in which oil income pays for arms imports is not modelled. The takeover coalition does not press for the opening of boundaries, although the 2002 book names the lifting of capital controls as the first of its three poles.
+- **Hype plays no part.** The book says that high technology was "firing up both investor's hype and the stock market". Unless the optional hype module is on, hype stays at 1, so the takeover coalition gains only by buying.
+- **It is not known whether a spark can start a bout.** In trial runs that started with 60,000 firms the largest spark was 0.15. It raised inflation by well under one point a year, and the first bout of stagflation began in the same year with and without the module. In a run of 60 years from 300,000 firms the first bout began about three years earlier with the module. The timing of bouts is very sensitive to small changes, so this does not show that the spark caused it.
+- **The danger zone has never stayed open.** In a trial run of 119 years the conflict coalition fell into the danger zone ten times, each time for one year, and two or three years of conflict lifted it back. This is the pattern the 1995 paper reports. The run did not show what the 2002 book describes for the 1990s, when a danger zone opened and no conflict closed it.
+- **The takeover coalition gains only in the first wave of mergers.** In the same trial run its part of the top 100's capitalization rose from 8 to 14 per cent in the first 25 years. After the year labelled 1950 it rose only from 8.6 to 10.4 per cent in 40 years.
+- **The module changes the larger result little.** In the run of 60 years from 300,000 firms, differential capitalization ended at 8,412 with the module and 8,121 without. Different random numbers alone move it by about 2 per cent.
+
+What should happen: during a wave of mergers the takeover coalition should gain a larger part of the top 100's capitalization. Whenever the conflict coalition earns less than the top 100, a short spell of conflict should follow and lift it back to the average or above. During a bout of stagflation the conflict coalition should gain on the takeover coalition. In quiet years after a bout it should drift back towards the average and fall into the danger zone again.
 
 ---
 
 ## Optional module: Organised force
 
-The module is in `modules/force.py` and is switched on with `--with force`. It runs beside the nine modules and replaces none of them. Two existing modules received one optional read each. The green-field module reads the military hiring planned for the year, which is 0 when this module is off. The resistance module reads a yearly rate of repression, which is 0 when this module is off. A run without this module gives exactly the figures it gave before. When the coalitions module is also on, this module reads its level of conflict and its labels, and the coalitions module needs no change.
+Name in the model: `force`
 
-**Source.** Chapter 12, "The differential underpinnings of universal sabotage" and the footnote on military contractors. Chapter 13, the passage on war finance and "The government bond". Chapter 16, "The stagflation norm". Chapter 17, "Amalgamation versus stagflation", "Oscillating regimes: a bird's eye view" and "The role of the Middle East" with Figure 17.2 and its footnotes. Jonathan Nitzan and Shimshon Bichler, "Bringing Capital Accumulation Back In: The Weapondollar-Petrodollar Coalition" (1995), sections 2 and 5. Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapter 5. Shimshon Bichler and Jonathan Nitzan, "Dominant Capital and the New Wars" (2004), with Figure 16. Jonathan Nitzan and Shimshon Bichler, "New Imperialism or New Capitalism?" (2006). The last two were downloaded from the authors' archive for this module and are in `data/bn_archives/papers/`, in the folders `dominant_capital_new_wars_2004` and `new_imperialism_or_new_capitalism_2006`.
+Switch it on by adding `--with force` to the command. It runs beside the nine main modules and replaces none of them.
 
-**What the literature says.** The literature does not treat war as an outside event. Chapter 12 lists "the use of force, including military, for differential business ends" among the means by which owners beat the average. Chapter 13 says that "war and organized violence – nominally the archenemies of the 'free market' – had been absorbed into capital", and that "the government bond represents a share in the organized violence of society". The literature ties force to one of the two regimes. Chapter 17 says that in depth, "sustaining such accumulation-through-crisis requires entrenchment, fortified power arrangements and a greater use of force and violence". It says that the depth regime of the 1930s "was marked by the massive use of military force", and that the depth regime of the 1970s "was accompanied by heightened conflict and violence". Figure 17.2 "shows a positive long-term correlation between inflation in the industrialized countries on the one hand and the global arms trade expressed as a share of world GDP on the other", and the book says that this "points to the conflictural underpinnings" of the regimes. A footnote adds that "military contracts ... lead deliveries roughly by three years". The literature says what force does for inflation. Chapter 16 says that buyers pay higher prices because "they are forced. And the way to force them is by creating, imposing and maintaining various forms of social crisis, apparent or real", and its first example is "military hostilities during the First World War". Such crises "undermine the ability of most people to resist price increases". The literature says who gains. The 1995 paper reports that "the largest 100 contractors accounted for between 62 and 72 per cent" of all military contract awards from 1966 to 1991. It reports that sixteen large contractors took 3.8 per cent of the net profit of the Fortune 500 in 1974 and 10.7 per cent in 1985, as military budgets rose, and it concludes that "this persistent military bias served to enhance the relative power of the Arma-Core". It reports the prediction of Michal Kalecki that a rise in military budgets "would bring a redistribution of income from the old to the new groups". It says that the arms sellers "succeeded in avoiding price competition". The book adds that military contractors "sometime operate at as little as 10 per cent of their capacity – while earning superior rates of return". The literature says how large military spending has been. Figure 16 of the 2004 paper gives United States military spending as a part of gross domestic product: 15 per cent in the First World War, 43 per cent in the Second, 15 per cent in the Korean war, 10 per cent in the Vietnam war and 3.8 per cent in 2000. The literature says what force does to labour. The 2002 book reports Kalecki's argument that military spending "might have lessened the disciplinary impact of unemployment", but that "the 'shortfall' was more than compensated for by the direct use of force and violence in the name national security", and that in his fascist model "full employment was sustained by military spending in preparation for war". Finally, the literature says that force does not last by itself. "Military expenditures must be legitimized by external threats", so "domestic weapon procurement is inherently unstable". The 2004 paper says that the oil and arms coalition "needs an atmosphere of permanent threat", and that war required "dominant capital on board", which happened when "the collective mindset of dominant capital has finally started to shift from breadth to depth". The literature gives no rule that says when force is used or how much, and no rate for any of its effects.
+### What it is about
 
-**Rule.** The module holds one number, the level of organised force, between 0 and 1. The rule has seven parts.
+The nine main modules cannot tell a war from an ordinary bout of stagflation, which is a period of rising prices together with unemployment. This module adds the difference. It keeps one number, the level of organised force, between 0 and 1. Nothing sets that number from outside. It follows the stagflation that the largest firms themselves produce.
 
-1. The call for force in a year is the intensity of stagflation. If the coalitions module is on, the call is the intensity of stagflation or that module's level of conflict, whichever is higher.
-2. While the call is above the level of force, the level closes one third of the gap each year. While the call is below the level, the level closes 15 per cent of the gap each year.
-3. The arms contractors are the claims of the top hundred that sit in two sectors, which stand for arms and oil. If the coalitions module is on, the contractors are the claims of the top hundred that carry its conflict label. No other claim receives a military order.
-4. At full force, military spending is 15 per cent of all income, and the contractors receive 67 per cent of it. The module reckons that spending as jobs on the contractors' books, equal to the same part of the working population. Each year the module plans the hiring or the dismissals that would bring those jobs to the number that the level of force calls for, and it publishes the plan. The contractors carry out the plan in the following year, each in proportion to its size. One year's military hiring may take at most half of the people who are out of work. The contractors keep their markup while they grow.
-5. The green-field module sets the planned military hiring aside before it lets other claims hire. Employment therefore cannot pass the working population.
-6. The module publishes a yearly rate of repression, which is 15 per cent at full force and less in proportion at a lower level. The resistance module removes that part of the level of popular resistance each year.
-7. The module reports the level of force, the military jobs as a part of the working population, and the contractors' part of the capitalization of the top hundred.
+Force does three things that an ordinary bout does not. It gives orders to arms makers, who grow at the expense of every other firm. It puts people to work while prices rise. And it holds down the popular resistance that rising prices provoke. This is how the years of a war differ from the years of a depression: in both, prices can be pushed up, but in a war there are jobs and little open protest.
 
-The module raises no price and moves no earnings from one claim to another. The contractors gain at the expense of other claims in the differential sense of the theory: their part of the total rises. The rule gives force no cost of its own. Two costs arise in other modules. Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the concert of dominant capital in the compass, and that limits the intensity of stagflation.
+### What the theory says
 
-**Additions.** Three numbers are taken from figures in the literature, and only the first is used for the quantity that its source gives it for. The lag of three years is the book's figure for the time from a military contract to its delivery, and the form in which the rule uses it is an addition. The 62 to 72 per cent is the part of prime contract awards that the hundred largest military contractors received from 1966 to 1991. The rule uses the middle of that range, 67 per cent, for the part of orders that goes to the arms claims among the hundred largest claims. That is a different group, so the setting is an addition. The 15 per cent is the reading for the First World War and for the Korean war in one chart of United States military spending, in which the Second World War reads 43 per cent. The literature does not give it as the level that full force brings, so the setting is an addition. Every other number is an addition: the 15 per cent a year at which force fades, the half of the unemployed that one year's hiring may take, the 15 per cent a year of repression, and the 10 per cent of its employees that a contractor keeps in a year of dismissals. Setting the call for force equal to the intensity of stagflation is an addition in its form. The literature says that depth "requires" more force, and it does not say that force follows depth in proportion. Reckoning military spending as jobs on the contractors' books is an addition, made because the ledger counts employees and holds no account of sales. The choice of two sectors is an addition, and it copies the sectors that the coalitions module gives to its conflict coalition. Seven things in the literature are missing. The module does not say who pays for the orders. In the literature the government pays by taxing broadly and by selling bonds to large owners, and the ledger has no taxes. Soldiers are not counted, so the armed forces take nobody out of the working population. Arms exports and the buyers of arms abroad are not in the ledger, although Figure 17.2 measures exports. The destruction of war is not modelled. The 2006 paper says that war is "detrimental to capital mobility, the lifeline of global breadth", and this module closes no boundary and slows no merger. The module holds no popular resistance to war itself. The optional module for what can be sold does not count military orders as spending, so the two modules together do not show the argument that military spending absorbs what cannot otherwise be sold.
+Chapter 12, "The differential underpinnings of universal sabotage" and the footnote on military contractors. Chapter 13, the passage on war finance and "The government bond". Chapter 16, "The stagflation norm". Chapter 17, "Amalgamation versus stagflation", "Oscillating regimes: a bird's eye view" and "The role of the Middle East" with Figure 17.2 and its footnotes. Jonathan Nitzan and Shimshon Bichler, "Bringing Capital Accumulation Back In: The Weapondollar-Petrodollar Coalition" (1995), sections 2 and 5. Nitzan and Bichler, *The Global Political Economy of Israel* (2002), chapter 5. Shimshon Bichler and Jonathan Nitzan, "Dominant Capital and the New Wars" (2004), with Figure 16. Nitzan and Bichler, "New Imperialism or New Capitalism?" (2006).
 
-**Expected.** While there is no stagflation, the level of force should be zero and the module should do nothing. When a bout of stagflation begins, the level of force should rise behind it with a delay of two or three years. The arms contractors should then grow much faster than the rest of the top hundred. Unemployment should rise less than in an ordinary bout, so prices should rise while fewer people are out of work, which is how a war differs from a depression. Popular resistance should rise less. The bout might last longer, because resistance is what ends a bout in this model. The bout might also be milder, because lower unemployment loosens the concert of dominant capital. When the bout ends, the level of force should fade over ten to fifteen years, and the contractors should dismiss the people they hired. Those dismissals should keep unemployment above the lowest level that the model allows. If the coalitions module is on, a spell of conflict started by the conflict coalition should also raise the level of force a little.
+Dominant capital is the book's name for the largest firms. Depth is its name for growing faster than the average by earning more for each employee, mainly through price rises.
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 and 119 years, compared with the same runs without the module. In the first bout of stagflation the level of force rose to about 0.86, military jobs reached 8 per cent of the working population, and the contractors' part of the top hundred's capitalization rose from 15 to 39 per cent. Unemployment peaked at 7.5 per cent against 11.5 per cent without the module, and it stood at 4.5 per cent in a year when prices rose 8 per cent, so the bout looked like a war and not like a depression. Popular resistance peaked at 0.27 against 0.50. Differential capitalization fell from 521 to 469 during the bout, against a fall from 508 to 378 without the module, because the growth of the contractors made up part of what the top hundred lost through higher risk. After the bout the contractors dismissed the people they had hired over about fifteen years, and unemployment rose to 6 per cent where the run without the module stayed at the lowest level the model allows. That unemployment tightened the concert of dominant capital again, and a second bout reached full intensity by the year labelled 1950, where the run without the module had only a brief bout that died out. A trial with repression alone gave no second bout by 1950, and a trial with military hiring alone gave the second bout just the same, so the dismissals after one war prepared the next bout. Over 119 years the module gave four bouts between twenty-two and twenty-eight years apart, each with its own rise of force, and the long quiet period from 1950 to 1990 of the run without the module did not occur. Three results count against the run or remain doubtful. Every bout became a war, because the rule makes force follow stagflation, so the likeness to Figure 17.2 is built in and is not a finding. Inflation was almost the same with and without the module, so force did not add to price rises as the book says conflict does. With the coalitions module also on, the contractors' part of the top hundred's capitalization reached 54 per cent, against 20 per cent with the coalitions module alone, which is far beyond anything in the record. Two runs with the modules listed in opposite orders gave the same figures.
+War is not an outside event:
+
+- Chapter 12 lists "the use of force, including military, for differential business ends" among the ways owners beat the average.
+- "War and organized violence – nominally the archenemies of the 'free market' – had been absorbed into capital", and "the government bond represents a share in the organized violence of society" (chapter 13).
+
+Force belongs to depth:
+
+- In depth, "sustaining such accumulation-through-crisis requires entrenchment, fortified power arrangements and a greater use of force and violence" (chapter 17).
+- The depth regime of the 1930s "was marked by the massive use of military force", and that of the 1970s "was accompanied by heightened conflict and violence".
+- Figure 17.2 "shows a positive long-term correlation between inflation in the industrialized countries on the one hand and the global arms trade expressed as a share of world GDP on the other". The book says this "points to the conflictural underpinnings" of the regimes.
+- A footnote adds that "military contracts ... lead deliveries roughly by three years".
+
+What force does for inflation:
+
+- Buyers pay higher prices because "they are forced. And the way to force them is by creating, imposing and maintaining various forms of social crisis, apparent or real". The first example given is "military hostilities during the First World War" (chapter 16).
+- Such crises "undermine the ability of most people to resist price increases".
+
+Who gains:
+
+- The 1995 paper reports that "the largest 100 contractors accounted for between 62 and 72 per cent" of United States military contract awards from 1966 to 1991.
+- Sixteen large contractors took 3.8 per cent of the net profit of the 500 largest firms in 1974 and 10.7 per cent in 1985, as military budgets rose. The paper concludes that "this persistent military bias served to enhance the relative power of the Arma-Core", its name for the large arms makers.
+- It reports Michal Kalecki's prediction that a rise in military budgets "would bring a redistribution of income from the old to the new groups".
+- The arms sellers "succeeded in avoiding price competition".
+- Military contractors "sometime operate at as little as 10 per cent of their capacity – while earning superior rates of return" (chapter 12, footnote).
+
+How large military spending has been:
+
+- Figure 16 of the 2004 paper gives United States military spending as a part of all income: 15 per cent in the First World War, 43 per cent in the Second, 15 per cent in the Korean war, 10 per cent in the Vietnam war and 3.8 per cent in 2000.
+
+What force does to labour:
+
+- The 2002 book reports Kalecki's argument that military spending "might have lessened the disciplinary impact of unemployment", but "the 'shortfall' was more than compensated for by the direct use of force and violence in the name national security". In his model of fascism "full employment was sustained by military spending in preparation for war".
+
+Force does not last by itself:
+
+- "Military expenditures must be legitimized by external threats", so "domestic weapon procurement is inherently unstable" (1995 paper).
+- The 2004 paper says that the oil and arms coalition "needs an atmosphere of permanent threat". War needed "dominant capital on board", and this came when "the collective mindset of dominant capital has finally started to shift from breadth to depth".
+- The 2006 paper says that war is "detrimental to capital mobility, the lifeline of global breadth".
+
+These sources give no rule for when force is used or how much, and no rate for any of its effects.
+
+### What the module does each year
+
+The arms contractors are the top-100 firms in sectors 0 and 1, which stand for arms and oil. If the coalitions module is on, they are the top-100 firms that carry its conflict label. No other firm receives a military order.
+
+1. **The contractors carry out last year's plan.** They hire or dismiss the number of people that the module planned a year ago, each in proportion to its size. In a year of dismissals a contractor keeps at least 10 per cent of its employees.
+2. **The module works out the call for force.** This is the intensity of stagflation. If the coalitions module is on, it is the intensity of stagflation or that module's level of conflict, whichever is higher.
+3. **The level of force moves towards the call.** If the call is above the level, the level closes one third of the gap. If the call is below, the level closes 15 per cent of the gap. So force builds up over about three years and fades over ten to fifteen.
+4. **The module plans military jobs for next year.** At full force, military spending is 15 per cent of all income, and the contractors receive 67 per cent of it. The module counts that spending as jobs with the contractors, equal to the same part of the working population. At a lower level of force the number is in proportion. The plan is the difference between that number and the military jobs that exist. One year's hiring may take at most half of the people who are out of work.
+5. **Other modules make room.** The green-field module sets the planned military hiring aside before it lets other firms hire, so employment cannot pass the working population. The contractors keep their markup while they grow.
+6. **The module publishes a rate of repression.** It is 15 per cent at full force, and less in proportion. The resistance module removes that part of the level of popular resistance each year.
+
+The module raises no price and moves no earnings from one firm to another. The contractors gain in the book's differential sense: their part of the total rises.
+
+**An example.** The intensity of stagflation is 0.6 and the level of force is 0.3. The level rises by a third of the gap, to 0.4. Military jobs should now be 0.15 × 0.67 × 0.4 = 4.0 per cent of the working population. They are 2.0 per cent, so the module plans to hire another 2.0 per cent next year. Unemployment is 7 per cent. Half of the people out of work is more than 3 per cent of the working population, so the limit on hiring does not bind. The rate of repression is 0.15 × 0.4 = 6 per cent. If popular resistance stands at 0.30, the resistance module takes 0.018 off it.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `arms_sectors` | 0 and 1 | The sectors whose top-100 firms are arms contractors. They are the sectors that the coalitions module gives to its conflict coalition. | Our own choice |
+| `lag` | 3.0 | The years from a military contract to its delivery. The level of force closes one part in this many of the gap each year. | The book, chapter 17, footnote. The way the rule uses it is our own. |
+| `fade` | 0.15 | The part of the gap closed each year while the call is below the level | Our own choice |
+| `military_part` | 0.15 | Military spending as a part of all income at full force | Our own choice. 15 per cent is the reading for the First World War and for the Korean war in the 2004 paper's chart, where the Second World War reads 43 per cent. The paper does not give it as the level that full force brings. |
+| `top_part` | 0.67 | The part of military orders that goes to the contractors | Our own choice. It is the middle of the 62 to 72 per cent that the 1995 paper reports for the 100 largest military contractors. That is a different group from the arms makers among the 100 largest firms. |
+| `take` | 0.5 | The most that one year's military hiring may take of the people out of work | Our own choice |
+| `repress` | 0.15 | The part of popular resistance removed in a year at full force | Our own choice |
+| `hold` | 0.1 | The smallest part of its employees that a contractor keeps in a year of dismissals | A plain limit with no source |
+| `floor` | 0.005 | The lowest level of unemployment. The green-field module uses the same figure. | A plain limit with no source |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+### What it reads from other modules and what it gives them
+
+It reads `stagflation_intensity` from the compass. When the coalitions module is on, it also reads `conflict` and the coalition labels.
+
+It publishes:
+
+- `force_hires`, the military hiring planned for the year. The green-field module and the optional privatisation module read it. It counts as zero when this module is off.
+- `repression`, the yearly rate of repression. The resistance module and the optional organised labour module read it. It counts as zero when this module is off.
+- `force`, the level of force, which the optional ownership of nature module reads
+- `force_jobs`, military jobs as a part of the working population, which the optional energy module reads
+- `force_contractors_top`, the contractors' part of the top 100's capitalization, for reporting
+
+### What is known to be wrong or untested
+
+- **Every bout of stagflation becomes a war.** The rule makes force follow stagflation in proportion. The book says that depth "requires" more force. It does not say that force follows in proportion. Any likeness between a run and Figure 17.2 is therefore built in and is not a finding.
+- **Nobody pays for the military orders.** In the sources the government pays by taxing broadly and by selling bonds to large owners. The model can record such payments, and this module records none.
+- **Military spending is counted as jobs.** This is our own device. The model counts employees and has no record of sales.
+- **Force has no cost of its own.** Two costs arise in other modules. Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the cohesion of the top 100 in the compass, which limits the intensity of stagflation.
+- **Force does not add to price rises.** In trial runs that started with 60,000 firms, inflation was almost the same with and without the module. The book says that conflict contributes to inflation.
+- **Much of what the sources describe is missing.** Soldiers are not counted, so the armed forces take nobody out of the working population. Arms exports and buyers of arms abroad are not in the model, although Figure 17.2 measures exports. The destruction of war is not modelled. The module closes no boundary and slows no merger, although the 2006 paper says war harms the movement of capital. There is no popular resistance to war itself.
+- **Military orders do not count as spending in the optional module "What can be sold".** The two together cannot show the argument that military spending absorbs what cannot otherwise be sold.
+- **With the coalitions module also on, the contractors grow beyond reason.** In a trial run their part of the top 100's capitalization reached 54 per cent, against 20 per cent with the coalitions module alone.
+- **Dismissals after one war may prepare the next bout.** In trial runs the contractors dismissed their extra employees over about 15 years after a bout. That kept unemployment up, which tightened the cohesion of the top 100 again and brought a second bout. A trial with repression alone gave no early second bout, and a trial with military hiring alone did. The full-size run described next ended ten years after its first bout, too soon to show this.
+- **What a full-size run shows.** In a run of 60 years from 300,000 firms, the first bout of stagflation looked like a war and not like a depression. In the figures printed every five years, unemployment peaked at 7.5 per cent, against 10.7 per cent without the module. It stood at 2.3 per cent while prices rose 7 per cent a year. Popular resistance peaked at 0.27, against 0.46. The top 100's part of all employees rose to 24 per cent during the bout, where without the module it fell to 17 per cent. Differential capitalization rose through the bout and ended at 9,859, against 8,121. After the bout unemployment stayed near 1.5 per cent, where the run without the module fell to 0.5 per cent, the lowest the model allows. With the coalitions module also on, differential capitalization ended at 7,917.
+
+What should happen: with no stagflation, the level of force is zero and the module does nothing. When a bout begins, force should rise behind it with a delay of two or three years. The contractors should grow much faster than the rest of the top 100. Unemployment and popular resistance should rise less than in an ordinary bout. The bout might last longer, because resistance is what ends a bout in this model. When the bout ends, force should fade over ten to fifteen years, and the contractors should dismiss the people they hired.
 
 ---
 
-## Optional module: Who owns the claims
+## Optional module: Who owns the firms
 
-The module is in `modules/owners.py` and is switched on with `--with owners`. It runs beside the nine modules and replaces none of them. No existing module reads its numbers, so a run with this module gives exactly the figures of a run without it, and adds the readouts described below. One line of `core.py` was changed for this module. A scaling may now name an added per-claim attribute as well as one of the five terms of a claim. The four checks in `checks.py` still pass, and a run without this module gives the same output as before the change.
+Name in the model: `owners`
 
-**Source.** Chapter 12, "The absentee ownership of power". Chapter 13, "Owners and technocrats" and "Sovereign owners?". Chapter 14, "The universe of owners". Sandy Brian Hager, "What Happened to the Bondholding Class?" (2013), Table 2. Sandy Brian Hager, "Corporate Ownership of the Public Debt" (2015). Joseph Baines and Sandy Brian Hager, "From Passive Owners to Planet Savers? Asset Managers, Carbon Majors and the Limits of Sustainable Finance" (2022). The last paper was downloaded from the authors' archive for this module and is in `data/bn_archives/papers/baines_hager_asset_managers_2022/`.
+Switch it on by adding `--with owners` to the command. It runs beside the nine main modules and replaces none of them.
 
-**What the literature says.** Chapter 12 says that "modern capitalists have become investors of 'funds', absentee owners of pecuniary wealth with no direct industrial dealings". It gives a figure: "Currently, roughly half of all capitalist assets are owned indirectly through institutional investors such as pension and mutual funds, hedge and sovereign funds, insurance companies, banks and corporations." It says of the people behind those funds: "The ultimate owners of these assets, whether big or small, exercise little voice in the management of the underlying production processes. For the most part, they merely buy and sell shares of these assets and collect the flow of dividends. Often, their diversification is so extensive that they don't know exactly what they own." It says that the largest direct owners are just as far from production, and that they spend their energies on "cutting and pasting assets through endless deals of divestment and merger". Chapter 14 divides owners into two groups. "The vast majority of owners" hold assets for use, "primarily savings and pensions", and "these assets give their owners little or no control over other people". "A small minority of owners" holds financial instruments for accumulation, and these "give their owners direct and indirect control over other people". The chapter adds: "we focus not on individual owners, but on groups of owners". Chapter 13 rejects the view that managers took control away from owners: "the separation of ownership from control was never much more than a 'pseudofact'", and "it is not the engineers and bureaucrats, but the capitalists who are in the driver seat". It also says that ownership at a distance changes nothing in conduct: "whether the capitalists are absent or present, the logic of their mega-machine seems to enforce this accumulation on society with increasing mechanical exactitude". The same chapter says that governments which set up sovereign wealth funds "are further integrating, if not locking themselves, into the larger architecture of capitalist power". Hager supplies measurements for the United States. The richest one per cent of households held 61.5 per cent of corporate stocks in 1922, 76 per cent in 1953 and 51.3 per cent in 2010. Pension funds "are indeed widely owned, with the top percentile of US households owning only 15 percent of their total assets in 2010". Mutual funds are "heavily concentrated, with the top percentile owning 47 percent of their total assets in 2010". Baines and Hager report that the three largest asset managers "own more than 20 percent of shares in the average S&P 500 company". They report that "effective control can be exercised with stakes as low as five percent", and that Maurice Zeitlin showed that control needs "as little as five to 10 percent ownership stakes". They find that these managers "much more often than not oppose rather than support" shareholder resolutions on the environment. The literature says who owns and how much at certain dates. It gives no rule for how ownership passes from direct owners to institutional investors, and it names no effect of that passage on prices, earnings or mergers.
+### What it is about
 
-**Rule.** The module gives every claim one more number, which is the part of the claim that its own large owners hold directly. The rest of the claim is held through institutional investors. The rule has seven parts.
+The model's list of firms says nothing about who owns each firm. This module adds that. For every firm it keeps one more number: the part of the firm that its own large owners hold directly. The rest is held through funds, such as pension funds and mutual funds, which hold shares in many firms at once.
 
-1. At the start every claim is held wholly and directly by its own owners. A newly founded claim is also held wholly and directly.
-2. The listed claims are the largest claims by capitalization. One claim in every five hundred is listed, and the top hundred are always listed. Institutional investors can buy only listed claims.
-3. Each year the direct owners of a listed claim offer for sale 5 per cent of what they hold above a controlling block of 10 per cent. They never sell the controlling block.
-4. Two kinds of institutional investor bring money each year. Funds of the first kind are fed from wages and stand for pension funds. They bring 3 per cent of the wage bill. Funds of the second kind are fed from capitalist earnings and stand for mutual funds and hedge funds. They bring 20 per cent of all earnings. The two kinds buy the shares on offer in proportion to the money that each brings. If the money is less than the value of the shares on offer, only that much is sold.
-5. After a merger the whole merged claim has the pattern of ownership of the buyer. The owners of the target are paid in money and hold nothing in the merged claim.
-6. The module traces the capitalization and the earnings of each claim back to two groups of households. The first group is the richest one per cent, which stands for the small minority that holds assets for accumulation. The second group is everybody else. The richest one per cent hold 51.3 per cent of directly held shares, 15.3 per cent of the funds fed from wages and 47 per cent of the funds fed from earnings.
-7. The module reports ten readouts each year. They include the part of all capitalization that is held through institutional investors, the same part for the top hundred, the division of capitalist earnings among direct owners and the two kinds of fund, the part of all capitalization that belongs in the end to the richest one per cent, the part of all income that reaches the richest one per cent as owners, and the part of all employees who work in claims where the institutional investors together hold at least a controlling block.
+Think of a family that founded a company and at first owns all of it. Once the company is large enough to be traded on a stock exchange, the family sells shares to funds a little at a time. It keeps a block large enough to stay in control.
 
-The module changes no price, no earnings, no employment and no capitalization.
+The module only reports. It changes no price, no earnings, no employment and no capitalization, so every other figure of a run is the same with it on or off. This is deliberate, and it follows the book, which says that owning at a distance changes nothing in how firms behave.
 
-**Additions.** Four numbers are taken from the literature: the controlling block of 10 per cent, and the three parts that the richest one per cent hold. The controlling block is the upper end of the "five to 10 percent" that Baines and Hager report from Zeitlin. The three parts are Hager's readings for the single year 2010. As settings they are additions, because the rule holds them fixed for a whole run and Hager shows that they moved: his table gives the richest one per cent 76 per cent of corporate stocks in 1953 and 51.3 per cent in 2010. Every other number is an addition: one claim in five hundred is listed, direct owners offer 5 per cent a year, funds fed from wages bring 3 per cent of the wage bill, and funds fed from earnings bring 20 per cent of earnings. Parts 2, 3 and 4 are additions as a whole, because the literature gives no rule for the passage from direct to indirect ownership. Part 5 is an addition that comes from the core, which treats every merger as a purchase for money and none as an exchange of shares. Giving ownership no effect on conduct follows the sentence quoted from chapter 13, and it is still a choice. Six things in the literature are missing. The institutional investors are two pools and not separate bodies, so the module cannot show three managers holding a fifth of every large claim. Funds never sell, and pension funds pay nothing out. Money that finds no shares to buy disappears from the account, where in the literature it would raise share prices, and that rise is hype, which this model holds at one. Banks, insurance companies, government funds and corporations that hold other corporations are not held apart. The ownership of the two debt claims of module 2 is not traced. The salaries of the richest one per cent are counted as wages. Jongchul Kim's paper "Propertization" (2018) was looked at. It concerns money market funds and gives nothing that this ledger could hold.
+### What the theory says
 
-**Expected.** The part of all capitalization that is held through institutional investors should start at zero and should rise with the top hundred's part of all capitalization, because only large claims are listed and because a buyer's pattern of ownership spreads over every claim it absorbs. It should fall back whenever small claims gain on large ones. The top hundred should come to be held almost wholly through funds, down to the controlling block. The funds fed from earnings should gain on the funds fed from wages whenever the capitalist share of income rises. The richest one per cent's part of all capitalization should fall slowly, because the funds fed from wages belong mostly to everybody else. Their part of all income should follow the capitalist share of income. Every figure that the model reported before should stay the same.
+Chapter 12, "The absentee ownership of power". Chapter 13, "Owners and technocrats" and "Sovereign owners?". Chapter 14, "The universe of owners". Sandy Brian Hager, "What Happened to the Bondholding Class?" (2013), Table 2. Sandy Brian Hager, "Corporate Ownership of the Public Debt" (2015). Joseph Baines and Sandy Brian Hager, "From Passive Owners to Planet Savers? Asset Managers, Carbon Majors and the Limits of Sustainable Finance" (2022).
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 and 119 years. The output of `full.py` with the module was identical to the output without it, as intended, and two runs with the modules listed in opposite orders gave identical readouts. The part of all capitalization held through institutional investors rose from zero to 22 per cent by the year labelled 1920, fell to 18 per cent by 1930 while the first bout of stagflation lowered the top hundred's part of all capitalization, and then rose to 30 per cent in 1950, 56 per cent in 1970 and 71 per cent in 1990. The book's "roughly half" was therefore passed near the year labelled 1965. The top hundred were 70 per cent held through funds by 1920 and 86 per cent by 1950. The part of all employees working in claims where the funds held a controlling block rose to 28 per cent by 1950 and 59 per cent by 1990. The richest one per cent's part of all capitalization fell from 51 to 36 per cent by 1990, while their part of all income moved with the capitalist share, from 4.7 per cent at the start to 13.8 per cent at the height of the first bout. Two results are doubtful. The funds' money never limited anything: at most 9 per cent of it found shares to buy, so the two saving rates decide only the mix of the two kinds of fund, and that mix moved only from 60 to 55 per cent in funds fed from wages. The fall in the richest one per cent's part of capitalization is larger than the fall Hager reports for corporate stocks, and it follows from holding the three parts fixed.
+Owners stand far from production:
+
+- "Modern capitalists have become investors of 'funds', absentee owners of pecuniary wealth with no direct industrial dealings" (chapter 12).
+- "Currently, roughly half of all capitalist assets are owned indirectly through institutional investors such as pension and mutual funds, hedge and sovereign funds, insurance companies, banks and corporations."
+- "The ultimate owners of these assets, whether big or small, exercise little voice in the management of the underlying production processes. For the most part, they merely buy and sell shares of these assets and collect the flow of dividends. Often, their diversification is so extensive that they don't know exactly what they own."
+- The largest direct owners are just as far from production. They spend their energies on "cutting and pasting assets through endless deals of divestment and merger".
+
+Two kinds of owner (chapter 14):
+
+- "The vast majority of owners" hold assets for use, "primarily savings and pensions", and "these assets give their owners little or no control over other people".
+- "A small minority of owners" holds assets for accumulation, and these "give their owners direct and indirect control over other people".
+- "We focus not on individual owners, but on groups of owners."
+
+Owners, not managers, are in charge (chapter 13):
+
+- "The separation of ownership from control was never much more than a 'pseudofact'", and "it is not the engineers and bureaucrats, but the capitalists who are in the driver seat".
+- "Whether the capitalists are absent or present, the logic of their mega-machine seems to enforce this accumulation on society with increasing mechanical exactitude."
+- Governments that set up investment funds of their own "are further integrating, if not locking themselves, into the larger architecture of capitalist power".
+
+Measurements for the United States:
+
+- Hager's Table 2 gives the part of each kind of asset that the richest one per cent of households hold. For corporate stocks it was 61.5 per cent in 1922, 76 per cent in 1953 and 51.3 per cent in 2010. For pension assets it was 8 per cent in 1922, 5.5 per cent in 1953 and 15.3 per cent in 2010.
+- Pension funds "are indeed widely owned, with the top percentile of US households owning only 15 percent of their total assets in 2010". Mutual funds are "heavily concentrated, with the top percentile owning 47 percent of their total assets in 2010" (Hager 2015).
+- The three largest fund managers "own more than 20 percent of shares in the average S&P 500 company" (Baines and Hager).
+- "Effective control can be exercised with stakes as low as five percent." Baines and Hager report that Maurice Zeitlin showed that control needs "as little as five to 10 percent ownership stakes".
+- These managers "much more often than not oppose rather than support" shareholder proposals on the environment.
+
+These sources say who owns and how much at certain dates. They give no rule for how ownership passes from direct owners to funds, and they name no effect of that passage on prices, earnings or mergers.
+
+### What the module does each year
+
+At the start of a run every firm is held wholly and directly by its own owners. So is every newly founded firm.
+
+1. **It picks the listed firms.** These are the firms that funds can buy. One firm in every 500 is listed, taking the largest by capitalization first. The top 100 are always listed.
+2. **Direct owners offer shares.** The direct owners of a listed firm never sell a controlling block of 10 per cent. Each year they offer 5 per cent of what they hold above that block.
+3. **Two kinds of fund bring money.** Funds of the first kind are fed from wages and stand for pension funds. They bring 3 per cent of all wages. Funds of the second kind are fed from owners' earnings and stand for mutual funds and hedge funds. They bring 20 per cent of the earnings of all firms.
+4. **The funds buy.** The two kinds buy the shares on offer in proportion to the money each brings. If the money is less than the value of the shares on offer, only that much is sold.
+5. **It traces everything back to households.** There are two groups of households: the richest one per cent, and everybody else. The richest one per cent hold 51.3 per cent of directly held shares, 15.3 per cent of the funds fed from wages and 47 per cent of the funds fed from earnings.
+6. **It reports ten numbers,** which are listed below.
+
+When one firm buys another, the merged firm has the buyer's pattern of ownership. The owners of the bought firm are paid in money and hold nothing in the merged firm.
+
+**An example.** A listed firm has a capitalization of 1,000, and its own owners hold 70 per cent of it. They offer 5 per cent of the 60 points they hold above the controlling block. That is 3 per cent of the firm, worth 30. All wages are 10,000 and all earnings 1,500, so each kind of fund brings 300. The funds have more than enough, so they buy all 30, half each. The direct owners now hold 67 per cent.
+
+If the funds' holdings are half in each kind, the richest one per cent of households own 0.67 × 51.3 + 0.33 × (0.5 × 15.3 + 0.5 × 47) = 44.7 per cent of this firm.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `listed_one_in` | 500 | One firm in this many is listed and can be bought by funds | Our own choice |
+| `sell_rate` | 0.05 | The part of their holding above the controlling block that direct owners offer each year | Our own choice |
+| `control_block` | 0.10 | The block that direct owners never sell | The upper end of the "five to 10 percent" that Baines and Hager report from Zeitlin |
+| `save_wages` | 0.03 | The part of all wages that funds fed from wages bring each year | Our own choice |
+| `save_earnings` | 0.20 | The part of all earnings that funds fed from owners' earnings bring each year | Our own choice |
+| `rich_direct` | 0.513 | The part of directly held shares that belongs to the richest one per cent of households | Hager 2013, Table 2, corporate stocks in 2010 |
+| `rich_wage_funds` | 0.153 | The part of funds fed from wages that belongs to the richest one per cent | Hager 2013, Table 2, pension assets in 2010 |
+| `rich_profit_funds` | 0.47 | The part of funds fed from earnings that belongs to the richest one per cent | Hager 2015, mutual funds in 2010 |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
+
+The three figures from Hager are readings for the single year 2010. The module holds them fixed for a whole run, which is our own choice. Hager shows that they moved: the same table gives the richest one per cent 76 per cent of corporate stocks in 1953.
+
+### What it reads from other modules and what it gives them
+
+It reads nothing that another module publishes.
+
+It publishes ten numbers, measured at the start of each year. No other module reads them.
+
+| Name in the code | What it is |
+|---|---|
+| `owners_indirect` | The part of all capitalization held through funds. The book's "roughly half" can be set against it. |
+| `owners_indirect_top` | The same part for the top 100 firms |
+| `owners_wide` | The part of the funds' holdings that is in funds fed from wages |
+| `owners_income_direct` | The part of all firms' earnings that goes to direct owners |
+| `owners_income_wage_funds` | The part that goes to funds fed from wages |
+| `owners_income_profit_funds` | The part that goes to funds fed from owners' earnings |
+| `owners_top_percent_cap` | The part of all capitalization that belongs in the end to the richest one per cent |
+| `owners_top_percent_income` | The part of all income, wages and earnings together, that reaches the richest one per cent as owners |
+| `owners_reach` | The part of all employees who work in firms where the funds together hold at least a controlling block |
+| `owners_placed` | The part of the funds' new money that found shares to buy |
+
+The optional hype module changes the number this module keeps for each firm. With both on, the direct owners of top-100 firms are treated as insiders who trade shares with the funds.
+
+### What is known to be wrong or untested
+
+- **The funds' money never limits anything.** In trial runs that started with 60,000 firms, at most 9 per cent of the money found shares to buy. The two rates of saving decide only the mix of the two kinds of fund, and that mix moved only from 60 to 55 per cent in funds fed from wages.
+- **Money that finds no shares disappears.** In the sources, money chasing shares would raise their prices. That rise is hype, which stays at 1 unless the optional hype module is on.
+- **The rule for the passage of ownership is wholly ours.** Steps 1 to 4 have no source.
+- **The funds are two pools, not separate bodies.** The module cannot show three managers holding a fifth of every large firm.
+- **Funds never sell, and pension funds pay nothing out.**
+- **A merger is always a purchase for money.** The model has no mergers by exchange of shares, so the owners of a bought firm never become owners of the buyer.
+- **The richest one per cent's part of capitalization falls too far.** In a trial run of 119 years it fell from 51 to 36 per cent in a hundred years. This is more than the fall Hager reports for corporate stocks. It follows from holding his three figures fixed.
+- **Several kinds of owner are not held apart:** banks, insurance companies, government funds, and firms that hold shares in other firms.
+- **Debts are not traced.** The module does not say who owns corporate debt or the government's debt.
+- **The salaries of the richest one per cent are counted as wages.**
+- **Ownership has no effect on what firms do.** This follows the sentence from chapter 13 quoted above, and it is still a choice.
+- **One paper was looked at and not used.** Jongchul Kim's "Propertization" (2018) concerns money market funds and gives nothing that this model could hold.
+- **What trial runs show.** In trial runs that started with 60,000 firms, the part of all capitalization held through funds rose from zero to 22 per cent after 30 years. It fell to 18 per cent during the first bout of stagflation, when the top 100's part of all capitalization fell. It then rose to 30 per cent after 60 years, 56 per cent after 80 and 71 per cent after 100. It passed the book's "roughly half" after about 75 years. The top 100 were 70 per cent held through funds after 30 years and 86 per cent after 60. The part of all income reaching the richest one per cent as owners moved with the capitalist share of income, from 4.7 per cent at the start to 13.8 per cent at the height of the first bout.
+- **The module changes nothing else, as intended.** In a run of 60 years from 300,000 firms, every figure the model prints was identical with the module on and off.
+
+What should happen: the part of capitalization held through funds should start at zero and rise as the top 100's part of all capitalization rises, because only large firms are listed and because a buyer's pattern of ownership spreads over every firm it buys. The top 100 should come to be held almost wholly through funds, down to the controlling block. Funds fed from earnings should gain on funds fed from wages whenever the capitalist share of income rises.
 
 ---
 
-## Optional module: Hype as a lever, rebuilt
+## Optional module: Hype as a lever
 
-This section replaces the section of the first version of the module, which was rebuilt after review on 26 November 2026. The first version had three faults. It made insiders push the hype of dominant capital up until it stood at 1.43 times the average and then down, and 1.43 is only the largest reading in the appendix to chapter 11, which is the hype of one index of five hundred firms in one sample and not a limit. It did not count what insiders gain from the rise and fall of hype, which is the reason the book gives for studying hype at all. It built its own systemic fear, which belongs to a later module on the power index. The rebuilt module has no turning level, counts the insiders' gains, and has no fear of its own.
+Name in the model: `hype`
 
-The module is in `modules/hype.py` and is switched on with `--with hype`. It runs beside the nine modules and replaces none of them. One line of `modules/mergers.py` reads a number that this module publishes, and that number is one when this module is off. That line was added for the first version and is unchanged. When the owners module is also on (`--with owners,hype`), this module changes the per-claim number that the owners module keeps.
+Switch it on by adding `--with hype` to the command. It runs beside the nine main modules and replaces none of them.
 
-**Source.** Chapter 11, "Decomposition", "Movers and shakers of hype", "Flocks of experts and the inefficiency of markets", "Let there be hype", and the appendix on strategists' estimates with Figure 11.2. Chapter 12, the passage on goodwill and "The absentee ownership of power". Chapter 15, "Differential advantage". Chapter 17, the account of the 1990s. Nitzan and Bichler, "Dominant Capital and the New Wars" (2004). Bichler and Nitzan, "A CasP Model of the Stock Market" (2016), for the link that is left open.
+### What it is about
 
-**What the literature says.** Hype is "the ratio of expected future earnings to actual future earnings". It is "the ex post collective error of capitalists when pricing the asset", and it "is revealed only once the earnings are reported". Hype is therefore measured against the earnings that arrive, and never against a correct price. Expectations "eventually converge to actual earnings", so hype "tends to revert to a long-term mean value of 1". Forecasters' errors are "large, persistent and very similar to those of their peers"; forecasters "act as a herd", and "their adjustment is painfully lethargic". They "pay far more attention to the changing sentiment of other analysts than to the changing facts". The appendix says that estimates "are usually set at the beginning of the year as some positive multiple of current earnings", and that strategists "underestimate earning when they are rising" and "overestimate them when they are stable or falling". The book then says why hype matters for power. If its movements are large and patterned, "this situation would open the door for 'insiders' to practically print their own money and therefore to try to manipulate hype to that end". An insider "knows something about future earnings that other capitalists do not", for example "a KKR partner who is secretly orchestrating a big leveraged buyout". That knowledge "allows them to buy assets for which earning expectations fall short of 'true' earnings — and wait". The "active insider" goes further. This insider "knows not only how to identify hype, but also how to shape its trajectory", and works "in loosely organized pacts of capitalists, public officials, pundits and assorted 'opinion makers'". The book's example is the sub-prime scheme, in which "the active insiders in the scheme leveraged their positions — and then stirred the capitalist imagination and frothed the hype to amplify their gains many times over". The book describes the whole round. "By definition, a rise in hype inflates the fortunes of outsiders who unknowingly happened to ride the bandwagon." "Since hype is a cyclical process, its reversion works both ways. And so, as the upswing builds momentum and hype becomes excessive, those 'in the know' start selling the market short to those who are not in the know. Eventually — and if need be with a little inside push — the market tips. And as prices reverse direction, the short-positioned insiders see their fortunes swell as fast as the market sinks. Finally, when the market bottoms, the insider starts accumulating under-hyped assets so that the process can start anew." Nothing in the herd stops this: "there is no built-in 'mechanism' to stop the insiders", and "it is enough to influence or co-opt those who lead (the mean estimate) in order to shift the entire pack". On mergers, chapter 12 says that a merged firm is worth more than its parts because of "the power to increase differential earnings, raise differential hype and reduce differential uncertainty", and chapter 15 says that "mergers often generate differential hype that owners can leverage to their own advantage". Hype also feeds mergers: in the 1990s high technology "was firing up both investor's hype and the stock market, giving mergers and acquisition repeated shots of adrenalin", and the 2004 paper says that "corporate takeover thrives on investors' hype and an open takeover pool". On the outsiders, chapter 12 says that owners through funds "merely buy and sell shares of these assets", and that "often, their diversification is so extensive that they don't know exactly what they own". The appendix reports hype readings between 1.43 and 0.74, a mean of 1.02, and a cycle of "four to five years" in the errors of strategists for one index from 1988 to 2006. These are observations and not rules. The literature gives no rule and no rate for any of these movements, and chapter 14 says that the book treats hype "only in passing".
+Hype is how far owners' expectations run ahead of what a firm will really earn. In the nine main modules it stays at 1 for every firm: owners expect exactly what comes. This module lets it move, and lets a group of well-placed owners profit from the movement.
 
-**Rule.** The earnings in the ledger at the start of a year are the earnings that have already arrived. The hype term of a claim is the earnings that owners expect for the coming year, divided by the earnings that have arrived. This section calls that number the multiple. One year later the module divides what was expected by what did arrive. That ratio is the book's hype for the year that has ended, and this section calls it the revealed hype. Insiders are the owners who know what is about to happen to the multiple of a claim of dominant capital and who can shape it. Outsiders are all other owners. The module counts the part of each claim that insiders have bought from outsiders beyond what they usually hold, or have sold to them, and this section calls that part their position. A position below zero means that insiders have sold, or have sold short. The rule has nine parts.
+Think of a company about to announce a takeover. A few people know. They buy shares quietly. The announcement comes, commentators talk the company up, and the share price rises faster than its earnings. The few who knew sell near the top to people who did not. A year later the earnings come in below what was hoped, and the price falls back. The book calls the few "insiders" and the others "outsiders", and it says that this is why hype matters: it is a way for some owners to gain at the expense of others.
 
-1. The module remembers each claim's earnings per employee of a year ago and works out the revealed hype of each claim and of all claims together.
-2. Each year all forecasters revise all multiples by one common amount. The common amount removes half of the error that the arrived earnings revealed for all claims together.
-3. The multiple of each single claim is also corrected, at 20 per cent a year, for the amount by which its own revealed error differs from the common one.
-4. The claims of dominant capital receive an upward push after acquisitions. The push is half of the employees that dominant capital acquired in the year before, measured as a part of its own employees.
-5. Insiders know the change that parts 2, 3 and 4 are about to bring to the multiple of each claim of dominant capital. They buy 1 per cent of a claim for each per cent of rise that is coming, and they sell 1 per cent for each per cent of fall that is coming. Their position in a claim cannot exceed 10 per cent of the claim in either direction. They close their position in a claim that has dropped out of dominant capital.
-6. Insiders talk up the claims they hold and talk down the claims they have sold short. The yearly push on a claim's multiple is the cohesion of dominant capital, which the compass supplies, times the insiders' position in the claim as a part of the largest position they may hold.
-7. The module publishes the hype of dominant capital divided by the hype of all claims. The merger module multiplies the amount each buyer seeks by this number.
-8. The insiders' gain on a claim in a year is their position in it times the change in its capitalization that the year's change in hype brings. Outsiders hold the other side of every position, so this gain is the loss of outsiders against what they would have had if nobody had traded. The module adds the gains of the year, divides by the capitalization of all claims, and publishes that yearly part and its running sum.
-9. When the owners module is on, the direct owners of dominant capital are the insiders and the funds are the outsiders. Each purchase or sale of part 5 moves the same part of the claim between direct holdings and the funds. The gain of part 8 is taken in shares, which direct owners buy from the funds at the new price, and a loss is covered by a sale of shares. Direct holdings cannot go above the whole claim and are not pushed below the controlling block of 10 per cent.
+The module needs three more words.
 
-No part of the rule tells hype when to turn. A rise in the multiples of dominant capital is followed a year later by reported earnings that fall short of what was expected. Parts 2 and 3 then pull the multiples down, and the pull grows with the error. When the fall that is coming outweighs the rise that is coming, the insiders of part 5 sell. Their push weakens as they sell and turns downward when they are short. When the multiples have fallen below what the arriving earnings bear out, the same parts work in the other direction.
+- **The multiple** of a firm is the earnings that owners expect for the coming year, divided by the earnings that have already arrived. It is the hype number that the model keeps for the firm. A multiple of 1.1 says that owners expect a tenth more than the firm last earned.
+- **Revealed hype** is what the multiple turns out to have been worth. A year later the module divides what was expected by what did arrive. If owners expected 2.2 and 2.1 arrived, revealed hype is 1.048: they expected about 5 per cent too much. This is the book's own definition of hype.
+- **The insiders' position** in a firm is the part of the firm that insiders have bought from outsiders beyond what they usually hold. A position of 0.04 means they hold an extra 4 per cent of the firm. A position below zero means they have sold, or have sold shares they do not own in order to buy them back cheaper later, which is called selling short.
 
-The module also reads a number called `systemic_fear` from the published accounts, with 0 as the value when no module supplies it. No module supplies it at present. When it is above 0, every upward push of parts 4 and 6 is multiplied by one minus the number. The read is left for the later module on the power index.
+### What the theory says
 
-**Additions.** The whole rule is an addition, because the literature gives directions and no rule. No number in the rule comes from a figure in the literature. The numbers are: the herd removes 50 per cent of the common error each year; 20 per cent of a claim's own further error is removed each year; the push from mergers is half of the part acquired; insiders trade 1 per cent of a claim for each per cent of coming change; their position is at most 10 per cent of a claim; their push at the largest position equals cohesion; buyers seek 1 per cent more for each per cent of differential hype; direct holdings are not pushed below 10 per cent. Five choices of form are additions. Insiders are taken to know the coming change exactly, where the book says that they know more than others. Their push is tied to cohesion. Insiders trade only the claims of dominant capital. Part 7 uses the hype of dominant capital divided by the hype of all claims, where the first version used the hype of dominant capital alone. Forecasters are taken to forecast earnings per employee, so they are taken to foresee the employees a claim gains by merger. Part 8 counts only gains that come from changes in hype. Part 9 keeps no account of money, and it follows the owners module in letting the buyer's pattern of ownership stand for the whole merged claim. The form of the read of `systemic_fear` is an addition that rests on one sentence of the 2016 paper, which says that when "the level of hype" is "already high", "increasing it further … becomes harder and harder". Four numbers of the first version were removed because they were used outside their context. The reading of 1.43 was used as a turning level. The cycle of "four to five years" was built into the herd as the length of a swing, although the appendix reports it as an outcome. A setting for how much of a swing survives each year went with it. The "two standard deviations" of the 2016 paper belong to the share price index divided by the wage rate. Four things in the literature are missing. The insiders are one group, and the module does not say which owners belong to it. Outsiders are not divided, so the module cannot say which of them lose. The owners module does not learn of the trades of part 9 when it reckons the make-up of the funds. The press findings of this project are not used.
+Chapter 11, "Decomposition", "Movers and shakers of hype", "Flocks of experts and the inefficiency of markets", "Let there be hype", and the appendix on forecasters' estimates with Figure 11.2. Chapter 12, the passage on goodwill and "The absentee ownership of power". Chapter 15, "Differential advantage". Chapter 17, the account of the 1990s. Jonathan Nitzan and Shimshon Bichler, "Dominant Capital and the New Wars" (2004). Shimshon Bichler and Jonathan Nitzan, "A CasP Model of the Stock Market" (2016).
 
-**Expected.** The revealed hype of all claims together should stay near one over a long period. It should be below one while earnings rise and above one after they stop rising, as the appendix reports. During a merger wave the differential hype of dominant capital should rise, insiders should be buyers, and mergers should be larger than without the module. When the wave slows, the push from mergers should weaken, the reported earnings should pull the multiples down, insiders should sell and then sell short, and differential hype should fall back. The same round should occur in a bout of stagflation, when earnings rise fast and cohesion is high. Insiders should gain in nearly every year, because they trade ahead of changes that they know. The gain should be larger when their push is on than when it is off. With the owners module on, direct holdings of dominant capital should rise while insiders buy and fall while they sell, and over a long period they should stand higher than without this module.
+What hype is (chapter 11):
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 years, compared with the same runs without the module. In the first merger wave the differential hype of dominant capital rose from 1.00 to 1.36 by the year labelled 1904 with insiders holding their largest position, the yearly volume of mergers reached 0.99 per cent of all employees against a peak of 0.76 without the module, insiders then sold and were short by 1908, and differential hype was back at 1.08 by 1916. The first bout of stagflation began about five years earlier than without the module; in it the multiple of dominant capital rose to 1.65 and fell to 0.93 within eight years, and the revealed hype of all claims was 0.93 while earnings were rising and 1.13 after they stopped. The running sum of the yearly parts of all capitalization that passed from outsiders to insiders was 0.4 per cent at the end of the merger wave and 6.1 per cent after 60 years, which is 23 per cent when each year is measured against the capitalization of dominant capital alone; insiders lost in a few years and never more than 0.02 per cent. A trial with the insiders' push switched off gave 1.4 per cent, and a trial with the push from mergers switched off gave 4.6 per cent, nearly all of it in the bouts of stagflation. With the owners module also on, every figure that `full.py` prints was identical, the running sum of what part 9 moved into direct holdings was 10.8 per cent of all capitalization by 1950, and the top hundred were 68 per cent held through funds in 1950 against 86 per cent with the owners module alone. Four things are doubtful: insiders almost never lose because the rule lets them know the coming change exactly; the size of every gain scales with the 10 per cent limit on positions, which is an addition; the swings followed the merger wave and the bouts of stagflation and showed no regular beat; and in the first twenty years direct owners still hold nearly the whole of each claim, so purchases cannot show in the owners module. The risk shaping module still reads the systemic fear that the first version supplied, and that read now returns 0 until the later module exists. Two runs at 20,000 claims with the modules listed in opposite orders gave identical figures.
+- Hype is "the ratio of expected future earnings to actual future earnings". It is "the ex post collective error of capitalists when pricing the asset", and it "is revealed only once the earnings are reported". So hype is measured against the earnings that arrive, and never against a correct price.
+- "When they are excessively optimistic, the hype factor is greater than 1. When they are exceedingly pessimistic, hype is less than 1."
+- Expectations "eventually converge to actual earnings", so hype "tends to revert to a long-term mean value of 1".
+
+How forecasters behave (chapter 11):
+
+- Their errors "tend to be large, persistent and very similar to those of their peers". They "act as a herd", and "their adjustment is painfully lethargic". They "pay far more attention to the changing sentiment of other analysts than to the changing facts".
+- The appendix says that estimates "are usually set at the beginning of the year as some positive multiple of current earnings". Forecasters "underestimate earning when they are rising" and "overestimate them when they are stable or falling".
+
+Insiders (chapter 11):
+
+- If the movements of hype are large and follow a pattern, "this situation would open the door for 'insiders' to practically print their own money and therefore to try to manipulate hype to that end".
+- An insider "knows something about future earnings that other capitalists do not", for example "a KKR partner who is secretly orchestrating a big leveraged buyout". That knowledge "allows them to buy assets for which earning expectations fall short of 'true' earnings — and wait".
+- The "active insider" goes further. This insider "knows not only how to identify hype, but also how to shape its trajectory", and works "in loosely organized pacts of capitalists, public officials, pundits and assorted 'opinion makers'".
+- The book's example is the scheme of risky home loans in the United States in the 2000s: "the active insiders in the scheme leveraged their positions — and then stirred the capitalist imagination and frothed the hype to amplify their gains many times over".
+- "By definition, a rise in hype inflates the fortunes of outsiders who unknowingly happened to ride the bandwagon."
+- The whole round: "Since hype is a cyclical process, its reversion works both ways. And so, as the upswing builds momentum and hype becomes excessive, those 'in the know' start selling the market short to those who are not in the know. Eventually — and if need be with a little inside push — the market tips. And as prices reverse direction, the short-positioned insiders see their fortunes swell as fast as the market sinks. Finally, when the market bottoms, the insider starts accumulating under-hyped assets so that the process can start anew."
+- Nothing in the herd stops this: "there is no built-in 'mechanism' to stop the insiders", and "it is enough to influence or co-opt those who lead (the mean estimate) in order to shift the entire pack".
+- "A dollar invested in changing earning expectations could yield a return far greater than a dollar spent on increasing the earnings themselves."
+
+Hype and mergers:
+
+- A merged firm is worth more than its parts because of "the power to increase differential earnings, raise differential hype and reduce differential uncertainty" (chapter 12).
+- "Mergers often generate differential hype that owners can leverage to their own advantage" (chapter 15).
+- In the 1990s high technology "was firing up both investor's hype and the stock market, giving mergers and acquisition repeated shots of adrenalin" (chapter 17). The 2004 paper says that "corporate takeover thrives on investors' hype and an open takeover pool".
+
+Outsiders:
+
+- Owners through funds "merely buy and sell shares of these assets", and "often, their diversification is so extensive that they don't know exactly what they own" (chapter 12).
+
+Observations that are not rules:
+
+- For one index of 500 firms from 1988 to 2006, the appendix reports hype readings between 1.43 and 0.74, a mean of 1.02, and a cycle of "four to five years" in forecasters' errors. The module uses none of these as a setting. They are outcomes to compare a run with.
+- The 2016 paper says that when "the level of hype" is "already high", "increasing it further … becomes harder and harder".
+
+These sources define hype and give the direction of every effect and the order of the insiders' moves. They give no rule and no rate. Chapter 14 says the book refers "to hype and risk only in passing". The whole rule below is an addition of ours.
+
+### What the module does each year
+
+In this module, insiders are owners who know what is about to happen to the multiple of a top-100 firm and who can shape it. Outsiders are all other owners.
+
+1. **It works out revealed hype.** For each firm it takes last year's multiple, times the earnings for each employee a year ago, divided by the earnings for each employee now. It works out the same number for all firms together.
+2. **The herd corrects part of the common error.** All multiples are revised by one common amount. It removes half of the error that the arrived earnings revealed for all firms together.
+3. **Each firm's own error is corrected more slowly.** A firm's multiple is also corrected for 20 per cent of the amount by which its own error differs from the common one.
+4. **Acquisitions push the multiples of the top 100 up.** The push is half of the employees that the top 100 acquired in the year before, as a part of their own employees.
+5. **Insiders trade ahead of the change.** They know the change that steps 2, 3 and 4 are about to bring to each top-100 firm. They buy 1 per cent of a firm for each per cent of rise that is coming and sell 1 per cent for each per cent of fall. Their position in a firm cannot be more than 10 per cent of the firm in either direction. They close their position in a firm that has dropped out of the top 100.
+6. **Insiders push the multiple their way.** They talk up firms they hold and talk down firms they have sold short. The push is the cohesion of the top 100 times the insiders' position as a part of the largest position allowed. Cohesion is a number between 0 and 1, published by the compass, that says how far the top 100 can act together.
+7. **Hype feeds mergers.** The module publishes the hype of the top 100 divided by the hype of all firms. The mergers module multiplies the amount each buyer seeks by this number.
+8. **It counts what insiders gain.** The insiders' gain on a firm is their position times the change in the firm's capitalization that the year's change in hype brings. Outsiders are on the other side of every trade, so the insiders' gain is the outsiders' loss. The module adds up the year's gains and reports them as a part of all capitalization, with a running total.
+9. **With the owners module also on, the trades show in who owns the firms.** The direct owners of top-100 firms are the insiders and the funds are the outsiders. Each trade of step 5 moves the same part of the firm between the two. Insiders take each year's gain in shares bought from the funds at the new price, and sell shares to cover a loss. Direct holdings cannot go above the whole firm and are not pushed below a controlling block of 10 per cent.
+
+No step tells hype when to turn. A rise in the multiples of the top 100 is followed a year later by earnings that fall short of what was expected. Steps 2 and 3 then pull the multiples down, and the pull grows with the error. When the fall that is coming outweighs the rise, insiders sell. Their push weakens as they sell and turns downward when they are short. When the multiples have fallen below what earnings bear out, the same steps work in the other direction.
+
+**An example.** A top-100 firm had a multiple of 1.10. Its earnings for each employee rose from 2.00 to 2.10. Its revealed hype is 1.10 × 2.00 ÷ 2.10 = 1.048. Revealed hype for all firms together is 1.02.
+
+- Step 2 lowers the multiple by about half of 2 per cent, which is 1.0 per cent.
+- Step 3 lowers it by a fifth of the remaining 2.7 per cent, which is 0.5 per cent.
+- The top 100 employ 20 per cent of all employees and bought firms with 1 per cent of all employees, so they grew 5 per cent by buying. Step 4 raises the multiple by 2.5 per cent.
+- The change that is coming is a rise of about 1.0 per cent. Insiders already hold an extra 3 per cent of the firm, and they buy 1 per cent more. Their position is 0.04.
+- Cohesion is 0.2. Step 6 adds a push of 0.2 × 0.04 ÷ 0.10 = 8 per cent.
+- The multiple rises by about 9 per cent, from 1.10 to 1.20. The firm's capitalization rises by the same 9 per cent. The insiders gain 0.04 × 9 per cent, which is about 0.4 per cent of the firm's capitalization.
+
+### Settings
+
+All of these are our own choices, except `top`. None comes from a figure in the book or the papers.
+
+| Name in the code | Default | What it means |
+|---|---|---|
+| `herd` | 0.5 | The part of the common error that all forecasters remove from every multiple each year |
+| `own` | 0.2 | The part of a firm's own further error that is removed each year |
+| `goodwill` | 0.5 | The push on the multiples of the top 100 for each unit of employees they acquired last year, as a part of their own |
+| `trade` | 1.0 | The part of a firm that insiders buy or sell for each unit of change that is coming |
+| `bound` | 0.10 | The largest position insiders can hold in a firm, in either direction. It limits positions and not hype. |
+| `lever` | 1.0 | The yearly push on a multiple when insiders hold their largest position and cohesion is 1 |
+| `takeover` | 1.0 | The per cent rise in what buyers seek for each per cent by which the hype of the top 100 exceeds the hype of all firms |
+| `block` | 0.10 | With the owners module on, the part of a firm that direct owners are not pushed below. It is the controlling block of that module. |
+| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `merger_volume`, from the mergers module
+- `cohesion`, from the compass
+- `systemic_fear`, from the optional module on eruptions. Every upward push of steps 4 and 6 is multiplied by one minus this number. It counts as zero when that module is off.
+- `power_fear`, from the optional module on the power index and systemic fear. Every change of the year to a multiple, up or down, is multiplied by one minus this number. It counts as zero when that module is off.
+- the number that the owners module keeps for each firm, when that module is on
+
+It publishes `merger_hype`, the number of step 7. The mergers module reads it, and so do the optional modules for a second country and for cross-border ownership. It counts as 1 when this module is off.
+
+It also publishes eight numbers for reporting:
+
+| Name in the code | What it is |
+|---|---|
+| `hype_average` | The multiple of all firms taken together |
+| `hype_dominant` | The multiple of the top 100 |
+| `hype_revealed` | Revealed hype for the year just ended, all firms together |
+| `hype_insiders` | The insiders' position in the top 100 as a part of the largest allowed: +1 when fully bought, −1 when fully sold short |
+| `hype_passed_year` | The part of all capitalization that passed from outsiders to insiders in the year. It is negative when insiders lost. |
+| `hype_passed` | The running total of `hype_passed_year` |
+| `hype_passed_dominant` | The same running total, with each year's gain measured against the capitalization of the top 100 alone |
+| `hype_shift` | With the owners module on, the running total of what step 9 moved from the funds into direct holdings, as a part of all capitalization. Otherwise 0. |
+
+### What is known to be wrong or untested
+
+- **Insiders almost never lose.** The rule lets them know the coming change exactly. The book says only that they know more than others. In trial runs that started with 60,000 firms they lost in a few years, and never more than 0.02 per cent of all capitalization.
+- **The size of every gain depends on the limit on positions.** The limit of 10 per cent is our own choice, and gains scale with it.
+- **The insiders' push is tied to cohesion.** This is our own choice.
+- **Insiders trade only top-100 firms.** They are one group, and the module does not say which owners belong to it. Outsiders are not divided either, so the module cannot say which of them lose.
+- **Forecasters are taken to foresee mergers.** They forecast earnings for each employee, so they are taken to know how many employees a firm will gain by buying.
+- **The correction arrives a year late.** A module sees only the list of firms as it stood at the start of a year.
+- **Only gains from changes in hype are counted.** With the owners module on, gains are taken in shares, and the module keeps no account of money.
+- **The owners module does not learn of the trades of step 9** when it works out the mix of the two kinds of fund.
+- **The average level of hype affects nothing else.** Only the hype of the top 100 against the average, and the insiders' gains, have consequences.
+- **The form of the two links to fear is ours.** The link to `systemic_fear` rests on the one sentence of the 2016 paper quoted above.
+- **The swings show no regular beat.** In trial runs they followed the wave of mergers and the bouts of stagflation. The appendix to chapter 11 reports a cycle of four to five years.
+- **What trial runs show.** In trial runs of 60 years that started with 60,000 firms, the hype of the top 100 against the average rose from 1.00 to 1.36 in the first 14 years, during the first wave of mergers, with insiders holding their largest position. The yearly volume of mergers reached 0.99 per cent of all employees, against a peak of 0.76 without the module. Insiders then sold and were short four years later. Revealed hype for all firms was 0.93 while earnings were rising and 1.13 after they stopped, which is the direction the appendix reports. The running total that passed from outsiders to insiders was 6.1 per cent of all capitalization after 60 years. With the insiders' push switched off it was 1.4 per cent. With the push from acquisitions switched off it was 4.6 per cent, nearly all of it in the bouts of stagflation.
+- **What a full-size run shows.** In a run of 60 years from 300,000 firms, the wave of mergers was faster with the module. After 25 years the top 100 employed 12.0 per cent of all employees, against 8.3 per cent without it. Differential capitalization, which includes hype, was then 1,458 against 765. The first bout of stagflation came five to seven years earlier, and a second bout had begun when the run ended. Differential capitalization ended at 6,314, against 8,121. With the owners module also on, every figure the model prints was the same as with the hype module alone.
+
+What should happen: revealed hype for all firms together should stay near 1 over a long period. It should be below 1 while earnings rise and above 1 after they stop rising. During a wave of mergers the hype of the top 100 should rise against the average, insiders should be buyers, and mergers should be larger than without the module. When the wave slows, insiders should sell and then sell short, and the hype of the top 100 should fall back. Insiders should gain in nearly every year, and more with their push than without it.
 
 ---
 
