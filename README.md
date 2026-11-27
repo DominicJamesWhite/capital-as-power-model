@@ -116,7 +116,8 @@ python checks.py
 
 The workbench is a page in your web browser. You choose modules and settings, start a run, watch the charts fill in, and compare runs side by side.
 
-```npython workbench/server.py
+```
+python workbench/server.py
 ```
 
 The page opens at http://127.0.0.1:8765. It runs on your own computer and sends nothing anywhere. `workbench/README.md` has more.
