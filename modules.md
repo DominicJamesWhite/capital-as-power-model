@@ -163,20 +163,18 @@ With only markups as income, the capitalist share of income is the average marku
 
 ### Settings
 
-All of these are our own choices. No source gives any of them.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `normal_markup` | 0.10 | The markup at which small firms hire neither more nor less than the working population grows |
-| `target_markup` | 0.30 | The markup that dominant capital holds an industry towards |
-| `erosion` | 1.0 | How much the markup falls for each point by which an industry's hiring outruns the working population (step 2) |
-| `response` | 0.5 | Extra hiring by small firms for each point of markup above normal (step 5) |
-| `hold` | 0.1 | The part of the gap to the target that a fully held industry closes each year (step 3) |
-| `volume_cost` | 0.5 | Hiring that top-100 firms give up for each point by which they raise their markup (step 6) |
-| `wage_weakness` | 0.2 | The rise in every markup for each point of unemployment above the level in the next row (step 1) |
-| `labour_holds_at` | 0.05 | The level of unemployment at which wages keep pace with prices. It stands for the strength of labour. |
-| `floor` | 0.005 | The lowest markup an industry can have. This is a plain limit with no source. |
-| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `normal_markup` | 0.10 | The markup at which small firms hire neither more nor less than the working population grows | Our own choice |
+| `target_markup` | 0.30 | The markup that dominant capital holds an industry towards | Our own choice |
+| `erosion` | 1.0 | How much the markup falls for each point by which an industry's hiring outruns the working population (step 2) | Our own choice |
+| `response` | 0.5 | Extra hiring by small firms for each point of markup above normal (step 5) | Our own choice |
+| `hold` | 0.1 | The part of the gap to the target that a fully held industry closes each year (step 3) | Our own choice |
+| `volume_cost` | 0.5 | Hiring that top-100 firms give up for each point by which they raise their markup (step 6) | Our own choice |
+| `wage_weakness` | 0.2 | The rise in every markup for each point of unemployment above the level in the next row (step 1) | Our own choice |
+| `labour_holds_at` | 0.05 | The level of unemployment at which wages keep pace with prices. It stands for the strength of labour. | Our own choice |
+| `floor` | 0.005 | The lowest markup an industry can have | A plain limit with no source |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 One more number is fixed in the code and is not yet a setting you can change: `resistance_shift`, 0.05, the rise in `labour_holds_at` at full popular resistance.
 
@@ -243,17 +241,15 @@ The book gives no rule for how fast the interest part moves or how large the gov
 
 ### Settings
 
-All of these are our own choices. No source gives any of them.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `base` | 0.10 | Interest as a part of owners' income when unemployment is at its usual level |
-| `slope` | 4.0 | The rise in that part for each point of unemployment above the usual level |
-| `usual_unemployment` | 0.05 | The usual level of unemployment |
-| `years` | 5 | The number of years over which unemployment is averaged |
-| `speed` | 0.1 | The part of the gap that the interest part closes each year |
-| `government_part` | 0.02 | The government's interest payments as a part of all income |
-| `start` | 0.20 | The interest part in the first year |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `base` | 0.10 | Interest as a part of owners' income when unemployment is at its usual level | Our own choice |
+| `slope` | 4.0 | The rise in that part for each point of unemployment above the usual level | Our own choice |
+| `usual_unemployment` | 0.05 | The usual level of unemployment | Our own choice |
+| `years` | 5 | The number of years over which unemployment is averaged | Our own choice |
+| `speed` | 0.1 | The part of the gap that the interest part closes each year | Our own choice |
+| `government_part` | 0.02 | The government's interest payments as a part of all income | Our own choice |
+| `start` | 0.20 | The interest part in the first year | Our own choice |
 
 The limits of 0 and 90 per cent in step 3 are written into the code without a name. They are plain limits with no source.
 
@@ -663,19 +659,17 @@ The book treats resistance as something people do. It quotes Nicholas Georgescu-
 
 ### Settings
 
-All of these are our own choices, except `top`, which follows the book (chapter 14).
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `from_inflation` | 0.6 | The rise in popular resistance for each unit of the top 100's yearly price rise |
-| `from_unemployment` | 0.5 | The rise for each unit of unemployment above usual |
-| `from_power` | 0.02 | The rise for each unit of the part of employees that the top 100 hold |
-| `from_mergers` | 3.0 | The rise in roadblocks for each unit of merger volume |
-| `usual_unemployment` | 0.05 | The usual level of unemployment |
-| `fade` | 0.08 | The part of each level that fades each year |
-| `risk` | 0.5 | The rise in a top-100 firm's risk for each unit rise in popular resistance |
-| `start` | 0.0 | Popular resistance in the first year |
-| `top` | 100 | How many firms count as dominant capital |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `from_inflation` | 0.6 | The rise in popular resistance for each unit of the top 100's yearly price rise | Our own choice |
+| `from_unemployment` | 0.5 | The rise for each unit of unemployment above usual | Our own choice |
+| `from_power` | 0.02 | The rise for each unit of the part of employees that the top 100 hold | Our own choice |
+| `from_mergers` | 3.0 | The rise in roadblocks for each unit of merger volume | Our own choice |
+| `usual_unemployment` | 0.05 | The usual level of unemployment | Our own choice |
+| `fade` | 0.08 | The part of each level that fades each year | Our own choice |
+| `risk` | 0.5 | The rise in a top-100 firm's risk for each unit rise in popular resistance | Our own choice |
+| `start` | 0.0 | Popular resistance in the first year | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 ### What it reads from other modules and what it gives them
 
@@ -743,13 +737,11 @@ The book says who opens the boundaries and why. It gives no rule for when. The w
 
 ### Settings
 
-All of these are our own choices. No source gives any of them.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `threshold` | 0.5 | How much of its reach dominant capital must hold before a boundary starts to give |
-| `speed` | 0.2 | How far a boundary moves in a year for each unit of net pressure |
-| `close_margin` | 0.3 | How far roadblocks must exceed pressure before a boundary closes |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `threshold` | 0.5 | How much of its reach dominant capital must hold before a boundary starts to give | Our own choice |
+| `speed` | 0.2 | How far a boundary moves in a year for each unit of net pressure | Our own choice |
+| `close_margin` | 0.3 | How far roadblocks must exceed pressure before a boundary closes | Our own choice |
 
 The order of the boundaries, sector first and then nation, is fixed in the code. It follows the book's account of the United States.
 
@@ -1343,16 +1335,14 @@ Now a bout of stagflation reaches full intensity. The commitment is 0, so the pu
 
 ### Settings
 
-All of these are our own choices, except `top`. No source gives any of the others.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `full_sway` | 0.25 | The part of the government's debt that the top 100 must hold for their sway to be complete |
-| `hold` | 1.0 | How much push one unit of roadblocks holds back |
-| `speed` | 0.3 | How far a boundary moves in a year for each unit of difference between push and hold |
-| `close_margin` | 0.3 | How far the hold must exceed the push before a boundary closes |
-| `rival_cost` | 0.10 | The part of a top-100 firm's markup that is lost when a boundary opens fully |
-| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `full_sway` | 0.25 | The part of the government's debt that the top 100 must hold for their sway to be complete | Our own choice |
+| `hold` | 1.0 | How much push one unit of roadblocks holds back | Our own choice |
+| `speed` | 0.3 | How far a boundary moves in a year for each unit of difference between push and hold | Our own choice |
+| `close_margin` | 0.3 | How far the hold must exceed the push before a boundary closes | Our own choice |
+| `rival_cost` | 0.10 | The part of a top-100 firm's markup that is lost when a boundary opens fully | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 ### What it reads from other modules and what it gives them
 
@@ -1469,32 +1459,30 @@ For example, the motive is present. Unemployment is 8 per cent and popular resis
 
 ### Settings
 
-All of these are our own choices. No source gives any of them.
-
 Settings of all three compasses:
 
-| Name in the code | Default | What it means |
-|---|---|---|
-| `rise` | 0.15 | The yearly rise in intensity. Module 7 uses the same figure. |
-| `fall` | 0.10 | The yearly fall in intensity. Module 7 uses the same figure. |
-| `concert` | 4.0 | The intensity cannot be more than this many times cohesion. Module 7 uses the same figure. |
-| `slack` | 20.0 | The rise in cohesion for each unit of unemployment above usual, as in module 7 |
-| `usual_unemployment` | 0.05 | The usual level of unemployment |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `rise` | 0.15 | The yearly rise in intensity. Module 7 uses the same figure. | Our own choice |
+| `fall` | 0.10 | The yearly fall in intensity. Module 7 uses the same figure. | Our own choice |
+| `concert` | 4.0 | The intensity cannot be more than this many times cohesion. Module 7 uses the same figure. | Our own choice |
+| `slack` | 20.0 | The rise in cohesion for each unit of unemployment above usual, as in module 7 | Our own choice |
+| `usual_unemployment` | 0.05 | The usual level of unemployment | Our own choice |
 
 Further settings of `compass_targets` and `compass_consensus`:
 
-| Name in the code | Default | What it means |
-|---|---|---|
-| `dry` | 0.5 | The part of their reach that the top 100 must hold before buying counts as dried up. Module 9 uses the same figure for the point at which a boundary starts to give. |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `dry` | 0.5 | The part of their reach that the top 100 must hold before buying counts as dried up. Module 9 uses the same figure for the point at which a boundary starts to give. | Our own choice |
 
 Further settings of `compass_consensus`:
 
-| Name in the code | Default | What it means |
-|---|---|---|
-| `hesitant` | 0.02 | The yearly rise in intensity when there is a motive and people can resist fully |
-| `full_slack` | 0.05 | How far unemployment must stand above usual for people to be counted as wholly unable to resist |
-| `price_war` | 5.0 | The fall in intensity for each unit by which the growth of employment exceeds the growth of the working population |
-| `bicker` | 0.2 | The yearly fall in intensity at full popular resistance |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `hesitant` | 0.02 | The yearly rise in intensity when there is a motive and people can resist fully | Our own choice |
+| `full_slack` | 0.05 | How far unemployment must stand above usual for people to be counted as wholly unable to resist | Our own choice |
+| `price_war` | 5.0 | The fall in intensity for each unit by which the growth of employment exceeds the growth of the working population | Our own choice |
+| `bicker` | 0.2 | The yearly fall in intensity at full popular resistance | Our own choice |
 
 ### What it reads from other modules and what it gives them
 
@@ -1595,21 +1583,19 @@ The module never moves earnings from one coalition to the other. One gains on th
 
 ### Settings
 
-All of these are our own choices, except `top`. No source gives any of the others.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `conflict_sectors` | 0 and 1 | The sectors whose firms are labelled for the conflict coalition |
-| `takeover_sectors` | 2 and 3 | The sectors whose firms are labelled for the takeover coalition |
-| `rise` | 0.5 | The yearly rise in the level of conflict in the danger zone, when the conflict coalition is the only coalition |
-| `fall` | 0.15 | The yearly fall in the level of conflict outside the danger zone |
-| `price_rise` | 0.06 | The extra yearly price rise of the conflict coalition's firms at full violence |
-| `volume_cost` | 0.5 | The employees given up for each unit of that price rise. The sabotage module uses the same figure. |
-| `fade` | 0.2 | The part of a firm's excess markup that is lost in a year with no violence |
-| `spark` | 0.5 | The part of the level of conflict that reaches the stagflation module |
-| `concert` | 4.0 | The spark is complete when the top 100 employ one part in this many of all employees. The compass uses the same figure. |
-| `takeover_edge` | 0.5 | The extra buying that the takeover coalition seeks in a year with no violence. 0.5 means half as much again. |
-| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `conflict_sectors` | 0 and 1 | The sectors whose firms are labelled for the conflict coalition | Our own choice |
+| `takeover_sectors` | 2 and 3 | The sectors whose firms are labelled for the takeover coalition | Our own choice |
+| `rise` | 0.5 | The yearly rise in the level of conflict in the danger zone, when the conflict coalition is the only coalition | Our own choice |
+| `fall` | 0.15 | The yearly fall in the level of conflict outside the danger zone | Our own choice |
+| `price_rise` | 0.06 | The extra yearly price rise of the conflict coalition's firms at full violence | Our own choice |
+| `volume_cost` | 0.5 | The employees given up for each unit of that price rise. The sabotage module uses the same figure. | Our own choice |
+| `fade` | 0.2 | The part of a firm's excess markup that is lost in a year with no violence | Our own choice |
+| `spark` | 0.5 | The part of the level of conflict that reaches the stagflation module | Our own choice |
+| `concert` | 4.0 | The spark is complete when the top 100 employ one part in this many of all employees. The compass uses the same figure. | Our own choice |
+| `takeover_edge` | 0.5 | The extra buying that the takeover coalition seeks in a year with no violence. 0.5 means half as much again. | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 ### What it reads from other modules and what it gives them
 
@@ -1971,19 +1957,17 @@ No step tells hype when to turn. A rise in the multiples of the top 100 is follo
 
 ### Settings
 
-All of these are our own choices, except `top`. None comes from a figure in the book or the papers.
-
-| Name in the code | Default | What it means |
-|---|---|---|
-| `herd` | 0.5 | The part of the common error that all forecasters remove from every multiple each year |
-| `own` | 0.2 | The part of a firm's own further error that is removed each year |
-| `goodwill` | 0.5 | The push on the multiples of the top 100 for each unit of employees they acquired last year, as a part of their own |
-| `trade` | 1.0 | The part of a firm that insiders buy or sell for each unit of change that is coming |
-| `bound` | 0.10 | The largest position insiders can hold in a firm, in either direction. It limits positions and not hype. |
-| `lever` | 1.0 | The yearly push on a multiple when insiders hold their largest position and cohesion is 1 |
-| `takeover` | 1.0 | The per cent rise in what buyers seek for each per cent by which the hype of the top 100 exceeds the hype of all firms |
-| `block` | 0.10 | With the owners module on, the part of a firm that direct owners are not pushed below. It is the controlling block of that module. |
-| `top` | 100 | How many firms count as dominant capital. This one follows the book (chapter 14). |
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `herd` | 0.5 | The part of the common error that all forecasters remove from every multiple each year | Our own choice |
+| `own` | 0.2 | The part of a firm's own further error that is removed each year | Our own choice |
+| `goodwill` | 0.5 | The push on the multiples of the top 100 for each unit of employees they acquired last year, as a part of their own | Our own choice |
+| `trade` | 1.0 | The part of a firm that insiders buy or sell for each unit of change that is coming | Our own choice |
+| `bound` | 0.10 | The largest position insiders can hold in a firm, in either direction. It limits positions and not hype. | Our own choice |
+| `lever` | 1.0 | The yearly push on a multiple when insiders hold their largest position and cohesion is 1 | Our own choice |
+| `takeover` | 1.0 | The per cent rise in what buyers seek for each per cent by which the hype of the top 100 exceeds the hype of all firms | Our own choice |
+| `block` | 0.10 | With the owners module on, the part of a firm that direct owners are not pushed below. It is the controlling block of that module. | Our own choice |
+| `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
 ### What it reads from other modules and what it gives them
 
@@ -4092,181 +4076,837 @@ What should happen: with the border shut, the five should first buy up the indus
 
 ## Optional module: Cross-border ownership
 
-The module is in `modules/cross_border.py` and is switched on with `--with cross_border`. It is meant to be run together with the second country, as `--with second_country,cross_border`. When it is run alone it draws the same border through the ledger, around the last two of the twenty sectors, and treats that border as open. The sabotage module received one optional read, called `foreign_held`, which is the foreign-owned part of each industry. The second country module received three optional reads. The first, `cross_border_on`, tells it to leave its own purchases of small claims across the border to this module. The second and third, `cross_border_inward` and `cross_border_outward`, are the employees of the claims that changed owners, so that the second country's roadblocks still rise with foreign purchases. All four are zero when this module is off, and runs without this module gave exactly the figures they gave before. `core.py` was not changed.
+Name in the model: `cross_border`
 
-**Source.** *Capital as Power* (2009), chapter 15, the sections "Globalization", "Global production or global ownership?", "Net or gross?", "Capital flow and the creorder of global power" and "Foreign investment and differential accumulation". Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapter 6, in `data/bn_archives/papers/gpe_israel_2002/`. Shimshon Bichler and Jonathan Nitzan, "New Imperialism or New Capitalism?" (2006), in `data/bn_archives/papers/new_imperialism_or_new_capitalism_2006/`.
+Switch it on by adding `--with cross_border` to the command. It is meant to run together with the second country module, as `--with second_country,cross_border`. That module marks off a tenth of the firms as a second, smaller country behind a border. Run without it, this module draws the same border itself, around the firms of the last two of the twenty sectors, and treats the border as open.
 
-**What the literature says.** The book says that capital does not flow from one country to another as a thing. "By definition, capital mobility is a purely pecuniary process. Usually, the only thing that happens is a reshuffle of ownership claims, in which foreign capitalists acquire an asset from (or sell one to) their domestic counterparts." "There is no cross-border flow of machines, structures, vehicles, technical know-how, or employees." What changes is power: "When ownership crosses a border, it alters the organization and institutions of power on both sides of that border." The question to ask is therefore who owns, and not where the factories are: "The key issue, therefore, is not the location of factories and employees, but of the capitalists." The book reports that the foreign-owned part of all assets in the world rose "from 9 per cent to 26 per cent" between 1990 and 2006. The book then says how the movement must be measured. "Capitalist integration and globalization can move both ways, which means that the proper measure to use here is the gross flow — that is, the sum of inflow and outflow." The net flow is the difference between inflow and outflow, and "the net and gross magnitudes are the same when capital goes only in one direction". For the seven largest economies in 2007, "the value of gross flows reached 82 per cent of green-field investment, compared to only 16 per cent" for net flows. Flows may ebb, but "the impact it has on the level of capital stocks tends to be cumulative". The 2006 paper gives the stock: foreign assets were 20 per cent of world output in 1900, "a mere 5%" in 1945 and 92 per cent in 2000, and the book says of the fall that "instability, depression, wars and capital controls hampered the movement of capital". The book says who gains. "Whereas exports augment the profits of small as well as large firms, the bulk of foreign earnings go to the largest corporations." "Free investment tends mostly to raise" differential accumulation. Foreign operations came to supply "one third of the total" of United States corporate profit. The size of a foreign holding is "the present value of their expected future earnings", and "the level and pattern of these earnings reflect the control of business over industry". The Israel book adds that when foreign owners were invited into Israel "there was complete silence on what would prevent foreign owners from cooperating with their domestic counterparts". The literature gives no rule and no rate for how much is bought across a border in a year, and no rule for when holdings are sold back.
+### What it is about
 
-**Rule.** The rule has six parts.
+When owners in one country buy a company in another, nothing travels except the title of ownership. The module lets the largest firms of each country buy firms on the other side of the border. A firm that is bought stays where it is, with its employees, its industry and its earnings. Only its owner changes.
 
-1. Every claim carries one more number. The number is 1 when the claim is owned in the country where it sits, and 2 when the dominant capital of the other country owns it. A purchase across the border changes the number from 1 to 2. The claim keeps its employees, its industry, its price and its earnings per employee. No claim is merged and no employee moves.
-2. Each year the dominant group of each country seeks claims across the border. The dominant group is the hundred largest claims in the first country and the five largest in the second. The employees it seeks are a set fraction of its own employees, multiplied by the openness of the border and by the part of the other country that is still locally owned and outside that country's own dominant group. The targets are drawn at random.
-3. The openness of the border is the permeability that the second country module publishes. Without that module nothing in the model raises capital controls, and the permeability is taken to be 1. In both cases the roadblocks of both countries slow the buying, and the buying follows the hype and the eruptions that the merger module follows when those optional modules are on.
-4. Foreign owners also sell back. Each year each foreign-owned claim returns to local owners with a chance equal to a set rate multiplied by the part of the border that is not open. A foreign-owned claim that a local buyer absorbs in a merger also returns to local owners.
-5. The sabotage module counts the foreign-owned part of each industry as held by dominant capital. Entry is barred in that part, and the markup of the industry is held toward the target.
-6. The module publishes its readouts each year. The flow from a country is the employees of the claims its dominant group bought across the border, less those it sold back or lost to local buyers. The gross flow is the sum of the two flows and the net flow is their difference. Both are given as a part of all employees and as a ratio to new hiring, which is this model's stand-in for green-field investment. The module publishes the foreign-owned share of all capitalization and of each country's capitalization. It publishes foreign earnings as a part of the earnings of each country's owners and of each dominant group. It publishes differential capitalization for each dominant group twice: once without its holdings abroad and once with them.
+Think of an investment group in New York that buys a brewery in Mexico. No vats, lorries or workers leave Mexico. The brewery's profit now belongs to owners in New York, and the brewery has a powerful owner behind it when it sets its prices.
 
-**Additions.** Every number is an addition. A dominant group seeks claims with 2 per cent of its own employees each year at an open border. A foreign-owned claim is sold back with a chance of 5 per cent a year at a fully shut border. Roadblocks slow buying with the same strength as in module 4. The border is around two sectors of twenty and the second group is five claims, and both are copied from the second country module. Only dominant capital buys across the border, which is stronger than the book's "the bulk of foreign earnings". Part 4 is an addition, because the book says that assets are sold back and gives no rule. Part 5 is an addition, because the literature says that foreign ownership changes power on both sides of the border and does not say how markups respond. Counting flows in employees is an addition that follows the way the model already measures mergers against new hiring.
+The module also keeps count of how much ownership crosses the border each year, in each direction, and how much has built up.
 
-Several things are missing. A claim is owned wholly at home or wholly abroad, so the purchase of a part of a claim is not shown. Foreign earnings are not added to any single claim, so the differential capitalization that the ledger reports does not include them, and only the two published readouts do. Adding them to the buyer's earnings per employee was considered and rejected, because module 5 pulls each claim's earnings per employee back toward the level of its industry and would erase the addition within a few years. The merger modules do not know who owns a claim. The flow that is counted when a local buyer absorbs a foreign-owned claim is an estimate, and it is reported a year late. Debt does not cross the border, and there is one currency. Without the second country module the border has no capital controls and no second set of settings behind it.
+### What the theory says
 
-**Expected.** Buying across the border should be small while the dominant groups are small and should grow as they grow, because the amount sought is a fraction of their own size. The foreign-owned share should build up over time even when the yearly flow ebbs. The first country's hundred should come to own a large part of the small country, and the five of the small country should own very little of the large one, so the gross flow and the net flow should be close to each other. Differential capitalization measured with holdings abroad should be higher than the same measure without them. Where foreign owners hold a large part of an industry, its markup should rise. With the second country at its own settings the border stays shut, and nothing should cross.
+The book, chapter 15, the sections "Globalization", "Global production or global ownership?", "Net or gross?", "Capital flow and the creorder of global power" and "Foreign investment and differential accumulation". Nitzan and Bichler, *The Global Political Economy of Israel* (2002), chapter 6. Bichler and Nitzan, "New Imperialism or New Capitalism?" (2006).
 
-**What it showed.** These results come from runs of 60 years at 60,000 starting claims. Run alone, the module left foreign owners with 39 per cent of the second country's capitalization and 6 per cent of all capitalization in the year labelled 1950, foreign earnings were 13 per cent of the earnings of the first country's hundred, and their differential capitalization was 1,305 with holdings abroad against 1,187 without. The gross flow stayed between 3 and 8 per cent of new hiring and the net flow was close to it, because the five bought almost nothing in the large country; the book's 82 per cent against 16 per cent did not appear. With part 5 cut out, the ledger's own figures were identical to the run without the module, so every change in the ledger came through the markup: with part 5 the ledger's differential capitalization in 1950 was 1,406 against 1,564, and the capitalist share was 11.3 per cent against 12.2. With the second country at its own settings the border stayed shut for all 60 years and the run was identical to the run with the second country alone. With the second country started at an open border, foreign owners held 23 per cent of its capitalization by 1950, the second country kept 12 per cent of all employees where it fell to 3 per cent under the second country module's own mergers, and the border stayed open where it had fallen to 0.2. Two runs with the modules listed in opposite orders gave the same figures.
+Capital does not move from one country to another as a thing (chapter 15):
+
+- "By definition, capital mobility is a purely pecuniary process. Usually, the only thing that happens is a reshuffle of ownership claims, in which foreign capitalists acquire an asset from (or sell one to) their domestic counterparts."
+- "There is no cross-border flow of machines, structures, vehicles, technical know-how, or employees."
+- What changes is power: "When ownership crosses a border, it alters the organization and institutions of power on both sides of that border."
+- The question to ask is therefore who owns: "The key issue, therefore, is not the location of factories and employees, but of the capitalists."
+- The foreign-owned part of all assets in the world rose "from 9 per cent to 26 per cent" between 1990 and 2006.
+
+How the movement should be measured (chapter 15, "Net or gross?"):
+
+- "Capitalist integration and globalization can move both ways, which means that the proper measure to use here is the gross flow — that is, the sum of inflow and outflow." The net flow is the difference between inflow and outflow.
+- "The net and gross magnitudes are the same when capital goes only in one direction".
+- For the seven largest economies in 2007, "the value of gross flows reached 82 per cent of green-field investment, compared to only 16 per cent" for net flows. Green-field investment is the book's name for building new plant and hiring, as opposed to buying what exists.
+- A flow may ebb, but "the impact it has on the level of capital stocks tends to be cumulative".
+- The 2006 paper gives the amount that had built up. Foreign assets were 20 per cent of world output in 1900, "a mere 5%" in 1945 and 92 per cent in 2000. The book says of the fall that "instability, depression, wars and capital controls hampered the movement of capital".
+
+Who gains (chapter 15):
+
+- The largest firms gain most, because "whereas exports augment the profits of small as well as large firms, the bulk of foreign earnings go to the largest corporations."
+- For the same reason "free investment tends mostly to raise" differential accumulation. Differential accumulation is the book's name for growing faster than the average.
+- Foreign operations came to supply "one third of the total" of the profit of United States corporations.
+- The size of a foreign holding is "the present value of their expected future earnings", and "the level and pattern of these earnings reflect the control of business over industry".
+
+The Israel book adds that when foreign owners were invited into Israel, "there was complete silence on what would prevent foreign owners from cooperating with their domestic counterparts".
+
+These sources give no rule and no rate for how much is bought across a border in a year. They give no rule for when holdings are sold back.
+
+### What the module does each year
+
+In the steps below, "the hundred" are the 100 firms of the first country with the highest capitalization, and "the five" are the five firms of the second country with the highest capitalization. A firm that is owned from abroad cannot be one of its country's hundred or five. The book's name for the largest firms and their allies in government is dominant capital.
+
+1. **It records who owns each firm.** Every firm carries a number: 1 if owners of its own country hold it, and 2 if the largest firms of the other country hold it. Every firm starts at 1, and so does every newly founded firm.
+2. **It works out how open the border is.** It starts from the openness of the border that the second country module publishes, which runs from 0 for full capital controls to 1 for none. Without that module it uses 1. Resistance to mergers, which the model calls roadblocks, lowers the figure: the module multiplies it by one minus the roadblocks of the first country, and again by one minus the roadblocks of the second country. If the optional hype module is on, the figure is also multiplied by that module's mood for mergers. If the optional eruptions module reports an eruption, buying stops.
+3. **The hundred buy in the second country, and the five buy in the first.** A group seeks firms whose employees add up to 2 per cent of the group's own employees, times the openness from step 2, times the free part of the other country. The free part is the part of that country's employees who work for firms that are still locally owned and are not among its own largest firms. The module draws targets at random from those firms until the amount is reached. The last firm drawn usually does not fit whole. It is bought with a chance equal to the part of it that fits.
+4. **A purchase changes the owner and nothing else.** The firm's number changes from 1 to 2. It keeps its employees, its industry, its price and its earnings. No firm is merged and no employee moves.
+5. **Foreign owners also sell back.** Each year each foreign-owned firm returns to local owners with a chance of 5 per cent, times one minus the openness from step 2. At a fully open border with no roadblocks nothing is sold back. A foreign-owned firm also returns to local owners when a local firm buys it in a merger.
+6. **It tells the sabotage module where foreign owners are.** For each industry it publishes the part of the employees who work for foreign-owned firms. The sabotage module (module 1) adds that part to the part held by the largest firms. It therefore bars entry there and pulls the industry's markup toward its target for held industries, as it does where the hundred are strong.
+7. **It takes over the second country module's purchases across the border.** That module would otherwise merge small firms across the border, which moves their employees into the buyer's country. With this module on it does not. It still raises its roadblocks by the employees of the firms that changed owners, and it still lets one of the five be bought whole by a larger foreign firm.
+8. **It reports.** The list under "What it reads from other modules and what it gives them" shows every number.
+
+**An example.** The module runs alone, so the border counts as open. The hundred employ 2,000,000 people. The first country's roadblocks stand at 0.2 and the second country has none. The second country has 3,000,000 employees, and 2,400,000 of them work for firms that are locally owned and are not among the five.
+
+- The openness is 1 × (1 − 0.2) × (1 − 0) = 0.8.
+- The free part of the second country is 2,400,000 ÷ 3,000,000 = 0.8.
+- The hundred seek firms with 0.02 × 2,000,000 × 0.8 × 0.8 = 25,600 employees.
+- Each firm they already hold abroad is sold back with a chance of 0.05 × (1 − 0.8) = 1 per cent.
+- If they sell back firms with 600 employees, and the five buy nothing, the flow from the first country is 25,000 employees. The gross flow and the net flow are both 25,000, because ownership moved in one direction only.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `sectors` | 2 | How many of the twenty sectors, counted from the last, lie in the second country. It must match the same setting of the second country module. | Our own choice, copied from the second country module |
+| `top_home` | 100 | How many firms count as the first country's dominant capital | The book, chapter 14 |
+| `top_second` | 5 | How many firms count as the second country's dominant capital | The Israel book: "the five largest corporate groups" |
+| `rate` | 0.02 | The employees a group seeks across the border each year, as a part of its own, at a fully open border with everything still to buy | Our own choice |
+| `retreat` | 0.05 | The yearly chance that a foreign-owned firm is sold back when the border is fully shut | Our own choice |
+| `counterforce` | 1.0 | How strongly roadblocks slow buying across the border | Our own choice. It is the figure of module 4. |
+| `open_alone` | 1.0 | The openness of the border when the second country module is off | Our own choice |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `border_open` and `second_roadblocks` from the optional second country module. Without that module it uses the setting `open_alone` and 0.
+- `roadblocks` from the resistance module (module 8)
+- `new_hires`, the number of people newly hired in the year, from the green-field module (module 3)
+- `merger_hype` from the optional hype module, taken as 1 when that module is off, and `eruption_stops_buying` from the optional eruptions module, taken as 0 when that module is off
+- from the optional currencies module, a multiplier on what each group seeks (`currency_buying_1`, `currency_buying_2`) and an added chance of sale (`currency_flight_1`, `currency_flight_2`). They are 1 and 0 when that module is off.
+- each firm's employees, industry, earnings and capitalization
+
+It publishes 22 numbers. In the names, "home" means the first country and "second" the second.
+
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `foreign_held` | For each industry, the part of its employees who work for foreign-owned firms | The sabotage module (module 1) |
+| `cross_border_on` | 1 while this module is on | The second country module and the currencies module |
+| `cross_border_inward`, `cross_border_outward` | The employees of the firms bought in the year in the second country and in the first, as a part of all employees | The second country module |
+| `cb_flow_from_home`, `cb_flow_from_second` | The flow from each country: the employees of the firms its group bought across the border, less those it sold back or lost to local buyers, as a part of all employees | The currencies module |
+| `cb_gross_flow`, `cb_net_flow` | The sum of the two flows and the difference between them, as a part of all employees | Nobody |
+| `cb_gross_to_hiring`, `cb_net_to_hiring` | The same two, divided by the number of people newly hired in the year. New hiring is the model's stand-in for green-field investment. | Nobody |
+| `cb_foreign_share` | The foreign-owned part of all capitalization | Nobody |
+| `cb_foreign_share_home`, `cb_foreign_share_second` | The foreign-owned part of each country's capitalization | Nobody |
+| `cb_foreign_earnings_home`, `cb_foreign_earnings_second` | The earnings of the firms a country's owners hold abroad, as a part of all the earnings of that country's owners | Nobody |
+| `cb_foreign_earnings_top_home`, `cb_foreign_earnings_top_second` | The same earnings as a part of the earnings of the hundred, or of the five, with their holdings abroad | Nobody |
+| `cb_dk_home`, `cb_dk_second` | Differential capitalization of the hundred, or of the five, against the locally owned firms of their country, without their holdings abroad. Differential capitalization is the average capitalization of the largest firms divided by the average of all. | Nobody |
+| `cb_dk_home_with_foreign`, `cb_dk_second_with_foreign` | The same with their holdings abroad counted in | Nobody |
+| `cb_open` | The openness worked out in step 2 | Nobody |
+
+The sabotage module reads 0 for `foreign_held` when this module is off, and the second country module reads 0 for its three numbers.
+
+### What is known to be wrong or untested
+
+- **The sources give definitions and directions. They give no rule and no rate.** Every number is our own except the hundred and the five. The rule for buying copies the second country module, which is itself our own.
+- **Only the largest firms buy across the border.** The book says "the bulk of foreign earnings" go to the largest corporations, not all of them.
+- **The rule for selling back is our own.** The book says that assets are sold back and that foreign holdings fell in the first half of the twentieth century. It gives no rule.
+- **Roadblocks make foreign owners sell.** The chance of a sale depends on the openness from step 2, which roadblocks lower. Resistance to mergers in either country therefore makes foreign owners sell, even at a border with no capital controls. Nothing in the sources says so.
+- **Step 6 is our own.** The sources say that foreign ownership changes power on both sides of the border. They do not say how markups respond.
+- **Flows are counted in employees.** The book counts them in money. The model already measures mergers in employees against new hiring, and this module does the same.
+- **A firm is owned wholly at home or wholly abroad.** The purchase of a part of a firm cannot be shown.
+- **Foreign earnings are not added to any firm.** The model's own differential capitalization therefore leaves them out, and only the two figures that this module reports with holdings abroad include them. Adding them to the buyer's earnings for each employee would not last, because the cost cutting module (module 5) pulls each firm's earnings for each employee back toward the level of its industry.
+- **The merger modules do not know who owns a firm.** A local firm of the hundred or the five can buy a foreign-owned firm like any other. The flow counted for such a purchase is an estimate, the number of firms lost times the average size of the firms still held, and it is reported a year late.
+- **Debt does not cross the border, and there is one currency** unless the currencies module is on.
+- **Without the second country module the border has nothing behind it.** There are no capital controls and no second set of merger settings. The run then shows only what a change of owners does by itself.
+- **Run alone, in trials.** These trials ran for 60 years from 60,000 firms, a fifth of the full count, so they show direction and not size. In the year labelled 1950 foreign owners held 39 per cent of the second country's capitalization and 6 per cent of all capitalization. Foreign earnings were 13 per cent of the earnings of the hundred. Their differential capitalization was 1,305 with holdings abroad and 1,187 without.
+- **The book's gap between gross and net flows did not appear.** In the same trial the gross flow stayed between 3 and 8 per cent of new hiring and the net flow was close to it, because the five bought almost nothing in the large country. The book reports 82 per cent against 16 per cent.
+- **Every change to the rest of the model comes through step 6.** With step 6 switched off, the model's own figures were identical to a run without the module. With it on, differential capitalization in 1950 was 1,406 against 1,564, and the capitalist share of income was 11.3 per cent against 12.2.
+- **With the second country at its default settings, nothing crosses.** The border stayed shut for all 60 years of a trial, and the run was identical to a run with the second country module alone.
+- **With the second country started at an open border, in a trial,** foreign owners held 23 per cent of its capitalization by 1950. The second country kept 12 per cent of all employees, where it fell to 3 per cent under the second country module's own mergers. The border stayed open, where it had fallen to 0.2.
+- **At the full count.** In one run of 60 years from 300,000 firms, with the module alone, foreign owners held 41 per cent of the second country's capitalization and 6.6 per cent of all capitalization in the year labelled 1950. The five held 0.3 per cent of the first country's capitalization. Foreign earnings were 16 per cent of the earnings of the hundred. Their differential capitalization, measured against the locally owned firms of the first country, was 7,438 with holdings abroad and 6,498 without. The gross flow was between 1 and 8 per cent of new hiring, and the net flow was close to it. The openness from step 2 fell from 0.99 to 0.78 as roadblocks rose. The model's own differential capitalization was 1,346 in 1920 against 1,351 without the module, 3,034 in 1935 against 3,077, and 7,020 in 1950 against 8,121. The capitalist share of income in 1950 was 13.1 per cent against 12.0.
+- **At the full count with the second country module.** At that module's default settings the border stayed shut for all 60 years, and every printed figure equalled the run with the second country module alone.
+- **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
+- **The module has not been run together with most other optional modules.**
+
+What should happen: buying across the border should be small while the largest firms are small, and should grow as they grow, because the amount they seek is a part of their own size. The foreign-owned part should build up over the years even when the yearly flow ebbs. The hundred should come to own a large part of the small country, and the five should own very little of the large one, so the gross flow and the net flow should be close to each other. Differential capitalization measured with holdings abroad should be higher than without them. Where foreign owners hold a large part of an industry, its markup should rise.
+
+---
 
 ## Optional module: Currencies and devaluation
 
-The module is in `modules/currencies.py` and is switched on with `--with currencies`. It needs owners who cross the border, so it is meant to be run as `--with cross_border,currencies`, or together with the second country as well. The cross-border ownership module received two optional reads. The first, `currency_flight_1` or `currency_flight_2`, is an added chance that a foreign-owned claim is sold back. The second, `currency_buying_1` or `currency_buying_2`, multiplies the employees that a dominant group seeks across the border. The sabotage module received one optional read, called `currency_markup`, which is a yearly shift in the markup of each industry. The first and third are zero and the second is one when this module is off, and runs without this module gave exactly the figures they gave before. `core.py` was not changed.
+Name in the model: `currencies`
 
-**Source.** *Capital as Power* (2009), chapter 17, "The retreat of breadth". Chapter 15, "Globalization". Chapter 9, the passage on prices as a way of ordering society. Jonathan Nitzan, "Asian Equities: Not for the Fainthearted", *The BCA Emerging Markets Strategist*, February 1998, which is the book's reference "Nitzan 1998a"; it was downloaded from the authors' archive into `data/bn_archives/papers/nitzan_asian_equities_1998/`. Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapter 4, in `data/bn_archives/papers/gpe_israel_2002/`. The book's other reference, Nitzan's "The 'Asian Miracle': How Close to Maturity?" (1997), was also downloaded, into `data/bn_archives/papers/nitzan_asian_miracle_1997/`. That file is a scan with no readable text, and nothing in the rule rests on it.
+Switch it on by adding `--with currencies` to the command. It needs owners who cross the border between the model's two countries, so run it as `--with cross_border,currencies`, or with the second country module as well. Run alone it changes nothing.
 
-**What the literature says.** The book gives one short account of currencies. In the 1990s "the rapid breadth expansion, particularly in the emerging markets of Asia, created a massive build-up of excess capacity and loosened the grip of business sabotage", "with disastrous consequences for profit margins". "The implications for differential accumulation were not lost on absentee investors, who began liquidating their holdings in peripheral regions where earnings growth fell short of the world average." "The first victim was the Mexican peso circa 1994, followed in 1997 by the Thai baht and the rest of the Asian currencies. From there the centrifugal forces of excessive external breadth spread devaluation throughout the developing world." The account has an order: earnings growth falls behind the world average, absentee owners sell, and the currency falls. Chapter 15 says what a sale across a border is: "the only thing that happens is a reshuffle of ownership claims, in which foreign capitalists acquire an asset from (or sell one to) their domestic counterparts". Chapter 9 treats devaluation as an instrument of power: "What previously required military conquest can now be done through currency devaluation". The 1998 paper was written for investors during the Asian crisis. It counts holdings in the owners' own currency: "the Asian asset class having lost over 50% in US$ terms since June 1997". It compares Asian "earnings per share" with "the world benchmark", and reports that "since 1996, Asian earnings per share were actually falling against a rising world trend". It calls the fallen markets "a short-term buying opportunity for investors who can stomach the risk". It says what the fall does inside the countries: "a combination of mass layoffs, wage reductions and rising prices of basic necessities", which "could be an explosive social cocktail". It says what the fall does to other countries: "devaluation cannot be a solution for all countries: it solves the problem in one country only by passing it to others". The Israel book describes owners leaving a currency before it falls: "investors, who expected an imminent exchange rate correction, naturally sold their stocks to buy dollars". It describes the plan that followed as "the standard IMF template of devaluation, tight monetary and fiscal policy and, of course, a significant wage erosion". The literature gives no rule for how far a currency moves when owners sell, and it gives no rates.
+### What it is about
 
-**Rule.** The rule has six parts.
+The module gives the second, smaller country a currency of its own. The currency rises while foreign owners are buying firms in the country, and falls when they sell. A fall of a currency is called a devaluation.
 
-1. The second country has its own currency. The first country's currency is the unit in which everything is counted. The module holds one number, which is the value of the second country's currency in units of the first, and the number starts at 1. With two countries there is only one such number, so a fall of one currency is a rise of the other.
-2. The currency moves only as owners enter and leave. Each year the module takes the employees of the claims that owners of the first country bought in the second country, less those they sold back. It subtracts the same figure for the second country's owners in the first country. It divides the result by the employees of the second country. The currency rises by a set multiple of that number when the number is positive, and falls when it is negative.
-3. Each year the module measures earnings per employee in each country and in the two together, with the second country's earnings counted in the first country's currency. It takes the yearly growth of each over the last three years. The shortfall of a country is the growth of the two together less the growth of that country, when that difference is positive.
-4. Foreign owners sell where earnings growth falls short. Each foreign-owned claim in a country is sold back to local owners with an added yearly chance equal to a set multiple of that country's shortfall, up to a limit. The cross-border ownership module carries out the sales, because it holds the record of who owns each claim. While owners are selling in a country they also buy less there.
-5. A fallen currency makes claims cheap for owners who hold the other currency. The employees that a dominant group seeks across the border are divided by the value of the currency of the country where it buys, up to a limit.
-6. A fall of the currency raises prices against wages in the country whose currency fell. The sabotage module adds a set multiple of the year's fall to the markup of every industry of that country, and it takes a smaller amount from the markups of the other country. Each amount is weighted by the other country's part of all employees.
+Think of Thailand in 1997. Foreign investors had bought Thai shares for years, and the baht was strong. When the profits of Thai companies stopped keeping up with profits elsewhere, the investors sold and took their money out. The baht lost about half its value within months. Prices in the shops rose, wages did not, and Thai companies became cheap for anyone who held dollars.
 
-The module returns no change to any claim. It acts only through the numbers that the cross-border ownership module and the sabotage module read in the following year. It also publishes the value of the currency, its yearly change, the two shortfalls, and three readouts counted in the first country's currency: the differential capitalization of the hundred largest claims of both countries, the second country's part of all capitalization, and the year's gain or loss on foreign holdings in the second country as a part of the capitalization of the first country's hundred.
+In the model the foreign owners decide to sell by one test: whether earnings in the country are growing more slowly than earnings in the two countries together.
 
-**Additions.** Every number is an addition. The currency rises by 2 per cent when owners from abroad buy claims that hold 1 per cent of the country's employees, and it cannot move by more than 0.5 in its logarithm in one year. Earnings growth is measured over three years. The added chance of sale is ten times the shortfall in yearly growth and is never more than 50 per cent a year. A cheap currency cannot raise buying to more than three times its level. A fall of the currency by 10 per cent adds about one hundredth to the markups of the second country. Measuring earnings growth as earnings per employee is an addition, because the 1998 paper uses earnings per share. Making the currency move in proportion to the net change of owners is an addition. Part 5 is an addition in form, because the 1998 paper names the buying opportunity and warns against it in the same sentence. Part 6 gives a form to "wage reductions and rising prices of basic necessities". Its weights stand for how much each country buys from the other, which the model does not hold. Applying part 6 to a rise of the currency as well as to a fall is an addition.
+### What the theory says
 
-Several things are missing. There are two countries and one exchange rate, so the spread of devaluation from one peripheral country to the next, which chapter 17 describes, cannot appear. Debt does not cross the border, so the 1998 paper's point that a fallen currency makes foreign debt heavier cannot be shown. The paper says that risk rises after the fall, and this module changes no claim's risk. The paper says that unrest follows, and the model has one number for popular resistance in both countries, which this module does not raise. No organ of government defends the currency, and there are no reserves. The capitalization in the ledger is not converted, and only the three published readouts are counted in the first country's currency. Flows are counted in employees, because that is what the cross-border ownership module publishes.
+The book, chapter 17, "The retreat of breadth"; chapter 15, "Globalization"; and chapter 9, a passage on prices as a way of ordering society. Jonathan Nitzan, "Asian Equities: Not for the Fainthearted" (*The BCA Emerging Markets Strategist*, February 1998), which the book cites as "Nitzan 1998a". Nitzan and Bichler, *The Global Political Economy of Israel* (2002), chapter 4. The book also cites a 1997 paper by Nitzan here, "The 'Asian Miracle': How Close to Maturity?". Nothing in the module rests on it.
 
-**Expected.** While the dominant capital of the first country is buying into the second country, the second country's currency should rise. The rise should itself count as earnings growth for the foreign owners, because they count earnings in their own currency. A dearer currency should slow their buying. When the buying slows, the currency should stop rising, the second country's earnings growth should fall below that of the two countries together, and the foreign owners should start to sell. Their sales should lower the currency, the lower currency should lower the earnings they count, and the selling should feed itself until little is left to sell. The cheap currency should then draw buyers back. A fall of the currency should raise markups and the price level in the second country. Without the cross-border ownership module no owner crosses the border, and the currency should stay at 1.
+The book gives one short account of currencies (chapter 17). It has an order: earnings growth falls behind the world average, absentee owners sell, and the currency falls.
 
-**What it showed.** These results come from runs at 60,000 starting claims. Run alone, the module changed nothing and the currency stayed at 1, because no owner crosses the border without the cross-border ownership module. Run with that module for 60 years, the currency of the second country rose from 1 to 1.52 by the year labelled 1945 while foreign owners came to hold 23 per cent of the country's capitalization. Its rise then stopped, the country's earnings growth fell 2 points a year short of the growth of the two countries together, and foreign owners sold. The currency fell to 0.93 by 1950, the foreign-owned part fell to 3 per cent, and foreign earnings fell from 7 per cent to 1 per cent of the earnings of the first country's hundred, against 13 per cent in the run without currencies. In a run of 85 years the buyers came back after 1960 and the currency stood at 1.66 in 1975, so the module produced a rise, a collapse and a second rise from its own rule. The collapse came at the same date with part 6 switched off, so it is produced by parts 2 to 5 and not by the markup. The figures for the whole ledger differed from the run without currencies by amounts no larger than a shift in the timing of a bout of stagflation produces: differential capitalization in 1950 was 1,237 against 1,406, and the capitalist share was 14.0 per cent against 11.3. With the second country at its own settings the border stayed shut and the currency stayed at 1. With the second country started at an open border the currency rose to 1.37 and fell to 1.11 by 1950. Two runs with the modules listed in opposite orders gave the same figures.
+- The book says of the 1990s: "The rapid breadth expansion, particularly in the emerging markets of Asia, created a massive build-up of excess capacity and loosened the grip of business sabotage", "with disastrous consequences for profit margins". Breadth is the book's word for growing by employing more people. Business sabotage is its name for earning by holding production back.
+- "The implications for differential accumulation were not lost on absentee investors, who began liquidating their holdings in peripheral regions where earnings growth fell short of the world average." Differential accumulation is the book's name for growing faster than the average.
+- "The first victim was the Mexican peso circa 1994, followed in 1997 by the Thai baht and the rest of the Asian currencies. From there the centrifugal forces of excessive external breadth spread devaluation throughout the developing world."
+
+Two more passages of the book:
+
+- Chapter 15 says what a sale across a border is: "the only thing that happens is a reshuffle of ownership claims, in which foreign capitalists acquire an asset from (or sell one to) their domestic counterparts".
+- Chapter 9 treats devaluation as an instrument of power: "What previously required military conquest can now be done through currency devaluation".
+
+The 1998 paper was written for investors during the Asian crisis:
+
+- It counts holdings in the owners' own currency: "the Asian asset class having lost over 50% in US$ terms since June 1997".
+- It compares Asian "earnings per share" with "the world benchmark", and reports that "since 1996, Asian earnings per share were actually falling against a rising world trend".
+- It calls the fallen markets "a short-term buying opportunity for investors who can stomach the risk".
+- On what the fall does inside the countries: "a combination of mass layoffs, wage reductions and rising prices of basic necessities", which "could be an explosive social cocktail".
+- On what it does to other countries: "devaluation cannot be a solution for all countries: it solves the problem in one country only by passing it to others".
+
+The Israel book describes owners leaving a currency before it falls: "Investors, who expected an imminent exchange rate correction, naturally sold their stocks to buy dollars". It describes the plan that followed as "the standard IMF template of devaluation, tight monetary and fiscal policy and, of course, a significant wage erosion".
+
+These sources give no rule for how far a currency moves when owners sell, and they give no rates.
+
+### What the module does each year
+
+The module keeps one number: the value of the second country's currency, counted in the first country's currency. It starts at 1. A value of 0.8 means the second country's currency buys a fifth less of the first country's than at the start. With two countries there is only one such number, so a fall of one currency is a rise of the other.
+
+The module changes no firm. It works by publishing numbers that two other modules act on in the following year: the cross-border ownership module, which keeps the record of who owns each firm, and the sabotage module (module 1), which sets markups. In the steps below, "the hundred" are the 100 largest firms of the first country and "the five" are the five largest of the second.
+
+1. **It moves the currency as owners enter and leave.** It takes the employees of the firms that the hundred bought in the second country in the past year, less those they sold back. It subtracts the same figure for the five in the first country. It divides the result by the number of employees in the second country. The currency rises by 2 per cent for each 1 per cent that results, and falls in the same way when the result is negative. Nothing else moves the currency. It cannot move by more than about 65 per cent up or 40 per cent down in one year.
+2. **It measures earnings growth.** It works out earnings for each employee in the second country, in the first country, and in the two together. The second country's earnings are counted at the current value of its currency. It takes the yearly growth of each over the last three years. A country's shortfall is the growth of the two together less its own growth, or zero if its own growth is the higher.
+3. **Foreign owners sell where earnings growth falls short.** Each foreign-owned firm in a country gets an added yearly chance of being sold back to local owners. The chance is ten times that country's shortfall, and never more than 50 per cent. The cross-border ownership module carries out the sales.
+4. **A cheap currency draws buyers, and owners who are selling buy less.** The cross-border ownership module multiplies the employees that a group seeks across the border by a number from this module. For the hundred the number is 1 divided by the value of the second country's currency, and never more than 3. For the five it is the value of that currency itself, with the same limit. The number is then lowered in proportion to the added chance of sale from step 3. When that chance is at its limit of 50 per cent, the group buys nothing.
+5. **A falling currency raises prices against wages.** The sabotage module adds an amount to the year's change in the markup of every industry of the second country. The amount is 0.1 times the fall of the currency, times the first country's part of all employees. It takes an amount from the markups of the first country: 0.1 times the fall, times the second country's part of all employees. A rise of the currency does the opposite.
+6. **It reports.** It publishes the value of the currency, its change in the year, the two shortfalls and three figures counted in the first country's currency. The table under "What it reads from other modules and what it gives them" lists them.
+
+**An example.** The second country has 10 per cent of all employees. In the past year the hundred bought, after sales, firms there with 0.1 per cent of all employees. The five bought nothing.
+
+- The net entry of owners is 0.001 ÷ 0.10 = 0.01 of the second country's employees.
+- The currency rises by 2 × 0.01 = 2 per cent, from 1.00 to 1.02.
+- The markup of each industry of the second country changes by −0.1 × 0.02 × 0.9 = −0.0018. In the first country it changes by +0.1 × 0.02 × 0.1 = +0.0002.
+
+Some years later, earnings for each employee in the two countries together are growing by 3 per cent a year, and in the second country by 1 per cent.
+
+- The second country's shortfall is 0.03 − 0.01 = 0.02.
+- Each foreign-owned firm there has an added chance of 10 × 0.02 = 20 per cent of being sold in the year.
+- If the currency stands at 1.25, the hundred seek 1 ÷ 1.25 = 0.8 of what they would otherwise seek, times 1 − 0.2 ÷ 0.5 = 0.6. That is 0.48 of the usual amount.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `sectors` | 2 | How many of the twenty sectors, counted from the last, lie in the second country. It must match the same setting of the second country and cross-border ownership modules. | Our own choice, copied from the second country module |
+| `sensitivity` | 2.0 | The rise of the currency, in per cent, when owners from abroad buy firms with 1 per cent of the country's employees | Our own choice |
+| `max_move` | 0.5 | The largest change of the currency in one year, as a change of its logarithm. That is a rise of about 65 per cent or a fall of about 40 per cent. | A plain limit with no source |
+| `window` | 3 | The number of years over which earnings growth is measured | Our own choice |
+| `flight_rate` | 10.0 | The added yearly chance that a foreign-owned firm is sold, for each unit of shortfall in yearly earnings growth | Our own choice |
+| `max_flight` | 0.5 | The largest added yearly chance of sale | A plain limit with no source |
+| `cheapness` | 1.0 | How strongly a cheap currency raises buying from abroad. Buying is multiplied by 1 divided by the value of the currency, raised to this power. | Our own choice |
+| `max_buying` | 3.0 | The largest multiple by which a cheap currency can raise buying | A plain limit with no source |
+| `pass_through` | 0.1 | The rise in a country's markups for each unit of fall of its currency, if the other country were nearly the whole world | Our own choice |
+| `top` | 100 | How many firms count as dominant capital in the figures the module reports. Dominant capital is the book's name for the largest firms and their allies in government. | The book, chapter 14 |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `cross_border_on`, `cb_flow_from_home` and `cb_flow_from_second` from the cross-border ownership module. The two flows are the net purchases of the hundred and of the five in the past year.
+- the record of who owns each firm, which the cross-border ownership module keeps
+- `bought_inward` and `bought_outward` from the second country module. It uses these only when the cross-border ownership module is off.
+- each firm's employees, industry, earnings and capitalization
+
+It publishes 13 numbers.
+
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `currency_flight_1`, `currency_flight_2` | The added chance of sale from step 3, for firms held by the hundred in the second country and for firms held by the five in the first | The cross-border ownership module |
+| `currency_buying_1`, `currency_buying_2` | The multiplier from step 4 on what the hundred seek and on what the five seek | The cross-border ownership module |
+| `currency_markup` | For each industry, the amount from step 5 | The sabotage module (module 1) |
+| `currency_second` | The value of the second country's currency | Nobody |
+| `currency_change` | The year's change of that value, as a change of its logarithm | Nobody |
+| `currency_inflow` | The net entry of owners from step 1 | Nobody |
+| `currency_shortfall_second`, `currency_shortfall_home` | The shortfall of each country from step 2 | Nobody |
+| `currency_dk_common` | Differential capitalization of the 100 largest firms of both countries together, with the second country's firms counted in the first country's currency. Differential capitalization is the average capitalization of the largest firms divided by the average of all. | Nobody |
+| `currency_second_cap_part` | The second country's part of all capitalization, counted in the first country's currency | Nobody |
+| `currency_holding_gain` | The year's gain or loss from the currency on firms held by the hundred in the second country, as a part of the capitalization of the hundred | Nobody |
+
+The cross-border ownership module reads 0 for the two chances and 1 for the two multipliers when this module is off. The sabotage module reads 0.
+
+### What is known to be wrong or untested
+
+- **The sources say who sells, where, and that the currency then falls. They give no rule and no rate.** Every number is our own.
+- **Earnings growth is measured for each employee.** The 1998 paper uses earnings per share, and the model has no shares.
+- **The currency moves in proportion to the net entry of owners.** That form is our own.
+- **Step 4 is our own in form.** The 1998 paper names the buying opportunity and warns against it in the same sentence.
+- **Step 5 gives a form to "wage reductions and rising prices of basic necessities".** Its weights stand for how much each country buys from the other, which the model does not hold. Applying the step to a rise of the currency as well as to a fall is our own.
+- **Three limits have no source:** the largest yearly move of the currency, the largest added chance of sale, and the largest multiple on buying.
+- **Devaluation cannot spread.** There are two countries and one exchange rate, so the spread from one peripheral country to the next, which chapter 17 describes, cannot appear.
+- **Debt does not cross the border.** The 1998 paper's point that a fallen currency makes foreign debt heavier cannot be shown.
+- **Risk and unrest do not respond.** The paper says that risk rises after a fall, and this module changes no firm's risk. The paper says that unrest follows. The model has one number for popular resistance in both countries, and this module does not raise it.
+- **Nobody defends the currency.** No body of government does so, and there are no reserves.
+- **The model's own capitalization is not converted.** Only the three figures named in step 6 are counted in the first country's currency.
+- **Flows are counted in employees,** because that is what the cross-border ownership module publishes.
+- **Run alone it does nothing.** In a trial the currency stayed at 1, because no owner crosses the border without the cross-border ownership module.
+- **A rise, a collapse and a second rise, in trials.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. With the cross-border ownership module on, the second country's currency rose from 1 to 1.52 by the year labelled 1945, while foreign owners came to hold 23 per cent of the country's capitalization. The rise then stopped. The country's earnings growth fell 2 points a year short of the growth of the two countries together, and foreign owners sold. The currency fell to 0.93 by 1950 and the foreign-owned part fell to 3 per cent. Foreign earnings fell from 7 per cent to 1 per cent of the earnings of the hundred, against 13 per cent in the run without currencies. In a trial of 85 years the buyers came back after 1960, and the currency stood at 1.66 in 1975.
+- **The collapse does not come from step 5.** It came in the same year with step 5 switched off.
+- **The rest of the model moved little.** In the same trial, differential capitalization in 1950 was 1,237 against 1,406 without currencies, and the capitalist share of income was 14.0 per cent against 11.3. A shift in the timing of a bout of stagflation produces differences of that size. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut.
+- **With the second country module on.** At that module's default settings the border stayed shut in a trial and the currency stayed at 1. With the border open from the start, the currency rose to 1.37 and fell to 1.11 by 1950.
+- **At the full count the collapse did not come within 60 years.** In one run of 60 years from 300,000 firms with the cross-border ownership module, the module's numbers were read every fifth year. The second country's currency was higher at each reading: 1.29 in the year labelled 1920 and 1.82 in 1950. At none of the readings was there a shortfall or an added chance of sale. The dear currency slowed buying instead. By 1950 the hundred sought 0.55 of what they would otherwise seek, and foreign owners held 30 per cent of the second country's capitalization, against 41 per cent without currencies. Counted in the first country's currency, the second country's part of all capitalization rose from 10 to 22 per cent. The model's own differential capitalization was 1,364 in 1920, 3,061 in 1935 and 7,176 in 1950, against 1,346, 3,034 and 7,020 with the cross-border ownership module alone.
+- **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
+- **The module has not been run together with most other optional modules.**
+
+What should happen: while the hundred are buying into the second country, its currency should rise. The rise itself counts as earnings growth for the foreign owners, because they count earnings in their own currency. A dearer currency should slow their buying. When the buying slows, the currency should stop rising, the country's earnings growth should fall below that of the two countries together, and the foreign owners should start to sell. Their sales should lower the currency, the lower currency should lower the earnings they count, and the selling should feed itself until little is left to sell. The cheap currency should then draw buyers back. A fall of the currency should raise markups and prices in the second country.
 
 ---
 
 ## Optional module: Governments as owners
 
-The module is in `modules/sovereign_funds.py` and is switched on with `--with sovereign_funds`. It runs beside the nine modules and replaces none of them. One optional read was added to `modules/resistance.py`. The resistance module now subtracts from the level of roadblocks a number that this module publishes, times the level of roadblocks. The number is 0 when this module is off, and a run without this module gives exactly the figures it gave before. `core.py` was not changed.
+Name in the model: `sovereign_funds`
 
-**Source.** Chapter 13, "The state of capital" and its section "Sovereign owners?". Chapter 14, "Differential accumulation", the passage on benchmarks. Chapter 12, the note on the price of oil and the passage on indirect ownership. Joseph Baines and Sandy Brian Hager, "From Passive Owners to Planet Savers?" (2022), for one figure. The book and the papers on disk were searched for sovereign funds, foreign reserves and state-owned firms. One search of the web for writing by the authors on sovereign wealth funds found nothing beyond these passages.
+Switch it on by adding `--with sovereign_funds` to the command. It runs beside the nine main modules and replaces none of them.
 
-**What the literature says.** Chapter 13 asks how far "the various organs of government have been conditioned, habituated and shaped by the logic of capital", and it gives the sovereign wealth fund as an illustration. The book describes what came before the funds: "Traditionally, capitalist governments treated their foreign reserves as a buffer for securing imports and protecting the currency. Consequently, the extra money was usually 'parked' in liquid foreign government bonds." It describes how the funds arose: "Massive shifts in the global distribution of income gave rise to a significant concentration of foreign currency assets", and "these piles of cash made the lure of capital too difficult to resist, as a result of which many governments started to invest their holdings through a new institution: the 'sovereign wealth fund'". It gives their size: "By 2006, sovereign wealth funds had amassed assets estimated at $2.5 trillion — representing 10 per cent of all institutionally held investments in the world and nearly 1.5 per cent of all global financial assets." It reports a forecast that by 2015 they would exceed "the sum total of global reserves by as much as 50 per cent". The book rejects the view that these funds are a government intrusion into the market: "By setting up and managing sovereign wealth funds, governments are further integrating, if not locking themselves, into the larger architecture of capitalist power." It quotes an official of Abu Dhabi, who lists the principles of that government's funds as "maximizing risk-adjusted returns, relative to well-established market indices; taking a long-term view; avoiding leverage; and investing in a well-diversified portfolio", and who says that the main fund holds "minority stakes in companies that have included no control rights". The book then says that "there is (still) no means of preventing governments from using their assets in line with their policy goals", but that "it is not clear how their investment and divestment decisions would differ from the business-as-usual policies of ExxonMobil, Bechtel or Samsung". Chapter 14 states the test that every owner faces: "Every investment is stacked against its own group benchmark — and, in the abstract, against the global benchmark", and "the goal is not to maximize but to exceed, not to meet but to beat". A note in chapter 12 says that the value of the sovereign wealth funds of oil-producing governments "swells and contracts with the ups and downs of petroleum prices". The literature gives no rule for how fast a government buys, and it does not say which acts of government change once a government is an owner.
+### What it is about
 
-**Rule.** The module adds one government organ that holds a reserve of money and a fund of shares. The rule has eight parts.
+Some governments hold shares in large corporations through an investment fund of their own, called a sovereign wealth fund. The module adds one such fund. It asks what a government does differently once it is itself an owner of the largest firms.
 
-1. The organ keeps a reserve of money. The reserve is parked in government bonds and earns the normal rate of return. Each year the reserve also receives 0.3 per cent of all capitalist earnings, and it receives the earnings that belong to the shares in the fund.
-2. Each year the organ moves 10 per cent of the reserve into the fund.
-3. The fund follows an index, which is the hundred largest claims. The fund buys the same additional part of every claim in the index, so it spends on each claim in proportion to the capitalization of that claim. The fund never holds more than 5 per cent of any claim. Money that finds no room under that limit stays in the reserve.
-4. When a claim drops out of the index, the fund sells its whole stake in that claim, and the money returns to the reserve.
-5. When a claim in the index buys another claim, the fund's stake covers the whole merged claim.
-6. Each year the module gives a verdict on the fund. The verdict is the growth in the value of the shares that the fund held over the past year, less the growth of the average capitalization of all claims over the same year. New money is not counted as growth. A fund that shrank less than the average has succeeded, and a fund that grew less than the average has failed.
-7. The module averages the verdict over the last five years. When the average is below zero, the organ wears down the roadblocks that slow mergers and hold boundaries shut. The part of the roadblocks that the organ wears down in a year is 30 per cent, times the part of the organ's assets that is held as shares, times how far the fund trails. A fund that trails the average by 5 per cent a year counts as trailing completely. A fund that beats the average does nothing to the roadblocks.
-8. The module publishes the verdict, the wearing down of roadblocks, the fund as a part of all capitalization, the fund's part of the hundred largest claims, the fund's value divided by the average capitalization of a claim, the rank that the fund would have if it were a claim, the reserve as a part of all capitalization, the part of the organ's assets that is held as shares, and the part of the organ's yearly income that comes from its shares.
+Think of the fund that Norway built from its oil income, or the funds of Abu Dhabi and Singapore. Each holds a small part of thousands of companies around the world. Each is judged as any investment fund is judged: did it do better than the market average?
 
-The module changes the ledger only by changing one added number on each claim, which is the part of the claim that the fund does not hold. It changes no price, no earnings, no employment and no capitalization directly.
+In the model the government body that runs the fund is judged in the same way. When its fund falls behind the average, it removes obstacles to the mergers of the largest firms, because mergers are what lift those firms above the average.
 
-**Additions.** The literature supplies the reserve in bonds, the move into shares, the index, the minority stakes, the test against a benchmark, and the statement that the organ is locked into the order of capital. One number is taken from the literature, and its use is an addition. Baines and Hager report that "effective control can be exercised with stakes as low as five percent". That is a threshold for control over a corporation. Neither they nor the book give it as a limit on the stakes of sovereign funds. The rule sets the limit at that figure so that the fund stays below control. Every other number is an addition: the 0.3 per cent of capitalist earnings, the yearly 10 per cent of the reserve, the index of one hundred claims, the five years, the shortfall of 5 per cent, and the yearly 30 per cent. Feeding the reserve from capitalist earnings is an addition. The book speaks of foreign currency received by the governments of exporting countries, and this model has one country by default. Part 7 as a whole is an addition. The book says that the decisions of such an owner would not differ from business as usual, and it does not name roadblocks or any other act of government. Setting the yearly 30 per cent to zero leaves a module that only reports. Judging the fund against the average of all claims is a choice, because the fund is nearly the same thing as the index that it follows. Seven things are missing. The money that the organ receives is taken from no claim and from no wage, because the ledger holds no taxes. The fund's buying does not raise the price of shares. There is only one organ, so the funds of different governments cannot be judged against each other. The fund does not cross a border when the second country is switched on. The module that traces owners and this module do not know of each other. A merger gives the fund a stake in the absorbed claim without payment, as it does for every owner of the buyer. The reserve is not counted against the government debt that module 2 reports.
+### What the theory says
 
-**Expected.** The fund should reach its limit of 5 per cent of the hundred largest claims within a few years, because those claims are small at the start. The fund as a part of all capitalization should then follow the top hundred's part of all capitalization. The verdict should be close to the differential accumulation of dominant capital, because the fund holds dominant capital. The verdict should therefore be favourable during a merger wave and unfavourable during a bout of stagflation, since every bout in the full run lowered differential capitalization. The organ should wear roadblocks down only during and just after a bout. Lower roadblocks should let mergers resume sooner and should let boundaries open a little further. More mergers should raise concentration, and higher concentration should bring the next bout of stagflation sooner. Nothing should differ from the run without the module until the first unfavourable five-year average.
+The book, chapter 13, "The state of capital" and its section "Sovereign owners?"; chapter 14, "Differential accumulation"; chapter 12, a note on the price of oil and a passage on indirect ownership. Joseph Baines and Sandy Brian Hager, "From Passive Owners to Planet Savers?" (2022), for one figure.
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 years, compared with the same run without the module. The fund reached its limit of 5 per cent of the hundred largest claims by the year labelled 1905, and from 1900 its value was larger than that of any single claim. The fund stood at 1.5 per cent of all capitalization in 1920 and stayed between 1.1 and 2.1 per cent afterwards, which is near the book's figure of 1.5 per cent of global financial assets, and this nearness follows from the limit on stakes and was not aimed at. The verdict was favourable by 8 to 16 per cent a year until 1920 and unfavourable by 8 per cent in 1925, during the first bout, and the two runs were identical until then. By 1930 the organ was wearing down 6 per cent of the roadblocks a year, the level of roadblocks was 0.17 against 0.24, and mergers afterwards ran higher (0.46 against 0.33 of new hiring in 1935), so that the top hundred held 24.7 per cent of employees in 1945 against 22.5 per cent and differential capitalization was 1,294 against 1,093. The next bout of stagflation then came sooner and harder: in 1950 unemployment was 13.2 per cent against 2.1 per cent, the capitalist share was 23.0 against 12.2 per cent, and differential capitalization had fallen to 898 against 1,564. Three things are doubtful. The reserve grew from 3 to 18 per cent of all capitalization between 1920 and 1945, because bond interest compounds and the limit on stakes leaves the money nowhere to go, so the part of the organ's assets held as shares fell from 0.36 to 0.11 and the lock weakened for a reason that the literature does not give. The whole difference between the runs comes from a few years of lower roadblocks around 1930, and a difference that grows this much from so small a cause may owe more to the compass's twenty-year memory than to this rule. The sector boundary opened no further than without the module. A trial with the yearly 30 per cent set to zero reproduced the run without the module, and two runs at 20,000 claims over 40 years with the modules listed in opposite orders gave the same figures.
+Chapter 13 asks how far "the various organs of government have been conditioned, habituated and shaped by the logic of capital". It gives the sovereign wealth fund as an illustration:
+
+- What came before the funds: "Traditionally, capitalist governments treated their foreign reserves as a buffer for securing imports and protecting the currency. Consequently, the extra money was usually 'parked' in liquid foreign government bonds."
+- How the funds arose: "Massive shifts in the global distribution of income gave rise to a significant concentration of foreign currency assets". "These piles of cash made the lure of capital too difficult to resist, as a result of which many governments started to invest their holdings through a new institution: the 'sovereign wealth fund'".
+- Their size: "By 2006, sovereign wealth funds had amassed assets estimated at $2.5 trillion — representing 10 per cent of all institutionally held investments in the world and nearly 1.5 per cent of all global financial assets." A forecast had them exceeding "the sum total of global reserves by as much as 50 per cent" by 2015.
+- The funds are not a government intrusion into the market: "By setting up and managing sovereign wealth funds, governments are further integrating, if not locking themselves, into the larger architecture of capitalist power."
+- The book quotes an official of Abu Dhabi, who lists the principles of that government's funds as "maximizing risk-adjusted returns, relative to well-established market indices; taking a long-term view; avoiding leverage; and investing in a well-diversified portfolio". He says that the main fund holds "minority stakes in companies that have included no control rights".
+- The book adds that "there is (still) no means of preventing governments from using their assets in line with their policy goals", but "it is not clear how their investment and divestment decisions would differ from the business-as-usual policies of ExxonMobil, Bechtel or Samsung".
+
+Chapter 14 states the test that every owner faces: "Every investment is stacked against its own group benchmark — and, in the abstract, against the global benchmark", and "the goal is not to maximize but to exceed, not to meet but to beat". A benchmark is the average that an investment is measured against.
+
+A note in chapter 12 says that the value of the sovereign wealth funds of oil-producing governments "swells and contracts with the ups and downs of petroleum prices".
+
+Baines and Hager report that "effective control can be exercised with stakes as low as five percent". That is a threshold for control over a corporation. Neither they nor the book give it as a limit on what a sovereign fund holds.
+
+These sources give no rule for how fast a government buys. They do not say which acts of government change once a government is an owner.
+
+### What the module does each year
+
+The module adds one government body. It holds a reserve of money and a fund of shares. The shares are small parts of the 100 firms with the highest capitalization, which the book uses to stand for dominant capital: the largest firms and their allies in government.
+
+1. **It judges the fund on the past year.** The verdict is the growth in the value of the shares the fund held, less the growth of the average capitalization of all firms. New money put into the fund is not counted as growth. A fund that grew by 5 per cent while the average grew by 8 per cent has failed. A fund that shrank by 2 per cent while the average shrank by 6 per cent has succeeded.
+2. **The reserve receives the year's income.** The reserve is held in government bonds and earns the normal rate of return, which is 5 per cent unless another module changes it. It also receives 0.3 per cent of the earnings of all firms, and the earnings that belong to the fund's shares.
+3. **The fund sells what has left the top 100.** When a firm drops out of the 100 largest, the fund sells its whole stake in it, and the money returns to the reserve.
+4. **The government body moves a tenth of the reserve into shares.** The fund buys the same additional part of every one of the 100 largest firms, so it spends on each in proportion to its capitalization. It never holds more than 5 per cent of any firm. Money that finds no room under that limit stays in the reserve.
+5. **A merger extends the stake.** When one of the 100 buys another firm, the fund's stake covers the whole merged firm.
+6. **A fund that trails makes the government body wear down roadblocks.** Roadblocks are the model's name for the obstacles that resistance puts in the way of mergers. The module averages the verdict over the last five years. If the average is below zero, it publishes a number: 0.3, times the part of the body's assets that is held as shares, times how far the fund trails. A fund that trails by 5 per cent a year or more counts as trailing completely. The resistance module (module 8) then lowers the roadblocks by that number times their level. A fund that beats the average does nothing to the roadblocks.
+7. **It reports.** The table under "What it reads from other modules and what it gives them" lists the numbers.
+
+The module changes no price, no earnings, no employment and no capitalization. The only thing it records on a firm is the part of that firm which the fund holds.
+
+**An example.** The reserve holds 1,000. All firms together earn 20,000 in the year, and the fund's shares earn 30.
+
+- The reserve receives 5 per cent of 1,000 in interest, which is 50. It receives 0.3 per cent of 20,000, which is 60. It receives the 30 from the shares. It now holds 1,140.
+- The government body moves a tenth, 114, into shares, if there is room under the limit of 5 per cent of each firm.
+- Over the last five years the fund's shares have grown by 3 per cent a year less than the average firm. The fund trails by 0.03 ÷ 0.05 = 0.6 of the full amount.
+- Shares are 40 per cent of the body's assets. The number it publishes is 0.3 × 0.4 × 0.6 = 0.072.
+- If roadblocks stand at 0.25, the resistance module lowers them by 0.072 × 0.25 = 0.018 in the year.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `levy` | 0.003 | The part of the earnings of all firms that the reserve receives each year | Our own choice |
+| `lure` | 0.10 | The part of the reserve that is moved into shares each year | Our own choice |
+| `stake_cap` | 0.05 | The largest part of any one firm that the fund holds | A plain setting. Baines and Hager give 5 per cent as the lowest stake that gives control over a corporation. The module uses the figure for something else: a limit that keeps the fund below control. |
+| `index_size` | 100 | How many of the largest firms the fund buys | Our own choice. It is the book's count for dominant capital. |
+| `judged_over` | 5 | The number of years over which the verdict is averaged | Our own choice. It stands for "taking a long-term view". |
+| `full_shortfall` | 0.05 | A fund that trails the average by this much a year counts as trailing completely | Our own choice |
+| `relief` | 0.3 | The part of the roadblocks that the government body wears down in a year when all its assets are shares and the fund trails completely. At 0 the module only reports. | Our own choice |
+
+### What it reads from other modules and what it gives them
+
+It reads each firm's earnings and capitalization, and the normal rate of return. It reads nothing that another module publishes.
+
+It publishes nine numbers.
+
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `sovereign_relief` | The number from step 6 | The resistance module (module 8). It reads 0 when this module is off. |
+| `sovereign_verdict` | The verdict on the past year from step 1 | Nobody |
+| `sovereign_part` | The fund as a part of all capitalization | Nobody |
+| `sovereign_stake_top` | The fund's part of the 100 largest firms | Nobody |
+| `sovereign_dk` | The fund's value divided by the average capitalization of a firm | Nobody |
+| `sovereign_rank` | The rank the fund would have if it were a firm | Nobody |
+| `sovereign_reserve` | The reserve as a part of all capitalization | Nobody |
+| `sovereign_dependence` | The part of the government body's assets that is held as shares | Nobody |
+| `sovereign_income_from_shares` | The part of its yearly income that comes from its shares | Nobody |
+
+### What is known to be wrong or untested
+
+- **The sources supply the outline and no rule.** They supply the reserve held in government bonds, the move into shares, buying by an index, the minority stakes, the test against a benchmark, and the statement that governments lock themselves into the order of capital. Every number is our own.
+- **Step 6 as a whole is our own.** The book says that the decisions of such an owner would not differ from business as usual. It does not name roadblocks or any other act of government.
+- **Feeding the reserve from the earnings of firms is our own.** The book speaks of foreign currency received by the governments of exporting countries, and the model has one country unless an optional module adds a second.
+- **The fund is judged against the average of all firms.** That is a choice. The fund is nearly the same thing as the list of firms it buys, so it could not be judged against that list.
+- **Nobody pays the money the reserve receives.** It is taken from no firm and from no wage, because the model has no taxes of this kind.
+- **The fund's buying does not raise the price of shares.**
+- **There is one government body.** The funds of different governments cannot be judged against each other.
+- **The fund does not cross a border** when the second country module is on.
+- **This module and the module on who owns the firms do not know of each other.**
+- **A merger gives the fund a stake in the bought firm without payment.** It does the same for every owner of the buyer.
+- **The reserve is not set against the government's debt** that the debt module (module 2) reports.
+- **The fund fills up fast, in trials.** These trials ran for 60 years from 60,000 firms, a fifth of the full count, so they show direction and not size. The fund reached its limit of 5 per cent of the 100 largest firms by the year labelled 1905. From 1900 it was worth more than any single firm. It stood at 1.5 per cent of all capitalization in 1920 and between 1.1 and 2.1 per cent afterwards. That is near the book's 1.5 per cent of global financial assets. The nearness follows from the limit on stakes and was not aimed at.
+- **The verdict follows the largest firms.** In the trial it was favourable by 8 to 16 per cent a year until 1920, and unfavourable by 8 per cent in 1925, during the first bout of stagflation. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut. Until then the run was identical to a run without the module.
+- **A few years of lower roadblocks changed the rest of the trial.** By 1930 the government body was wearing down 6 per cent of the roadblocks a year, and they stood at 0.17 against 0.24 without the module. Mergers then ran higher: 0.46 of new hiring in 1935 against 0.33. In 1945 the top 100 employed 24.7 per cent of all employees against 22.5, and differential capitalization was 1,294 against 1,093. The next bout of stagflation came sooner and harder. In 1950 unemployment was 13.2 per cent against 2.1, the capitalist share of income was 23.0 per cent against 12.2, and differential capitalization had fallen to 898 against 1,564.
+- **That difference may not be the rule's doing.** It all grows from a few years of lower roadblocks around 1930. The compass module (module 7) remembers twenty years, and a difference that grows so much from so small a cause may owe more to that memory than to this rule.
+- **The reserve piles up.** In the trial it grew from 3 to 18 per cent of all capitalization between 1920 and 1945. Interest compounds, and the limit on stakes leaves the money nowhere to go. The part of the body's assets held as shares fell from 0.36 to 0.11, so the tie in step 6 weakened for a reason the sources do not give.
+- **The sector boundary opened no further** than without the module.
+- **At the full count the same sequence came later and was milder.** In one run of 60 years from 300,000 firms, the fund held 5 per cent of the 100 largest firms and was worth more than any firm from the first reading, in the year labelled 1895. It was 0.8 per cent of all capitalization in 1920 and 1.8 per cent in 1950. The verdict was favourable by 7 to 18 per cent a year until 1930 and unfavourable by 8 per cent in 1935, during the first bout. Until then every printed figure equalled the run without the module. In 1940 the government body was wearing down 5.5 per cent of the roadblocks a year, and they stood at 0.18 against 0.23. In 1945 mergers were 0.42 of new hiring against 0.33. In 1950 the top 100 employed 20.7 per cent of all employees against 19.3, and differential capitalization was 8,661 against 8,121. No second bout had come by the end of the run. The reserve grew from 2 to 12 per cent of all capitalization between 1920 and 1950, and the part of the body's assets held as shares fell from 0.27 to 0.13.
+- **With `relief` at 0 the run is the run without the module.** A trial confirmed it.
+- **The order in which modules are listed makes no difference.** Two trial runs of 40 years from 20,000 firms, with the modules listed in opposite orders, gave the same figures.
+- **The module has not been run together with most other optional modules.**
+
+What should happen: the fund should reach its limit of 5 per cent of the 100 largest firms within a few years, because those firms are small at the start. After that the fund's part of all capitalization should follow the top 100's part. The verdict should be close to the differential accumulation of the top 100, which is the book's name for their growth against the average, because the fund holds the top 100. It should be favourable during a wave of mergers and unfavourable during a bout of stagflation. The government body should wear roadblocks down only during and just after a bout. Lower roadblocks should let mergers resume sooner and let boundaries open a little further. More mergers should raise concentration, and that should bring the next bout sooner.
 
 ---
 
 ## Optional module: Synchronisation of regimes
 
-The module is in `modules/synchronisation.py` and is switched on with `--with synchronisation`. It is a readout. It changes no employees, no earnings, no hype, no risk and no price, and a run with the module gives exactly the figures of the run without it. The module writes one thing to the ledger: a serial number on every claim, which lets the module see which claims were absorbed in the year before. No other module reads that number. No existing module was edited, and `core.py` was not changed.
+Name in the model: `synchronisation`
 
-**Source.** *Capital as Power* (2009), chapter 14, "Spread, integration, oscillation". Chapter 17, "Amalgamation versus stagflation", with Figure 17.1, its notes, and the endnote on the moving correlation. Jonathan Nitzan and Shimshon Bichler, *The Global Political Economy of Israel* (2002), chapter 2, in `data/bn_archives/papers/gpe_israel_2002/`. Shimshon Bichler and Jonathan Nitzan, "Francis' Buy-to-Build Estimates for Britain and the United States" (2013), in `data/bn_archives/papers/buy_to_build_2013_download/`. The other papers on disk were searched for the words "synchronized", "out of step" and "in tandem", and they add nothing on this subject.
+Switch it on by adding `--with synchronisation` to the command. It only measures. A run with it gives exactly the figures of a run without it.
 
-**What the literature says.** Chapter 14 names three features of differential accumulation: its spread, its integration and its alternating regimes. Integration means that the buying and selling of capital "transcends its original industry, sector and, finally, home country, resulting in a progressive convergence of accumulation benchmarks across these different universes". The chapter then ties the three together: "The first two processes work to reinforce one another; and their unfolding makes the breadth–depth cycles ever more interdependent and synchronized across sectors and societies." Chapter 17 gives the history. Differential accumulation "first became important in certain sectors in the United States and Europe", and "the spread was very uneven; and so, despite high capital mobility, initially the cyclical regimes in different sectors and countries were disjoined and out of step with one another". "It was only later — with the gradual proliferation and deepening of business principles and the ideology of discounting, with the progressive breaking of sectoral envelopes, and with the growing globalization of ownership — that differential accumulation became the compass of modern capitalism", and only then that "breadth and depth grew more stylized and inversely synchronized". The book measures this for the United States taken whole. An endnote says: "the 30-year moving correlation between the stagflation and amalgamation indices in Figure 17.1 (with the latter index expressed as a natural log and measured as a deviation from its time trend) tightened almost to the fullest: it changed from a positive 0.06 in 1927 (virtually no correlation) to a negative 0.95 in 2007 (a nearly perfect inverse correlation)". The amalgamation index is the ratio of money spent on mergers to money spent on new plant. The stagflation index is "the average of: (1) the standardized deviations from the average rate of unemployment; and (2) the standardized deviation from the average rate of inflation". Both "are shown as 5-year moving averages". For countries the literature offers two charts. The 2013 paper finds that the indices of Britain and the United States move together, and says that this "corroborate[s] our suggestion that, over time, the global spread of differential accumulation helps synchronize the breadth-depth cycles across different countries". The Israel book says that Israel's "cycle of breadth and depth was initially out of step with the rest of the world" and describes a "gradual shift from divergence to convergence". The literature gives no measure of how closely the regimes of different sectors move together.
+### What it is about
 
-**Rule.** The rule has five parts.
+The book says that the largest firms beat the average in two main ways, which it calls regimes. In a breadth regime they grow by buying other firms. In a depth regime they raise prices faster than others while unemployment is high, which the book calls stagflation. The book says that the two regimes take turns, and that over the last century the turns came to fall in the same years in every sector and every country.
 
-1. Every claim carries a serial number. A claim that was in the ledger last year and is absent this year was absorbed in a merger, because no module dissolves claims. The employees of the absorbed claim are counted as merger volume of the sector in which the claim sat.
-2. Each year the module records two numbers for every sector. The first is the employees absorbed, as a part of the sector's employees. The second is the rise in the sector's price level, which is the average price of the sector's claims weighted by their employees. When the second country module is on, the module records the same two numbers for each country.
-3. Each year the module also records the two indices of Figure 17.1 for the whole ledger. The amalgamation index is the employees acquired divided by the employees newly hired. The stagflation index is the average of standardized unemployment and standardized inflation.
-4. Every series is smoothed as the average of the last five years. Each correlation is taken over the last thirty smoothed years. The module publishes nothing but blanks until thirty smoothed years exist, which is 35 years into a run.
-5. The module publishes seven readouts. The first is the average correlation between the merger volumes of every pair of sectors. The second is the same average for the price rises of every pair of sectors. The third is the average, over sectors, of the correlation between a sector's own merger volume and its own price rise. The fourth is the part of the sectors in which any merger took place. The fifth is the book's own measure: the correlation between the stagflation index and the logarithm of the amalgamation index, less its trend. The sixth and seventh are the correlation between the two countries' merger volumes and between their price rises.
+The module measures whether that happens in a run. Suppose mergers in steel, banking and retail all surge in the same years and all dry up in the same years. Then the sectors are in step, and the module reports a figure near 1. If each sector has its surges in different years, it reports a figure near 0.
 
-A correlation of 1 means that two series rise and fall together. A correlation of 0 means that they are unrelated. A correlation of minus 1 means that one rises when the other falls. Every readout describes the year before, because a module sees only the ledger at the start of the step.
+The figure is a correlation. A correlation of 1 means that two series rise and fall together. A correlation of 0 means that they are unrelated. A correlation of minus 1 means that one rises when the other falls.
 
-**Additions.** The window of thirty years, the smoothing over five years, the two indices and the use of a correlation come from the book. The book applies them to one country taken whole. Applying a correlation to pairs of sectors and to two countries is an addition. Counting a sector's price rise as its depth is an addition, because the book's depth is stagflation and the model holds no unemployment by sector. Counting a merger in the sector of the absorbed claim, and not of the buyer, is an addition. Measuring the amalgamation index in employees follows the model's own practice. The trend of the amalgamation index is taken inside each window of thirty years, where the book takes it over the whole century, and that is an addition. The logarithm is never given a ratio below 0.0001, and that number is an addition. The module does not measure the convergence of benchmarks, because the model has one normal rate of return and one average for all sectors. The module does not measure how far ownership is integrated, because a claim has one industry. The openness of the sector boundary, which module 9 holds, is the nearest thing to it.
+### What the theory says
 
-**Expected.** The book's sequence cannot appear in full, and the reason lies in the starting position and not in this readout. The run starts with twenty sectors that are alike, one wage, one level of unemployment and one compass for the whole ledger. Price rises should therefore move together in all sectors from the first year. Merger volumes should also start together, because every sector starts its first wave in the same year, and they should drift apart as chance makes the wave run out at different dates in different sectors. If the theory holds inside the model, the correlation between sectors' merger volumes should rise again when the sector boundary opens, and the whole-ledger correlation between the two indices should move toward minus 1. With the second country behind a shut border, the two countries should move together only as far as the single wage and the single compass make them.
+The book, chapter 14, "Spread, integration, oscillation"; chapter 17, "Amalgamation versus stagflation", with Figure 17.1, its notes and an endnote. Nitzan and Bichler, *The Global Political Economy of Israel* (2002), chapter 2. Bichler and Nitzan, "Francis' Buy-to-Build Estimates for Britain and the United States" (2013).
 
-**What it showed.** These results come from runs at 60,000 starting claims. A run of 60 years with the module printed exactly the same table as the run without it, which is correct for a readout, and two runs with the modules listed in opposite orders gave the same figures. In a run of 119 years the price rises of the sectors moved together almost perfectly throughout, with an average correlation between 0.89 and 1.00, so the model shows no period in which the depth regimes of sectors were out of step. The merger volumes of the sectors moved together at 0.90 in the year labelled 1925, stayed between 0.6 and 0.9 until 1975, and then fell to 0.04 by 2000 while the sector boundary opened from 0.05 to 0.12, which is the opposite of the book's sequence. The book's own measure for the whole ledger was minus 0.68 in 1925 and was positive in most later years, reaching 0.77 in 1995, where the book reports a move from 0.06 to minus 0.95; this agrees with the README's finding that the model alternates between stagflation and boom and that mergers do not return to end a bout. In a run of 60 years with the second country and a window of fifteen years, the two countries' price rises correlated at 0.98 or more in every year, and their merger volumes correlated at 0.99 in 1910, minus 0.74 in 1925 and 0.97 in 1950, with the border shut throughout, so that synchronisation between the countries came from the shared wage and compass and not from integrated ownership.
+Chapter 14 names three features of differential accumulation, which is the book's name for growing faster than the average. They are its spread, its integration and its alternating regimes.
+
+- Integration means that the buying and selling of capital "transcends its original industry, sector and, finally, home country, resulting in a progressive convergence of accumulation benchmarks across these different universes". A benchmark is the average that owners measure themselves against.
+- "The first two processes work to reinforce one another; and their unfolding makes the breadth–depth cycles ever more interdependent and synchronized across sectors and societies."
+
+Chapter 17 gives the history:
+
+- Differential accumulation "first became important in certain sectors in the United States and Europe".
+- But "the spread was very uneven; and so, despite high capital mobility, initially the cyclical regimes in different sectors and countries were disjoined and out of step with one another".
+- "It was only later — with the gradual proliferation and deepening of business principles and the ideology of discounting, with the progressive breaking of sectoral envelopes, and with the growing globalization of ownership — that differential accumulation became the compass of modern capitalism", and only then that "breadth and depth grew more stylized and inversely synchronized". An envelope is the book's word for a boundary around the firms that a buyer can reach.
+
+The book measures this for the United States taken whole:
+
+- An endnote says: "the 30-year moving correlation between the stagflation and amalgamation indices in Figure 17.1 (with the latter index expressed as a natural log and measured as a deviation from its time trend) tightened almost to the fullest: it changed from a positive 0.06 in 1927 (virtually no correlation) to a negative 0.95 in 2007 (a nearly perfect inverse correlation)".
+- The amalgamation index is the money spent on mergers divided by the money spent on new plant.
+- The stagflation index is "the average of: (1) the standardized deviations from the average rate of unemployment; and (2) the standardized deviation from the average rate of inflation". A standardized deviation is the distance of a reading from the average of its series, counted in the usual size of that series' swings.
+- Both "are shown as 5-year moving averages".
+
+For countries the sources offer two charts:
+
+- The 2013 paper finds that the indices of Britain and the United States move together. It says that this "corroborate[s] our suggestion that, over time, the global spread of differential accumulation helps synchronize the breadth-depth cycles across different countries".
+- The Israel book says that Israel's "cycle of breadth and depth was initially out of step with the rest of the world", and describes a "gradual shift from divergence to convergence".
+
+These sources give no measure of how closely the regimes of different sectors move together.
+
+### What the module does each year
+
+A module sees the list of firms only as it stood at the start of the year, so everything below describes the year before.
+
+1. **It finds the firms that were bought.** It gives every firm a serial number. A firm that was in the list a year ago and is gone now was bought in a merger, because no module removes firms in any other way. The module counts that firm's employees as merger volume of the sector the firm was in.
+2. **It records two numbers for each of the twenty sectors.** The first is the employees of the firms bought, as a part of the sector's employees. The second is the rise in the sector's price level, which is the average price of its firms weighted by their employees. When the optional second country module is on, it records the same two numbers for each country.
+3. **It records the book's two indices for the whole economy.** The amalgamation index is the employees of the firms bought, divided by the number of people newly hired. The stagflation index is the average of standardized unemployment and standardized inflation.
+4. **It smooths every series.** Each reading becomes the average of the last five years. Each correlation is then taken over the last thirty smoothed readings. Until thirty exist, which takes 35 years, the module publishes blanks.
+5. **It publishes seven correlations and shares.** The table under "What it reads from other modules and what it gives them" lists them.
+
+**An example.** A sector has 50,000 employees. In the year, firms with 500 employees are bought there, and the sector's price level rises from 2.00 to 2.06.
+
+- The sector's merger volume is 500 ÷ 50,000 = 0.01.
+- Its price rise is 3 per cent.
+- The module does this for all twenty sectors every year, and smooths each series over five years.
+- Thirty-five years into the run it can compare sectors. If the smoothed merger volumes of two sectors rise and fall in the same years, their correlation is near 1. The module reports the average of that figure over all 190 pairs of sectors.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `window` | 30 | The number of years over which each correlation is taken | The book, chapter 17: "the 30-year moving correlation" |
+| `smooth` | 5 | The number of years averaged before correlating | The book, Figure 17.1: "5-year moving averages" |
+| `least_index` | 0.0001 | The smallest amalgamation index that is used. The module takes the logarithm of the index, which a ratio of zero does not have. | A plain limit with no source |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `merger_volume`, the employees of the firms bought in the year as a part of all employees, from the merger module (module 4)
+- `new_hires`, the number of people newly hired, from the green-field module (module 3)
+- `unemployment`, which the core publishes
+- the country number that the optional second country module gives each firm
+- each firm's employees, sector and price
+
+It publishes eight numbers. No module reads any of them.
+
+| Name in the code | What it is |
+|---|---|
+| `sync_mergers_sectors` | The average correlation between the merger volumes of every pair of sectors |
+| `sync_prices_sectors` | The average correlation between the price rises of every pair of sectors |
+| `sync_inverse_sectors` | The average, over sectors, of the correlation between a sector's own merger volume and its own price rise. The book's alternation of regimes would show as a figure near minus 1. |
+| `sync_sectors_merging` | The part of the sectors in which any firm was bought during the thirty years |
+| `sync_breadth_depth` | The book's own measure for the whole economy: the correlation between the stagflation index and the logarithm of the amalgamation index, after the trend of that logarithm has been taken out |
+| `sync_mergers_countries` | The correlation between the merger volumes of the two countries. It is blank without the second country module. |
+| `sync_prices_countries` | The correlation between the price rises of the two countries. It is blank without the second country module. |
+| `sync_years` | The number of years recorded so far |
+
+### What is known to be wrong or untested
+
+- **The book applies its measure to one country taken whole.** The window of thirty years, the smoothing over five years, the two indices and the use of a correlation are the book's. Applying a correlation to pairs of sectors and to two countries is our own.
+- **A sector's price rise stands for its depth.** The book's depth regime is stagflation, which includes unemployment, and the model has no unemployment by sector.
+- **A merger is counted in the sector of the firm that was bought,** not of the buyer. That is our own choice.
+- **The amalgamation index is counted in employees,** as elsewhere in the model. The book counts money.
+- **The trend is taken inside each window of thirty years.** The book takes it over the whole century.
+- **The module does not measure integration.** It cannot measure the convergence of benchmarks, because the model has one normal rate of return and one average for all sectors. It cannot measure how far ownership is spread across sectors, because a firm has one industry. The nearest thing is the openness of the sector boundary, which the envelope module (module 9) sets.
+- **The model cannot show sectors that start out of step.** A run starts with twenty sectors that are alike, one wage, one level of unemployment and one compass for the whole economy. Price rises therefore move together in all sectors from the first year, and every sector starts its first wave of mergers in the same year. The cause lies in the starting position and not in this module.
+- **A firm founded in the second country is counted in the first country for its first year.**
+- **Prices moved together throughout, in trials.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. In a trial of 119 years the average correlation between the price rises of the sectors lay between 0.89 and 1.00. The model shows no period in which the depth regimes of sectors were out of step.
+- **Mergers moved apart as the boundary opened, which is the opposite of the book's sequence.** In the same trial the correlation between the merger volumes of the sectors was 0.90 in the year labelled 1925 and between 0.6 and 0.9 until 1975. It then fell to 0.04 by 2000, while the sector boundary opened from 0.05 to 0.12.
+- **The book's own measure did not tighten.** In the same trial it was minus 0.68 in 1925 and positive in most later years, reaching 0.77 in 1995. The book reports a move from 0.06 to minus 0.95. In the model, bouts of stagflation alternate with booms, and mergers do not return to end a bout.
+- **Two countries moved together without shared ownership.** A trial of 60 years with the second country module used a window of fifteen years. The two countries' price rises correlated at 0.98 or more in every year. Their merger volumes correlated at 0.99 in 1910, minus 0.74 in 1925 and 0.97 in 1950. The border was shut throughout, so the two moved together because they share one wage and one compass.
+- **At the full count.** In one run of 60 years from 300,000 firms, every printed figure equalled the run without the module. The correlations exist from the year labelled 1925 and were read every fifth year. Between the sectors' merger volumes the figure was 0.99 in 1925 and 1930 and between 0.81 and 0.96 afterwards. Between their price rises it was 0.84 in 1925 and 0.92 or more afterwards. Firms were bought in 19 of the 20 sectors. The book's own measure was minus 0.92 in 1925 and minus 0.94 in 1930. That was before the first bout of stagflation, so those figures cannot be read as regimes taking turns. It then weakened to minus 0.35 in 1940, and stood at 0.21 in 1945 and minus 0.16 in 1950. Inside the sectors, merger volume and price rises moved together and not against each other: the average figure was 0.90 in 1925 and between 0.04 and 0.44 from 1935.
+- **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
+
+What should happen: if the theory holds inside the model, the correlation between the sectors' merger volumes should start high, drift down as chance makes the first wave run out at different dates in different sectors, and rise again when the sector boundary opens. The book's own measure for the whole economy should move toward minus 1. With the second country behind a shut border, the two countries should move together only as far as the single wage and the single compass make them.
+
+---
 
 ## Optional module: The power index and systemic fear
 
-The module is in `modules/fear.py` and is switched on with `--with fear`. It is a readout with one optional link. By itself it changes no employees, no earnings, no hype, no risk and no price. When the hype module is also on (`--with hype,fear`), the hype module reads one number that this module publishes. One optional read was added to `modules/hype.py` for that purpose, and the read has no effect when this module is off. `core.py` was not changed.
+Name in the model: `fear`
 
-**Source.** Shimshon Bichler and Jonathan Nitzan, "A CasP Model of the Stock Market" (2016), sections 5.1, 5.3, 6.1, 6.2, 6.5 and 6.6, in `data/bn_archives/papers/stock_market_2016/`. Bichler and Nitzan, "Systemic Fear, Modern Finance and the Future of Capitalism" (2010), in `data/bn_archives/papers/systemic_fear_2010/`, for the earlier way of measuring fear.
+Switch it on by adding `--with fear` to the command. Run that way it only measures, and the run gives exactly the figures of a run without it. Run together with the optional hype module, as `--with hype,fear`, it also changes how owners price firms.
 
-**What the literature says.** The 2016 paper defines the power index "as the ratio between the S&P 500 price index and the average wage rate, normalized with its historical mean=100". The authors say that they "compare not overall purchasing power and income services, but merely prices". The two prices "represent a conflict: the clash between those who own the capitalized means of power and those who are controlled by them". The wage rate is used "not as a measure of productivity or wellbeing, but as a benchmark against which to gauge the differential power of owners". The paper says that the index returns toward its mean because power provokes resistance: "it is easier for capitalists to augment their power when the power index is at one or two standard deviations below its average ... than when the index is one or two standard deviations above it", and "it is this changing intensity of resistance ... that makes our power index mean reverting". The paper names a ceiling: "it seems that two standard deviations above the mean is the historical asymptote, or limit, of capitalized equity power in the United States". It adds that "when capitalized power approaches its asymptotes, capitalists have good reason to fear their very own power". Systemic fear is "an apprehension that the current mode of power might crumble". The paper says that this fear is known by what owners do. Owners "effectively negate and abandon their core ritual of forward-looking capitalization; and we can know the degree to which they negate this ritual by the extent to which their asset pricing comes to depend on current rather than future earnings". The systemic fear index is computed by "(1) computing the 12-month trailing correlation between price and EPS (earnings per share) of the S&P 500 index; (2) calculating the ten-year trailing average of the 12-month moving correlation". A correlation is a number between minus 1 and 1 that says how closely two series move together. The index runs "from a Pearson coefficient of 0 (or less), which indicates that forward-looking capitalists do not fear for their system, to a Pearson coefficient of +1". The 2010 paper had instead correlated "the annual rates of change of equity prices and current earnings per share". The 2016 paper reports that the two indices move together, with a correlation of 0.83 over 132 years: "the greater the capitalized power of equity owners relative to the underlying population, the greater their systemic fear and therefore the greater their reliance on current earnings when pricing their stocks". The paper gives the reason. When the profit share and "the level of hype are already high and income volatility and the normal rate of return already low", then "increasing it further ... becomes harder and harder", and "since the future is too bleak to rely on, this reassurance can come only from current profit". The literature gives the two definitions, one figure for the ceiling and the direction of the link. It gives no rule that turns the distance of the power index from its mean into a degree of fear.
+### What it is about
 
-**Rule.** The rule has five parts.
+The module measures two things that Bichler and Nitzan define. The first is the power index: the price of shares in the largest firms divided by the wage. It says how far owners stand above the people who work for them. The second is systemic fear: owners' fear that the whole order which makes them rich might break down.
 
-1. The model has no shares. The module takes the price of a share to be the capitalization of the hundred largest claims divided by their employees. The power index is that price divided by the wage.
-2. The module keeps every yearly reading of the index since the start of the run. It publishes the index with the mean of those readings set to 100. It also publishes the distance of the index from its mean, counted in standard deviations of the logarithm of the readings. A standard deviation is the usual size of the swings of a series around its mean. The distance is published as 0 until thirty readings exist.
-3. The ceiling is two standard deviations above the mean, which is the paper's figure. The module publishes the gap between the index and the ceiling, and the number of years in which the index stood at or above the ceiling.
-4. The module measures the fear index. Each year it records the share price of part 1 and the current earnings of the hundred largest claims for each employee. The fear index is the correlation, over the last ten years, between the yearly change of the logarithm of the price and the yearly change of the logarithm of the earnings. A reading near 1 means that capitalization followed current earnings. A reading near 0 means that it did not.
-5. The module publishes a number between 0 and 1 named `power_fear`. The number is 0 when the power index is at or below its mean. It rises in a straight line with the distance of part 2, and it is 1 at the ceiling. The hype module multiplies every change that the year would bring to a multiple by one minus this number. The multiple of a claim is the earnings that owners expect divided by the earnings that have arrived. At the ceiling the multiple stands still, so owners price each claim on its current earnings alone.
+The authors argue that the two go together. Think of a share market that has climbed for years while wages stood still. Owners have never been so far above everyone else, and for that very reason they grow nervous. They stop trusting forecasts of profits ten years ahead, and price each company on the profit it reports this year.
 
-Every reading describes the year before, because a module sees only the ledger at the start of the step.
+The module measures both things in a run. With the hype module on, it also makes owners behave in that way when the power index stands far above its own past average.
 
-**Additions.** The ratio of share prices to the wage, the mean set to 100, the two standard deviations and the window of ten years come from the paper. The use of the two standard deviations as a setting is an addition. The paper says that "it seems" that this level is "the historical asymptote", and it describes three moments in the record of the United States. The rule turns that observation into the level at which fear is complete, for an index that is the model's own and is measured against the history of the run. Taking capitalization for each employee of the hundred largest claims as the share price is an addition. The module can use only the history of the run so far, where the authors look back over the whole record, and that is an addition. Waiting for thirty readings is an addition; in a trial with ten readings a slow early rise was read as a ceiling, because the index had hardly varied yet. Correlating yearly changes over ten years is an addition, because the model has no months and the 2016 paper correlates monthly levels over twelve months. The form of part 5 is an addition: no fear at or below the mean, a straight line, and full fear at the ceiling. Holding the multiple still is an addition. The paper says that pricing comes to depend on current earnings, and it does not say that the corrections of forecasters stop. The hype module also reads a number named `systemic_fear`, which the eruptions module supplies, and this module publishes under a different name so that the two cannot collide. The paper says that resistance is what turns the index back from its ceiling. This module tells the resistance module nothing, so the index is turned back only by what the model already contains. The paper also names the profit share, risk and the normal rate of return as things that become harder to move near the ceiling, and only hype is linked here.
+### What the theory says
 
-**Expected.** Without the hype module the run should be unchanged, and the measured fear index should stand near 1 in every year. The reason is that hype is then held at one, so capitalization is current earnings divided by risk and the normal rate of return, and nothing in it looks forward. With the hype module on and the link switched off, the measured fear index should be well below 1, because multiples then move apart from current earnings. With the link on, the measured fear index should be higher in the years when the power index stands above its mean. The power index should reach its ceiling in a bout of stagflation, because a bout raises earnings for each employee faster than the wage.
+Shimshon Bichler and Jonathan Nitzan, "A CasP Model of the Stock Market" (2016), sections 5.1, 5.3, 6.1, 6.2, 6.5 and 6.6. Bichler and Nitzan, "Systemic Fear, Modern Finance and the Future of Capitalism" (2010), for an earlier way of measuring fear.
 
-**What it showed.** These results come from runs at 60,000 starting claims over 60 years. The run with the module alone printed exactly the same table as the run without it, and the measured fear index averaged 0.99, as expected when hype is held at one. With the hype module on and the link switched off, the measured fear index averaged 0.39, and the power index first reached its ceiling in the first bout of stagflation, at 2.7 standard deviations above its mean in the year labelled 1920. With the link on, the measured fear index averaged 0.50, and it stood at 0.66 in 1925 and 0.91 in 1930 against 0.34 and 0.63 with the link off. The hype of dominant capital did not fall back during the bout, because the multiples were held still: differential hype was 1.27 in 1925 against 0.95, and differential capitalization was 478 against 346. The later course of the run then differed, with a second bout of stagflation near 1945 and a final differential capitalization of 1,063 against 1,760, so the link changes outcomes well beyond the years in which it acts, and one run does not show whether that is a pattern.
+The power index (the 2016 paper):
+
+- It is defined "as the ratio between the S&P 500 price index and the average wage rate, normalized with its historical mean=100". The S&P 500 is an index of the share prices of 500 large United States corporations.
+- The authors say that they "compare not overall purchasing power and income services, but merely prices".
+- The two prices "represent a conflict: the clash between those who own the capitalized means of power and those who are controlled by them".
+- The wage rate is used "not as a measure of productivity or wellbeing, but as a benchmark against which to gauge the differential power of owners".
+
+Why the index returns toward its average, and where it stops:
+
+- The paper says that "it is easier for capitalists to augment their power when the power index is at one or two standard deviations below its average ... than when the index is one or two standard deviations above it". A standard deviation is the usual size of the swings of a series around its average.
+- "It is this changing intensity of resistance ... that makes our power index mean reverting".
+- On the limit, the paper says that "it seems that two standard deviations above the mean is the historical asymptote, or limit, of capitalized equity power in the United States".
+- It follows that "when capitalized power approaches its asymptotes, capitalists have good reason to fear their very own power".
+
+Systemic fear:
+
+- It is "an apprehension that the current mode of power might crumble".
+- It is known by what owners do. Owners "effectively negate and abandon their core ritual of forward-looking capitalization; and we can know the degree to which they negate this ritual by the extent to which their asset pricing comes to depend on current rather than future earnings".
+- The systemic fear index is computed by "(1) computing the 12-month trailing correlation between price and EPS (earnings per share) of the S&P 500 index; (2) calculating the ten-year trailing average of the 12-month moving correlation". A correlation is a number between minus 1 and 1 that says how closely two series move together.
+- The index runs "from a Pearson coefficient of 0 (or less), which indicates that forward-looking capitalists do not fear for their system, to a Pearson coefficient of +1".
+- The 2010 paper had instead correlated "the annual rates of change of equity prices and current earnings per share".
+
+How the two are tied:
+
+- The 2016 paper reports that the two indices move together, with a correlation of 0.83 over 132 years: "the greater the capitalized power of equity owners relative to the underlying population, the greater their systemic fear and therefore the greater their reliance on current earnings when pricing their stocks".
+- The reason it gives: when the profit share and "the level of hype are already high and income volatility and the normal rate of return already low", then "increasing it further ... becomes harder and harder", and "since the future is too bleak to rely on, this reassurance can come only from current profit".
+
+These sources give the two definitions, one figure for the limit and the direction of the tie. They give no rule that turns the distance of the power index from its average into a degree of fear.
+
+### What the module does each year
+
+A module sees the list of firms only as it stood at the start of the year, so every reading describes the year before. "The top 100" are the 100 firms with the highest capitalization.
+
+1. **It works out the power index.** The model has no shares. The module takes the price of a share to be the capitalization of the top 100 divided by the number of their employees. The power index is that price divided by the wage.
+2. **It compares the index with its own past.** It keeps every yearly reading since the start of the run. It publishes the index with the average of those readings set to 100. It also works out the distance of this year's reading from the average, counted in standard deviations. It uses the logarithms of the readings for this. Until thirty readings exist, the distance is published as 0.
+3. **It marks the limit.** The limit is two standard deviations above the average. The module publishes the gap between the index and the limit, and counts the years in which the index stood at or above it.
+4. **It measures the fear index.** It records the share price from step 1 and the earnings of the top 100 for each of their employees. The fear index is the correlation, over the last ten years, between the yearly change of that price and the yearly change of those earnings. A reading near 1 means that capitalization followed current earnings. A reading near 0 means that it did not.
+5. **It publishes a degree of fear between 0 and 1.** The degree is 0 when the power index is at or below its average. It rises in a straight line with the distance from step 2, and it is 1 at the limit.
+6. **The hype module acts on that degree.** The hype module moves each firm's multiple every year. The multiple is the earnings that owners expect divided by the earnings that have arrived. With this module on, the hype module multiplies every such movement, up or down, by one minus the degree of fear. At the limit the multiples stand still, so owners price each firm on its current earnings alone.
+
+**An example.** The top 100 have a capitalization of 50,000,000 and employ 1,000,000 people. The wage is 1.
+
+- The price of a share is 50,000,000 ÷ 1,000,000 = 50, and the power index is 50 ÷ 1 = 50.
+- The readings of the run so far put this year's index 1.2 standard deviations above their average.
+- The degree of fear is 1.2 ÷ 2 = 0.6.
+- The hype module had worked out that a firm's multiple should rise by 0.05 this year. It now raises it by 0.05 × (1 − 0.6) = 0.02.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `ceiling` | 2.0 | How many standard deviations above its average the power index meets its limit. Fear is complete there. | A plain setting. The 2016 paper says "it seems" that this level is "the historical asymptote" of the index in the United States. The module uses the figure for something else: the level at which fear is complete, for an index of the model's own, measured against the history of the run. |
+| `calm` | 0.0 | The distance from the average, in standard deviations, at or below which there is no fear | Our own choice |
+| `least_years` | 30 | The number of readings needed before the average and the standard deviation are used | Our own choice |
+| `window` | 10 | The number of years over which price and current earnings are correlated | The 2016 paper averages over ten years. Its use on yearly changes is our own. |
+| `link` | 1.0 | The part of the degree of fear that is passed to the hype module. At 0 the module only measures. | Our own choice |
+| `top` | 100 | How many firms count as dominant capital, the book's name for the largest firms and their allies in government | The book, chapter 14 |
+
+### What it reads from other modules and what it gives them
+
+It reads each firm's employees, earnings and capitalization, and the wage. It reads nothing that another module publishes.
+
+It publishes seven numbers.
+
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `power_fear` | The degree of fear from step 5, times the setting `link` | The optional hype module. It reads 0 when this module is off. |
+| `power_index` | The power index from step 1 | Nobody |
+| `power_index_100` | The power index with the average of the run so far set to 100 | Nobody |
+| `power_distance` | The distance of the index from its average, in standard deviations | Nobody |
+| `power_ceiling_gap` | The limit less that distance. It is blank until thirty readings exist. | Nobody |
+| `power_years_at_ceiling` | The number of years so far in which the index stood at or above the limit | Nobody |
+| `fear_index` | The fear index from step 4. It is blank until ten years of changes exist. | Nobody |
+
+The hype module also reads a number named `systemic_fear`, which the optional eruptions module publishes. The two numbers are separate and have different names.
+
+### What is known to be wrong or untested
+
+- **The paper supplies the measures and no rule.** The ratio of share prices to the wage, the average set to 100, the two standard deviations and the ten years come from the paper. Steps 5 and 6 are our own: no fear at or below the average, a straight line, and complete fear at the limit.
+- **The share price is a stand-in.** Taking the capitalization of the top 100 for each of their employees as the price of a share is our own.
+- **The module knows only the run so far.** The authors look back over the whole record. Early in a run the index has hardly varied, so a slow steady rise can be read as standing at the limit. Waiting for thirty readings was meant to prevent this. With ten readings it happened in trials, and at the full count it happens with thirty as well (see below).
+- **The fear index is measured differently from the paper's.** The model has no months. The module correlates yearly changes over ten years, where the 2016 paper correlates monthly levels over twelve months and averages ten years of those.
+- **Holding the multiple still is our own.** The paper says that pricing comes to depend on current earnings. It does not say that forecasters stop correcting their forecasts.
+- **Resistance is not told.** The paper says that resistance is what turns the index back from its limit. This module tells the resistance module nothing, so only what the model already contains turns the index back.
+- **Only hype is tied to the index.** The paper also names the profit share, risk and the normal rate of return as things that become harder to move near the limit.
+- **Run alone, in trials.** These trials ran for 60 years from 60,000 firms, a fifth of the full count, so they show direction and not size. The run with the module alone was identical to the run without it. The fear index averaged 0.99. That is as it should be: without the hype module hype is 1 for every firm, so capitalization is current earnings divided by risk and the normal rate of return, and nothing in it looks forward.
+- **With the hype module, in trials.** With `link` at 0 the fear index averaged 0.39. The power index first reached its limit in the first bout of stagflation, at 2.7 standard deviations above its average in the year labelled 1920. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut. With `link` at 1 the fear index averaged 0.50. It stood at 0.66 in 1925 and 0.91 in 1930, against 0.34 and 0.63 with `link` at 0.
+- **Fear kept hype up during the bout.** In the same trial the hype of the top 100 did not fall back during the bout, because the multiples were held still. Their hype against the average was 1.27 in 1925 against 0.95, and differential capitalization was 478 against 346.
+- **The tie changes a run long after it acts.** In the trial a second bout came near 1945, and differential capitalization ended at 1,063 against 1,760. One run does not show whether that is a pattern.
+- **At the full count the limit is reached in the wave of mergers, not in a bout.** In one run of 60 years from 300,000 firms with the module alone, every printed figure equalled the run without it, and the fear index lay between 0.90 and 1.00 at every fifth year from the year labelled 1905. But the power index stood 2.2 standard deviations above its average in 1920, which is the first year in which the distance is reported. It stayed at or above the limit in 22 years. Until 1920 the index had only risen slowly and steadily as the top 100 grew by mergers. So thirty readings do not prevent a slow early rise from being read as the limit.
+- **With the hype module at the full count.** The degree of fear was 0.71 in 1920 and 0.88 in 1925, before the first bout, and 1 in 1930, during it. The index stood at or above the limit in 7 years. The fear index was minus 0.81 in 1920, 0.76 in 1925 and 0.93 or more at every fifth year from 1930. Differential capitalization was 2,138 in 1920, 3,545 in 1935 and 6,019 in 1950, against 2,138, 3,317 and 6,314 with the hype module alone.
+- **The module has not been run together with most other optional modules.**
+
+What should happen: without the hype module the run should be unchanged, and the fear index should stand near 1 in every year. With the hype module on and `link` at 0, the fear index should be well below 1, because multiples then move apart from current earnings. With `link` at 1, the fear index should be higher in the years when the power index stands above its average. The power index should reach its limit in a bout of stagflation, because a bout raises earnings for each employee faster than the wage.
+
+---
 
 ## Optional module: Capitalization against plant and equipment
 
-The module is in `modules/plant.py` and is switched on with `--with plant`. It is a readout. It changes no employees, no earnings, no hype, no risk and no price, and it adds no attribute to the claims. No module reads the numbers that it publishes, so the record of plant can never reach earnings or capitalization. No existing module was edited, and `core.py` was not changed.
+Name in the model: `plant`
 
-**Source.** *Capital as Power* (2009), chapter 10, the sections "Tobin's Q: adding intangibles", "Boom and bust: adding irrationality" and "The gods must be crazy", with Figures 10.2, 10.3 and 10.4 and the endnote on deflated series. Chapter 12, the passage on book value. Chapter 15, the section "Tobin's Q" with Figure 15.3, and the last note of the Data Appendix. The papers in `data/bn_archives/papers/` were searched for the words "Tobin" and "replacement cost". The 2001 regimes paper and the 2002 book on Israel repeat the argument of chapter 15, and no other paper on disk adds to it. The online archive was not searched for this module.
+Switch it on by adding `--with plant` to the command. It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it.
 
-**What the literature says.** Tobin's Q is a ratio that mainstream economists use to compare what owners pay for firms with what the firms' plant and equipment would cost to buy again. Figure 10.2 "takes the market value of all outstanding corporate stocks and bonds and divides it by the current replacement cost of corporate fixed assets (plant and equipment)". If capitalization were a mirror of plant, the ratio "should have been 1". The book reports that "the historical mean value of the series is not 1, but 1.24", and that "over the past 75 years it has oscillated between a low of 0.6 and a high of 2.8". The book finds no reason for the level: "the question remains as to why Tobin's Q should average 1.24, rather than 1.01 or 20". Figure 10.4 then compares the two growth rates, both "smoothed as 10-year moving averages". The book says: "The gyrations of capitalization, instead of amplifying those of 'real' assets, move in exactly the opposite direction." These are "very long-term waves of roughly 30-year duration", and "whenever the growth rate of 'real' assets decelerates, the growth rate of capitalization accelerates, and vice versa". The dates are given: "during the 1940s and 1970s, when the dollar value of 'real assets' expanded the fastest, capitalists saw their capitalization growth dwindle". The book does not accept that plant has a quantity at all: "a collection of capital goods cannot have a definite physical quantity". It makes the comparison only by assuming, for the sake of argument, "that the material quantity of capital goods (whether that quantity 'exists' or not) can be measured by their prices". Chapter 12 adds that "on the company books, physical assets are recorded not at current market value, but at cost", and that "the very cost of producing plant and equipment is already a manifestation of systemic conflict and struggle". Chapter 15 defines building: "we use the term 'green-field investment' to denote the purchase of newly produced plant and equipment. The production of these items is distinct from the process of accumulation." In a merger "no new capacity is created". Chapter 15 also reports that the ratio rises and falls together with the ratio of buying to building, and concludes that "Tobin's Q turns from a cause to a consequence: it goes up when investors happen to buy and down when they decide to build". The conclusion of chapter 10 is: "For the capitalist, the real thing is the nominal capitalization of future earnings. This capitalization is not 'connected' to reality; it is the reality." The literature gives the measure, three figures for its level, the ten-year smoothing and the length of the waves. It gives no rule for how much plant a new employee needs, for how plant wears out, or for the size of the opposite movement.
+### What it is about
 
-**Rule.** The rule has five parts.
+Most economics says that a firm is worth, in the end, what its factories and machines are worth. The book denies it. The module keeps a rough record, in money, of the plant and equipment that hiring has paid for. It then compares the capitalization of all firms with that record, year by year.
 
-1. In the first year the record of plant is set equal to all capitalization divided by a starting ratio, which is 1. The cost of plant for one employee, in the prices of the first year, is that record divided by the number of employees. That cost stays fixed in first-year prices for the whole run.
-2. Each year the module counts the employees who were newly hired in every industry that grew in the year before. The plant built for them costs their number, times the cost of plant for one employee, times the price level. The price level is the average price of all claims, weighted by their employees. A merger builds nothing, so a merger adds nothing to the record.
-3. Each year a fixed part of the plant wears out, here 5 per cent. The worn plant of employees who are still employed is replaced at current prices. Plant whose employees were dismissed wears out and is not replaced.
-4. The module keeps two records. The record at cost adds each year's building and replacement at the prices paid, and never revalues them. The record at current cost is revalued every year by the rise in the price level, which is what the book's "current replacement cost" does.
-5. The module publishes all capitalization divided by the record at current cost, which is the ratio of Figure 10.2. It publishes all capitalization divided by the record at cost. It publishes the mean, the lowest and the highest value of the first ratio so far. It publishes the yearly growth of capitalization and of the record at current cost, each averaged over the last ten years, as in Figure 10.4. It publishes the correlation between those two averaged growth rates over the last thirty years. It publishes the part of the record that has no employee. It publishes the correlation between the ratio and the ratio of employees acquired to employees hired, as in Figure 15.3.
+Think of a company whose buildings and machines would cost 1 billion to buy again, and whose shares and debts are priced at 3 billion. Economists call the ratio of the two, here 3, Tobin's Q. If capitalization mirrored plant, the ratio would be 1 and would stay there.
 
-A correlation of 1 means that two series rise and fall together. A correlation of minus 1 means that one rises when the other falls. The book's finding would appear as a correlation near minus 1 between the two growth rates. Every reading describes the start of the year, because a module sees only the ledger at the start of the step.
+The record can never affect a run. In the model, as in the book, a firm's capitalization comes from its earnings, its hype and its risk, and from nothing else.
 
-**Additions.** The ratio, the current-cost basis, the ten-year smoothing of the growth rates and the five-year smoothing of Figure 15.3 come from the book. The starting ratio of 1 is an addition. The book says the level of the ratio has no explanation, so the level in the model is a convention and only its movement carries meaning. The fixed cost of plant for one employee is an addition. The book denies that plant has a material quantity, and the model counts employees and nothing else, so the record is a count of employees hired, stated in money. Pricing plant at the average price of all claims is an addition. The yearly rate of wear is an addition, and so is the replacement of worn plant only where employees remain. Counting hiring industry by industry is an addition. Building new plant for every hire, even when idle plant stands elsewhere, is an addition. Taking the capitalization of all claims as "stocks and bonds" is an addition; the debt module divides the same earnings into interest and profit, so the claims in the ledger already capitalize both. The correlation coefficient and its window of thirty years are additions, because the book shows a chart and reports no coefficient. The record is one number for the whole ledger. A record held claim by claim would lose the plant of every acquired claim, because a merged claim keeps only the buyer's value of an added attribute. The module therefore cannot show the book's comparison of Microsoft with General Motors, and it cannot report the ratio for dominant capital alone. Employees hired by the force module and employees who arrive through privatisation are not counted as building.
+### What the theory says
 
-**Expected.** The run with the module should print exactly the table of the run without it. The ratio should leave 1 and should not return to it, because nothing in the model ties capitalization to plant. The book's opposite movement is not expected from the nine modules. In the model a bout of stagflation raises prices, which raises the record at current cost, and it raises markups faster than prices, which raises capitalization more. The two growth rates should therefore move together. In the record the 1940s and the 1970s were decades of fast price rises and of high interest rates and low share prices. The nine modules hold the normal rate of return fixed and hold hype at one, so the model has little that could lower capitalization while prices rise. The opposite movement might appear with the optional modules for the normal rate of return, for hype and for risk.
+The book, chapter 10, the sections "Tobin's Q: adding intangibles", "Boom and bust: adding irrationality" and "The gods must be crazy", with Figures 10.2, 10.3 and 10.4 and an endnote on series adjusted for prices; chapter 12, a passage on book value; chapter 15, the section "Tobin's Q" with Figure 15.3, and the last note of the Data Appendix.
 
-**What it showed.** These results come from runs at 60,000 starting claims. A run of 60 years with the module printed exactly the same table as the run without it, and a run with the modules listed in reverse order gave the same readings. In a run of 119 years the ratio rose from 1.00 to 1.24 during the merger wave, reached 2.98 in the first bout of stagflation near the year labelled 1930, fell back to 1.13 by 1955, and reached 3.08 in the last bout; its mean was 1.62, against the book's 1.24, 0.6 and 2.8. The two growth rates moved together and not in opposite directions: their correlation over thirty years lay between 0.27 and 0.99 in every reading taken at five-year intervals, and both were highest during stagflation, when capitalization grew by 16 per cent a year and the record by 7 per cent. The model therefore contradicts Figure 10.4, and the reason is the one given under Expected: its stagflation raises capitalization, where the stagflation of the 1940s and 1970s lowered it. With the module for the normal rate of return added, the ratio swung more widely (between 0.66 and 5.02) and the correlation stayed between 0.43 and 0.97; with the hype and risk shaping modules added it stayed between 0.45 and 0.72, so neither brought the opposite movement. The correlation with the ratio of buying to building had no steady sign (between minus 0.59 and 0.82), and it could not be computed in periods that include a year without net hiring.
+The measure and its level (chapter 10):
+
+- Figure 10.2 "takes the market value of all outstanding corporate stocks and bonds and divides it by the current replacement cost of corporate fixed assets (plant and equipment)". The replacement cost is what the plant would cost to buy again at today's prices.
+- If capitalization were a mirror of plant, the ratio "should have been 1".
+- In fact "the historical mean value of the series is not 1, but 1.24", and "over the past 75 years it has oscillated between a low of 0.6 and a high of 2.8".
+- The book finds no reason for the level: "the question remains as to why Tobin's Q should average 1.24, rather than 1.01 or 20".
+
+How the two grow (chapter 10, Figure 10.4):
+
+- Both growth rates are "smoothed as 10-year moving averages".
+- "The gyrations of capitalization, instead of amplifying those of 'real' assets, move in exactly the opposite direction."
+- These are "very long-term waves of roughly 30-year duration", and "whenever the growth rate of 'real' assets decelerates, the growth rate of capitalization accelerates, and vice versa".
+- The book gives the dates: "during the 1940s and 1970s, when the dollar value of 'real assets' expanded the fastest, capitalists saw their capitalization growth dwindle".
+
+What a record of plant is not:
+
+- The book holds that "a collection of capital goods cannot have a definite physical quantity".
+- The book makes the comparison only by assuming, for the sake of argument, "that the material quantity of capital goods (whether that quantity 'exists' or not) can be measured by their prices".
+- Chapter 12: "on the company books, physical assets are recorded not at current market value, but at cost", and "the very cost of producing plant and equipment is already a manifestation of systemic conflict and struggle".
+
+Building and buying (chapter 15):
+
+- The book defines building: "we use the term 'green-field investment' to denote the purchase of newly produced plant and equipment. The production of these items is distinct from the process of accumulation."
+- In a merger "no new capacity is created".
+- The ratio rises and falls together with the ratio of buying to building, so "Tobin's Q turns from a cause to a consequence: it goes up when investors happen to buy and down when they decide to build".
+
+The conclusion of chapter 10: "For the capitalist, the real thing is the nominal capitalization of future earnings. This capitalization is not 'connected' to reality; it is the reality."
+
+The book gives the measure, three figures for its level, the ten-year smoothing and the length of the waves. It gives no rule for how much plant a new employee needs, for how plant wears out, or for the size of the opposite movement.
+
+### What the module does each year
+
+The module keeps the record as one sum for the whole economy. In the steps below, the price level is the average price of all firms, weighted by their employees. A module sees the list of firms only as it stood at the start of the year, so every reading describes the start of the year.
+
+1. **In the first year it sets the record.** The record equals the capitalization of all firms. The module divides it by the number of employees and by the price level. The result is the cost of plant for one employee in first-year prices, and it stays fixed for the whole run.
+2. **Each later year it adds plant for the people hired.** It counts the people newly hired in every industry that grew in the year before. The plant built for them costs their number, times the cost for one employee, times the price level. A merger builds nothing, so it adds nothing.
+3. **Plant wears out.** Each year 5 per cent of the plant wears out. The worn plant of people who are still employed is replaced at today's prices. Plant whose employees were dismissed wears out and is not replaced.
+4. **It keeps the record in two ways.** The record at current cost is revalued every year by the rise in the price level, which is what the book's "current replacement cost" does. The record at cost adds each year's building and replacement at the prices paid and never revalues them, as a company's own books do.
+5. **It reports.** It publishes the capitalization of all firms divided by each record, the two growth rates, and how closely they move together. The table under "What it reads from other modules and what it gives them" lists the numbers.
+
+**An example.** In the first year all firms together have a capitalization of 5,000,000 and 1,000,000 employees, and the price level is 1.
+
+- The record is 5,000,000, and plant for one employee costs 5.
+- In the second year 20,000 people are hired in the industries that grew, and the price level is 1.04. New plant costs 20,000 × 5 × 1.04 = 104,000.
+- The record at current cost is first revalued to 5,000,000 × 1.04 = 5,200,000. Of that, 5 per cent wears out, which is 260,000. All of it belongs to people still employed, so all of it is replaced.
+- The record at current cost becomes 5,200,000 − 260,000 + 260,000 + 104,000 = 5,304,000.
+- The record at cost is not revalued. It becomes 5,000,000 − 250,000 + 260,000 + 104,000 = 5,114,000.
+- If capitalization is now 5,600,000, the ratio is 5,600,000 ÷ 5,304,000 = 1.06 at current cost and 1.10 at cost.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `start_ratio` | 1.0 | Capitalization divided by the record in the first year | Our own choice. It is the value the book says a mirror would give. |
+| `wear` | 0.05 | The part of the plant that wears out each year | Our own choice |
+| `smooth` | 10 | The number of years over which each growth rate is averaged | The book, Figure 10.4: "10-year moving averages" |
+| `window` | 30 | The number of years over which each correlation is taken | Our own choice. The book says its waves are "of roughly 30-year duration". |
+| `smooth_ratio` | 5 | The number of years over which the ratio and the ratio of buying to building are averaged before they are compared | The book, Figure 15.3, which shows 5-year moving averages |
+
+### What it reads from other modules and what it gives them
+
+It reads:
+
+- `industry_growth`, the growth in employment of each industry in the year before, and `new_hires`, the number of people newly hired, both from the green-field module (module 3)
+- `merger_volume`, the employees of the firms bought in the year as a part of all employees, from the merger module (module 4)
+- each firm's employees, industry, price and capitalization
+
+It publishes thirteen numbers. No module reads any of them.
+
+| Name in the code | What it is |
+|---|---|
+| `plant_ratio` | The capitalization of all firms divided by the record at current cost. This is the ratio of the book's Figure 10.2. |
+| `plant_ratio_at_cost` | The capitalization of all firms divided by the record at cost |
+| `plant_ratio_mean`, `plant_ratio_low`, `plant_ratio_high` | The average, the lowest and the highest value of `plant_ratio` so far |
+| `plant_record`, `plant_record_at_cost` | The two records |
+| `plant_built` | The plant built and replaced in the year |
+| `plant_idle` | The part of the record at current cost that has no employee |
+| `plant_growth_capitalization`, `plant_growth_record` | The yearly growth of capitalization and of the record at current cost, each averaged over the last ten years, as in Figure 10.4 |
+| `plant_growth_correlation` | The correlation between those two averaged growth rates over the last thirty years. A correlation of 1 means that two series rise and fall together, and minus 1 means that one rises when the other falls. The book's finding would show as a figure near minus 1. |
+| `plant_buy_build_correlation` | The correlation, over the last thirty years, between `plant_ratio` and the employees of firms bought divided by the people newly hired, both averaged over five years, as in Figure 15.3 |
+
+### What is known to be wrong or untested
+
+- **The book gives the measure and no rule for the record.** The ratio, the current-cost basis and the two smoothings are the book's. Everything else is our own.
+- **The starting ratio of 1 is a convention.** The book says the level of the ratio has no explanation. Only the movement of the ratio in a run carries meaning.
+- **The record is a count of people hired, stated in money.** The book denies that plant has a material quantity. The model counts employees and nothing else, so the module gives every employee the same fixed cost of plant.
+- **Plant is priced at the average price of all firms.** That is our own choice.
+- **The rate of wear is our own,** and so is replacing worn plant only where employees remain.
+- **Hiring is counted industry by industry,** so dismissals in one industry do not cancel building in another. New plant is built for every hire even when idle plant stands elsewhere.
+- **The capitalization of all firms stands for the book's "stocks and bonds".** The debt module (module 2) divides a firm's earnings into interest and profit, so the capitalization of a firm already covers both.
+- **The correlation and its thirty years are our own.** The book shows a chart and reports no figure.
+- **The record is one sum for the whole economy.** A record kept firm by firm would lose the plant of every firm that is bought. The module therefore cannot show the book's comparison of Microsoft with General Motors, and it cannot report the ratio for the largest firms alone.
+- **Some hiring is not counted as building:** people hired by the optional organised force module, and people who arrive through the optional privatisation module.
+- **The ratio leaves 1 and wanders, in trials.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. In a trial of 119 years the ratio rose from 1.00 to 1.24 during the wave of mergers. It reached 2.98 in the first bout of stagflation near the year labelled 1930, fell back to 1.13 by 1955, and reached 3.08 in the last bout. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut. The average was 1.62. The book's figures are 1.24, 0.6 and 2.8.
+- **The model contradicts the book's Figure 10.4.** In the same trial the two growth rates moved together and not in opposite directions. Their correlation lay between 0.27 and 0.99 in every reading taken at five-year intervals. Both were highest during stagflation, when capitalization grew by 16 per cent a year and the record by 7 per cent. The reason is that a bout of stagflation in the model raises prices, which raises the record, and raises markups faster than prices, which raises capitalization more. The book reports that in the 1940s and 1970s, when the value of plant grew fastest, the growth of capitalization dwindled.
+- **Three optional modules did not bring the opposite movement.** With the module for the normal rate of return added, the ratio swung between 0.66 and 5.02 and the correlation stayed between 0.43 and 0.97. With the hype and risk shaping modules added, it stayed between 0.45 and 0.72.
+- **The comparison with buying and building is unsteady.** In the trial the correlation of Figure 15.3 had no steady sign, between minus 0.59 and 0.82. It cannot be worked out for a period that includes a year without any net hiring.
+- **At the full count.** In one run of 60 years from 300,000 firms, every printed figure equalled the run without the module. The ratio rose from 1.00 to 1.24 by the year labelled 1930, reached 2.95 in the first bout near 1940 and fell back to 1.28 by 1950. Its average was 1.36. The ratio at cost reached 4.26. The correlation between the two growth rates was 0.98 in 1930 and 0.70 in 1950, so the two again moved together. Plant with no employee was at most 4 per cent of the record. The correlation of Figure 15.3 was 0.87 in 1925 and 0.76 in 1930, and could not be worked out afterwards.
+- **The order in which modules are listed makes no difference.** A trial run with the modules listed in reverse order gave the same readings.
+
+What should happen: the ratio should leave 1 and not return to it, because nothing in the model ties capitalization to plant. The book's opposite movement is not expected from the nine main modules. They hold the normal rate of return fixed and hold hype at 1, so the model has little that could lower capitalization while prices rise. The opposite movement might appear with the optional modules for the normal rate of return, for hype and for risk.
+
+---
 
 ## Optional module: Other measures of concentration
 
-The module is in `modules/concentration_measures.py` and is switched on with `--with concentration_measures`. It is a readout. It changes no employees, no earnings, no hype, no risk and no price, and it adds no attribute to the claims. No module reads the numbers that it publishes. No existing module was edited, and `core.py` was not changed. The table that `full.py` prints has no room for the new numbers, so the module file can be run by itself to print them: `.venv\Scripts\python.exe experiments\casp\model\modules\concentration_measures.py 60000 119`.
+Name in the model: `concentration_measures`
 
-**Source.** *Capital as Power* (2009), chapter 14, the sections "Dominant capital", "Aggregate concentration" and "Differential measures", with Equation (1), Table 14.1 and Figures 14.1 and 14.2. Chapter 15, the remark that new firms are smaller than the average, and the passage on the limit of merger. The papers in `data/bn_archives/papers/` were searched for the words "Gini", "Herfindahl" and "aggregate concentration". The two 2001 papers on regimes repeat the argument of chapter 14 in one sentence each. The other papers use the Gini index only for the incomes of persons. The online archive was not searched for this module.
+Switch it on by adding `--with concentration_measures` to the command. It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it. The table that `full.py` prints has no column for them. To print them every five years, run the module's own file: `python modules/concentration_measures.py 60000 119`, where the numbers are the number of firms at the start, the number of years and, if you add a third, the seed.
 
-**What the literature says.** There are several ways to measure how unequal firms are in size. Two of them use every firm. The Gini index is 0 when all firms are equal and close to 1 when one firm holds everything. The Herfindahl-Hirschman index adds up the square of every firm's share of the total. The book names both and sets them aside: "The most elegant solution is to not delineate it all, and instead use an integral index such as Gini or Herfindahl-Hirschman (HH). The advantage of these indices is that they take into account the entire distributional pattern of companies, so there is no need to set an arbitrary cut-off point. But integral indices also have two important deficiencies: they require detailed data that often do not exist, and they are difficult to reconcile intuitively with the binary notion of differential accumulation." The book then uses the hundred largest firms. Its first measure is aggregate concentration: "the per cent share of the top 100 firms ranked by market capitalization in the relevant corporate universe". It reports that "in the early 1950s, the top 100 firms accounted for 40 per cent of all market capitalization. By the early 2000s their share was 60 per cent", and that their share of profit rose from 23 to 53 per cent. The book then shows what this share is made of. Let s be the average size of a dominant firm, n the fixed number of dominant firms, S the average size of all firms and N the number of all firms. Equation (1) says that aggregate concentration equals (s / S) times (n / N). The book continues: "Over time these two ratios tend to trend in opposite directions. Whereas (s/S) tends to increase as large firms grow bigger while small firms do not, (n/N) tends to fall since the number of dominant-capital firms remains fixed while the overall number of firms keeps rising. In many instances, the rise in N is so fast that the aggregate concentration ratio ends up moving sideways or even down." The book says that the fall is misleading: "an increase in the number of small firms causes aggregate concentration to decline — yet that very increase fractures the sector even further, causing the relative power of dominant capital to rise". It concludes: "The relevant measure of power, therefore, is not aggregate but disaggregate. What we need to compare are not the totals, but the 'typical' units that make up those totals — i.e. the relevant (s/S) in Equation (1)." That ratio is the differential measure. The book reports that it rose from "nearly 7" to "around 35" for capitalization against listed firms, and from 1,667 to 31,325 for profit against all firms. Chapter 15 describes the opposite limit, in which large firms can only buy each other and "dominant capital has grown so big it is the average". The literature gives the share of the top hundred and the differential measure exactly. It gives no formula, no figure and no chart for the Gini index or the Herfindahl-Hirschman index. It describes the case in which the share falls while the differential measure rises. It does not describe a case in which the share rises while the differential measure falls.
+### What it is about
 
-**Rule.** The rule has seven parts.
+There are several ways to say how unequal firms are in size, and they can disagree. The module measures the same list of firms in four ways each year, so that you can watch the measures move apart.
 
-1. The dominant group is the hundred claims with the largest capitalization, ranked afresh each year. The same group is used for every measure.
-2. The share of the top hundred is the group's total divided by the total of all claims. The module computes it for capitalization, for earnings and for employees.
-3. The differential measure is the average of the group divided by the average of all claims. The module computes it for capitalization and for earnings.
-4. The number ratio is one hundred divided by the number of all claims. By Equation (1) the share equals the differential measure times the number ratio. The module publishes the change over the last year in the logarithm of each of the three. The change in the share is therefore always the sum of the other two changes.
-5. The Gini index is computed over all claims, for capitalization and for earnings.
-6. The Herfindahl-Hirschman index is computed over all claims, for capitalization and for earnings. The module also publishes 1 divided by the index. That number is the count of equal claims that would give the same index.
-7. The module counts the years so far in which the share of capitalization fell while differential capitalization rose, which is the case the book describes. It counts the years in which the share rose while differential capitalization fell. It also counts the years in which the top hundred's share of employees and differential capitalization moved in opposite directions.
+Think of a country where the 100 largest firms hold 40 per cent of everything. Then 100,000 small shops open. The share of the 100 falls a little, because the total has grown. Yet each of the 100 now towers over the typical firm by more than before, because the typical firm has become smaller. One measure says the giants lost ground. Another says they gained.
 
-Every reading describes the start of the year, because a module sees only the ledger at the start of the step. The module uses no random numbers.
+The book argues that the second measure is the one that shows power. That measure is the model's main result, differential capitalization.
 
-**Additions.** The share of the top hundred, the differential measure, the ranking by capitalization and Equation (1) come from the book. The size of the group, one hundred, is the book's and is the only setting. The formulas of the Gini index and the Herfindahl-Hirschman index are additions, because the book names the indices and does not write them out; the formulas used are the usual ones. Applying the two indices to the whole ledger, across all industries, is an addition. The Herfindahl-Hirschman index is commonly used inside one market, and the book speaks of "the entire distributional pattern of companies". The count of equal claims is an addition. The share of employees is an addition, because the book charts shares of capitalization and of profit only. The three counts of years are additions. The book says that the two indices are hard to reconcile with differential accumulation and does not say how. The module can therefore show how they move in the model, and it cannot say what the theory makes of them.
+### What the theory says
 
-**Expected.** The run with the module should print exactly the table of the run without it. During the merger wave all four measures should rise together, because mergers enlarge the largest claims and the number of claims grows slowly. After a bout of stagflation small claims are founded in great numbers. The book's case should then appear: the number ratio falls quickly, the share of the top hundred falls, and the differential measure rises. The Gini index should rise when many small claims are founded, because it counts every claim. The Herfindahl-Hirschman index should hardly notice them, because the square of a very small share is close to nothing. The earlier observation that the differential measure fell while the top hundred's share rose concerns the share of employees, which is the share that `full.py` prints. That share and differential capitalization can part for a second reason, which Equation (1) does not cover: capitalization also depends on earnings per employee and on risk.
+The book, chapter 14, the sections "Dominant capital", "Aggregate concentration" and "Differential measures", with Equation (1), Table 14.1 and Figures 14.1 and 14.2; chapter 15, a remark that new firms are smaller than the average, and a passage on the limit of merger.
 
-**What it showed.** These results come from runs at 60,000 starting claims. A run of 60 years with the module printed exactly the same table as the run without it, and the four checks of the core still passed. In a run of 119 years all the measures rose together during the merger wave: between the years labelled 1890 and 1920 the share of capitalization rose from 1.7 to 32 per cent, differential capitalization rose from 10 to 445, the Gini index rose from 0.43 to 0.75, and the count of equal claims fell from 31,400 to 890. The book's case appeared in the rush of founding after each bout of stagflation: between 1925 and 1930 the number of claims rose from 140,000 to 204,000, the share of capitalization fell from 30 to 21 per cent, and differential capitalization rose from 420 to 436; between 2000 and 2005 the share fell from 60 to 56 per cent while the differential measure rose from 3,424 to 4,851. The share of capitalization fell while the differential measure rose in 6 years of 118, and the reverse happened in 1 year. The top hundred's share of employees parted from differential capitalization far more often, in 29 years of 118; between 1920 and 1925, for example, the share of employees rose from 18 to 21 per cent while differential capitalization fell from 445 to 420, because the earnings per employee of the largest claims fell toward the average and their risk rose. The Gini index and the Herfindahl-Hirschman index followed the share of capitalization and not the differential measure: both fell between 1925 and 1930 and between 2000 and 2005, so the Gini index did not rise with the founding of small claims as expected.
+Two measures use every firm. The Gini index is 0 when all firms are equal and close to 1 when one firm holds everything. The Herfindahl-Hirschman index adds up the square of every firm's share of the total. The book names both and sets them aside:
+
+- "The most elegant solution is to not delineate it all, and instead use an integral index such as Gini or Herfindahl-Hirschman (HH). The advantage of these indices is that they take into account the entire distributional pattern of companies, so there is no need to set an arbitrary cut-off point. But integral indices also have two important deficiencies: they require detailed data that often do not exist, and they are difficult to reconcile intuitively with the binary notion of differential accumulation." Differential accumulation is the book's name for growing faster than the average.
+
+The book then uses the hundred largest firms. Its first measure is their share of the total, which it calls aggregate concentration:
+
+- It is "the per cent share of the top 100 firms ranked by market capitalization in the relevant corporate universe".
+- "In the early 1950s, the top 100 firms accounted for 40 per cent of all market capitalization. By the early 2000s their share was 60 per cent". Their share of profit rose from 23 to 53 per cent.
+
+The book shows what this share is made of. Let s be the average size of one of the largest firms, n their fixed number, S the average size of all firms and N the number of all firms. Equation (1) says that the share equals (s ÷ S) times (n ÷ N).
+
+- The book says that "over time these two ratios tend to trend in opposite directions. Whereas (s/S) tends to increase as large firms grow bigger while small firms do not, (n/N) tends to fall since the number of dominant-capital firms remains fixed while the overall number of firms keeps rising. In many instances, the rise in N is so fast that the aggregate concentration ratio ends up moving sideways or even down." Dominant capital is the book's name for the largest firms and their allies in government.
+- The fall is misleading: "an increase in the number of small firms causes aggregate concentration to decline — yet that very increase fractures the sector even further, causing the relative power of dominant capital to rise".
+- "The relevant measure of power, therefore, is not aggregate but disaggregate. What we need to compare are not the totals, but the 'typical' units that make up those totals — i.e. the relevant (s/S) in Equation (1)."
+
+That ratio, s ÷ S, is the differential measure. The book reports that it rose from "nearly 7" to "around 35" for capitalization against listed firms, and from 1,667 to 31,325 for profit against all firms.
+
+Chapter 15 describes the opposite limit, in which large firms can only buy each other and "dominant capital has grown so big it is the average".
+
+The book gives the share of the top hundred and the differential measure exactly. It gives no formula, no figure and no chart for the Gini index or the Herfindahl-Hirschman index. It describes the case in which the share falls while the differential measure rises. It does not describe a case in which the share rises while the differential measure falls.
+
+### What the module does each year
+
+In the steps below, "the top 100" are the 100 firms with the highest capitalization, ranked afresh each year. The same 100 are used for every measure. A module sees the list of firms only as it stood at the start of the year, so every reading describes the start of the year.
+
+1. **It works out the share of the top 100.** The share is their total divided by the total of all firms. The module works it out for capitalization, for earnings and for employees.
+2. **It works out the differential measure.** This is the average of the top 100 divided by the average of all firms. The module works it out for capitalization and for earnings.
+3. **It works out the number ratio.** This is 100 divided by the number of all firms. By the book's Equation (1), the share always equals the differential measure times the number ratio.
+4. **It splits the year's change in the share into two parts.** It publishes the change over the year in the logarithm of the share, of the differential measure and of the number ratio. The first always equals the sum of the other two. A change in a logarithm is close to the percentage change divided by 100.
+5. **It works out the Gini index** over all firms, for capitalization and for earnings.
+6. **It works out the Herfindahl-Hirschman index** over all firms, for capitalization and for earnings. It also publishes 1 divided by the index. That is the number of equal firms that would give the same index.
+7. **It counts the years in which measures parted.** It counts the years so far in which the share of capitalization fell while differential capitalization rose, which is the case the book describes. It counts the years in which the share rose while differential capitalization fell. It also counts the years in which the top 100's share of employees and differential capitalization moved in opposite directions.
+
+The module uses no random numbers.
+
+**An example.** There are 300,000 firms, and the top 100 hold 2 per cent of all capitalization.
+
+- The number ratio is 100 ÷ 300,000 = 0.00033.
+- The differential measure is 0.02 ÷ 0.00033 = 60. A typical top-100 firm is worth 60 times a typical firm.
+- A year later there are 330,000 firms, and the differential measure has risen to 63.
+- The share is now 63 × 100 ÷ 330,000 = 1.91 per cent. It has fallen although the differential measure rose.
+- In logarithms, the differential measure changed by +0.049 and the number ratio by −0.095. The share changed by their sum, −0.046.
+- The module adds one to its count of years in which the share fell while the differential measure rose.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `top` | 100 | How many firms count as the largest | The book, chapter 14 |
+
+### What it reads from other modules and what it gives them
+
+It reads each firm's employees, earnings and capitalization. It reads nothing that another module publishes.
+
+It publishes eighteen numbers. No module reads any of them.
+
+| Name in the code | What it is |
+|---|---|
+| `conc_claims` | The number of firms |
+| `conc_number_ratio` | 100 divided by the number of firms |
+| `conc_share_cap`, `conc_share_earnings`, `conc_share_employees` | The top 100's share of all capitalization, of all earnings and of all employees |
+| `conc_diff_cap`, `conc_diff_earnings` | The differential measure for capitalization and for earnings |
+| `conc_gini_cap`, `conc_gini_earnings` | The Gini index for capitalization and for earnings |
+| `conc_hh_cap`, `conc_hh_earnings` | The Herfindahl-Hirschman index for capitalization and for earnings |
+| `conc_hh_equal_claims` | 1 divided by the Herfindahl-Hirschman index for capitalization |
+| `conc_change_share`, `conc_change_diff`, `conc_change_number` | The year's change in the logarithm of the share of capitalization, of the differential measure and of the number ratio |
+| `conc_years_share_down_diff_up` | The years so far in which the share of capitalization fell while the differential measure rose |
+| `conc_years_share_up_diff_down` | The years so far in which the share rose while the differential measure fell |
+| `conc_years_apart_employees` | The years so far in which the share of employees and differential capitalization moved in opposite directions |
+
+### What is known to be wrong or untested
+
+- **The book supplies two of the four measures.** The share of the top hundred, the differential measure, the ranking by capitalization and Equation (1) are the book's. The formulas for the Gini index and the Herfindahl-Hirschman index are the usual ones. The book names the indices and does not write them out.
+- **The two indices are applied to the whole economy, across all industries.** The Herfindahl-Hirschman index is commonly used inside one market. The book speaks of "the entire distributional pattern of companies", so the module uses all firms.
+- **Four things are our own:** the number of equal firms, the share of employees, which the book does not chart, and the three counts of years.
+- **The module cannot say what the theory makes of the two indices.** The book says they are hard to reconcile with differential accumulation and does not say how. The module shows how they move in the model.
+- **The share of employees is not the share in Equation (1).** The table that `full.py` prints shows the top 100's share of employees. That share and differential capitalization can part for a reason that Equation (1) does not cover: capitalization also depends on earnings for each employee and on risk.
+- **All measures rose together during the wave of mergers, in trials.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. In a trial of 119 years, between the years labelled 1890 and 1920 the share of capitalization rose from 1.7 to 32 per cent, differential capitalization rose from 10 to 445, the Gini index rose from 0.43 to 0.75, and the number of equal firms fell from 31,400 to 890.
+- **The book's case appeared when many firms were founded.** In the model many small firms are founded after each bout of stagflation, which is a run of years in which the largest firms raise prices together while hiring is cut. In the same trial, between 1925 and 1930 the number of firms rose from 140,000 to 204,000, the share of capitalization fell from 30 to 21 per cent, and differential capitalization rose from 420 to 436. Between 2000 and 2005 the share fell from 60 to 56 per cent while the differential measure rose from 3,424 to 4,851. The share fell while the differential measure rose in 6 years of 118, and the reverse happened in 1 year.
+- **The share of employees parted from differential capitalization far more often,** in 29 years of 118 in that trial. Between 1920 and 1925, for example, the share of employees rose from 18 to 21 per cent while differential capitalization fell from 445 to 420. The earnings for each employee of the largest firms fell toward the average, and their risk rose.
+- **The Gini index did not behave as expected.** It was expected to rise when many small firms are founded, because it counts every firm. In the trial both indices followed the share of capitalization and not the differential measure: both fell between 1925 and 1930 and between 2000 and 2005.
+- **At the full count.** In one run of 60 years from 300,000 firms, every printed figure equalled the run without the module. Between the years labelled 1895 and 1930 the top 100's share of capitalization rose from 0.8 to 31 per cent, the differential measure rose from 29 to 3,027, the Gini index rose from 0.48 to 0.77, and the number of equal firms fell from 153,000 to 1,023. Between 1935 and 1940, after the first bout, the number of firms rose from 1.03 million to 1.34 million. The share fell from 33 to 22 per cent, and both indices fell with it. Over those five years the differential measure fell too, from 3,375 to 2,918, so the book's case does not show at five-year readings. It appeared in 3 single years of 59, and the reverse in none. The share of employees parted from the differential measure in 9 years.
+
+What should happen: during the wave of mergers all four measures should rise together, because mergers enlarge the largest firms and the number of firms grows slowly. When many small firms are founded, the book's case should appear: the number ratio falls quickly, the share of the top 100 falls, and the differential measure rises. The Herfindahl-Hirschman index should hardly notice the new firms, because the square of a very small share is close to nothing.

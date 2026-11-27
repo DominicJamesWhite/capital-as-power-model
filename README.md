@@ -77,7 +77,7 @@ Each module describes one way that power is used. Nine modules always run.
 | Envelope | Opens the boundaries between industries, sectors and countries, so that large firms can buy firms beyond them. |
 | Debt | Records lending. |
 
-About 34 more modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
+More than 30 other modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
 
 You can replace any module with a different version. This is deliberate. The theory describes relations between people, and there is often more than one reasonable way to write such a relation as a rule.
 
