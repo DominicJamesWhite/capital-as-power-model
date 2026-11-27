@@ -43,6 +43,10 @@ For example, take a firm with 1,000 employees that earns 2 for each of them. Hyp
 
 The formula comes from the book.
 
+A firm in the model is an owner of earnings, and nothing more. The model does not record what a firm makes. When one firm buys another, the two become one firm. After many mergers, a single firm in the model may stand for what you would call a group of companies.
+
+Debts are kept separately. The government's debt, corporate debt and household debt are each one running total, not firms in the list.
+
 ### The main result
 
 The main number the model reports is differential capitalization.
