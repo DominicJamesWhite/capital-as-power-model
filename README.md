@@ -22,6 +22,8 @@ The theory is set out in *Capital as Power: A Study of Order and Creorder* (2009
 
 This project is independent. The authors of the theory have not reviewed or endorsed it.
 
+The model was built with Claude.
+
 ## How the model works
 
 ### Firms
