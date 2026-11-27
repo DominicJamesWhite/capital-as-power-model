@@ -9,13 +9,19 @@ own conditions, and unemployment and the capitalist share of income are totals t
 The rule has five parts, each tied to a passage of the book (see modules.md):
   1. Earnings come from a markup.
   2. Where an industry is not concentrated, growth of capacity beyond the growth of the
-     working population wears the markup down (sellers undercut each other).
+     working population wears the markup down (sellers undercut each other). The growth
+     counted is the hiring that firms set out to do, so the markup also wears down when
+     firms seek more people than there are and bid against each other for them.
   3. Small firms expand while the markup is above the normal level and cut back below it.
   4. Where dominant capital holds an industry, entry is barred and the markup is held toward
      a target. Raising the markup costs the dominant firms some volume.
-  5. Unemployment weakens wages against prices, which raises markups everywhere.
+  5. Unemployment weakens wages against prices. Each level of unemployment has a level of the
+     capitalist share of income that goes with it, and markups move toward that level over
+     some years. The size and the delay come from the authors' measurements for the United
+     States ("Nonlinearities of the Sabotage-Redistribution Process", 2014; "Can Capitalists
+     Afford Recovery?", 2014).
 
-Every rate below is an addition to the book.
+Every other rate below is an addition to the book.
 """
 import numpy as np
 from core import ScaleComponent, Publish, top_positions, BASE
@@ -23,12 +29,12 @@ from core import ScaleComponent, Publish, top_positions, BASE
 
 class Sabotage:
     name = "sabotage"
-    reads = ("unemployment", "industry_growth")
+    reads = ("unemployment", "industry_growth", "industry_sought")
     supplies = ("hire_small", "hire_dominant", "entry_open")
     figures = {}           # nothing it supplies is a single yearly figure
 
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
-                 hold=0.1, wage_weakness=0.2, labour_holds_at=0.05, volume_cost=0.5,
+                 hold=0.1, share_gain=0.3, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
                  floor=0.005, top=100):
         self.normal_markup = normal_markup    # the markup at which small firms neither expand nor cut back
         self.target_markup = target_markup    # the markup dominant capital holds an industry toward
@@ -36,7 +42,9 @@ class Sabotage:
         self.response = response              # extra hiring by small firms per unit of markup above normal (part 3)
         self.hold = hold                      # yearly speed at which a fully held industry approaches the target (part 4)
         self.volume_cost = volume_cost        # employment given up by dominant firms per unit of price rise (part 4)
-        self.wage_weakness = wage_weakness    # rise in every markup per unit of unemployment above the level below (part 5)
+        self.share_gain = share_gain          # rise in the capitalist share that goes with each unit of unemployment above the level below (part 5)
+        self.gain_years = gain_years          # years that the share lags behind unemployment: each year 1 / gain_years of the gap is closed
+        self.standing = 0.0                   # the gain in the share that unemployment has brought so far, by industry
         self.labour_holds_at = labour_holds_at  # unemployment at which wages keep pace with prices: the strength of labour
         self.floor = floor                    # a markup cannot fall below this
         self.resistance_shift = 0.05          # rise in that level of unemployment at full resistance
@@ -85,7 +93,9 @@ class Sabotage:
     def propose(self, L, rng):
         n, held, markup = self.industry_state(L)
         g, u = L.shared["workforce_growth"], L.accounts["unemployment"]
-        growth = L.accounts["industry_growth"]
+        # Part 2 works on the hiring that firms set out to do. In a year when they sought more people than the
+        # working population held, they hired fewer than they sought, and they bid against each other for them.
+        growth = L.accounts.get("industry_sought", L.accounts["industry_growth"])
         # Firms that closed took their capacity out of the industry (the failure module). Their buyers turn to the
         # firms that are left, so the part of the industry's employees that closed firms had counts as growth
         # that did not take place; 0 when no firm failed.
@@ -95,7 +105,11 @@ class Sabotage:
         labour = L.accounts.get("labour_strength_by_industry", L.accounts.get("resistance", 0.0))
         holds_at = self.labour_holds_at + self.resistance_shift * labour
         holds_at = holds_at + L.accounts.get("second_country_labour", 0.0)       # a second country's own strength of labour (optional module); 0 without it
-        wages = self.wage_weakness * (u - holds_at)                               # part 5
+        # Part 5. Unemployment sets a level for the capitalist share, and the share moves toward it. What has
+        # been gained so far is remembered, so a year of unchanged unemployment adds only what is still missing.
+        gain = (self.share_gain * (u - holds_at) - self.standing) / self.gain_years
+        self.standing = self.standing + gain
+        wages = gain * (1 + markup) ** 2          # a share s is a markup of s / (1 - s), so a small rise ds of the share is ds (1 + markup)^2 of markup
         wages = wages + L.accounts.get("currency_markup", 0.0)                    # a devaluation raises prices against wages (optional currencies module); 0 without it
         undercut = -(1 - held) * self.erosion * (growth - g)                     # part 2
         grip = 1 - min(1.0, L.accounts.get("resistance", 0.0))                    # coordination weakens under resistance

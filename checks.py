@@ -344,7 +344,8 @@ def check_levels():
     """Every optional module that takes the place of no other, with the main modules, for 60 years.
 
     The check is a test and not a limit: nothing in the model holds a component inside the range
-    tested here. The run is made twice, with the core's netting of the record on and off."""
+    tested here. The run is made twice, with the core's netting of the record on and off. If the
+    core's guard stops the run, the years before the stop are tested."""
     import registry
     from stage2 import starting_ledger
     from full import all_modules
@@ -359,7 +360,10 @@ def check_levels():
         L = m.L
         low, high, furthest, base_low, base_high, beside = np.inf, 0.0, 0.0, np.inf, 0.0, 0.0
         for _ in range(60):
-            m.step()
+            try:
+                m.step()
+            except LedgerError:          # the guard stopped the run: the years so far are tested
+                break
             stacking = L.stacking_markup()
             low, high = min(low, stacking.min()), max(high, stacking.max())
             others = [n for n, c in L.info.items() if c.kind == "markup" and c.group is None and n != BASE]
@@ -371,6 +375,8 @@ def check_levels():
         result[netting] = dict(low=low, high=high, furthest=np.exp(furthest), base_low=base_low,
                                base_high=base_high, beside=beside, history=m.history, components=len(others) + 1)
     on, off = result[True], result[False]
+    assert len(on["history"]) == len(off["history"]) >= 20
+    ran = len(on["history"])
     # 1. The netting changes no markup: both runs give the same figures in every year, and the same division of the gain.
     for a, b in zip(on["history"], off["history"]):
         for key in "dk", "markup", "markup_top", "capital_share", "unemployment":
@@ -390,7 +396,8 @@ def check_levels():
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass it.
     assert off["furthest"] > width and off["beside"] > 1.0
-    print(f"11. Levels: with the main modules and {len(names)} optional modules on for 60 steps, the stacking part of "
+    print(f"11. Levels: with the main modules and {len(names)} optional modules on for {ran} steps"
+          f"{'' if ran == 60 else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
           f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
@@ -628,12 +635,15 @@ def check_sales_account():
         r1, r2 = m.step(), m.step()
     assert r1["published"]["unsold"] == 0.0 and r1["published"]["sold_part"] == 1.0     # the opening prices are all paid
     a = r2["published"]["sales_account"]
-    # Offered 1,180. Wage earners buy 1,000. Owners lay out last year's 150 and 5 x 4 = 20 for the new jobs. 10 is unsold.
+    # Offered 1,180. Wage earners buy 1,000. Owners were paid 150 at the start. Firms keep a quarter of the 150
+    # received, so the payout moves half of the way from 150 to 112.5: owners lay out 131.25. The new jobs are
+    # equipped for 5 x 3 = 15. Owners buy 146.25 and 33.75 is unsold.
     assert np.isclose(a["offered"], 1180.0) and np.isclose(a["bought_by_wage_earners"], 1000.0)
-    assert np.isclose(a["bought_by_owners"], 170.0) and np.isclose(a["unsold"], 10.0)
-    assert np.isclose(r2["published"]["unsold"], 10 / 1180) and np.isclose(r2["published"]["sold_part"], 170 / 180)
-    assert np.isclose(r2["published"]["sales_cut"], 10 / 1180)
-    lost = 10 / 180
+    assert np.isclose(a["owners_outlay"], 131.25) and np.isclose(a["building"], 15.0)
+    assert np.isclose(a["bought_by_owners"], 146.25) and np.isclose(a["unsold"], 33.75)
+    assert np.isclose(r2["published"]["unsold"], 33.75 / 1180) and np.isclose(r2["published"]["sold_part"], 146.25 / 180)
+    assert np.isclose(r2["published"]["sales_cut"], 33.75 / 1180)
+    lost = 33.75 / 180
     # The larger firm keeps its price and books the whole loss. The smaller takes half out of its price and books half.
     # (The core has set the price cut against the standing rise of the same firm, so the markup is tested.)
     assert np.allclose(L.markup_without(SHORTFALL), [0.18, 0.18 * (1 - 0.5 * lost)])
@@ -641,10 +651,24 @@ def check_sales_account():
     assert np.allclose(L.components[SHORTFALL], [1 - lost, (1 - lost) / (1 - 0.5 * lost)])
     assert np.allclose(L.e, [0.18 * (1 - lost), 0.18 * (1 - lost)])
     assert np.isclose(L.p[0], 1.18) and np.isclose(L.p[1], 1 + 0.18 * (1 - 0.5 * lost))
-    assert np.isclose(r2["capital_share"], 170.0 / 1170.0)          # unsold goods are income to nobody
+    assert np.isclose(r2["capital_share"], 146.25 / 1146.25)        # unsold goods are income to nobody
     with np.errstate(divide="ignore"):
-        r3 = m.step()                                               # owners now lay out the 170 they received
-    assert np.isclose(r3["published"]["sales_account"]["owners_outlay"], 170.0)
+        r3 = m.step()                                               # the payout moves half of the way to three quarters of the 146.25 received
+    assert np.isclose(r3["published"]["sales_account"]["owners_outlay"], 0.5 * 131.25 + 0.5 * 0.75 * 146.25)
+    # When the equipment of the new jobs costs at least what owners do not lay out, nothing is unsold: with 17
+    # new jobs, 131.25 + 51 covers the 180. With no new job, 48.75 is unsold. And when firms keep nothing,
+    # owners lay out the 150 they received, and 30 is unsold.
+    for jobs, retained, unsold in (17.0, 0.25, 0.0), (0.0, 0.25, 48.75), (0.0, 0.0, 30.0):
+        class Jobs(Push):
+            def propose(self, L, rng, jobs=jobs):
+                first, self.done = not self.done, True
+                return [ScaleComponent("push", 1.2 if first else 1.0, self.name),
+                        Publish("jobs_created", jobs if first else 0.0, self.name)]
+        m = Model(Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0]),
+                  [Jobs(), Sales(top=1, retained=retained)], top=1)
+        with np.errstate(divide="ignore"):
+            m.step()
+            assert np.isclose(m.step()["published"]["sales_account"]["unsold"], unsold)
 
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
@@ -653,7 +677,7 @@ def check_sales_account():
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
               "externalisation", "proletarianization", "wants"]]
-    years_unsold = years = 0
+    years_unsold = years = stopped = 0
     largest = 0.0
     for names in mixes:
         histories = []
@@ -661,7 +685,11 @@ def check_sales_account():
             m = Model(starting_ledger(0, 5000), all_modules() + registry.make(order), seed=0)
             kept = 0.0
             for step in range(60):
-                r = m.step()
+                try:
+                    r = m.step()
+                except LedgerError:      # the guard stopped the run: the years so far are tested
+                    stopped += 1
+                    break
                 a = r["published"]["sales_account"]
                 tol = 1e-9 * a["offered"]
                 bought = (a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
@@ -689,16 +717,19 @@ def check_sales_account():
                 largest = max(largest, a["unsold"] / a["offered"])
                 assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10)
             histories.append(m.history)
+        assert len(histories[0]) == len(histories[1]) >= 20
         for x, y in zip(*histories):
             assert x["dk"] == y["dk"] and x["capital_share"] == y["capital_share"] and x["unemployment"] == y["unemployment"]
             assert x["published"]["unsold"] == y["published"]["unsold"]
-    print(f"14. Sales account: with wages of 1,000, priced earnings of 180, owners who received 150 the year before "
-          f"and 5 new jobs at 4 years' wages each, owners buy 170 and 10 is unsold. The firm of dominant capital "
+    print(f"14. Sales account: with wages of 1,000, priced earnings of 180, owners who received 150 the year before, "
+          f"of which firms kept a quarter, a payout that follows half of the way, and 5 new jobs at 3 years' wages each, "
+          f"owners buy 146.25 and 33.75 is unsold. With 17 new jobs nothing is unsold. The firm of dominant capital "
           f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
-          f"share is 170 in 1,170. In {years} years of runs with the modules that move money, what was offered equalled "
+          f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
           f"record of transfers shows it had. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
-          f"what was offered. Opposite listing orders gave identical figures.")
+          f"what was offered. Opposite listing orders gave identical figures."
+          + (f" The guard stopped {stopped} of the 4 runs before the 60th year." if stopped else ""))
 
 
 def check_failure():
@@ -865,6 +896,38 @@ def check_payers():
           f"both sides of the sales account.")
 
 
+def check_unemployment_level():
+    """In the sabotage module a level of unemployment sets a level of the capitalist share, and not a yearly rise."""
+    from stage2 import starting_ledger
+    from modules.sabotage import Sabotage
+
+    class Steady:           # stands in for the green-field module: every industry sets out to hire as fast as the working population grows
+        name, supplies = "steady", ("industry_growth", "industry_sought")
+
+        def start(self, L):
+            return {"industry_sought": np.full(L.sector_of.size, L.shared["workforce_growth"])}
+
+        def propose(self, L, rng):
+            return []
+
+    shares = {}
+    for u in 0.05, 0.15:
+        L = starting_ledger(0, 3000)
+        L.shared["workforce"] = L.n.sum() / (1 - u)        # nobody is hired, so unemployment stays at this level
+        m = Model(L, [Sabotage(hold=0.0), Steady()], seed=0)   # with no holding toward a target, only unemployment moves a markup
+        shares[u] = [m.step()["capital_share"] for _ in range(40)]
+    still, slump = shares[0.05], shares[0.15]
+    # At the level where wages keep pace with prices, nothing moves.
+    assert max(still) - min(still) < 1e-12
+    # Ten points above it the share ends 3 points higher. A third of that comes in the first year,
+    # and after 40 years of the same unemployment the share has stopped rising.
+    assert abs(slump[0] - still[0] - 0.01) < 5e-4 and abs(slump[-1] - still[-1] - 0.03) < 1.5e-3
+    assert all(b > a for a, b in zip(slump[:10], slump[1:11])) and slump[-1] - slump[-2] < 1e-8
+    print(f"17. Unemployment and the share: with unemployment held at 5 per cent the capitalist share stays at "
+          f"{still[-1]:.4f} for 40 years. Held at 15 per cent it rises by {slump[0] - still[0]:.4f} in the first year "
+          f"and stands {slump[-1] - still[-1]:.4f} higher after 40 years, where it has stopped rising.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -882,4 +945,5 @@ if __name__ == "__main__":
     check_sales_account()
     check_failure()
     check_payers()
-    print("All sixteen checks passed.")
+    check_unemployment_level()
+    print("All seventeen checks passed.")

@@ -19,7 +19,7 @@ from core import Scale, Found, Set, Publish, top_positions
 class Greenfield:
     name = "greenfield"
     reads = ("hire_small", "hire_dominant", "entry_open")
-    supplies = ("new_hires", "jobs_created", "industry_growth")
+    supplies = ("new_hires", "jobs_created", "industry_growth", "industry_sought")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "new_hires": ("New hires", "number", "Employees added by hiring in the year."),
         "jobs_created": ("Jobs created", "number", "Employees added by the firms that grew, before the cutbacks of other firms are taken off."),
@@ -50,6 +50,9 @@ class Greenfield:
         jobs = rate * n
         up = jobs > 0
         jobs[up] *= 1 - min(1.0, A.get("hiring_drag", 0.0))      # money spent on buying is not spent on building
+        # What the firms of each industry set out to hire, before the size of the working population limits it.
+        # The sabotage module reads it: firms that seek more people than there are bid against each other.
+        sought = np.bincount(ind, jobs, k) / np.maximum(np.bincount(ind, n, k), 1e-12)
         room = workforce * (1 - self.floor) - employed - jobs[~up].sum()
         room = room - A.get("force_hires", 0.0)                  # military hiring planned for this year (optional module)
         room = room - A.get("privatisation_jobs", 0.0)           # privatised employees arrive with their jobs (optional module); 0 without it
@@ -86,6 +89,7 @@ class Greenfield:
                    Publish("jobs_created", float(jobs[up].sum()), self.name),
                    Publish("industry_growth", np.bincount(ind, jobs, k) / np.maximum(np.bincount(ind, n, k), 1e-12),
                            self.name),
+                   Publish("industry_sought", sought, self.name),
                    Scale("employees", 1 + kept / n, self.name)]
         if count.sum():
             n_j = np.maximum(np.bincount(ind, n, k), 1e-12)

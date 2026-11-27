@@ -142,6 +142,7 @@ What works:
 What does not work yet:
 
 - **Many modules together.** With most optional modules on, unemployment reaches levels that are not believable.
+- **The sales module.** With the optional `sales` module on, the first slump can end in collapse. `modules.md` says why.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
 - **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.

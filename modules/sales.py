@@ -14,8 +14,10 @@ firms sell.
   2. The government buys with what it collected in the year and did not pay out. An organ of
      government that a module names as a buyer, such as the armed forces, buys with all it
      received.
-  3. Owners lay out on goods what they received the year before, kept level against the wage,
-     and on top of that they pay for the equipment of the year's new jobs. Owners here are the
+  3. Owners lay out on goods what firms pay out to them, kept level against the wage. Firms
+     keep a part of what owners earn. What they pay out follows the rest part of the way each
+     year. The part that firms keep buys goods only as the equipment of the year's new jobs,
+     and that equipment is bought whether or not the part kept covers it. Owners here are the
      owners of the firms and every party that receives payments as a holder of debt.
   4. Firms buy from firms. A cost in a price that a module marks as laid out on what firms
      sell, such as the outlay on advertising, is collected from buyers and spent in the same
@@ -23,7 +25,7 @@ firms sell.
 
 What is left is unsold. Unsold goods are income to nobody: the wages were paid, so the whole
 shortfall falls on owners, and their money income of the year is the priced earnings less the
-unsold amount. That lower income is what they lay out the next year.
+unsold amount. What they are paid the next year follows that lower income.
 
 Owners then respond, and each response lowers the unsold amount:
 
@@ -68,18 +70,34 @@ with the argument. It then asks what a crisis is, and answers with the two condi
 WHAT IS ADDED
 
 The book gives no account of how much can be sold. Everything here is an addition: the account
-itself; that owners lay out what they received the year before; that the equipment of a new
-job is bought on top of it, and what it costs; that the shortfall falls on every firm in
+itself; that owners lay out all they are paid; that the equipment of a new
+job is bought on top of it; that the shortfall falls on every firm in
 proportion to its priced earnings; how far small sellers cut prices; that dominant capital
 cuts its hiring by the unsold part and buys firms in place of the jobs; and the number of
 years over which the two conditions are judged.
 
-One choice changes what the model says. A single owner saves, and the paper reports that
-owners "save most" of their income. But money saved is handed to somebody: to the seller of a
-firm, to a borrower, to a builder. The model has no rule by which owners as a class keep
-money idle for good, so by default they do not (`hoarded` is 0), and goods stay unsold only
-when priced earnings run ahead of what owners lay out. A value of `hoarded` above 0 is the
-reading of Kalecki and of Baran and Sweezy: that part of owners' income buys nothing, ever.
+THREE FIGURES FROM THE NATIONAL ACCOUNTS
+
+Neither the book nor the papers give the three figures the account needs, so they are measured
+from the national accounts of the United States for 1947 to 2019 (Bureau of Economic Analysis).
+
+  - `retained`, 0.25. Firms kept a quarter of owners' income: net saving of domestic business
+    divided by corporate profit before tax plus net interest, which is the capitalist income
+    of the book's Figure 12.2. In half of the years it lay between 0.20 and 0.29, and in all
+    of them between 0.12 and 0.37. The figure leaves out what owners save out of the income
+    paid to them, which the accounts do not separate from the saving of wage earners. If all
+    private saving were theirs it would be 0.70.
+  - `payout_follows`, 0.5. What was paid out (the same income less what firms kept), as a
+    part of private wages, kept 0.49 of its value of the year before, give or take 0.12,
+    and moved the rest of the way to the paid-out part of the income of the year before.
+  - `job_cost`, 3.0. The plant and equipment of private business, at what it would cost to
+    replace, came to 3.0 years of the wages and salaries that private business paid. In half
+    of the years it lay between 2.7 and 3.3, and in all of them between 2.5 and 3.6.
+
+With these figures the account is the one the paper reports from Kalecki and from Baran and
+Sweezy: the part of owners' income that is kept and not built with buys nothing, and that
+much stays unsold. Setting `retained` to 0 and `payout_follows` to 1 gives the other reading,
+in which owners as a class lay out all they receive a year late.
 
 WHAT IS LEFT OUT
 
@@ -127,17 +145,18 @@ class Sales:
         "crisis_of_capital": ("Crisis for capital", "index", "1 if either condition of accumulation fails, 0 if both hold."),
     }
 
-    def __init__(self, job_cost=4.0, price_give=0.5, held_back=1.0, buy_instead=1.0, hoarded=0.0,
-                 judged_over=5, significant=0.01, top=100):
+    def __init__(self, job_cost=3.0, price_give=0.5, held_back=1.0, buy_instead=1.0, retained=0.25,
+                 payout_follows=0.5,                 judged_over=5, significant=0.01, top=100):
         self.job_cost = job_cost        # money spent on equipment for each new job, in years of the wage
         self.price_give = price_give    # part of its shortfall that a price-cutting seller takes out of its markup within a year
         self.held_back = held_back      # fall in the hiring rate of a firm of dominant capital per unit of the unsold part
         self.buy_instead = buy_instead  # employees that such a firm seeks by purchase for each job it holds back
-        self.hoarded = hoarded          # part of owners' money income that is never laid out on anything
+        self.retained = retained        # part of owners' money income that firms keep; it buys goods only as the equipment of new jobs
         self.judged_over = judged_over  # years over which each condition of accumulation is judged
         self.significant = significant  # a fall smaller than this part of the level counts as steady
         self.top = top
-        self.standard = None            # what owners received last year, in years of the wage
+        self.payout_follows = payout_follows   # part of the gap between what owners are paid and the paid-out part of the last income that closes in a year
+        self.payout = None              # what owners are paid and lay out in a year, in years of the wage
         self.carried = {WAGE_EARNERS: 0.0, GOVERNMENT: 0.0}   # money that found no goods to buy last year
         self.dk, self.share = [], []    # differential capitalization and the capitalist share, year by year
         self.account = {}               # the last account, in money
@@ -158,8 +177,8 @@ class Sales:
         outlays = float((n * wage * L.outlays_on_firms()).sum())      # costs in prices that firms lay out on what firms sell
         goods = wages + priced                            # what is offered to wage earners, the government and owners
         offered = goods + outlays
-        if self.standard is None:                         # at the start, owners lay out what the opening prices give them
-            self.standard = priced / wage
+        if self.payout is None:                           # a run starts with everything sold: owners lay out what the opening prices ask
+            self.payout = priced / wage
 
         flows = A.get("party_flows", {})
         net = {p: f["received"] - f["paid"] for p, f in flows.items()}
@@ -174,7 +193,7 @@ class Sales:
         has_wages = max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0) + self.carried[WAGE_EARNERS]
         has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + organs + self.carried[GOVERNMENT]
         building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
-        outlay = (1.0 - self.hoarded) * self.standard * wage
+        outlay = self.payout * wage
 
         # What each bought. Wage earners and the government spend all they have. If that is more than
         # everything offered, each buys in proportion and keeps the rest of its money for next year.
@@ -188,7 +207,8 @@ class Sales:
         if unsold < 1e-12 * offered:                      # a rounding error is not unsold goods
             by_owners, unsold = rest, 0.0
         income = priced - unsold + to_firms + holders     # owners' money income of the year
-        self.standard = income / wage
+        # What is paid out to owners moves part of the way toward the paid-out part of the year's income.
+        self.payout += self.payout_follows * ((1.0 - self.retained) * income / wage - self.payout)
         return {"offered": offered, "wages": wages, "priced_earnings": priced,
                 "bought_by_wage_earners": by_wages, "bought_by_government": by_government,
                 "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
