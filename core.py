@@ -49,6 +49,13 @@ it received earlier and has not paid out, and what it receives in the same year.
 cannot pay, the receiver does not get. The net amount that each firm receives or pays under a
 module's transfers is entered by the core in an income component of that module.
 
+Two kinds of money are spent on goods and are therefore not transfers between the parties above.
+A module can name a party that spends all it receives, in the same year, on what firms sell: an
+organ of government that buys arms with a tax, for example. Such a party holds nothing. And a
+module can say of a cost component that firms lay the cost out on what other firms sell: the
+buyers pay it in the price, and the sellers receive it as part of their sales. The core only
+records both facts. A module that keeps an account of sales reads them.
+
 ADDITION TO THE LITERATURE. Nitzan and Bichler give no rule for how several sources of power
 over the same buyers combine. The division of the markup into named components, the choice of
 which components stack and which overlap, the rule for an overlap group, the convention
@@ -199,6 +206,7 @@ class Component:
                                     # so it is already counted in total income (used by the capitalist share)
     settled: bool = False           # income component only: the core sets it each year from the owner's transfers.
                                     # Every such income has a payer inside the model, so it adds nothing to total income.
+    bought_from_firms: bool = False # cost component only: firms lay this cost out on what firms of the ledger sell
 
 
 def group_value(values, part, discounts_overlap=False):
@@ -252,6 +260,7 @@ class Ledger:
         # only receives: the ledger does not follow what it does with the money.
         self.parties = {WAGE_EARNERS, GOVERNMENT}
         self.holds = {GOVERNMENT: 0.0}
+        self.buyers = set()      # the parties that spend all they receive, in the same year, on what firms sell
         self.overlap = {}        # for each overlap group, the part of a smaller premium's excess that counts
         self.discounts_overlap = set()   # the overlap groups whose discounts overlap as their premiums do (a switch for
                                          # comparisons; empty unless a run asks for it: every discount then counts in full)
@@ -268,18 +277,23 @@ class Ledger:
         self.extra[name] = np.broadcast_to(np.asarray(values), self.n.size).copy()
         self.extra_default[name] = default
 
-    def add_party(self, name, holds=False):
+    def add_party(self, name, holds=False, buys=False):
         """Name a party to transfers that is not a firm, such as a group of households. A module
         calls this in its start(). With holds=False the party only receives. With holds=True it
-        keeps what it receives and can pay it out later, as the government does."""
+        keeps what it receives and can pay it out later, as the government does. With buys=True
+        the party spends all it receives, in the same year, on what firms sell, and holds nothing."""
+        if holds and buys:
+            raise LedgerError(f"party '{name}': a party that spends all it receives cannot hold money")
         self.parties.add(name)
         if holds:
             self.holds.setdefault(name, 0.0)
+        if buys:
+            self.buyers.add(name)
 
     # ---- components
 
     def add_component(self, name, owner, kind="markup", group=None, default=None, values=None,
-                      paid_from_wages=False, transfers=False):
+                      paid_from_wages=False, transfers=False, bought_from_firms=False):
         """Register a component of earnings per employee. A module calls this in its start().
 
         kind    "markup" (neutral value 1), "income" (neutral value 0, in money per employee) or
@@ -292,6 +306,8 @@ class Ledger:
         transfers  income component only, and at most one for each module: the core sets it each
                 year to what each firm received less what it paid under the owner's Transfer
                 changes, for each employee. The owner cannot set it directly.
+        bought_from_firms  cost component only: firms lay this cost out on what firms of the ledger
+                sell, so the money is part of other firms' sales.
         The base markup exists from the start; registering it gives it its owner."""
         if kind not in ("markup", "income", "cost"):
             raise LedgerError(f"component '{name}': kind must be 'markup', 'income' or 'cost'")
@@ -308,8 +324,10 @@ class Ledger:
             raise LedgerError(f"module '{owner}' already has a component that records its transfers")
         if kind != "markup" and group is not None:
             raise LedgerError(f"component '{name}': only a markup component can be in an overlap group")
+        if bought_from_firms and kind != "cost":
+            raise LedgerError(f"component '{name}': only a cost component can be laid out on what firms sell")
         self.info[name] = Component(kind, owner, neutral, neutral if default is None else float(default),
-                                    group, bool(paid_from_wages), bool(transfers))
+                                    group, bool(paid_from_wages), bool(transfers), bool(bought_from_firms))
         start = neutral if values is None else values
         self.components[name] = np.broadcast_to(np.asarray(start, dtype=float), self.n.size).copy()
         if group is not None:
@@ -381,6 +399,14 @@ class Ledger:
         out = np.zeros(self.n.size)
         for name in sorted(self.components):
             if self.info[name].kind == "cost":
+                out = out + self.components[name]
+        return out
+
+    def outlays_on_firms(self):
+        """The costs that firms lay out on what firms of the ledger sell, for each employee, counted in wages."""
+        out = np.zeros(self.n.size)
+        for name in sorted(self.components):
+            if self.info[name].bought_from_firms:
                 out = out + self.components[name]
         return out
 

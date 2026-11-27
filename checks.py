@@ -1,4 +1,4 @@
-"""Fifteen checks of the model's bookkeeping. They test arithmetic, not the theory.
+"""Sixteen checks of the model's bookkeeping. They test arithmetic, not the theory.
 
 Checks 1 to 4 test the ledger and its measures. Checks 5 to 9 test the named components of
 earnings per employee. Check 10 tests the bookkeeping of the green-field module when it founds
@@ -10,6 +10,9 @@ account of who buys: what is offered equals what each buyer bought plus what is 
 buyer spends money that the record does not show it had. Check 15 tests the failure module: the
 interest that firms owe adds up, a firm that closes leaves the list, and a year in which some
 firms are bought and others close is divided among its sources with nothing left over.
+Check 16 tests that the money for military orders, for public employment, for burdens that firms
+shift onto others and for advertising has a payer and a receiver, and that the sales account
+counts each of them.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
@@ -649,7 +652,7 @@ def check_sales_account():
     from full import all_modules
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
-              "externalisation", "proletarianization"]]
+              "externalisation", "proletarianization", "wants"]]
     years_unsold = years = 0
     largest = 0.0
     for names in mixes:
@@ -661,20 +664,23 @@ def check_sales_account():
                 r = m.step()
                 a = r["published"]["sales_account"]
                 tol = 1e-9 * a["offered"]
-                bought = a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
+                bought = (a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
+                          + a["bought_by_firms"])
                 assert abs(a["offered"] - bought - a["unsold"]) <= tol
                 assert min(a["bought_by_wage_earners"], a["bought_by_government"], a["bought_by_owners"], a["unsold"]) >= 0
-                assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"], rtol=1e-12)
+                assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"] + a["bought_by_firms"], rtol=1e-12)
                 if step:      # the account is of the year before: set it against that year's record of transfers
                     last = m.history[-2]
                     parties, pub = last["parties"], last["published"]
                     net = {p: row["received"] - row["paid"] for p, row in parties.items()}
                     to_firms = sum(t["paid"] * ((t["receiver"] == "firms") - (t["payer"] == "firms"))
                                    for t in last["transfers"])
-                    holders = sum(row["received"] for p, row in parties.items() if p not in (WAGE_EARNERS, GOVERNMENT))
+                    organs = sum(row["received"] for p, row in parties.items() if p in m.L.buyers)
+                    holders = sum(row["received"] for p, row in parties.items()
+                                  if p not in (WAGE_EARNERS, GOVERNMENT) and p not in m.L.buyers)
                     lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
                     assert a["bought_by_wage_earners"] <= a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid + kept + tol
-                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + kept + tol
+                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept + tol
                     assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
                                                      + repaid - lent + tol)
                 kept = a["kept_for_next_year"]
@@ -690,7 +696,7 @@ def check_sales_account():
           f"and 5 new jobs at 4 years' wages each, owners buy 170 and 10 is unsold. The firm of dominant capital "
           f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
           f"share is 170 in 1,170. In {years} years of runs with the modules that move money, what was offered equalled "
-          f"what wage earners, the government and owners bought plus what was unsold, and no buyer spent more than the "
+          f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
           f"record of transfers shows it had. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
           f"what was offered. Opposite listing orders gave identical figures.")
 
@@ -788,6 +794,76 @@ def check_failure():
           f"part of the gain. In a run of 40 years from 5,000 firms, {closed:.0f} firms closed and {restructured:.0f} "
           f"of the largest were restructured.")
 
+def check_payers():
+    """The money for military orders, public employment, burdens off the books and advertising has a payer and a receiver."""
+    import registry
+    from stage2 import starting_ledger
+    from full import all_modules
+    from modules.force import ARMED_FORCES
+    from modules.wants import OUTLAY
+
+    # 1. By hand: a party that spends all it receives holds nothing, and it cannot also hold money.
+    L = Ledger(employees=[100.0, 100.0], epe=0.5, industry=[0, 0], sector_of_industry=[0])
+    L.add_party("buyer", buys=True)
+    assert "buyer" in L.buyers and "buyer" not in L.holds
+    try:
+        L.add_party("both", holds=True, buys=True)
+        raise AssertionError("a party that both holds and spends all was accepted")
+    except LedgerError:
+        pass
+    L.add_component("outlay", "x", kind="cost", values=0.25, bought_from_firms=True)
+    L.add_component("other cost", "x", kind="cost", values=0.5)
+    assert np.allclose(L.outlays_on_firms(), 0.25)          # only the cost that is laid out on what firms sell
+
+    # 2. A run with the four modules and the sales module.
+    names = ["sales", "force", "privatisation", "externalisation", "wants"]
+    m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
+    arms = pay = burdens = advertising = 0.0
+    kept = 0.0
+    for step in range(45):
+        outlay = float((m.L.n * m.L.shared["wage"] * m.L.components[OUTLAY]).sum())
+        r = m.step()
+        rows = {t["label"]: t for t in r["transfers"]}
+        parties = r["parties"]
+        tol = 1e-9 * r["employment"] * m.L.shared["wage"]
+        # The armed forces receive the tax for military orders and hold nothing.
+        tax = sum(rows[k]["paid"] for k in rows if k.endswith("for military orders"))
+        assert abs(parties[ARMED_FORCES]["received"] - tax) <= tol and parties[ARMED_FORCES]["holds"] is None
+        # The government pays public employees what it collected for them, and keeps nothing.
+        collected = sum(rows[k]["paid"] for k in rows if k.endswith("for public employment"))
+        assert abs(rows["pay of public employees"]["paid"] - collected) <= tol
+        assert abs(parties[GOVERNMENT]["holds"]) <= tol
+        # Wage earners pay for the burdens on employees and communities, in full.
+        b = rows["burdens borne by employees and communities"]
+        assert b["payer"] == WAGE_EARNERS and b["receiver"] == "firms" and abs(b["paid"] - b["asked"]) <= tol
+        # No firm paid more tax than it earned.
+        assert (m.L.e >= 0).all()
+        assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-9)
+        # The sales account of this year is of the year before.
+        a = r["published"]["sales_account"]
+        assert np.isclose(a["bought_by_firms"], outlay, rtol=1e-12)
+        assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"] + a["bought_by_firms"], rtol=1e-12)
+        if step:
+            last = m.history[-2]["parties"]
+            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept) <= tol
+            net = last[WAGE_EARNERS]["received"] - last[WAGE_EARNERS]["paid"]
+            assert abs(a["wage_earners_had"] - (a["wages"] + net) - kept_wages) <= tol
+        kept, kept_wages = 0.0, 0.0
+        if a["kept_for_next_year"] > 0:          # money that found no goods is split between the two; follow it from the account
+            kept = a["government_had"] - a["bought_by_government"]
+            kept_wages = a["wage_earners_had"] - a["bought_by_wage_earners"]
+        income = r["employment"] * m.L.shared["wage"] / (1 - r["capital_share"])
+        arms, pay = max(arms, tax / income), max(pay, collected / income)
+        burdens, advertising = max(burdens, b["paid"] / income), max(advertising, a["bought_by_firms"] / a["offered"])
+    assert arms > 0 and pay > 0 and burdens > 0 and advertising > 0
+    print(f"16. Payers: a party that spends all it receives holds nothing. In a run of 45 years from 5,000 firms with "
+          f"the sales, force, privatisation, externalisation and wants modules, the armed forces received exactly the "
+          f"tax for military orders (at most {arms:.1%} of all income) and the sales account counted it as bought by "
+          f"the government; the government paid public employees exactly the tax collected for them (at most "
+          f"{pay:.1%}); wage earners paid in full for the burdens on employees and communities (at most "
+          f"{burdens:.1%}); and the outlay on advertising (at most {advertising:.1%} of what firms offered) was on "
+          f"both sides of the sales account.")
+
 
 if __name__ == "__main__":
     check_stillness()
@@ -805,4 +881,5 @@ if __name__ == "__main__":
     check_transfers()
     check_sales_account()
     check_failure()
-    print("All fifteen checks passed.")
+    check_payers()
+    print("All sixteen checks passed.")

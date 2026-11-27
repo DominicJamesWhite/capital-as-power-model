@@ -910,11 +910,14 @@ A cost component enters the firm's price and never its earnings. "How the price 
 | wants premium | markup, hold on buyers | wants | The premium of a firm that holds more of its industry's buyers than of its capacity |
 | public debt income | income | public_debt | Interest received on the public debt less the tax paid towards it. The core fills it in from the module's payments. |
 | household interest | income | household_debt | Interest received from households. The core fills it in from the module's payment. |
-| burdens off the books | income | externalisation | What the firm gains from burdens it has shifted onto others |
+| burdens off the books | income | externalisation | What the firm gains from burdens it has shifted onto later years. Nobody pays it yet. |
+| burdens paid by wage earners | income | externalisation | What the firm gains from burdens it has shifted onto its employees and onto communities. The core fills it in from the module's payment. |
+| tax for military orders | income | force | The tax the firm pays for the year's military orders, as an amount below zero. The core fills it in from the module's payments. |
+| tax for public employment | income | privatisation | The tax the firm pays for the pay of public employees, as an amount below zero. The core fills it in from the module's payments. |
 | sales shortfall | markup, a group of its own | sales | The part of its priced earnings that the firm receives this year, after the loss it books for goods left unsold the year before. A value of 0.9 says a tenth is lost. It is set afresh every year and is 1 when everything was sold. |
 | cost difference | cost | cost cutting | How far the firm's cost for each employee stands below the wage (a saving, below 0) or above it (a lag, above 0) as a result of its yearly draws |
 | unsold goods carried | cost | sales | What the firm laid out on goods it did not sell. It equals what the sales shortfall takes from the markup, so the price does not move. |
-| outlay on wants | cost | wants | The outlay of the firm's industry on shaping what buyers want, for each employee |
+| outlay on wants | cost | wants | The outlay of the firm's industry on shaping what buyers want, for each employee. The module marks it as laid out on what other firms sell. |
 
 The base, the stagflation lead, the cost-cutting edge and the cost difference belong to main modules and are always present. The rest appear only when their optional module is on. Three markup components are marked "hold on buyers". The next part explains why they are treated differently. The sales shortfall is alone in a group of its own: it multiplies the markup like any other part, but it is a level that its module sets each year, so the core does not cancel it against the gains and losses of other modules.
 
@@ -1007,7 +1010,7 @@ A choice is needed only inside the overlap group, because its result depends on 
 
 ### How the capitalist share counts income
 
-The capitalist share is the earnings of all firms as a part of all income. The core counts each income once. A payment such as household interest has a payer whose income is already counted, so it adds nothing to all income. The gain from burdens off the books in the externalisation module is paid by nobody in the model, so it is added to all income.
+The capitalist share is the earnings of all firms as a part of all income. The core counts each income once. A payment such as household interest has a payer whose income is already counted, so it adds nothing to all income. In the externalisation module, the gain from burdens that fall on later years is paid by nobody in the model, so it is added to all income. The gain from burdens on employees and communities is paid by wage earners, so it is not.
 
 ### How the price is worked out
 
@@ -1066,7 +1069,7 @@ The model holds the book's "units per employee" at one for every firm, because i
 1. The cost of unsold goods is set at the start of a year. If another module moves the same firm's markup during that year, the firm's price moves by slightly more or less than that module intended. The model does not say what happened to the goods.
 2. The cost cutting rule wears away gains that have nothing to do with cost, and that wearing away is recorded as a fall of price.
 3. A cost component rises with the wage. For a firm that carries one, the price therefore rises by slightly less or more than the stagflation module intended. The book does not say what a cost other than the wage should follow.
-4. The outlay on wants is paid to nobody. It is worked out on the whole markup of an industry, premiums included. A firm founded during a year carries no outlay until the next year.
+4. The outlay on wants is worked out on the whole markup of an industry, premiums included. A firm founded during a year carries no outlay until the next year.
 5. The model has no count of goods. A firm that cuts its costs keeps its price here, where the book also allows it to sell more for each employee.
 6. A new firm's markup is still lower than its industry's by the year's rise in the wage (see module 3). Its price agrees with that markup.
 7. When two modules change one markup in one year, the core multiplies the two changes. With a markup of 0.10, a rise of 0.06 and a fall of 0.05 give 0.08 and not 0.11. The price follows the markup exactly, so the price is right for the markup that results. Whether that markup is what the two rules intended is a question about the rules.
@@ -1090,8 +1093,8 @@ The literature gives no rule for keeping such a record and no figure for any of 
 **The rule.**
 
 1. A module proposes a transfer with a label, a payer, a receiver and an amount. The core refuses a transfer with a side it does not know.
-2. A side is either firms or a party that is not a firm. The core knows two such parties from the start: wage earners and the government. A module may name more when the run starts. The public debt module names two: the richest one per cent of households, and holders of public debt that the module does not follow.
-3. No payer pays more than it has in the year. A firm has its earnings of the year before any transfer. Wage earners have the year's wages. The government has what it received in earlier years and did not pay out, plus what it receives this year. A party that a module names can only receive, unless the module says that it holds money as the government does.
+2. A side is either firms or a party that is not a firm. The core knows two such parties from the start: wage earners and the government. A module may name more when the run starts. The public debt module names two: the richest one per cent of households, and holders of public debt that the module does not follow. The force module names the armed forces.
+3. No payer pays more than it has in the year. A firm has its earnings of the year before any transfer. Wage earners have the year's wages. The government has what it received in earlier years and did not pay out, plus what it receives this year. A party that a module names can only receive, unless the module says that it holds money as the government does. A module can also say that a party spends all it receives, in the same year, on what firms sell. Such a party holds nothing. The armed forces are one: they spend the tax for military orders on those orders.
 4. A payer asked for more than it has pays each of its transfers in the same proportion. What a payer does not pay, the receiver does not get. So a government that collects less tax than it expected pays less interest.
 5. The core settles transfers after the year's hiring, markups and wage are known, and before the year's mergers. No firm can be charged more than it earned.
 6. What a firm receives in a year does not add to what it can pay in the same year. The result therefore does not depend on the order of the transfers.
@@ -1109,12 +1112,17 @@ The wage itself is not changed by a transfer. The government in this record is t
 | public debt | Six transfers. Firms and wage earners pay the tax to the government. The government pays the interest to firms, to wage earners (for the households outside the richest one per cent), to the richest one per cent of households, and to the holders that the module does not follow. |
 | household debt | One transfer: wage earners pay the interest and firms receive it. The money lent and the money repaid are not transfers; the module publishes both. |
 | sales | No transfer of its own. It reads the record, through `party_flows`, to work out what wage earners, the government and owners had to spend. |
+| force | Two transfers. Firms and wage earners pay a tax for the year's military orders to the armed forces, which spend it on the orders. |
+| privatisation | Three transfers. Firms and wage earners pay a tax to the government, and the government pays it to wage earners as the pay of public employees. |
+| externalisation | One transfer: wage earners pay firms for the burdens that firms have shifted onto employees and communities. |
 | risk shaping | No transfer of its own. It publishes what a bailout is worth, which is the capitalization that the bailout adds. Module 2 adds that amount to the government's debt. |
-| privatisation | No transfer of its own. Dominant capital pays a part of what the takeover is worth, and module 2 takes that amount off the government's debt. |
+| privatisation | No transfer for a takeover. Dominant capital pays a part of what the takeover is worth, and module 2 takes that amount off the government's debt. |
 
 Bailouts and takeovers do not appear as transfers of their own. In the literature a bailout is paid for with bonds, and the proceeds of a sale go to the government. Both change what the government owes. What the government owes is then paid for, year after year, by the tax for its interest, and the public debt module records that tax and that interest.
 
-**What is our own here.** A firm can pay out of its earnings of the year and not out of what it received the same year. A payer who cannot pay in full pays every transfer in the same proportion. The households outside the richest one per cent are counted as wage earners. A bailout is taken to be worth the rise in capitalization it brings. The bailout debt stands for ever, where the Israeli bonds ran for five years. The part of its worth that dominant capital pays for a takeover is a plain setting with no source (`price_part` in the privatisation module, one half).
+**Money that is spent on goods is not a transfer.** A cost in a price is paid by the buyer and received by whoever sells what the cost buys. A module can mark a cost as laid out on what other firms sell. The wants module does: chapter 9 reckons "a 15 per cent markup on these advertising expenditures", so the outlay on advertising is the sales of firms that sell advertising. The sales module counts such a cost as goods that firms buy from firms.
+
+**What is our own here.** The taxes for military orders and for public employment are one rate on wages and on every firm's earnings; no source says who pays either. Wage earners pay in money for burdens that firms shift onto employees and communities. A firm can pay out of its earnings of the year and not out of what it received the same year. A payer who cannot pay in full pays every transfer in the same proportion. The households outside the richest one per cent are counted as wage earners. A bailout is taken to be worth the rise in capitalization it brings. The bailout debt stands for ever, where the Israeli bonds ran for five years. The part of its worth that dominant capital pays for a takeover is a plain setting with no source (`price_part` in the privatisation module, one half).
 
 One number in the core is an allowance for rounding and not a rule. A firm that pays out all it has keeps one part in a million million of its earnings, because the sum that divides the year's gain among the modules cannot handle earnings of exactly nothing.
 
@@ -1123,8 +1131,8 @@ One number in the core is an allowance for rounding and not a rule. A firm that 
 1. With the public debt module off, the debt from bailouts is reported and nobody is taxed for it.
 2. The bailout debt is never repaid, and the worth of a bailout is counted again each year the bailout is renewed. In a run with 28 optional modules, where the crisis never ended, this debt passed a whole year's income.
 3. The price of a takeover has no source. The payment changes no firm, because the model does not follow who owns firms. Only the government's debt records it.
-4. The earnings on privatised employees are a markup and are paid in the price. The taxes that paid those employees before the takeover are not in the record.
-5. Three kinds of money still have a side missing: the gain from burdens off the books, the outlay on wants, and what the force and sovereign funds modules charge to nobody.
+4. The earnings on privatised employees are a markup and are paid in the price. What the government goes on paying to the firms that run a service after a takeover is not in the record.
+5. Two kinds of money still have a side missing: the gain from burdens that firms shift onto later years, which nobody pays, and what the sovereign funds module charges to nobody. Military orders are paid for by tax alone, and no bonds are sold for them.
 6. A tax is worked out at the start of the year and collected at the end. When earnings change a great deal in between, the two differ, and the public debt module publishes the amounts asked for and not the amounts paid.
 7. A firm that pays all it has is left with almost no earnings, and its capitalization falls with them. No rule says what should happen to such a firm.
 8. Wage earners lose part of their wages to tax and interest, and nothing in the model responds. The core publishes the loss so that a later rule can use it.
@@ -1158,7 +1166,7 @@ A different choice in any of these would give different results. None has been t
 
 The message gives the year, how many firms are affected, and which modules changed those firms that year. The guard tests for impossible values. It does not hold any number inside a range.
 
-**The checks.** `checks.py` runs fifteen tests of the bookkeeping. All must pass.
+**The checks.** `checks.py` runs sixteen tests of the bookkeeping. All must pass.
 
 | Check | What it tests |
 |---|---|
@@ -1175,8 +1183,9 @@ The message gives the year, how many firms are affected, and which modules chang
 | 11. Levels | With the main modules and the optional ones on for 60 years, no firm ends a year with a gain standing beside a loss, and no base lies above the highest markup seen in the run. |
 | 12. Price | A firm with a wage of 2, a base of 0.1, premiums of 1.5 and 1.2 in the overlap group and a cost component of 0.03 has a price of 2.36. The core refuses a direct change to a price. Every price equals the formula in every year. |
 | 13. Transfers | The worked examples of transfers above come out as stated. No transfer is paid above what was asked or above what its payer had. Runs with modules listed in opposite orders give identical figures. |
-| 14. Sales account | The worked example of the sales module comes out as stated. In every year of long runs, what firms offered equals what wage earners, the government and owners bought plus what was unsold, and no buyer spent more than the record of transfers shows it had. Opposite listing orders give identical figures. |
+| 14. Sales account | The worked example of the sales module comes out as stated. In every year of long runs, what firms offered equals what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the record of transfers shows it had. Opposite listing orders give identical figures. |
 | 15. Failure | The interest that firms owe adds up to the total that lenders take. A firm that closes leaves the list and its employees are without work. A top-100 firm that fails stays. With the module switched off nothing fails. When some firms are bought and others close in one year, the year's gain still divides with nothing left over. |
+| 16. Payers | The armed forces receive exactly the tax for military orders and hold nothing. The government pays public employees exactly the tax collected for them. Wage earners pay in full for the burdens on employees and communities. The outlay on advertising is on both sides of the sales account. |
 
 ---
 
@@ -1200,7 +1209,7 @@ Think of a town where a few families own all the shops. The shop workers spend t
 - **Holding back can go too far.** Strategic sabotage is the book's name for the way owners earn by limiting what industry makes. Figure 12.1 shows the capitalist share rising as industry is held back, and then falling: "When business sabotage becomes excessive, pushing output toward the zero mark, the result is recession and low capitalist earnings" (chapter 12). In the module, goods that nobody buys are earnings that owners do not receive.
 - **Large and small sellers respond differently.** The book reports Gardiner Means's finding on the 1930s. Competitive industries "saw massive declines in their market prices, but only moderate drops in their output and employment". In concentrated industries "prices declined slightly, while production and payroll collapsed" (chapter 12). In the module, firms outside the top 100 cut prices, and top-100 firms keep prices and hold back production.
 - **Buying in place of building.** When too much capacity threatens, "Mergers and acquisitions alleviate the problem whereas greenfield aggravates it" (chapter 14, Proposition 3). In the module, a top-100 firm seeks by purchase the employees it does not hire.
-- **The account is kept in money.** The book says there is no count of goods that does not rest on prices: "in order to compute the quantity we first need to know the price" (chapter 8). So the module never counts goods. What firms offer is the wages they pay plus the earnings they price for.
+- **The account is kept in money.** The book says there is no count of goods that does not rest on prices: "in order to compute the quantity we first need to know the price" (chapter 8). So the module never counts goods. What firms offer is the wages they pay, plus the earnings they price for, plus the costs in their prices that they spend on what other firms sell.
 - **Whose argument the account is.** The argument that goods stay unsold because owners do not spend their income belongs to Michal Kalecki and to Paul Baran and Paul Sweezy. The paper reports it: workers spend nearly all their income, while capitalists "save most of it", so a higher capitalist share means less spending. The authors say their evidence "certainly seems consistent" with it. They do not adopt it. They ask instead what a crisis is, and answer with the two conditions above.
 
 The book and the papers give no account of how much can be sold. The whole account below is our own. So is every rule for how owners respond, beyond the direction that the passages above give.
@@ -1209,9 +1218,9 @@ The book and the papers give no account of how much can be sold. The whole accou
 
 At the start of each year the module works out the account of the year just ended. Published numbers reach other modules a year late, so the responses follow a year after the goods were left unsold.
 
-1. **It adds up what firms offered.** This is all wages plus the earnings that firms priced for, which is each firm's wage bill times its markup.
+1. **It adds up what firms offered.** This is all wages plus the earnings that firms priced for, which is each firm's wage bill times its markup. If a module has marked a cost in prices as spent on what other firms sell, such as the outlay on advertising, that cost is offered too, and firms buy exactly that much from each other. It is never unsold.
 2. **It works out what wage earners bought.** Wage earners spend all the money they have. That is their wages, plus payments they received, less the taxes and interest they paid, plus what households borrowed, less what they paid back. The payments come from the core's record of transfers. The household debt module publishes the money lent and repaid.
-3. **It works out what the government bought.** The government spends what it collected in the year and did not pay out. It spends nothing that the record does not show.
+3. **It works out what the government bought.** The government spends what it collected in the year and did not pay out. A body that a module names as spending all it receives, such as the armed forces, spends all of it. Neither spends anything that the record does not show.
 4. **It works out what owners bought.** Owners lay out what they received the year before. The amount is kept level against the wage: if the wage has risen by 5 per cent, so has the outlay. On top of this, owners pay for the equipment of the year's new jobs, at 4 years of the wage for each job. Owners cannot buy more than is left after wage earners and the government have bought.
 5. **What is left is unsold.** The unsold part is the unsold amount divided by all that was offered. The wages were paid in full, so the whole loss falls on owners. Their money income for the year is the priced earnings less the unsold amount, plus the interest and other payments that firms and holders of debt received. That income is what they lay out next year.
 6. **Every firm loses the same part of its priced earnings.** The model has no account of which goods buyers want, so no firm is hit harder than another.
@@ -1269,7 +1278,7 @@ It publishes:
 | `bought_not_built` | The same rate, times `buy_instead` | The merger module |
 | `unsold` | The unsold part of all that was offered | Nobody |
 | `sold_part` | The part of priced earnings that owners received | Nobody |
-| `sales_account` | The whole account in money: what was offered, what each buyer had and bought, and what was unsold | Nobody. Check 14 tests it. |
+| `sales_account` | The whole account in money: what was offered, what each buyer had and bought, and what was unsold | Nobody. Checks 14 and 16 test it. |
 | `accumulation_differential` | 1 if the first condition holds, 0 if not | Nobody |
 | `accumulation_share` | 1 if the second condition holds, 0 if not | Nobody |
 | `crisis_of_capital` | 1 if either condition fails | Nobody |
@@ -1284,7 +1293,8 @@ With this module off, the green-field and merger modules take the two rates as z
 - **The cost of a new job is our own figure, and much rests on it.** At 4 years of the wage, a year of ordinary hiring pays for far more than firms add to their priced earnings, so nothing is unsold while firms hire. The book gives a rough figure that is much lower. Chapter 10 reports that corporate capitalization has averaged 1.24 times "the current replacement cost of corporate fixed assets (plant and equipment)". A job is capitalized at 1 year of the wage when a run starts, so its equipment would cost about 0.8 years. A lower cost leaves more unsold. In runs of 60 years from 30,000 firms with two seeds, peak unemployment with this module alone was 17 per cent at a cost of 4, 19 per cent at 2 and 24 per cent at 1. With the proletarianization module also on it was 21, 25 and 34 per cent.
 - **Every firm loses the same part of its priced earnings.** The model has no account of what buyers want. The theory rejects accounts of demand that rest on personal satisfaction, so one cannot simply be added.
 - **Money paid for firms buys nothing and takes nothing away.** It passes from owners to owners. The same holds for what top-100 firms pay for public services, which the government uses to retire debt.
-- **Some money has no payer and is left out.** Costs other than the wage are in prices and are paid to nobody. The gain from burdens off the books (externalisation module) is not counted as money that owners have. Military orders (organised force module) have no recorded payer, so the goods made for them are counted like any others. People in public employment (privatisation module) are outside the account.
+- **Two costs in prices and one income are left out.** The cost difference of the cost cutting module is a saving or a lag against the wage and is paid to nobody. The module's own cost for unsold goods is not a payment. The gain from burdens that firms shift onto later years (externalisation module) is an entry in a firm's accounts and not money, so owners cannot spend it.
+- **Public services are not goods on offer.** Public employees (privatisation module) are paid from a tax and spend their pay on what firms sell. What they make is not sold.
 - **The government's debt is a price and not a loan here.** The debt module puts a price on the government's interest. A rise in that price is not counted as borrowing, so the government spends only what it collects.
 - **Stagflation and the cost of unsold goods.** The stagflation module works out its price rise on a firm's markup and not on its costs, so a firm that carries unsold goods has its price raised by slightly less than intended.
 - **A second country.** The second country module runs in place of the merger module and does not read `bought_not_built`.
@@ -1809,10 +1819,11 @@ The arms contractors are the top-100 firms in sectors 0 and 1, which stand for a
 4. **The module plans military jobs for next year.** At full force, military spending is 15 per cent of all income, and the contractors receive 67 per cent of it. The module counts that spending as jobs with the contractors, equal to the same part of the working population. At a lower level of force the number is in proportion. The plan is the difference between that number and the military jobs that exist. One year's hiring may take at most half of the people who are out of work.
 5. **Other modules make room.** The green-field module sets the planned military hiring aside before it lets other firms hire, so employment cannot pass the working population. The contractors keep their markup while they grow.
 6. **The module publishes a rate of repression.** It is 15 per cent at full force, and less in proportion. The resistance module removes that part of the level of popular resistance each year.
+7. **A tax pays for the year's orders.** The orders are what the military jobs make, at the contractors' prices. The module charges one rate on all wages and on every firm's earnings, contractors included. Wage earners and firms pay it to the armed forces, which spend all of it on the orders. A firm cannot pay more than it earns. With military jobs at 4 per cent of the people employed, and the contractors' prices at the average, the rate is 4 per cent.
 
-The module raises no price and moves no earnings from one firm to another. The contractors gain in the book's differential sense: their part of the total rises.
+The module raises no price. The contractors gain in the book's differential sense: their part of the total rises, and every firm pays for the orders that only they receive.
 
-**An example.** The intensity of stagflation is 0.6 and the level of force is 0.3. The level rises by a third of the gap, to 0.4. Military jobs should now be 0.15 × 0.67 × 0.4 = 4.0 per cent of the working population. They are 2.0 per cent, so the module plans to hire another 2.0 per cent next year. Unemployment is 7 per cent. Half of the people out of work is more than 3 per cent of the working population, so the limit on hiring does not bind. The rate of repression is 0.15 × 0.4 = 6 per cent. If popular resistance stands at 0.30, the resistance module takes 0.018 off it.
+**An example.** The intensity of stagflation is 0.6 and the level of force is 0.3. The level rises by a third of the gap, to 0.4. Military jobs should now be 0.15 × 0.67 × 0.4 = 4.0 per cent of the working population. They are 2.0 per cent, so the module plans to hire another 2.0 per cent next year. Unemployment is 7 per cent. Half of the people out of work is more than 3 per cent of the working population, so the limit on hiring does not bind. The rate of repression is 0.15 × 0.4 = 6 per cent. If popular resistance stands at 0.30, the resistance module takes 0.018 off it. The tax for the 2.0 per cent of the working population already in military jobs is a little over 2 per cent of wages and of earnings, because the rate is worked out on the people employed and at the contractors' prices.
 
 ### Settings
 
@@ -1840,16 +1851,21 @@ It publishes:
 - `force`, the level of force, which the optional ownership of nature module reads
 - `force_jobs`, military jobs as a part of the working population, which the optional energy module reads
 - `force_contractors_top`, the contractors' part of the top 100's capitalization, for reporting
+- `force_tax`, the rate of the tax for military orders, for reporting
+
+It owns the income named "tax for military orders", which the core fills in with what each firm paid.
 
 ### What is known to be wrong or untested
 
 - **Every bout of stagflation becomes a war.** The rule makes force follow stagflation in proportion. The book says that depth "requires" more force. It does not say that force follows in proportion. Any likeness between a run and Figure 17.2 is therefore built in and is not a finding.
-- **Nobody pays for the military orders.** In the sources the government pays by taxing broadly and by selling bonds to large owners. The model can record such payments, and this module records none.
+- **The orders are paid for by tax alone, and the rule for the tax is our own.** Chapter 13 says that the government bond capitalizes "the power of government to tax", and that capitalists "financed 'national' wars to multiply their capitalization many times over". No source says how the tax for arms is divided, so the module uses one rate on all income, as the public debt module does. It sells no bonds, and the top 100 pay the same rate as everybody else.
+- **The tax can be twice what the settings describe.** At full force the settings give the contractors orders worth 10 per cent of all income, and the module counts them as 10 per cent of the working population in military jobs. The tax pays for what those jobs make at the contractors' prices. When the contractors' markup stands far above the average, the tax is larger. In runs of 60 years from 30,000 firms with every optional module on, the rate reached 20 and 21 per cent, and wage earners lost up to 27 per cent of their wages to taxes and interest in one year. Nothing in the model responds to that loss.
 - **Military spending is counted as jobs.** This is our own device. The model counts employees and has no record of sales.
-- **Force has no cost of its own.** Two costs arise in other modules. Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the cohesion of the top 100 in the compass, which limits the intensity of stagflation.
+- **Besides the tax, force has two costs, and both arise in other modules.** Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the cohesion of the top 100 in the compass, which limits the intensity of stagflation.
 - **Force does not add to price rises.** In trial runs that started with 60,000 firms, inflation was almost the same with and without the module. The book says that conflict contributes to inflation.
 - **Much of what the sources describe is missing.** Soldiers are not counted, so the armed forces take nobody out of the working population. Arms exports and buyers of arms abroad are not in the model, although Figure 17.2 measures exports. The destruction of war is not modelled. The module closes no boundary and slows no merger, although the 2006 paper says war harms the movement of capital. There is no popular resistance to war itself.
-- **Nobody is recorded as paying for military orders.** The optional module "What can be sold" therefore counts the goods made for them like any other goods. The wages of the people hired add to what wage earners spend, and no tax or loan is set against them. The two modules together cannot show the argument that military spending absorbs what cannot otherwise be sold.
+- **Military spending does not absorb unsold goods here.** The optional module "What can be sold" counts the armed forces as a buyer that spends the tax. The tax takes from wage earners and owners what the armed forces spend, so the orders add no spending of their own. Only borrowing for arms could, and the module has none.
+- **The figures below are from runs without the tax.** No run at the full count has been made with it for this module alone.
 - **With the coalitions module also on, the contractors grow beyond reason.** In a trial run their part of the top 100's capitalization reached 54 per cent, against 20 per cent with the coalitions module alone.
 - **Dismissals after one war may prepare the next bout.** In trial runs the contractors dismissed their extra employees over about 15 years after a bout. That kept unemployment up, which tightened the cohesion of the top 100 again and brought a second bout. A trial with repression alone gave no early second bout, and a trial with military hiring alone did. The full-size run described next ended ten years after its first bout, too soon to show this.
 - **What a full-size run shows.** In a run of 60 years from 300,000 firms, the first bout of stagflation looked like a war and not like a depression. In the figures printed every five years, unemployment peaked at 7.5 per cent, against 10.7 per cent without the module. It stood at 2.3 per cent while prices rose 7 per cent a year. Popular resistance peaked at 0.27, against 0.46. The top 100's part of all employees rose to 24 per cent during the bout, where without the module it fell to 17 per cent. Differential capitalization rose through the bout and ended at 9,859, against 8,121. After the bout unemployment stayed near 1.5 per cent, where the run without the module fell to 0.5 per cent, the lowest the model allows. With the coalitions module also on, differential capitalization ended at 7,917.
@@ -2691,7 +2707,8 @@ These sources give no rule and no rate for how fast public services are taken ov
 5. **The top 100 pay a price.** The worth of a takeover is the capitalization it adds to the top 100. The price is one half of the worth. The module publishes the price, and the debt module (module 2) reduces the government's debt by that amount in the following year. No firm's earnings change.
 6. **The takeover is not counted as new capacity.** The sabotage module (module 1) lowers markups in an industry where capacity grows faster than the working population. It does not see the takeover.
 7. **The government hires when the population resists.** While popular resistance is above 0, the government plans to hire some of the people who are out of work. The number is 10 per cent of those people, times the level of popular resistance. In the following year they leave the working population and join the pool.
-8. **It reports** the numbers listed below.
+8. **A tax pays the public employees.** Each person in the pool is paid the wage. The module charges one rate on all wages that firms pay and on every firm's earnings. Wage earners and firms pay it to the government, and the government pays it out as the pay of public employees. A firm cannot pay more than it earns. When the top 100 take over part of the pool, the tax falls for everybody.
+9. **It reports** the numbers listed below.
 
 **An example.** The working population is 30 million, so the pool starts at 1.5 million. The top 100 firms employ 2 million and are worth 100 million together. Cohesion is 0.4 and popular resistance is 0.1.
 
@@ -2700,6 +2717,7 @@ These sources give no rule and no rate for how fast public services are taken ov
 - Next year a top-100 firm with 20,000 employees receives 1,440 more.
 - The takeover adds 7.2 per cent to the employees of the top 100, so it is worth 7.2 million. The top 100 pay 3.6 million, and the government's debt falls by that much.
 - If 1.5 million people are out of work, the government plans to hire 0.1 × 0.1 × 1.5 million = 15,000 of them.
+- The 1.5 million public employees are paid 1.5 million wages. If firms pay 28 million wages and earn 4 million, the rate is 1.5 ÷ 32 = 4.7 per cent.
 
 ### Settings
 
@@ -2722,7 +2740,9 @@ It reads:
 - `resistance` from the resistance module (module 8)
 - `force_hires` from the optional organised force module, taken as 0 when that module is off. These are people the military plans to hire, and the government does not count them as out of work.
 
-It publishes eight numbers.
+It owns the income named "tax for public employment", which the core fills in with what each firm paid.
+
+It publishes nine numbers.
 
 | Name in the code | What it is | Who reads it |
 |---|---|---|
@@ -2734,6 +2754,7 @@ It publishes eight numbers.
 | `privatisation_rate` | The planned takeover as a part of the working population | Nobody |
 | `public_hiring_rate` | The planned public hiring as a part of the working population | Nobody |
 | `privatised_part_of_top` | The part of the top 100's employees that came from the pool | Nobody |
+| `public_pay_tax` | The rate of the tax of step 8 | Nobody |
 
 When the optional public debt module is on, a smaller government debt means less interest, less tax and less interest paid to the holders of the debt.
 
@@ -2743,7 +2764,9 @@ When the optional public debt module is on, a smaller government debt means less
 - **Step 6 is an interpretation.** The book says that green-field growth threatens prices because it adds capacity. Privatisation hires without building. The book does not draw that conclusion itself.
 - **Step 7 is wholly ours.** It exists so that the pool has a source inside the model. Setting `build` to 0 switches it off. Letting the pool grow with the working population is also ours.
 - **The price has no source.** The sources say "giving/selling" and "bargain prices" and give no figure. Using the proceeds to reduce the government's debt is ours.
-- **The taxes that pay public employees are not recorded.** The module cannot show the payments that the government goes on making to the firms that run the services.
+- **The rule for the tax is our own.** The book says that a government bond capitalizes "the power of government to tax" (chapter 13) and gives no rule for who pays for public services. One rate on all income is the rule of the public debt module. Public employees are paid the wage that firms pay, and pay no tax on it.
+- **After a takeover the government pays the firms nothing.** The tax for the service stops, and the firms earn a markup that buyers pay in the price. The book's footnote on government spending implies that the government goes on paying.
+- **The figures below are from runs without the tax.** No run at the full count has been made with it for this module alone.
 - **The sale of a state-owned firm as a whole firm is not modelled.** Only the takeover of employment is.
 - **The pool has no industries.** Privatised employees take the industry of the firm that receives them.
 - **The door opens widest at the wrong time.** The book places privatisation in a phase of breadth, beside mergers. In trial runs the door opened widest in the first year or two of a bout of stagflation, which is a run of years in which the top 100 raise prices together while hiring is cut. Unemployment had then raised cohesion, and resistance had not yet risen.
@@ -3436,7 +3459,7 @@ The module keeps two numbers for every firm. The outlay part is the part of its 
 4. **The module measures each firm's lead.** The lead is the firm's part of all the holds in its industry, divided by its part of the industry's employees, minus one. A firm with a lead above zero holds more of the buyers than of the capacity. The leads of an industry, weighted by employees, add up to zero. The rule counts no lead above 1.
 5. **A lead earns a premium.** The module works out how far each firm's markup should stand above or below the markup of its industry, as a fraction of that markup. The fraction is 0.2 times the lead, less the amount by which the firm's outlay part exceeds the average outlay part of its industry. A firm that spends more than its industry does on average pays the excess from its own earnings. The module then shifts every fraction in an industry by the same amount so that, weighted by employees, they add up to zero. What it gives to some firms it takes from the other firms of the same industry.
 6. **The premium is recorded as a part of the markup that the module owns.** This part is named "wants premium", and the module sets it afresh every year. A premium therefore ends in the year the lead is lost. The premium is one of three parts of a markup that are holds on the same buyers. The other two are the size premium of the optional price leaders module and the protection premium of the optional protections module. By default only the largest of the three counts in a firm's markup. "How markup components combine" explains this. The premium never takes a firm's markup below 0.005.
-7. **The industry's outlay goes into its prices.** The module owns a cost named "outlay on wants". Each year it sets that cost, for every firm of an industry, to the industry's average outlay part times the industry's markup. This is the industry's outlay for each employee, counted in wages. The core adds it to the wage and the markup when it works out the price. Buyers pay for their own persuasion.
+7. **The industry's outlay goes into its prices.** The module owns a cost named "outlay on wants". Each year it sets that cost, for every firm of an industry, to the industry's average outlay part times the industry's markup. This is the industry's outlay for each employee, counted in wages. The core adds it to the wage and the markup when it works out the price. Buyers pay for their own persuasion. The money goes to the firms that sell persuasion, which are firms of the model like any others, and the module tells the core so.
 8. **Held buyers are predictable buyers.** Each year a firm with a lead above zero loses a part of the amount by which its risk stands above 1. The part is 0.1 times the lead. A firm without a lead gets no relief.
 9. **It reports** five numbers, listed below.
 
@@ -3490,7 +3513,7 @@ It publishes five numbers. Nobody reads any of them.
 - **The whole gain of the large firms rests on one added number.** The power of 1.25 in step 2 is the only reason why a large firm gains a lead from the same outlay part as a small firm. No passage states it. In a trial run with the power set to 1, the 100 largest firms had a lead below zero and a markup 5 to 7 per cent below their neighbours.
 - **The rule that a trailing firm spends more is our own.** It applies the book's phrase "not to maximize but to exceed" to this one tool. In a trial run without it, the 100 largest firms gained about half as much markup, so half of their gain came from their lead and half from the extra outlay that small firms paid.
 - **The whole average outlay passes into the price.** No source says how much does.
-- **The outlay is paid to nobody.** The model does not tell the firms that sell persuasion apart from other firms. The 5 per cent of corporate income that the book ascribes to them does not appear.
+- **The sellers of persuasion are not told apart.** Buyers pay the outlay in the price, and firms that sell persuasion receive it as sales. Chapter 9 reckons "a 15 per cent markup on these advertising expenditures". The model does not say which firms these are, so the 5 per cent of corporate income that the book ascribes to them does not appear as theirs. With the optional sales module on, the outlay is counted as goods that firms buy from firms.
 - **The general effect is left out.** Chapter 9 describes a whole population made predictable for all sellers. The rule lets the gains cancel when all firms do the same.
 - **A firm's markup is not made steadier from year to year.** The relief of step 8 stands in for that. It is small: a trial run without it gave nearly the same result.
 - **A hold does not bar entry.** A new firm is founded as usual and then earns less than its neighbours for a few years.
@@ -3824,7 +3847,7 @@ The module measures a burden as a yearly amount for each employee of the firm, c
 4. **Each firm moves burdens off its books.** Each year a firm adds to the burden on each bearer 0.15 per cent of the wage for each employee, times the weakness of the bearer, times the firm's power, times the room left under a limit. The limit is 1.5 per cent of the wage for each bearer. A firm that already has 1.2 per cent on one bearer has a fifth of the room left.
 5. **Burdens on people return through resistance.** Each year a part of a firm's burdens on employees and on communities returns to its books. The part is 20 per cent times the level of popular resistance for a firm with no power beyond the 30 per cent that all have, and twice that for a firm with full power. This stands for uprisings, court rulings and campaigns, which pick out the prominent.
 6. **Burdens on later years return through disasters.** The burden on later years builds up, year by year, into a stock for each firm. The stock is counted in years of the wage for each employee. Each year each firm has a chance of a disaster equal to 5 per cent times its stock, and never more than 5 per cent. The module decides by a random draw from its own supply of random numbers. A disaster puts the firm's whole burden on later years back on its books, multiplies its risk by 1.8, and empties its stock. The emptied stock falls on the communities in that year.
-7. **The firm's earnings follow its burdens.** The module owns an income named "burdens off the books". Each year it sets that income, for each employee of a firm, to the wage times the burdens the firm has off its books. The income is kept apart from the firm's markup, and the firm's price does not change. Returns cannot take more than half of a firm's earnings for each employee in one year.
+7. **The firm's earnings follow its burdens, and wage earners pay for two of the three.** For each employee, the firm gains the wage times the burdens it has off its books. The gain from burdens on employees and on communities is paid by wage earners, in money and in the same year: they meet the cost that the firm did not. The module proposes it as a payment from wage earners to firms, and the core enters it in an income named "burdens paid by wage earners". The gain from burdens on later years is paid by nobody now living. It is an entry in the firm's accounts, named "burdens off the books": the firm reports higher earnings, and no money changes hands. Both incomes are kept apart from the firm's markup, and the firm's price does not change. Returns cannot take more than half of a firm's earnings for each employee in one year.
 8. **A return raises the firm's risk.** A return of step 5 raises the firm's risk by the fraction of its earnings that the return took away. Each year one fifth of the risk that this module has added to a firm fades.
 9. **Burdens feed resistance.** The module adds up the burdens that employees and communities bear in the year, and the stock that disasters released, and divides by the working population. It publishes 0.3 times the result. The resistance module (module 8) adds that number to the year's rise in popular resistance. Burdens on later years add nothing until a disaster releases them.
 10. **It reports** eleven numbers, listed below.
@@ -3835,7 +3858,7 @@ Nothing here comes from outside the model. The chance of a disaster is produced 
 
 - The weakness of communities is 1 − 0.2 = 0.8. The weakness of employees is 0.8 × 5 ÷ 10 = 0.4. The weakness of later years is 1.
 - The firm has full power. In the year it moves 0.0015 × 0.8 = 0.0012 onto communities, 0.0015 × 0.4 = 0.0006 onto its employees and 0.0015 onto later years.
-- Its earnings rise by 0.0033 for each employee, which is 33 in all.
+- Its earnings rise by 0.0033 for each employee, which is 33 in all. Wage earners pay 18 of it. The other 15 is the burden on later years, which nobody pays.
 - A very small firm has 30 per cent of that power and gains 0.001 for each employee.
 - Some years later the large firm has 0.01 on communities. With resistance at 0.2, the part that returns is 0.2 × 0.2 × 2 = 8 per cent, which is 0.0008 for each employee.
 - Its stock of burdens on later years has reached 0.4 years of the wage. Its chance of a disaster this year is 0.05 × 0.4 = 2 per cent. A disaster would multiply its risk by 1.8, so its capitalization would fall to 1 ÷ 1.8 = 0.56 of what it was.
@@ -3867,7 +3890,7 @@ It reads:
 - `unemployment`, which the core publishes
 - the wage, the size of the working population, and each firm's employees, earnings and capitalization
 
-It owns the income named "burdens off the books". Nobody in the model pays this income, so the core adds it to all income when it works out the capitalist share, which is the earnings of all firms as a part of all income.
+It owns two incomes. Nobody in the model pays "burdens off the books", so the core adds it to all income when it works out the capitalist share, which is the earnings of all firms as a part of all income. Wage earners pay "burdens paid by wage earners", so it adds nothing to all income.
 
 It publishes eleven numbers.
 
@@ -3897,9 +3920,10 @@ The resistance module reads 0 for the grievance when this module is off.
 - **Colonialism is in the title of the talk and is not in the rule.** The model has one country, so there is no bearer abroad. Nike's move of jobs to low-wage countries is absent for the same reason.
 - **Only the abstract of the talk was used.** The content of the talk itself was not available as text.
 - **The rule does not say what a burden is made of.** It cannot tell a poisoned river from an unsafe mine.
-- **The bearers lose nothing that the model counts.** Their wage and their employment are unchanged, and only their resistance responds.
+- **That wage earners pay in money is our own.** Cochrane says that the burdens are "imposed on vulnerable communities" and does not say in what form they are borne. Here wage earners pay the same amount that the firm gains. No bearer loses health, land or employment in the model.
+- **A burden that the state takes on is not told apart.** The book reports the view that the state "serves to absorb, temporarily or permanently, the bloating social cost of accumulation" (chapter 4, "The state imperative"). Here wage earners pay directly, and no tax is raised.
 - **A disaster strikes one firm.** Cochrane shows that the halt to drilling after the spill lowered the value of other oil companies as well.
-- **The income is paid by nobody.** It is one of the kinds of money in the model that has a receiver and no payer.
+- **The gain from burdens on later years is paid by nobody.** Reading it as an entry in the accounts and not as money is our own. With the optional sales module on, owners cannot spend it.
 - **The size of every effect follows from the added limit.** In trial runs the limit let burdens reach nearly a fifth of all earnings.
 - **The burden on later years never falls for the economy as a whole.** A firm struck by a disaster is free to begin again the next year.
 - **The standing resistance of quiet years is the grievance alone.** In a trial run with `grievance` at 0, popular resistance before the first bout of stagflation was the same as without the module. A bout of stagflation is a run of years in which the 100 largest firms raise prices together while hiring is cut.

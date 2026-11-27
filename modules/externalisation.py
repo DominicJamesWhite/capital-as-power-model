@@ -23,6 +23,13 @@ units of the yearly wage.
      weakness of the bearer, times the firm's power to shift, times the room left under a
      ceiling. Shifting a burden raises the firm's earnings per employee by the amount
      shifted times the wage. The price of the firm does not change.
+  4a. Who pays. The firm's gain from a burden on its employees or on communities is paid by
+     wage earners, in money and in the same year: they meet the cost that the firm did not.
+     The module proposes it as a payment from wage earners to firms, and the core settles it.
+     A firm with 100 employees that has shifted 1 per cent of the wage for each of them onto
+     communities receives one wage a year from wage earners. The gain from a burden on later
+     years is paid by nobody now living. It is an entry in the firm's accounts: the firm
+     reports higher earnings, and no money changes hands until a disaster returns the burden.
   5. Return by uprisings and court rulings. Each year a part of the burdens on employees and
      on communities returns to the books. The part is a rate times the level of popular
      resistance, and it is larger for a firm with more power, because campaigns pick the
@@ -117,6 +124,9 @@ the burdens fall on the vulnerable, and that they return through uprisings, cour
 disasters. It gives no rule and, apart from the fall of BP, no figure. Everything that turns
 these statements into numbers is added:
   - The three bearers and the rule that says how weak each is.
+  - Part 4a. Cochrane says that the burdens are "imposed on vulnerable communities" and does
+    not say in what form they are borne. That wage earners pay the same amount in money, and
+    that a burden on later years is an entry in the accounts and not money, are our own.
   - The measure of a firm's power to shift, and the part open to every firm. The book says
     that cost cutting does not let dominant capital beat the average. Cochrane calls
     externalisation a power process. The rule lets size count, which goes beyond the book.
@@ -135,8 +145,11 @@ WHAT IS MISSING
 Colonialism is in the title of the talk and is not in the rule. The model has one country, so
 there is no bearer abroad. Nike's shift of jobs to low-wage zones is absent for the same
 reason. The rule does not say what a burden is made of, so it cannot tell a poisoned river
-from an unsafe mine. The bearers do not carry the burden as a loss of anything in the ledger:
-their wage and their employment are unchanged, and only their resistance responds. A disaster
+from an unsafe mine. Employees and communities carry their burden as money that wage earners
+pay; no bearer loses health, land or employment in the ledger. A burden that the state takes
+on is not told apart: the book reports the view that the state "serves to absorb, temporarily
+or permanently, the bloating social cost of accumulation" (chapter 4, "The state
+imperative"), and here wage earners pay directly. A disaster
 strikes one firm. Cochrane shows that the drilling moratorium also lowered the value of
 other oil companies, and the rule has no such spread. The earnings from shifted burdens
 are an income component that this module owns. The core keeps them apart from the markup,
@@ -144,9 +157,11 @@ and the sabotage module does not read them as markup. The content of the talk be
 abstract is not used.
 """
 import numpy as np
-from core import Scale, SetComponent, Publish, top_positions
+from core import Scale, SetComponent, Publish, Transfer, top_positions, WAGE_EARNERS
 
-INCOME = "burdens off the books"   # this module's income component: what a firm gains for each employee from burdens it does not pay for
+INCOME = "burdens off the books"   # an income component: what a firm gains for each employee from burdens shifted onto later years
+PAID = "burdens paid by wage earners"   # an income component that the core sets: what a firm gains from burdens on employees and communities
+BORNE = "burdens borne by employees and communities"   # the transfer: wage earners pay, firms receive
 
 BEARERS = ("employees", "communities", "later_years")
 # Added per-firm numbers. Each holds one plus the quantity, because a change can only multiply.
@@ -197,8 +212,10 @@ class Externalisation:
     def start(self, L):
         for name in list(ON.values()) + [STOCK, MARK]:
             L.add_attribute(name, 1.0, 1.0)     # one plus zero: nothing is off the books at the start
-        # The gain is not paid out of wages or out of any other income in the ledger, so it counts as income of its own.
+        # The gain from burdens on later years is paid by nobody now living, so it counts as income of its own.
         L.add_component(INCOME, self.name, kind="income")
+        # The gain from burdens on employees and communities is paid by wage earners; the core records it here.
+        L.add_component(PAID, self.name, kind="income", transfers=True)
         return {key: 0.0 for key in self.supplies}
 
     def propose(self, L, rng):
@@ -245,8 +262,14 @@ class Externalisation:
         loss = loss_people + back["later_years"] * wage
         # The module sets its own income component: the burdens off the books times the wage. As
         # before, returns cannot take away more than a set part of earnings per employee in one year.
-        own = L.components[INCOME]
-        income = np.maximum(sum(new_x.values()) * wage, own - self.deepest_cut * e)
+        own = L.components[INCOME] + L.components[PAID]
+        whole = sum(new_x.values()) * wage
+        income = np.maximum(whole, own - self.deepest_cut * e)
+        # Part 4a: wage earners pay, in money, for the burdens that employees and communities bear. What
+        # falls on later years is paid by nobody yet: it stays an entry in the firm's accounts.
+        borne = (new_x["employees"] + new_x["communities"]) * wage
+        paid = np.where(whole > 0, borne * income / np.maximum(whole, 1e-300), 0.0)
+        income = income - paid
 
         # Parts 5 to 7: risk.
         new_mark = 1.0 + (mark - 1.0) * (1.0 - self.calm)
@@ -254,6 +277,8 @@ class Externalisation:
         new_mark = np.where(struck, new_mark * self.strike_risk, new_mark)
 
         changes = [SetComponent(INCOME, income, self.name),
+                   Transfer(BORNE, payer=WAGE_EARNERS, receiver=n * paid, source=self.name,
+                            amount=float((n * paid).sum())),
                    Scale("risk", new_mark / mark, self.name),
                    Scale(MARK, new_mark / mark, self.name),
                    Scale(STOCK, (1.0 + new_stock) / (1.0 + stock), self.name)]

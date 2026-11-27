@@ -4,16 +4,22 @@ THE RULE IN PLAIN WORDS
 
 The main modules take it that firms sell all they offer. This module keeps an account of
 who buys. Once a year it adds up, for the year just ended, the money that each party had and
-what that money bought. The account is kept in money: what firms offer is the wage bill plus
-the earnings they priced for.
+what that money bought. The account is kept in money: what firms offer is the wage bill, plus
+the earnings they priced for, plus the costs in their prices that they lay out on what other
+firms sell.
 
   1. Wage earners buy with all the money they have: the wage bill, plus the payments they
      received, less the taxes and interest they paid, plus what households borrowed, less what
      they paid back.
-  2. The government buys with what it collected in the year and did not pay out.
+  2. The government buys with what it collected in the year and did not pay out. An organ of
+     government that a module names as a buyer, such as the armed forces, buys with all it
+     received.
   3. Owners lay out on goods what they received the year before, kept level against the wage,
      and on top of that they pay for the equipment of the year's new jobs. Owners here are the
      owners of the firms and every party that receives payments as a holder of debt.
+  4. Firms buy from firms. A cost in a price that a module marks as laid out on what firms
+     sell, such as the outlay on advertising, is collected from buyers and spent in the same
+     year. It is on both sides of the account and is never unsold.
 
 What is left is unsold. Unsold goods are income to nobody: the wages were paid, so the whole
 shortfall falls on owners, and their money income of the year is the priced earnings less the
@@ -77,14 +83,14 @@ reading of Kalecki and of Baran and Sweezy: that part of owners' income buys not
 
 WHAT IS LEFT OUT
 
-Costs other than the wage are in prices and are paid to nobody the model follows; they are
-left out of both sides of the account. Money paid for firms that are bought, and money that
-dominant capital pays for public services, pass from owners to owners (the government retires
-debt with it), so they buy no goods and take none away. The gain from burdens off the books
-(optional module) is paid by nobody and is not counted as money that owners have. Military
-orders (optional module) have no recorded payer, so the goods made for them are counted like
-any others. People in publicly run employment are outside the list of firms and outside the
-account.
+Money paid for firms that are bought, and money that dominant capital pays for public
+services, pass from owners to owners (the government retires debt with it), so they buy no
+goods and take none away. Two costs in prices are not payments to anybody and are left out:
+the difference that cost cutting makes to a firm's costs, which is a saving or a lag against
+the wage, and this module's own entry for goods left unsold. The part of the gain from burdens
+off the books (optional module) that falls on later years is an entry in a firm's accounts
+and not money, so owners cannot spend it. The services of public employees are not sold, so
+they are not among the goods offered; their pay is counted with what wage earners have.
 """
 import numpy as np
 from core import ScaleComponent, SetComponent, Publish, top_positions, WAGE_EARNERS, GOVERNMENT
@@ -149,30 +155,34 @@ class Sales:
         wage, n = L.shared["wage"], L.n
         wages = float(wage * n.sum())
         priced = float((n * wage * asked).sum())          # the earnings that the firms priced for
-        offered = wages + priced
+        outlays = float((n * wage * L.outlays_on_firms()).sum())      # costs in prices that firms lay out on what firms sell
+        goods = wages + priced                            # what is offered to wage earners, the government and owners
+        offered = goods + outlays
         if self.standard is None:                         # at the start, owners lay out what the opening prices give them
             self.standard = priced / wage
 
         flows = A.get("party_flows", {})
         net = {p: f["received"] - f["paid"] for p, f in flows.items()}
-        holders = sum(flows[p]["received"] for p in sorted(flows) if p not in (WAGE_EARNERS, GOVERNMENT))
+        organs = sum(flows[p]["received"] for p in sorted(flows) if p in L.buyers)     # parties that spend all they receive
+        holders = sum(flows[p]["received"] for p in sorted(flows)
+                      if p not in (WAGE_EARNERS, GOVERNMENT) and p not in L.buyers)
         to_firms = sum(float((n * L.components[name]).sum())           # what firms received less what they paid
                        for name in sorted(L.info) if L.info[name].settled)
         lent, repaid = float(A.get("household_debt_lent", 0.0)), float(A.get("household_debt_repaid", 0.0))
 
         # What each party had to spend.
         has_wages = max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0) + self.carried[WAGE_EARNERS]
-        has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + self.carried[GOVERNMENT]
+        has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + organs + self.carried[GOVERNMENT]
         building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
         outlay = (1.0 - self.hoarded) * self.standard * wage
 
         # What each bought. Wage earners and the government spend all they have. If that is more than
         # everything offered, each buys in proportion and keeps the rest of its money for next year.
         first = has_wages + has_government
-        part = min(1.0, offered / first) if first > 0 else 1.0
+        part = min(1.0, goods / first) if first > 0 else 1.0
         by_wages, by_government = has_wages * part, has_government * part
         self.carried = {WAGE_EARNERS: has_wages - by_wages, GOVERNMENT: has_government - by_government}
-        rest = max(offered - by_wages - by_government, 0.0)
+        rest = max(goods - by_wages - by_government, 0.0)
         by_owners = min(outlay + building, rest)
         unsold = rest - by_owners
         if unsold < 1e-12 * offered:                      # a rounding error is not unsold goods
@@ -181,7 +191,7 @@ class Sales:
         self.standard = income / wage
         return {"offered": offered, "wages": wages, "priced_earnings": priced,
                 "bought_by_wage_earners": by_wages, "bought_by_government": by_government,
-                "bought_by_owners": by_owners, "unsold": unsold,
+                "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
                 "wage_earners_had": has_wages, "government_had": has_government,
                 "owners_had": income + repaid - lent, "owners_income": income,
                 "owners_outlay": outlay, "building": building, "lent": lent, "repaid": repaid,

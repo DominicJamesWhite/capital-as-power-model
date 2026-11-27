@@ -46,6 +46,13 @@ is able to act in concert, and popular resistance holds the pool shut and adds t
   7. Readouts. The module publishes the pool as a part of all working people, the door, the
      planned takeover and the planned public hiring as parts of the working population, and
      the part of the top hundred's employees that came from the pool.
+  8. Who pays public employees. Each person in the pool is paid the wage. A tax of the same
+     year pays for it: one rate on the wage bill of the firms and on every firm's earnings.
+     Wage earners and firms pay the tax to the government, and the government pays it out to
+     wage earners as the pay of public employees. A firm cannot pay more than it earns. With
+     a pool of 5 per cent of the working population, the rate is a little under 5 per cent.
+     When dominant capital takes over part of the pool, the tax falls for everybody. The
+     module publishes the rate.
 
 Nothing in the rule comes from outside. Cohesion comes from the compass, resistance from the
 resistance module, and the pool is filled and emptied only by those two.
@@ -119,16 +126,21 @@ says that the welfare state was built after the Great Depression and does not sa
 it. Part 6 gives the pool a source inside the model, and its rate can be set
 to zero. Letting the pool grow with the working population is an addition.
 
+Part 8 is an addition. The book says that a government bond capitalizes "the power of
+government to tax" (chapter 13), and gives no rule for who pays the tax for public services.
+One rate on all income is the rule of the public debt module. That a public employee is paid
+the wage of the firms is an addition.
+
 In part 4a, the part of the worth that is paid is a plain setting
 with no source. Its default of one half is the middle between giving and selling at full
 worth, and nothing more. Using the proceeds to retire debt is an addition.
 
 WHAT IS MISSING
 
-The taxes that pay public employees are not recorded as transfers, so the module cannot show
-the payments that government organs go on making to the firms that now run the services.
-The earnings on privatised employees come from a markup, and whoever buys the services pays
-it in the price, as with every markup in the model. The
+The module does not show the payments that government organs go on making to the firms that
+now run the services. Once a service is taken over, the tax for it stops, and the earnings on
+privatised employees come from a markup, which whoever buys the services pays in the price,
+as with every markup in the model. Public employees pay no tax on their own pay. The
 sale of state-owned firms as whole firms is not modelled, only the takeover of employment.
 The pool has no industries: privatised employees take the industry of the firm that receives
 them. The book places privatisation in a breadth phase, beside mergers, and this rule does not
@@ -137,7 +149,12 @@ Privatisation provokes no resistance of its own, which follows the book's remark
 population is "impartial to breadth", and may be too kind.
 """
 import numpy as np
-from core import Scale, Publish, top_positions
+from core import Scale, Publish, Transfer, top_positions, WAGE_EARNERS, GOVERNMENT
+
+TAX = "tax for public employment"       # this module's income component: what each firm pays, for each employee; the core sets it
+TAX_EARNINGS = "tax on earnings for public employment"
+TAX_WAGES = "tax on wages for public employment"
+PAY = "pay of public employees"
 
 
 class Privatisation:
@@ -145,7 +162,7 @@ class Privatisation:
     reads = ("cohesion", "resistance")
     supplies = ("privatisation_jobs", "public_workforce_change", "public_pool", "privatisation_door",
                 "privatisation_rate", "public_hiring_rate", "privatised_part_of_top",
-                "privatisation_proceeds")
+                "privatisation_proceeds", "public_pay_tax")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "privatisation_jobs": ("Public jobs taken over", "number", "Takeover planned for the year, in employees."),
         "public_workforce_change": ("Change in public employment", "number", "Planned takeover less planned public hiring, in employees."),
@@ -155,6 +172,7 @@ class Privatisation:
         "public_hiring_rate": ("Public hiring rate", "rate", "Planned public hiring as a part of the working population."),
         'privatised_part_of_top': ('Top 100 employees from privatisation', 'share', "Part of the top 100's employees that came from the public pool."),
         'privatisation_proceeds': ('Privatisation proceeds', 'number', "What the top 100 paid for the year's takeover, in money."),
+        "public_pay_tax": ("Tax for public employment", "share", "The rate charged on wages and on earnings to pay public employees."),
     }
 
     def __init__(self, start_part=0.05, absorb=0.3, defend=2.0, max_growth=0.25, build=0.1,
@@ -173,6 +191,7 @@ class Privatisation:
         self.planned_build = 0.0        # public hiring planned last year for this year, in employees
         self.taken = 0.0                # employees of the top hundred that came from the pool (grows with the working population)
         self.door = 0.0
+        self.rate = 0.0                 # the year's tax for the pay of public employees, as a part of the wage bill and of earnings
 
     def readouts(self, L, held):
         W = L.shared["workforce"]
@@ -183,10 +202,13 @@ class Privatisation:
                "privatisation_rate": self.planned_take / W,
                "public_hiring_rate": self.planned_build / W,
                "privatised_part_of_top": min(1.0, self.taken / held) if held > 0 else 0.0,
-               "privatisation_proceeds": self.proceeds}                                  # read by module 2, which retires government debt with it
+               "privatisation_proceeds": self.proceeds,                                  # read by module 2, which retires government debt with it
+               "public_pay_tax": self.rate}
         return [Publish(key, float(value), self.name) for key, value in out.items()]
 
     def start(self, L):
+        # What each firm pays in tax for public employment is recorded by the core in this component.
+        L.add_component(TAX, self.name, kind="income", transfers=True)
         self.pool = self.start_part * L.shared["workforce"]                              # part 1
         top = top_positions(L.cap(), np.arange(len(L)), self.top)
         return {c.key: c.value for c in self.readouts(L, L.n[top].sum())}
@@ -223,4 +245,17 @@ class Privatisation:
         # Part 6: the plan for next year's public hiring, from the people out of work.
         idle = W * (1 - self.floor) - employed - built - A.get("force_hires", 0.0)
         self.planned_build = float(self.build * resistance * max(idle, 0.0))
+
+        # Part 8: the pay of public employees and the tax that pays it. One rate is charged on the
+        # wage bill and on each firm's earnings before this tax. The government pays it out as pay.
+        wage = L.shared["wage"]
+        pay = self.pool * wage
+        wages = wage * employed
+        base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
+        self.rate = float(pay / (wages + base.sum()))
+        if pay > 0:
+            changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=GOVERNMENT, source=self.name),
+                        Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
+                                 amount=self.rate * wages),
+                        Transfer(PAY, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay)]
         return changes + self.readouts(L, held + take)

@@ -136,9 +136,12 @@ each year.
 
 WHAT IS MISSING
 
-The outlay is paid to nobody. The firms that sell persuasion are not told apart from other
-firms in the ledger, so the 5 per cent of corporate income that the book ascribes to them
-does not appear. The general effect that the book describes, a whole population made
+Buyers pay the outlay in the price, and the sellers of persuasion receive it. Chapter 9 reckons
+"a 15 per cent markup on these advertising expenditures", so the outlay is the sales of the
+firms that sell advertising. Those sellers are firms of the ledger, and the module says so to
+the core. The sales module therefore counts the outlay as goods that firms buy from firms. The
+sellers of persuasion are not told apart from other firms, so the 5 per cent of corporate
+income that the book ascribes to them does not appear as theirs. The general effect that the book describes, a whole population made
 predictable for all sellers, is left out, because the rule lets gains cancel when all firms
 do the same. The module does not make the markup of a firm steadier from year to year. The
 relief of part 7 stands in for that. The hold does not bar entry into an industry: a new
@@ -210,7 +213,8 @@ class Wants:
         # same opening prices whatever the order in which the modules are listed.
         n_j = np.bincount(L.ind, L.n, L.sector_of.size)
         M = np.bincount(L.ind, L.n * L.markup(), L.sector_of.size) / np.maximum(n_j, 1e-12)
-        L.add_component(OUTLAY, self.name, kind="cost", values=(self.customary * M)[L.ind])
+        # The outlay is laid out on what firms sell: the sellers of persuasion are firms of the ledger.
+        L.add_component(OUTLAY, self.name, kind="cost", values=(self.customary * M)[L.ind], bought_from_firms=True)
 
     def start(self, L):
         part = np.full(len(L), self.customary)

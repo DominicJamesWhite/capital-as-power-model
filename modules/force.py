@@ -31,6 +31,12 @@ that number from outside. It follows the depth regime that dominant capital itse
      part of the level of popular resistance each year.
   7. Readouts. The module publishes the level of force, the military jobs as a part of the
      working population, and the contractors' part of the top hundred's capitalization.
+  8. Who pays. The year's orders are what the military jobs make, at the contractors' prices.
+     A tax of the same year pays for them: one rate on the wage bill and on every firm's
+     earnings, contractors included. Wage earners and firms pay it to the armed forces, which
+     spend all of it on the orders. A firm cannot pay more than it earns. With 10 per cent of
+     the people employed in military jobs, and the contractors' prices at the average, the
+     rate is 10 per cent. The module publishes the rate.
 
 Force therefore does three things that an ordinary bout of stagflation does not do. It enlarges
 the arms contractors at the expense of every other firm, in the differential sense. It puts
@@ -99,14 +105,19 @@ three years, the part of contracts that the hundred largest contractors receive,
 of income spent on the military in past wars. Every other number is an addition. Reckoning
 military spending as jobs on the contractors' books is an addition, made because the ledger
 counts employees and holds no account of sales. Setting the call for force equal to the
-intensity of stagflation is an addition in its form. The speed at which force fades, the limit
+intensity of stagflation is an addition in its form. Part 8 is an addition: chapter 13 says
+that the government bond capitalizes "the power of government to tax" and that this power "is
+backed by institutionalized force", and no source says how the tax for arms is divided. One
+rate on all income is the rule of the public debt module. The speed at which force fades, the limit
 on yearly hiring and the rate of repression are additions. The choice of arms sectors is an
 addition, and it copies the sectors that the coalitions module gives to its conflict coalition.
 
 WHAT IS MISSING
 
-The module does not say who pays for the orders. In the literature the government pays by
-taxing broadly and by selling bonds to large owners, and the ledger has no taxes. Soldiers are
+The whole of a year's orders is paid from a tax of the same year. Chapter 13 says that
+capitalists "financed 'national' wars to multiply their capitalization many times over": wars
+are also paid for by borrowing from large owners, and the module sells no bonds. Dominant
+capital pays the same rate as everybody else here. Soldiers are
 not counted, so the armed forces take nobody out of the working population. Arms exports, the
 buyers of arms abroad and the destruction of war are not in the ledger. The module raises no
 price. The price rise of a conflict belongs to the stagflation module and to the coalitions
@@ -116,21 +127,27 @@ close any boundary. The module holds no resistance
 to war itself.
 """
 import numpy as np
-from core import Scale, Publish, top_positions
+from core import Scale, Publish, Transfer, top_positions, WAGE_EARNERS
 
 CONFLICT_LABEL, UNSET_LABEL = 1, -1     # the codes the coalitions module uses for its labels
+
+TAX = "tax for military orders"         # this module's income component: what each firm pays, for each employee; the core sets it
+ARMED_FORCES = "armed forces"           # a party that spends all it receives on what firms sell: the organ of government that places the orders
+TAX_EARNINGS = "tax on earnings for military orders"
+TAX_WAGES = "tax on wages for military orders"
 
 
 class Force:
     name = "force"
     reads = ("stagflation_intensity",)
-    supplies = ("force", "repression", "force_hires", "force_jobs", "force_contractors_top")
+    supplies = ("force", "repression", "force_hires", "force_jobs", "force_contractors_top", "force_tax")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "force": ("Level of organised force", "index", "From 0 to 1."),
         "repression": ("Repression", "rate", "Part of popular resistance removed in the year."),
         "force_hires": ("Military hiring planned", "number", "Military hires planned for the year, in employees."),
         "force_jobs": ("Military jobs", "share", "Military jobs as a part of the working population."),
         'force_contractors_top': ("Arms contractors' share of the top 100", 'share', "The contractors' part of the top 100's capitalization."),
+        "force_tax": ("Tax for military orders", "share", "The rate charged on wages and on earnings to pay for the year's military orders."),
     }
 
     def __init__(self, arms_sectors=(0, 1), lag=3.0, fade=0.15, military_part=0.15, top_part=0.67,
@@ -148,6 +165,7 @@ class Force:
         self.level = 0.0                    # the level of organised force, from 0 to 1
         self.jobs = 0.0                     # military jobs now on the contractors' books
         self.planned = 0.0                  # hiring (+) or dismissals (-) planned last year for this year
+        self.rate = 0.0                     # the year's tax for military orders, as a part of the wage bill and of earnings
 
     def contractors(self, L):
         """Positions of the arms contractors, and the top hundred."""
@@ -166,9 +184,13 @@ class Force:
                 Publish("repression", self.repress * self.level, self.name),
                 Publish("force_hires", max(self.planned, 0.0), self.name),
                 Publish("force_jobs", self.jobs / L.shared["workforce"], self.name),
-                Publish("force_contractors_top", float(K[mine].sum() / K[top].sum()), self.name)]
+                Publish("force_contractors_top", float(K[mine].sum() / K[top].sum()), self.name),
+                Publish("force_tax", self.rate, self.name)]
 
     def start(self, L):
+        # What each firm pays in tax for military orders is recorded by the core in this component.
+        L.add_component(TAX, self.name, kind="income", transfers=True)
+        L.add_party(ARMED_FORCES, buys=True)      # they spend the whole tax on the orders, in the same year
         return {c.key: c.value for c in self.readouts(L)}
 
     def propose(self, L, rng):
@@ -202,4 +224,17 @@ class Force:
             idle = workforce * (1 - self.floor) - (employed + done)
             wanted = min(wanted, self.take * max(idle, 0.0))
         self.planned = float(wanted)
+
+        # Part 8: the tax that pays for the year's orders. The orders are the output of the military
+        # jobs at the contractors' prices. One rate is charged on the wage bill and on each firm's
+        # earnings before this tax, and the armed forces spend what is paid on the orders.
+        price = float((L.n[mine] * L.p[mine]).sum() / held) if mine.size else float((L.n * L.p).sum() / employed)
+        orders = self.jobs * price
+        wages = L.shared["wage"] * employed
+        base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
+        self.rate = float(orders / (wages + base.sum()))
+        if orders > 0:
+            changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=ARMED_FORCES, source=self.name),
+                        Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=ARMED_FORCES, source=self.name,
+                                 amount=self.rate * wages)]
         return changes + self.readouts(L)
