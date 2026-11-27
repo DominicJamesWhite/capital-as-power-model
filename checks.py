@@ -976,7 +976,7 @@ def check_unemployment_level():
             return []
 
     shares = {}
-    for u in 0.05, 0.15:
+    for u in 0.05, 0.15, 0.04:
         L = starting_ledger(0, 3000)
         L.shared["workforce"] = L.n.sum() / (1 - u)        # nobody is hired, so unemployment stays at this level
         m = Model(L, [Sabotage(hold=0.0), Steady()], seed=0)   # with no holding toward a target, only unemployment moves a markup
@@ -988,9 +988,13 @@ def check_unemployment_level():
     # and after 40 years of the same unemployment the share has stopped rising.
     assert abs(slump[0] - still[0] - 0.01) < 5e-4 and abs(slump[-1] - still[-1] - 0.03) < 1.5e-3
     assert all(b > a for a, b in zip(slump[:10], slump[1:11])) and slump[-1] - slump[-2] < 1e-8
+    # One point below it, wage earners press for more: the share ends labour_gain times 0.01 lower.
+    tight, drop = shares[0.04], Sabotage().labour_gain * 0.01
+    assert abs(still[-1] - tight[-1] - drop) < 0.05 * drop and abs(tight[-1] - tight[-2]) < 1e-8
     print(f"17. Unemployment and the share: with unemployment held at 5 per cent the capitalist share stays at "
           f"{still[-1]:.4f} for 40 years. Held at 15 per cent it rises by {slump[0] - still[0]:.4f} in the first year "
-          f"and stands {slump[-1] - still[-1]:.4f} higher after 40 years, where it has stopped rising.")
+          f"and stands {slump[-1] - still[-1]:.4f} higher after 40 years, where it has stopped rising. Held at 4 per "
+          f"cent it stands {still[-1] - tight[-1]:.4f} lower.")
 
 
 if __name__ == "__main__":

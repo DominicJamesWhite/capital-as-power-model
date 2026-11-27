@@ -19,7 +19,9 @@ The rule has five parts, each tied to a passage of the book (see modules.md):
      capitalist share of income that goes with it, and markups move toward that level over
      some years. The size and the delay come from the authors' measurements for the United
      States ("Nonlinearities of the Sabotage-Redistribution Process", 2014; "Can Capitalists
-     Afford Recovery?", 2014).
+     Afford Recovery?", 2014). Below the unemployment at which wages keep pace with prices,
+     wage earners can press for more, and the level falls faster with each point of
+     unemployment than it rises above it (measured from the United States national accounts).
 
 Every other rate below is an addition to the book.
 """
@@ -34,7 +36,7 @@ class Sabotage:
     figures = {}           # nothing it supplies is a single yearly figure
 
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
-                 hold=0.1, share_gain=0.3, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
+                 hold=0.1, share_gain=0.3, labour_gain=2.6, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
                  floor=0.005, top=100):
         self.normal_markup = normal_markup    # the markup at which small firms neither expand nor cut back
         self.target_markup = target_markup    # the markup dominant capital holds an industry toward
@@ -43,6 +45,7 @@ class Sabotage:
         self.hold = hold                      # yearly speed at which a fully held industry approaches the target (part 4)
         self.volume_cost = volume_cost        # employment given up by dominant firms per unit of price rise (part 4)
         self.share_gain = share_gain          # rise in the capitalist share that goes with each unit of unemployment above the level below (part 5)
+        self.labour_gain = labour_gain        # fall in that level for each unit of unemployment below the level below: the strength of wage earners when few are without work (part 5)
         self.gain_years = gain_years          # years that the share lags behind unemployment: each year 1 / gain_years of the gap is closed
         self.standing = 0.0                   # the gain in the share that unemployment has brought so far, by industry
         self.labour_holds_at = labour_holds_at  # unemployment at which wages keep pace with prices: the strength of labour
@@ -107,7 +110,11 @@ class Sabotage:
         holds_at = holds_at + L.accounts.get("second_country_labour", 0.0)       # a second country's own strength of labour (optional module); 0 without it
         # Part 5. Unemployment sets a level for the capitalist share, and the share moves toward it. What has
         # been gained so far is remembered, so a year of unchanged unemployment adds only what is still missing.
-        gain = (self.share_gain * (u - holds_at) - self.standing) / self.gain_years
+        # When fewer people are without work than at that level, employers compete for them and wage earners press
+        # for higher wages; each point of unemployment below the level then lowers the share by labour_gain.
+        gap = u - holds_at
+        level = np.where(gap > 0, self.share_gain * gap, self.labour_gain * gap)
+        gain = (level - self.standing) / self.gain_years
         self.standing = self.standing + gain
         wages = gain * (1 + markup) ** 2          # a share s is a markup of s / (1 - s), so a small rise ds of the share is ds (1 + markup)^2 of markup
         wages = wages + L.accounts.get("currency_markup", 0.0)                    # a devaluation raises prices against wages (optional currencies module); 0 without it

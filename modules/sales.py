@@ -240,6 +240,16 @@ class Sales:
             self.tax_rate += self.tax_follows * gap
             borrowed = (1.0 - self.tax_follows) * gap * goods     # the tax not collected; below 0, what is repaid
 
+        # Owners lend only what they have, as any payer pays only what it has (rule 3 of "The record of transfers" in
+        # modules.md). They get back their own part of the tax not collected, so what they give up is the part that
+        # wage earners keep, and that cannot be more than owners' money of the year. The rest the government collects.
+        # What firms received less what they paid is read here from the record of the year's transfers (what the
+        # parties paid less what they received), which still counts the firms that have since closed or been bought.
+        means = max(priced - sum(net.values()) + holders + repaid - lent, 0.0)
+        if borrowed * wages / goods > means:
+            borrowed = means * goods / wages
+            self.tax_rate = charged - borrowed / goods
+
         # What each party had to spend. Wage earners and owners keep the tax not collected, in proportion to wages
         # and priced earnings, and pay any extra tax in the same proportion.
         has_wages = (max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid + borrowed * wages / goods, 0.0)
