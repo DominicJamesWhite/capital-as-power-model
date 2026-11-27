@@ -162,13 +162,13 @@ class PublicDebt:
                 "public_debt_service")
     figures = {                   # what the workbench calls each published number: label, unit, note
         'public_debt_dominant': ('Public debt held by the top 100', 'share', "The top 100's part of the whole public debt."),
-        'public_debt_dominant_of_claims': ("Top 100's part of firms' public debt", 'share', "The top 100's part of the public debt that firms hold."),
+        'public_debt_dominant_of_firms': ("Top 100's part of firms' public debt", 'share', "The top 100's part of the public debt that firms hold."),
         "public_debt_tax_dominant": ("Tax for interest paid by the top 100", "share", "Part of the tax for interest that the top 100 pay."),
         "public_debt_tax_wages": ("Tax for interest paid from wages", "share", "Part of the tax for interest that is paid from wages."),
         'public_debt_relative_tax': ('Relative tax rate of the top 100', 'times', "The top 100's tax rate divided by the rate of others."),
         "public_debt_net_dominant": ("Net gain of the top 100 from public debt", "share", "As a part of their other earnings."),
         "public_debt_net_others": ("Net gain of other firms from public debt", "share", "As a part of their other earnings."),
-        "public_debt_net_claims": ("Net gain of all firms from public debt", "share", "As a part of all income."),
+        "public_debt_net_firms": ("Net gain of all firms from public debt", "share", "As a part of all income."),
         "public_debt_net_wages": ("Net gain of households from public debt", "number", "Interest to households outside the richest 1%, less the tax on wages, as a part of the wage bill."),
         "public_debt_rich_households": ("Interest paid to the richest 1%", "share", "Part of all interest paid directly to the richest 1% of households."),
         "public_debt_flight": ("Flight to safety", "index", "The level of crisis that drives the flight to safety."),

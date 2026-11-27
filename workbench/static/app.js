@@ -52,7 +52,7 @@ const FIGS = [
 ];
 const FIG = Object.fromEntries(FIGS.map(f => [f.key, f]));
 const OTHER_NAMES = {
-  claims: "Number of firms", d_risk: "Differential risk", d_hype: "Differential hype", top_share_employees: "Top 100's share of employees",
+  firms: "Number of firms", d_risk: "Differential risk", d_hype: "Differential hype", top_share_employees: "Top 100's share of employees",
   top_share_cap: "Top 100's share of capitalization", markup: "Average markup", markup_top: "Average markup of the top 100",
   employment: "People employed", wage: "Wage", roadblocks: "Roadblocks against mergers", perm_sector: "Sector boundary opening",
   perm_nation: "National boundary opening", government_debt: "Government debt", corporate_debt: "Corporate debt",

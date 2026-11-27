@@ -147,7 +147,7 @@ class ConcentrationMeasures:
     reads = ()
     supplies = KEYS
     figures = {                   # what the workbench calls each published number: label, unit, note
-        "conc_claims": ("Number of firms", "number", ""),
+        "conc_firms": ("Number of firms", "number", ""),
         "conc_number_ratio": ("Top 100 as a part of all firms", "share", ""),
         "conc_share_cap": ("Top 100 share of capitalization", "share", ""),
         "conc_share_earnings": ("Top 100 share of earnings", "share", ""),
@@ -158,7 +158,7 @@ class ConcentrationMeasures:
         "conc_gini_earnings": ("Gini index of earnings", "index", ""),
         "conc_hh_cap": ("Herfindahl index of capitalization", "index", ""),
         "conc_hh_earnings": ("Herfindahl index of earnings", "index", ""),
-        "conc_hh_equal_claims": ("Equal firms equivalent", "number", "1 divided by the Herfindahl index of capitalization."),
+        "conc_hh_equal_firms": ("Equal firms equivalent", "number", "1 divided by the Herfindahl index of capitalization."),
         "conc_change_share": ("Change in top 100 share", "rate", "Yearly change, on a log scale."),
         "conc_change_diff": ("Change in differential capitalization", "rate", "Yearly change, on a log scale."),
         "conc_change_number": ("Change in top 100 as a part of all firms", "rate", "Yearly change, on a log scale."),

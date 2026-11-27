@@ -432,7 +432,7 @@ def top_positions(K, members, top):
 # Most keys are readouts (below). The rest are numbers the core keeps in L.shared or L.accounts,
 # or that the workbench works out from the readouts (inflation, mergers against hiring).
 CORE_FIGURES = {
-    "claims": ("Number of firms", "number", ""),
+    "firms": ("Number of firms", "number", ""),
     "dk": ("Differential capitalization", "times", "Average capitalization of a top 100 firm divided by that of the average firm."),
     "breadth": ("Breadth", "times", "Employees of the average top 100 firm divided by those of the average firm."),
     "depth": ("Depth", "times", "Earnings per employee of the top 100 divided by those of the average firm."),
