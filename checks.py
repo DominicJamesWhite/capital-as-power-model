@@ -1040,6 +1040,37 @@ def check_unemployment_level():
           f"cent it stands {still[-1] - tight[-1]:.4f} lower.")
 
 
+def check_second_country_purchases():
+    """With the border open, no purchase of the second country module names a firm bought in the same year,
+    or buys a firm that bought, even when firms tie in capitalization at the edge of the dominant group."""
+    from stage2 import starting_ledger
+    from modules.second_country import SecondCountry
+    sc = SecondCountry(start_permeability=1.0, takeover=0.5)
+    m = Model(starting_ledger(0, 3000), [sc], seed=0)
+    L = m.L
+    sec = np.flatnonzero(sc.industries(L)[L.ind])
+    K = L.cap().copy()
+    K[sec] = 1.0
+    K[sec[:4]] = 100.0                  # four clear leaders, then 26 firms tied for fifth place
+    K[sec[4:30]] = 50.0
+    L.cap = lambda: K
+    years = cross = 0
+    for i in range(150):
+        sc.permeability, sc.roadblocks = 1.0, 0.0
+        merges = [c for c in sc.propose(L, np.random.default_rng(i)) if isinstance(c, Merge)]
+        bought, buyers = set(), set()
+        for c in merges:                # in the order the core applies them
+            t, b = set(map(int, c.targets)), set(map(int, c.buyers))
+            assert not (t | b) & bought and not t & buyers, "a firm is bought again, or a buyer is bought"
+            bought |= t; buyers |= b
+        years += 1
+        cross += len(merges) > 2
+    assert cross > years / 2            # the purchases across the border did happen
+    print(f"18. Second country: in {years} years with the border open and 26 firms tied for fifth place in the "
+          f"second country, purchases across the border happened in {cross}, and no firm was bought twice or bought "
+          f"after it had bought.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1058,4 +1089,5 @@ if __name__ == "__main__":
     check_failure()
     check_payers()
     check_unemployment_level()
-    print("All seventeen checks passed.")
+    check_second_country_purchases()
+    print("All eighteen checks passed.")

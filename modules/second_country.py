@@ -215,8 +215,13 @@ class SecondCountry:
         inward = outward = 0.0
         # the cross-border ownership module (optional) takes over these purchases and moves no employees; 0 without it
         if p > 0 and sec_pos.size and not A.get("cross_border_on", 0.0):
-            taken = gone.copy()
-            taken[t1] = True; taken[t2] = True; taken[top1] = True; taken[top2] = True
+            # a firm bought this year is not bought again or made a buyer, and a firm that bought this year
+            # is not bought; the merger rule ranks each country's firms afresh, so its buyers and targets can
+            # differ from top1 and top2 when firms tie in capitalization
+            bought = gone.copy()
+            bought[t1] = True; bought[t2] = True
+            taken = bought.copy()
+            taken[b1] = True; taken[b2] = True; taken[top1] = True; taken[top2] = True
             free1, free2 = home_pos[~taken[home_pos]], sec_pos[~taken[sec_pos]]
             mood = A.get("merger_hype", 1.0) * (1 - A.get("eruption_stops_buying", 0.0))   # as in the merger module; 1 without those modules
             # a purchase across the border meets the roadblocks of both countries
@@ -225,7 +230,7 @@ class SecondCountry:
             want1 = self.home.base_rate * n[top1] * p * n[free2].sum() / n_second * mood
             b, t, inward = self._buy(top1, want1, free2, n, rng, self.home.max_targets)
             cross_b += [int(x) for x in b]; cross_t += [int(x) for x in t]
-            buyers2 = top2[~gone[top2]]
+            buyers2 = top2[~bought[top2]]
             want2 = self.local.base_rate * n[buyers2] * p * n[free1].sum() / n_home * mood
             ob, ot, outward = self._buy(buyers2, want2, free1, n, rng, self.local.max_targets)
             if ot:
