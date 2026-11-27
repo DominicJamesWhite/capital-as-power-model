@@ -836,10 +836,24 @@ class Model:
             if isinstance(c, Merge):
                 self._merge(c, remove)
                 touch(c.source, np.isin(np.arange(len(L)), c.buyers))
-            elif isinstance(c, Dissolve):
+        bought = remove.copy()          # the firms that were bought; the firms dissolved are marked next
+        for c in structural:
+            if isinstance(c, Dissolve):
                 remove[c.positions] = True
         if remove.any():
-            sources = sorted({c.source for c in structural if isinstance(c, (Merge, Dissolve))})
+            merging = sorted({c.source for c in structural if isinstance(c, Merge)})
+            dissolving = sorted({c.source for c in structural if isinstance(c, Dissolve)})
+            sources = merging if bought.any() else dissolving
+            if bought.any() and (remove & ~bought).any():
+                # Firms were bought and other firms were dissolved in the same year. The gain is reckoned in two
+                # steps, so that each kind of change is credited with its own part: first the list without the
+                # firms that were bought, then the list without the dissolved firms as well.
+                K = L.cap()[~bought]
+                ln_bought = float(np.log(K[top_positions(K, np.arange(K.size), self.top)].mean() / K.mean()))
+                for s in merging:
+                    credit(s, (ln_bought - ln_now) / len(merging))
+                ln_now = ln_bought
+                sources = dissolving
             keep = ~remove
             for name in "n", "e", "h", "d", "p", "ind":
                 setattr(L, name, getattr(L, name)[keep])

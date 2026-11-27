@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-The nine main modules take it that firms sell all they offer. This module keeps an account of
+The main modules take it that firms sell all they offer. This module keeps an account of
 who buys. Once a year it adds up, for the year just ended, the money that each party had and
 what that money bought. The account is kept in money: what firms offer is the wage bill plus
 the earnings they priced for.

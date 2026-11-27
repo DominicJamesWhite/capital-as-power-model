@@ -216,7 +216,7 @@ class ConcentrationMeasures:
 
 
 if __name__ == "__main__":
-    # Prints the measures every five years for a run of the nine modules with this readout added.
+    # Prints the measures every five years for a run of the main modules with this readout added.
     import full
     argv = [int(a) for a in sys.argv[1:]]
     count, years, seed = (argv + [60_000, 60, 0][len(argv):])[:3]

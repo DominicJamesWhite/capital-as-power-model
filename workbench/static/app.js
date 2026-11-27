@@ -1372,7 +1372,7 @@ function renderSetup() {
     el("div", { class: "su-sec-head" }, el("h3", { text: "Modules" }), seg, el("span", { class: "spacer" }),
       view === "map" ? el("button", { class: "btn sm", type: "button", text: "+ Add modules", onclick: openPicker }) : null),
     el("p", { class: "sub", text: view === "cards"
-      ? `The 9 main modules always run. ${nOpt} optional module${nOpt === 1 ? " is" : "s are"} on. Select a module's name to see it on the map.`
+      ? `The 10 main modules always run. ${nOpt} optional module${nOpt === 1 ? " is" : "s are"} on. Select a module's name to see it on the map.`
       : "Dashed rings mark changes that have not run yet. Select a module to go to its card." }),
     content);
   setupShell("New run", body, "Start run", startRun);

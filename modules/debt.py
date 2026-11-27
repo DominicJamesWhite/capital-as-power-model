@@ -15,6 +15,13 @@ concentrated in the hands of large owners and paid for by taxes levied broadly. 
 therefore reports the part of the government's debt held by dominant capital, taken to equal
 dominant capital's part of all capitalization. It does not pay that interest to those firms.
 
+The failure module closes firms that cannot pay their lenders, and it publishes two numbers
+that this module reads. Both change nothing when no firm closes. The first is the part of the
+interest that is left once the closed firms have stopped paying, and the interest part is
+multiplied by it. The second is the part of all employees whose firms closed, which is taken
+off the unemployment that this module reads: the book ties debt to "the strength and solidity
+of existing power institutions", and promises that are being broken are no sign of solidity.
+
 Two optional modules change the government's debt, and each publishes a number that this
 module reads. Both numbers are 0 when those modules are off, and they then change
 nothing. The risk shaping module publishes what the government borrows to
@@ -24,8 +31,9 @@ the sum of the two as a stock of money and adds it to the debt. A government who
 exceed its whole debt has no debt, and the rest of the proceeds is set against later borrowing.
 
 Additions to the book: the speed and slope of the interest share, pooling corporate debt into
-one total, the government's interest stream as a fixed part of all income, and the stock that
-bailouts add to the debt and proceeds take from it.
+one total, the government's interest stream as a fixed part of all income, the stock that
+bailouts add to the debt and proceeds take from it, and taking the jobs lost in closed firms
+off the unemployment that the module reads.
 """
 import numpy as np
 from core import Publish
@@ -76,7 +84,12 @@ class Debt:
         A = L.accounts
         # Last year's borrowing for bailouts, less last year's proceeds of privatisation (optional modules; 0 without them).
         self.added += A.get("bailout_borrowing", 0.0) - A.get("privatisation_proceeds", 0.0)
-        self.past = (self.past + [L.accounts["unemployment"]])[-self.years:]
+        # Firms that closed last year stopped paying their lenders (the failure module); 1 when no firm closed.
+        self.share = self.share * A.get("interest_left", 1.0)
+        # Unemployment stands here for how solid the institutions of power are. People who lost their jobs
+        # because their firm could not pay its lenders show the opposite, so the part of all employees whose
+        # firms closed in a year is taken off that year's unemployment (the failure module; 0 without it).
+        self.past = (self.past + [L.accounts["unemployment"] - A.get("failed_employees", 0.0)])[-self.years:]
         target = self.base + self.slope * (np.mean(self.past) - self.usual_unemployment)
         self.share = float(np.clip(self.share + self.speed * (target - self.share), 0.0, 0.9))
         return [Publish(k, v, self.name) for k, v in self.accounts(L).items()]

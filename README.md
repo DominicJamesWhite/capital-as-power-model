@@ -63,7 +63,7 @@ The model also reports unemployment, prices, and the share of all income that go
 
 The list of firms does nothing by itself. Every change comes from a module.
 
-Each module describes one way that power is used. Nine modules always run.
+Each module describes one way that power is used. Ten modules always run.
 
 | Module | What it does |
 |---|---|
@@ -76,6 +76,7 @@ Each module describes one way that power is used. Nine modules always run.
 | Resistance | Wage earners and others push back when prices, unemployment or mergers go too far. |
 | Envelope | Opens the boundaries between industries, sectors and countries, so that large firms can buy firms beyond them. |
 | Debt | Records lending. |
+| Failure | Firms that cannot pay the interest they owe close, and their employees lose their jobs. Small firms pay lenders more than large ones, so they close more often. |
 
 More than 30 other modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
 
@@ -92,7 +93,7 @@ You can replace any module with a different version. This is deliberate. The the
 
 You need Python 3 and the `numpy` package.
 
-Run the nine main modules for 60 years, starting with 30,000 firms:
+Run the ten main modules for 60 years, starting with 30,000 firms:
 
 ```
 python full.py 30000 60
@@ -104,6 +105,12 @@ Add optional modules by name:
 
 ```
 python full.py 30000 60 0 --with labour,public_debt
+```
+
+Leave a main module out by name, for example to see a run in which no firm fails:
+
+```
+python full.py 30000 60 0 --without failure
 ```
 
 Small runs are faster but less reliable. With fewer firms, the top 100 are a bigger part of the whole, and the results change.
@@ -129,7 +136,7 @@ The page opens at http://127.0.0.1:8765. It runs on your own computer and sends 
 What works:
 
 - The bookkeeping is exact. The model can say how much of any year's change came from each module.
-- The nine main modules run together and produce waves of mergers, periods of rising prices with unemployment, and resistance, without anyone entering them by hand.
+- The ten main modules run together and produce waves of mergers, periods of rising prices with unemployment, and resistance, without anyone entering them by hand.
 - Each optional module runs when it is switched on alone.
 
 What does not work yet:

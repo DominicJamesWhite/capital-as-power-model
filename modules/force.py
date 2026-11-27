@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-The nine modules cannot tell a war from an ordinary bout of stagflation. This module adds the
+The main modules cannot tell a war from an ordinary bout of stagflation. This module adds the
 difference. It holds one number, the level of organised force, between 0 and 1. Nothing sets
 that number from outside. It follows the depth regime that dominant capital itself produces.
 

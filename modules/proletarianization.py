@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-In the nine modules the working population grows every year at a rate that is typed in as a
+In the main modules the working population grows every year at a rate that is typed in as a
 setting. This module produces that rate. It holds a second population: people who live outside
 wage employment (on the land, in households, in other countries). Firms and government organs
 draw those people into the working population when few hands are idle, and the drawing slows

@@ -1,4 +1,4 @@
-"""Fourteen checks of the model's bookkeeping. They test arithmetic, not the theory.
+"""Fifteen checks of the model's bookkeeping. They test arithmetic, not the theory.
 
 Checks 1 to 4 test the ledger and its measures. Checks 5 to 9 test the named components of
 earnings per employee. Check 10 tests the bookkeeping of the green-field module when it founds
@@ -7,7 +7,9 @@ long run with many modules. Check 12 tests that the price of every firm is worke
 wage, the markup and the named costs. Check 13 tests the record of transfers: every transfer has
 a payer and a receiver, and no payer pays more than it has. Check 14 tests the sales module's
 account of who buys: what is offered equals what each buyer bought plus what is unsold, and no
-buyer spends money that the record does not show it had.
+buyer spends money that the record does not show it had. Check 15 tests the failure module: the
+interest that firms owe adds up, a firm that closes leaves the list, and a year in which some
+firms are bought and others close is divided among its sources with nothing left over.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
@@ -336,7 +338,7 @@ def check_founding():
 
 
 def check_levels():
-    """Every optional module that takes the place of no other, with the nine modules, for 60 years.
+    """Every optional module that takes the place of no other, with the main modules, for 60 years.
 
     The check is a test and not a limit: nothing in the model holds a component inside the range
     tested here. The run is made twice, with the core's netting of the record on and off."""
@@ -385,7 +387,7 @@ def check_levels():
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass it.
     assert off["furthest"] > width and off["beside"] > 1.0
-    print(f"11. Levels: with the nine modules and {len(names)} optional modules on for 60 steps, the stacking part of "
+    print(f"11. Levels: with the main modules and {len(names)} optional modules on for 60 steps, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
           f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
@@ -693,6 +695,100 @@ def check_sales_account():
           f"what was offered. Opposite listing orders gave identical figures.")
 
 
+def check_failure():
+    """Firms that fail: who owes what, who closes, and what the books show afterwards."""
+    from math import erfc, sqrt
+    from stage2 import starting_ledger
+    from full import all_modules
+    from modules.failure import Failure, chance_below
+    from core import Dissolve
+
+    # The curve used for the chance of failing agrees with the exact one.
+    z = np.linspace(-6.0, 6.0, 241)
+    exact = np.array([0.5 * erfc(-v / sqrt(2.0)) for v in z])
+    assert np.abs(chance_below(z) - exact).max() < 1e-6
+
+    # A hand-made list of 400 firms that all earn 0.10 for each employee. Lenders take four tenths of earnings.
+    def ledger(risk):
+        n = np.concatenate([np.full(200, 10.0), np.full(160, 100.0), np.full(40, 5000.0)])
+        return Ledger(employees=n, epe=0.10, industry=np.arange(400) % 20, sector_of_industry=np.repeat(np.arange(5), 4),
+                      risk=risk, shared={"workforce": float(n.sum())})
+
+    f = Failure(top=10)
+    L = ledger(1.0)
+    L.accounts["interest_share"] = 0.4
+    cover, chance, owed = f.chances(L)
+    assert np.isclose(owed.sum(), 0.4 * (L.n * L.e).sum(), rtol=1e-12)      # the interest of all firms is the total owed
+    assert np.isclose(cover[0] / cover[-1], 1.90 / 5.92) and np.isclose(cover[250] / cover[-1], 1.90 / 3.48)
+    assert set(np.unique(chance)) <= {0.0, 1.0}                              # with a risk of 1 nothing is left to chance
+    assert (chance[:200] == 1.0).all() and (chance[360:] == 0.0).all() and cover[:200].max() < 1 < cover[360:].min()
+
+    # In a year: the small firms close, their employees are without work, nobody else is touched.
+    class Lenders:
+        name, supplies = "lenders", ("interest_share",)
+
+        def start(self, L):
+            return {"interest_share": 0.4}
+
+        def propose(self, L, rng):
+            return []
+
+    m = Model(ledger(1.0), [Lenders(), Failure(top=10)], seed=0)
+    before = m.L.n.copy()
+    r = m.step()
+    assert len(m.L) == 200 and np.array_equal(m.L.n, before[200:])
+    assert r["published"]["failures"] == 200 and np.isclose(r["published"]["failed_employees"], 2000.0 / before.sum())
+    assert np.isclose(r["unemployment"], 2000.0 / before.sum())
+    assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10) and set(r["attribution"]) == {"failure"}
+    assert np.isclose(r["published"]["failed_by_industry"] @ np.bincount(np.arange(400) % 20, before, 20), 2000.0)
+
+    # A firm among the largest that cannot pay is restructured: it stays, with every employee, and its risk rises.
+    L = ledger(1.0)
+    L.components[BASE][-1] = 0.03                    # one of the largest firms earns a third of what the others earn
+    L.refresh()
+    m = Model(L, [Lenders(), Failure(top=40, small_burden=1.0, medium_burden=1.0, large_burden=1.0)], seed=0)
+    r = m.step()
+    assert len(m.L) == 400 and m.L.n[-1] == 5000.0 and np.isclose(m.L.d[-1], 1.5)
+    assert r["published"]["restructurings"] == 1 and r["published"]["failures"] == 0
+
+    # Switched off, or with no interest owed, no firm fails.
+    for module, share in (Failure(on=False), 0.4), (Failure(), 0.0):
+        L = ledger(2.0)
+        L.accounts["interest_share"] = share
+        assert not any(isinstance(c, (Dissolve, Scale)) for c in module.propose(L, np.random.default_rng(0)))
+
+    # Firms bought and firms closed in the same year: the year's gain still divides with nothing left over.
+    def both(L):
+        order = np.argsort(L.cap())
+        return [Merge(buyers=order[-5:], targets=order[100:105], source="buyer", risk_factor=0.95)]
+
+    def closing(L):
+        order = np.argsort(L.cap())
+        return [Dissolve(order[:300], "closer")]
+
+    m = Model(make_ledger(), [Fixed("buyer", both), Fixed("closer", closing)])
+    r = m.step()
+    alone = Model(make_ledger(), [Fixed("buyer", both)]).step()
+    assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10)
+    assert np.isclose(r["attribution"]["buyer"], alone["attribution"]["buyer"], atol=1e-10)   # the buyer is credited as if nobody closed
+
+    # A full run: firms fail in ordinary years, and the books stay whole.
+    m = Model(starting_ledger(0, 5000), all_modules(), seed=0)
+    closed = restructured = 0
+    for _ in range(40):
+        r = m.step()
+        closed += r["published"]["failures"]
+        restructured += r["published"]["restructurings"]
+        assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-9)
+    assert closed > 0
+    print(f"15. Failure: the interest that firms owe adds up to the total; a small firm owes 5.92 for each 1.90 that a "
+          f"large firm owes on the same sales; a firm with a risk of 1 fails only if it cannot pay; a firm that closes "
+          f"leaves the list and its employees are without work; a firm among the largest is restructured and stays; "
+          f"switched off, nothing fails; firms bought and firms closed in one year are each credited with their own "
+          f"part of the gain. In a run of 40 years from 5,000 firms, {closed:.0f} firms closed and {restructured:.0f} "
+          f"of the largest were restructured.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -708,4 +804,5 @@ if __name__ == "__main__":
     check_price()
     check_transfers()
     check_sales_account()
-    print("All fourteen checks passed.")
+    check_failure()
+    print("All fifteen checks passed.")

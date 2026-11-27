@@ -1,4 +1,4 @@
-r"""All nine modules together, from the starting position of 1890.
+r"""The main modules together, from the starting position of 1890.
 
 Nothing is entered by hand after the start. The model has to produce its own merger waves,
 its own periods of stagflation and its own openings of boundaries.
@@ -6,6 +6,7 @@ its own periods of stagflation and its own openings of boundaries.
 Run from the folder that holds this file:
     python full.py [firms] [years] [seed]
         [--with name,name]   optional modules, by their names in registry.py
+        [--without name,name] main modules to leave out, by the names they give themselves (for example failure)
         [--overlap part]     the part of a smaller premium's excess that counts in the overlap group
                              "hold on buyers": 0 (the default) means only the largest premium counts,
                              1 means the premiums multiply
@@ -27,13 +28,14 @@ from modules.resistance import Resistance
 from modules.envelope import Envelope
 from modules.debt import Debt
 from modules.costcutting import CostCutting
+from modules.failure import Failure
 
 START = 1890
 
 
 def all_modules():
     return [Sabotage(), Debt(), Greenfield(), Mergers(), CostCutting(), Stagflation(),
-            Compass(), Resistance(), Envelope()]
+            Compass(), Resistance(), Envelope(), Failure()]
 
 
 def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, overlap=None, discounts_overlap=()):
@@ -90,6 +92,14 @@ if __name__ == "__main__":
         i = argv.index("--with")
         extra = registry.make([n for n in argv[i + 1].split(",") if n])
         argv = argv[:i] + argv[i + 2:]
+    without = set()
+    if "--without" in argv:                    # main modules to leave out
+        i = argv.index("--without")
+        without = {n for n in argv[i + 1].split(",") if n}
+        argv = argv[:i] + argv[i + 2:]
+        unknown = without - {m.name for m in all_modules()}
+        if unknown:
+            sys.exit(f"No main module is called {', '.join(sorted(unknown))}.")
     overlap = None
     if "--overlap" in argv:                    # see the top of this file
         i = argv.index("--overlap")
@@ -101,6 +111,6 @@ if __name__ == "__main__":
         discounts_overlap = (HOLD_ON_BUYERS,)
     count, years, seed = ([int(a) for a in argv] + [300_000, 119, 0][len(argv):])[:3]
     # An optional module may name modules it takes the place of, as in replaces = ("envelope",).
-    replaced = {name for m in extra for name in getattr(m, "replaces", ())}
+    replaced = {name for m in extra for name in getattr(m, "replaces", ())} | without
     run(count, years, seed, modules=[m for m in all_modules() if m.name not in replaced] + extra, overlap=overlap,
         discounts_overlap=discounts_overlap)

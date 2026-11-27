@@ -86,6 +86,10 @@ class Sabotage:
         n, held, markup = self.industry_state(L)
         g, u = L.shared["workforce_growth"], L.accounts["unemployment"]
         growth = L.accounts["industry_growth"]
+        # Firms that closed took their capacity out of the industry (the failure module). Their buyers turn to the
+        # firms that are left, so the part of the industry's employees that closed firms had counts as growth
+        # that did not take place; 0 when no firm failed.
+        growth = growth - L.accounts.get("failed_by_industry", 0.0)
         # Resistance strengthens labour: wages then keep pace with prices at a higher level of unemployment.
         # The strength of organised labour in each industry (optional module) takes the place of popular resistance here.
         labour = L.accounts.get("labour_strength_by_industry", L.accounts.get("resistance", 0.0))

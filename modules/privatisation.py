@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-The nine modules give dominant capital two ways to add employees: hiring and buying other
+The main modules give dominant capital two ways to add employees: hiring and buying other
 firms. This module adds a third. It holds a pool of publicly run employment: people who work
 for government organs and for no firm. Dominant capital takes over parts of that pool when it
 is able to act in concert, and popular resistance holds the pool shut and adds to it.

@@ -2,7 +2,7 @@
 
 THE RULE IN PLAIN WORDS
 
-The nine modules pay the whole wage bill to wage earners. This module pledges a part of the wage
+The main modules pay the whole wage bill to wage earners. This module pledges a part of the wage
 bill as interest on the debts of households. The interest becomes part of the earnings of the
 firms in the ledger, and most of all of the firms that sit in the industries that dominant
 capital holds. Nothing in the rule comes from outside the model. Prices, wages and employment
