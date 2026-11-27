@@ -112,6 +112,15 @@ Check that the bookkeeping is correct:
 python checks.py
 ```
 
+## Use the workbench
+
+The workbench is a page in your web browser. You choose modules and settings, start a run, watch the charts fill in, and compare runs side by side.
+
+```npython workbench/server.py
+```
+
+The page opens at http://127.0.0.1:8765. It runs on your own computer and sends nothing anywhere. `workbench/README.md` has more.
+
 ## What works and what does not
 
 What works:
@@ -138,6 +147,7 @@ What does not work yet:
 | `stage2.py` | Runs only three modules: sabotage, green-field growth and mergers. |
 | `checks.py` | Tests of the bookkeeping. |
 | `modules.md` | What each module does, and the passage in the book it is based on. |
+| `workbench/` | A page in your web browser for running the model and comparing runs. |
 
 ## How to contribute
 
