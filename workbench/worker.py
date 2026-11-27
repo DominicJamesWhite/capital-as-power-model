@@ -356,6 +356,20 @@ def readout_notes():
 
 # ------------------------------------------------------------------ catalogue
 
+IMAGES = HERE / "static" / "module_images"
+
+
+def images_of(name):
+    """The module's image and its dark-mode version, if files named after the module exist."""
+    stem = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    out = {"image": "", "image_dark": ""}
+    if (IMAGES / f"{stem}.png").is_file():
+        out["image"] = f"/static/module_images/{stem}.png"
+    if (IMAGES / f"{stem}-dark.png").is_file():
+        out["image_dark"] = f"/static/module_images/{stem}-dark.png"
+    return out
+
+
 def load_core():
     import full
     return full.all_modules()
@@ -380,6 +394,7 @@ def catalogue():
         entry = {"id": "core:" + m.name, "name": m.name, "class": cls.__name__, "file": cls.__module__,
                  "settings": settings_of(cls), "replaces": [], "error": ""}
         entry.update(describe(cls, None, sections))
+        entry.update(images_of(m.name))
         out["core"].append(entry)
     try:
         import registry
@@ -392,6 +407,7 @@ def catalogue():
         entry = {"id": "opt:" + key, "name": key, "class": clsname, "file": path, "settings": [],
                  "replaces": [], "error": "", "title": "", "summary": "", "rule": [], "book": [],
                  "additions": [], "class_note": "", "doc_note": ""}
+        entry.update(images_of(key))
         try:
             cls = getattr(importlib.import_module(path), clsname)
             entry["settings"] = settings_of(cls)

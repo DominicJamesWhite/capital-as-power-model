@@ -169,51 +169,59 @@ const state = {
   gainRun: null,
   gainMode: recall("gainMode", "year"),
   logCharts: new Set(recall("log", [])),
+  big: new Set(recall("big", [])),
   editing: null,
   listSignature: "",
   lastStarted: null,
 };
 
-// ---------------------------------------------------------------- tabs
+// ---------------------------------------------------------------- the set-up panel
 
-function setupTabs() {
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
-  function select(tab, focus) {
-    for (const t of tabs) {
-      const on = t === tab;
-      t.setAttribute("aria-selected", on ? "true" : "false");
-      t.tabIndex = on ? 0 : -1;
-      $(t.getAttribute("aria-controls")).hidden = !on;
-    }
-    if (focus) tab.focus();
-    store("tab", tab.id);
-    if (tab.id === "tab-results") drawAllCharts();
-  }
-  tabs.forEach((t, i) => {
-    t.addEventListener("click", () => select(t));
-    t.addEventListener("keydown", e => {
-      let j = null;
-      if (e.key === "ArrowRight") j = (i + 1) % tabs.length;
-      if (e.key === "ArrowLeft") j = (i - 1 + tabs.length) % tabs.length;
-      if (e.key === "Home") j = 0;
-      if (e.key === "End") j = tabs.length - 1;
-      if (j !== null) { e.preventDefault(); select(tabs[j], true); }
-    });
-  });
-  const fromLink = { "#setup": "tab-setup", "#results": "tab-results", "#words": "tab-words" }[location.hash];
-  const saved = $(fromLink || recall("tab", "tab-setup"));
-  if (saved) select(saved);
-  return id => select($(id));
+const narrowScreen = () => window.matchMedia("(max-width: 900px)").matches;
+
+function setSetupOpen(open) {
+  $("shell").classList.toggle("folded", !open);
+  const b = $("toggle-setup");
+  b.setAttribute("aria-expanded", open ? "true" : "false");
+  b.textContent = open ? "Hide the run set-up" : "Show the run set-up";
+  store("setupOpen", open);
+  scheduleCharts();
 }
-let showTab = () => {};
+
+// Bring the set-up into view (used by "Use these settings").
+function showSetup() {
+  setSetupOpen(true);
+  $("side-scroll").scrollTop = 0;
+  if (narrowScreen()) $("setup").scrollIntoView();
+}
+
+// Bring the runs and charts into view (used after "Start run").
+function showResults() {
+  const main = $("main");
+  main.scrollTop = 0;
+  if (narrowScreen()) $("notice").scrollIntoView();
+}
 
 function banner(kind, title, ...body) {
-  const b = $("banner");
-  b.className = "banner" + (kind === "success" ? "" : " " + kind);
-  b.replaceChildren(el("p", { class: "banner-title", text: title }), el("div", { class: "banner-body" }, ...body));
+  const b = $("notice");
+  b.className = "notice" + (kind === "success" ? "" : " " + kind);
+  b.replaceChildren(el("p", { class: "notice-title", text: title }), el("div", { class: "notice-body" }, ...body));
   b.hidden = false;
-  b.focus();
+  b.focus({ preventScroll: !narrowScreen() });
 }
+
+// A short line in a chart legend, drawn with the same colour and dash as the line on the chart.
+function swatch(colour, dash) {
+  const s = svg("svg", { width: 22, height: 8, class: "swatch", "aria-hidden": "true" });
+  const l = svg("line", { x1: 1, x2: 21, y1: 4, y2: 4, stroke: colour, "stroke-width": 2.5, "stroke-linecap": "round" });
+  if (dash) l.setAttribute("stroke-dasharray", dash);
+  s.append(l);
+  return s;
+}
+// Each run keeps one colour and one line style. Line styles repeat every four colours,
+// so that runs next to each other in the list differ in both.
+const DASHES = [null, "7 4", "2 3", "10 3 2 3"];
+function runDash(slot) { return DASHES[slot % 4]; }
 
 // ---------------------------------------------------------------- glossary
 
@@ -266,12 +274,48 @@ async function loadCatalogue(again) {
   fillExtraSelect();
 }
 
+// Optional modules are sorted into three groups by what the model says about them: modules that
+// run in place of a core module, modules whose description says they only measure, and the rest.
+function optionalGroupOf(m) {
+  if (m.replaces && m.replaces.length) return "instead";
+  if (/\breadout\b|changes nothing|changes no term/i.test(m.doc_note || "")) return "measure";
+  return "rule";
+}
+
 function renderModules() {
-  const core = $("core-modules"), opt = $("optional-modules");
-  core.replaceChildren(...state.cat.core.map(m => moduleCard(m, false)));
-  opt.replaceChildren(...state.cat.optional.map(m => moduleCard(m, true)));
+  const open = recall("groupsOpen", {});
+  const groups = [
+    { id: "core", title: "Modules that always run", help: "These modules are the centre of the model. You cannot switch them off, but you can change their settings. An optional module can run in place of one of them.", mods: state.cat.core, optional: false },
+    { id: "rule", title: "Modules that add a rule", mods: state.cat.optional.filter(m => optionalGroupOf(m) === "rule"), optional: true },
+    { id: "instead", title: "Modules that run in place of one that always runs", mods: state.cat.optional.filter(m => optionalGroupOf(m) === "instead"), optional: true },
+    { id: "measure", title: "Modules that only measure", help: "These modules change nothing in the model.", mods: state.cat.optional.filter(m => optionalGroupOf(m) === "measure"), optional: true },
+  ].filter(g => g.mods.length);
+  const out = [];
+  for (const g of groups) {
+    if (g.optional && !out.some(x => x.classList && x.classList.contains("group-heading"))) {
+      out.push(el("h4", { class: "group-heading", text: "Modules you can switch on" }),
+        el("p", { class: "help", text: "These modules are off unless you switch them on. Some of them only measure things and change nothing in the model. Their descriptions say so." }));
+    }
+    const count = el("span", { class: "count" });
+    const det = el("details", { class: "group", "data-group": g.id }, el("summary", {}, g.title, count),
+      g.help ? el("p", { class: "help", text: g.help }) : null,
+      el("ul", { class: "module-list" }, ...g.mods.map(m => moduleCard(m, g.optional))));
+    det.open = !!open[g.id] || (g.optional && g.mods.some(m => state.form.optional.has(m.name)));
+    det.addEventListener("toggle", () => { const o = recall("groupsOpen", {}); o[g.id] = det.open; store("groupsOpen", o); });
+    det._count = () => {
+      const on = g.optional ? g.mods.filter(m => state.form.optional.has(m.name)).length : 0;
+      const changed = g.mods.reduce((n, m) => n + Object.keys(state.form.settings[m.id] || {}).length, 0);
+      const bits = [g.optional ? `${on} of ${g.mods.length} switched on` : `${g.mods.length}`];
+      if (changed) bits.push(changed === 1 ? "1 setting changed" : `${changed} settings changed`);
+      count.textContent = bits.join(", ");
+    };
+    det._count();
+    out.push(det);
+  }
+  $("module-groups").replaceChildren(...out);
   applyFilter();
 }
+function refreshGroupCounts() { for (const g of document.querySelectorAll(".group")) if (g._count) g._count(); }
 
 function paragraphs(list) {
   const out = [];
@@ -289,9 +333,20 @@ function paragraphs(list) {
   return out;
 }
 
+// A module's image, if the model folder holds one for it. It is decoration beside the module's
+// name, so it has an empty alt text, and if the file cannot be loaded it is removed.
+function moduleImage(m, cls) {
+  if (!m.image) return null;
+  const img = el("img", { src: m.image, alt: "", class: cls, loading: "lazy", decoding: "async" });
+  const pic = el("picture", { class: cls + "-frame" },
+    m.image_dark ? el("source", { srcset: m.image_dark, media: "(prefers-color-scheme: dark)" }) : null, img);
+  img.addEventListener("error", () => pic.remove());
+  return pic;
+}
+
 function moduleCard(m, optional) {
   const key = m.id.slice(m.id.indexOf(":") + 1);
-  const card = el("div", { class: "module", id: "mod-" + m.id.replace(/[^a-z0-9]/gi, "-"), "data-search": [m.name, m.title, m.summary, m.class].join(" ").toLowerCase() });
+  const card = el("li", { class: "module" + (optional ? "" : " core"), id: "mod-" + m.id.replace(/[^a-z0-9]/gi, "-"), "data-search": [m.name, m.title, m.summary, m.class].join(" ").toLowerCase() });
   const head = el("div", { class: "head" });
   if (optional) {
     const box = el("input", { type: "checkbox", id: "on-" + key, disabled: m.error ? true : null });
@@ -299,15 +354,18 @@ function moduleCard(m, optional) {
     box.addEventListener("change", () => {
       if (box.checked) state.form.optional.add(key); else state.form.optional.delete(key);
       card.classList.toggle("on", box.checked);
+      refreshGroupCounts();
       updateRunSummary();
     });
     card.classList.toggle("on", box.checked);
-    head.append(el("div", { class: "checkbox" }, box, el("label", { for: "on-" + key }, "Switch on: ", moduleLabel(m))));
+    head.append(el("div", { class: "check" }, box, el("label", { for: "on-" + key }, el("span", { class: "visually-hidden", text: "Switch on: " }), moduleLabel(m))));
   } else {
-    head.append(el("h5", { text: moduleLabel(m) }), el("span", { class: "tag", text: "Always runs" }));
+    head.append(el("h5", { text: moduleLabel(m) }), el("span", { class: "badge", text: "Always runs" }));
   }
-  const changedTag = el("span", { class: "tag changed", hidden: true });
+  const changedTag = el("span", { class: "badge changed", hidden: true });
   head.append(changedTag);
+  const tile = moduleImage(m, "mod-tile");
+  if (tile) card.append(tile);
   card.append(head);
   card.append(el("p", { class: "code-name", text: `Name in the model: ${m.name}` }));
   if (m.error) {
@@ -324,33 +382,33 @@ function moduleCard(m, optional) {
     const names = m.replaces.map(r => { const c = state.modules["core:" + r]; return c ? `${moduleLabel(c)} (${r})` : r; });
     card.append(el("p", { class: "note", text: `When you switch this on, it runs in place of ${listWords(names)}.` }));
   }
+  const extras = el("div", { class: "mod-details" });
   if ((m.rule && m.rule.length) || (m.book && m.book.length) || (m.additions && m.additions.length)) {
-    const more = el("div", { class: "more" });
+    const more = el("div", { class: "more" }, moduleImage(m, "mod-image"));
     if (m.rule.length) more.append(el("h5", { text: "How the rule works" }), ...paragraphs(m.rule));
     if (m.book.length) more.append(el("h5", { text: "What the book says" }), ...paragraphs(m.book));
     if (m.additions.length) more.append(el("h5", { text: "What the model adds to the book" }), ...paragraphs(m.additions));
-    card.append(el("details", {}, el("summary", { text: "More about this module" }), more));
+    extras.append(el("details", {}, el("summary", { text: "More about this module" }), more));
   }
   if (m.settings.length) {
-    const tbody = el("tbody");
+    const list = el("div", { class: "settings" });
     const sumText = el("span");
-    const details = el("details", {}, el("summary", {}, sumText),
-      el("table", { class: "settings-table" },
-        el("thead", {}, el("tr", {}, el("th", { text: "Setting" }), el("th", { text: "Value" }), el("th", { text: "Default" }), el("th", {}, el("span", { class: "visually-hidden", text: "Reset" })))),
-        tbody));
+    const details = el("details", {}, el("summary", {}, sumText), list);
     const refresh = () => {
       const n = Object.keys(state.form.settings[m.id] || {}).length;
       sumText.textContent = `Settings (${m.settings.length})` + (n ? `, ${n} changed` : "");
       changedTag.hidden = !n;
       changedTag.textContent = n === 1 ? "1 setting changed" : `${n} settings changed`;
+      refreshGroupCounts();
     };
-    for (const s of m.settings) tbody.append(settingRow(m, s, refresh));
+    for (const s of m.settings) list.append(settingRow(m, s, refresh));
     refresh();
-    card.append(details);
+    extras.append(details);
     card._refresh = refresh;
   } else {
-    card.append(el("p", { class: "hint", text: "This module has no settings." }));
+    extras.append(el("p", { class: "help", text: "This module has no settings." }));
   }
+  card.append(extras);
   return card;
 }
 
@@ -368,8 +426,8 @@ function settingRow(m, s, refresh) {
     input.value = value;
   }
   const errorSpot = el("span", { class: "error-message", id: id + "-error", hidden: true });
-  const reset = el("button", { type: "button", class: "button secondary small", text: "Reset", "aria-label": `Reset ${humanise(s.name)} to its default` });
-  const changedNote = el("span", { class: "tag changed", text: "Changed", hidden: true });
+  const reset = el("button", { type: "button", class: "btn small", text: "Reset", "aria-label": `Reset ${humanise(s.name)} to its default` });
+  const changedNote = el("span", { class: "badge changed", text: "Changed", hidden: true });
   const sync = () => {
     const v = input.value;
     const vals = state.form.settings[m.id] || (state.form.settings[m.id] = {});
@@ -387,14 +445,14 @@ function settingRow(m, s, refresh) {
   reset.addEventListener("click", () => { input.value = def; sync(); input.focus(); });
   const kindHint = { int: "A whole number.", float: "A number.", list: "Numbers separated by commas.", bool: "Yes or no.", none: "Leave empty for none.", text: "Text.", other: "", required: "No default. You must enter a value." }[s.kind] || "";
   const defText = s.kind === "bool" ? (s.default ? "Yes" : "No") : (def === "" ? "None" : def);
-  const row = el("tr", {},
-    el("td", {},
+  const row = el("div", { class: "setting" },
+    el("div", { class: "setting-top" },
       el("label", { class: "setting-name", for: id, text: humanise(s.name) }),
-      s.note ? el("p", { class: "setting-note", text: s.note.charAt(0).toUpperCase() + s.note.slice(1) }) : null,
-      el("div", { class: "setting-code", text: s.name })),
-    el("td", {}, errorSpot, input, " ", changedNote, el("div", { class: "setting-note", text: kindHint })),
-    el("td", { text: defText }),
-    el("td", {}, reset));
+      el("span", { class: "setting-code", text: s.name })),
+    s.note ? el("p", { class: "setting-note", text: s.note.charAt(0).toUpperCase() + s.note.slice(1) }) : null,
+    errorSpot,
+    el("div", { class: "setting-row" }, input, el("span", { class: "default", text: `Default: ${defText}` }), reset, changedNote),
+    kindHint ? el("div", { class: "setting-kind", text: kindHint }) : null);
   input.setAttribute("aria-describedby", id + "-error");
   reset.disabled = current === undefined;
   changedNote.hidden = current === undefined;
@@ -415,7 +473,12 @@ function checkSetting(s, v) {
 function applyFilter() {
   const q = $("module-filter").value.trim().toLowerCase();
   for (const card of document.querySelectorAll(".module")) {
-    card.classList.toggle("hidden-by-filter", q !== "" && !card.dataset.search.includes(q));
+    card.hidden = q !== "" && !card.dataset.search.includes(q);
+  }
+  for (const g of document.querySelectorAll(".group")) {
+    const any = [...g.querySelectorAll(".module")].some(c => !c.hidden);
+    g.hidden = q !== "" && !any;
+    if (q !== "" && any) g.open = true;
   }
 }
 
@@ -441,7 +504,7 @@ function updateRunSummary() {
 }
 
 function showErrors(errors) {
-  const box = $("error-summary"), list = $("error-list");
+  const box = $("problems"), list = $("problem-list");
   if (!errors.length) { box.hidden = true; return; }
   list.replaceChildren(...errors.map(([target, text]) => el("li", {}, el("a", { href: "#" + target, onclick: e => {
     e.preventDefault();
@@ -504,7 +567,7 @@ async function startRun() {
     state.gainRun = res.id;
     state.lastStarted = res.id;
     $("run-name").value = "";
-    showTab("tab-results");
+    showResults();
     banner("success", "Your run has been added",
       el("p", { text: "The charts below fill in year by year while the model runs. Runs go one at a time, so a new run waits until the one before it has finished." }));
     poll(true);
@@ -544,7 +607,7 @@ function useSettingsOf(run) {
   $("run-name").value = "";
   renderModules();
   updateRunSummary();
-  showTab("tab-setup");
+  showSetup();
   const body = [el("p", { text: `The settings of "${run.meta.name}" are now in the form. Change the one thing you want to test, give the run a new name, then select Start run.` })];
   if (lost.length) body.push(el("p", { text: "These choices no longer exist in the model and were left out: " + lost.join("; ") + "." }));
   banner("info", "Settings copied", ...body);
@@ -587,7 +650,7 @@ async function poll(now) {
   renderProgress();
   if (changed) { fillExtraSelect(); scheduleCharts(); }
   const busy = list.some(m => m.status === "running" || m.status === "waiting");
-  $("tab-running").textContent = busy ? "(running)" : "";
+  $("top-status").hidden = !busy;
   pollTimer = setTimeout(poll, busy ? 800 : 5000);
 }
 
@@ -616,7 +679,7 @@ function renderRuns() {
   if (sig === state.listSignature) { updateSteps(); return; }
   state.listSignature = sig;
   const area = $("runs-area");
-  if (!metas.length) { area.replaceChildren(el("p", { class: "inset", text: "You have no runs yet. Go to Set up a run to start one." })); return; }
+  if (!metas.length) { area.replaceChildren(el("p", { class: "aside-note", text: "You have no runs yet. Go to Set up a run to start one." })); return; }
   const tbody = el("tbody");
   for (const meta of metas) tbody.append(runRow(meta));
   area.replaceChildren(el("div", { class: "table-wrap" }, el("table", { class: "runs-table" },
@@ -638,8 +701,8 @@ function runRow(meta) {
     poll();
     scheduleCharts();
   });
-  const showCell = el("td", {}, el("div", { class: "checkbox" }, box,
-    el("label", { for: "show-" + meta.id }, el("span", { class: "swatch", style: `border-color: ${seriesColour(meta.colour || 0)}` }),
+  const showCell = el("td", {}, el("div", { class: "check" }, box,
+    el("label", { for: "show-" + meta.id }, swatch(seriesColour(meta.colour || 0), runDash(meta.colour || 0)),
       el("span", { class: "visually-hidden", text: `Show ${meta.name} on the charts` }))));
   let nameCell;
   if (state.editing === meta.id) {
@@ -653,30 +716,30 @@ function runRow(meta) {
     input.addEventListener("keydown", e => { if (e.key === "Enter") save(); if (e.key === "Escape") { state.editing = null; state.listSignature = ""; renderRuns(); } });
     nameCell = el("td", {}, el("label", { class: "label small", for: input.id, text: "New name" }), input,
       el("div", { class: "button-group" },
-        el("button", { type: "button", class: "button small", onclick: save, text: "Save name" }),
-        el("button", { type: "button", class: "button secondary small", text: "Cancel", onclick: () => { state.editing = null; state.listSignature = ""; renderRuns(); } })));
+        el("button", { type: "button", class: "btn small primary", onclick: save, text: "Save name" }),
+        el("button", { type: "button", class: "btn small", text: "Cancel", onclick: () => { state.editing = null; state.listSignature = ""; renderRuns(); } })));
     setTimeout(() => input.focus(), 0);
   } else {
-    nameCell = el("td", {}, el("div", { class: "name", text: meta.name }), el("div", { class: "what", text: whatText(meta) }),
-      el("div", { class: "what", text: "Started " + new Date(meta.created).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) }));
+    nameCell = el("td", {}, el("div", { class: "name", text: meta.name }),
+      el("div", { class: "what", text: whatText(meta) + ". Started " + new Date(meta.created).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) + "." }));
   }
-  const statusCell = el("td", {}, el("span", { class: "tag " + meta.status, text: statusText(meta) }), el("div", { class: "what step-text", "data-id": meta.id }));
+  const statusCell = el("td", {}, el("span", { class: "badge " + meta.status, text: statusText(meta) }), el("div", { class: "what step-text", "data-id": meta.id }));
   if (meta.status === "failed" || (meta.warnings && meta.warnings.length) || (meta.status === "stopped" && meta.message)) {
     statusCell.append(el("details", {}, el("summary", { text: meta.status === "failed" ? "What went wrong" : "Notes" }), problemText(run)));
   }
-  const actions = el("td", { class: "button-group" });
+  const actions = el("div", { class: "actions" });
   if (meta.status === "running" || meta.status === "waiting") {
-    actions.append(el("button", { type: "button", class: "button warning small", text: meta.status === "running" ? "Stop run" : "Remove from the queue",
+    actions.append(el("button", { type: "button", class: "btn small danger", text: meta.status === "running" ? "Stop run" : "Remove from the queue",
       onclick: () => stopRun(meta) }));
   } else {
     actions.append(
-      el("button", { type: "button", class: "button secondary small", text: "Rename", "aria-label": `Rename ${meta.name}`, onclick: () => { state.editing = meta.id; state.listSignature = ""; renderRuns(); } }),
-      el("button", { type: "button", class: "button secondary small", text: "Use these settings", "aria-label": `Use the settings of ${meta.name} for a new run`,
+      el("button", { type: "button", class: "link-btn", text: "Rename", "aria-label": `Rename ${meta.name}`, onclick: () => { state.editing = meta.id; state.listSignature = ""; renderRuns(); } }),
+      el("button", { type: "button", class: "link-btn", text: "Use these settings", "aria-label": `Use the settings of ${meta.name} for a new run`,
         onclick: async () => { if (!run.detail) { try { run.detail = await api(`/api/runs/${meta.id}?since=999999`); } catch (e) { return; } } useSettingsOf(run); } }),
-      el("a", { class: "button secondary small", href: `/api/runs/${meta.id}/csv`, download: "", "aria-label": `Download the figures of ${meta.name} as a CSV file`, text: "Download figures (CSV)" }),
-      el("button", { type: "button", class: "button warning small", text: "Delete", "aria-label": `Delete ${meta.name}`, onclick: () => deleteRun(meta) }));
+      el("a", { class: "link-btn", href: `/api/runs/${meta.id}/csv`, download: "", "aria-label": `Download the figures of ${meta.name} as a CSV file`, text: "Download figures (CSV)" }),
+      el("button", { type: "button", class: "link-btn danger", text: "Delete", "aria-label": `Delete ${meta.name}`, onclick: () => deleteRun(meta) }));
   }
-  return el("tr", {}, showCell, nameCell, statusCell, actions);
+  return el("tr", { class: state.shown.has(meta.id) ? "shown" : null }, showCell, nameCell, statusCell, el("td", {}, actions));
 }
 
 function problemText(run) {
@@ -721,8 +784,9 @@ function renderProgress() {
     kids.push(el("div", { class: "progress-box" },
       el("p", {}, el("b", { text: `Running "${running.name}": year ${running.step} of ${running.years}` }), last ? ` (the year labelled ${last.year})` : ""),
       el("progress", { max: running.years, value: running.step, "aria-label": `Progress of ${running.name}` }, `${pct}%`),
-      el("p", { class: "hint", text: "You can keep using the page while the model runs." }),
-      el("button", { type: "button", class: "button warning", text: "Stop run", onclick: () => stopRun(running) })));
+      el("div", { class: "progress-row" },
+        el("p", { class: "help", text: "You can keep using the page while the model runs." }),
+        el("button", { type: "button", class: "btn small danger", text: "Stop run", onclick: () => stopRun(running) }))));
   }
   if (waiting.length) kids.push(el("p", { text: `${plural(waiting.length, "run is", "runs are")} waiting to start: ${listWords(waiting.map(w => `"${w.name}"`))}.` }));
   const lastId = state.lastStarted;
@@ -764,7 +828,7 @@ function renderDifferences() {
   const area = $("differences-area");
   const runs = shownRuns();
   if (runs.length < 2) { area.replaceChildren(); return; }
-  if (runs.some(r => !r.detail)) { area.replaceChildren(el("p", { class: "hint", text: "Reading the settings of the runs you ticked…" })); return; }
+  if (runs.some(r => !r.detail)) { area.replaceChildren(el("p", { class: "help", text: "Reading the settings of the runs you ticked…" })); return; }
   const rows = [];
   const same = vals => vals.every(v => JSON.stringify(v) === JSON.stringify(vals[0]));
   const basic = [["Number of claims", r => r.meta.claims.toLocaleString("en-GB")], ["Years", r => r.meta.years], ["Seed", r => r.meta.seed]];
@@ -788,9 +852,9 @@ function renderDifferences() {
     kids.push(el("p", { text: "These runs have the same settings. They can still differ if the model itself was changed between the times they were run." }));
   } else {
     kids.push(el("div", { class: "table-wrap" }, el("table", { class: "diff-table" },
-      el("thead", {}, el("tr", {}, el("th", { text: "What differs" }), ...runs.map(r => el("th", {}, el("span", { class: "swatch", style: `border-color: ${seriesColour(r.meta.colour || 0)}` }), r.meta.name)))),
+      el("thead", {}, el("tr", {}, el("th", { text: "What differs" }), ...runs.map(r => el("th", {}, swatch(seriesColour(r.meta.colour || 0), runDash(r.meta.colour || 0)), r.meta.name)))),
       el("tbody", {}, ...rows.map(([label, vals]) => el("tr", {}, el("th", { text: label }), ...vals.map(v => el("td", { text: String(v) }))))))));
-    kids.push(el("p", { class: "hint", text: "Only differences are listed. Runs made on different days can also differ because the model was changed in between." }));
+    kids.push(el("p", { class: "help", text: "Only differences are listed. Runs made on different days can also differ because the model was changed in between." }));
   }
   area.replaceChildren(...kids);
 }
@@ -832,7 +896,7 @@ function seriesFor(key) {
     const slot = r.meta.colour || 0;
     const nth = dashCount[slot % 8] = (dashCount[slot % 8] || 0) + 1;
     return {
-      label: r.meta.name, colour: seriesColour(slot), dash: nth > 1 ? "7 4" : null,
+      label: r.meta.name, colour: seriesColour(slot), dash: DASHES[(slot + nth - 1) % 4],
       pts: r.rows.map(row => [row.year, row.values[key]]).filter(p => p[1] !== undefined),
     };
   });
@@ -840,8 +904,12 @@ function seriesFor(key) {
 
 function chartCard(meta, removable) {
   const box = el("div", { class: "chart-box" });
-  const card = el("div", { class: "chart-card" },
-    el("h5", { text: meta.title }),
+  const big = state.big.has(meta.key);
+  const grow = el("button", { type: "button", class: "link-btn", text: big ? "Show smaller" : "Open larger",
+    "aria-label": `${big ? "Show smaller" : "Open larger"}: ${meta.title}`, "aria-pressed": big ? "true" : "false",
+    onclick: () => { if (state.big.has(meta.key)) state.big.delete(meta.key); else state.big.add(meta.key); store("big", [...state.big]); drawAllCharts(); } });
+  const card = el("div", { class: "chart-card" + (big ? " big" : ""), "data-key": meta.key },
+    el("div", { class: "chart-head" }, el("h5", { text: meta.title }), grow),
     meta.explain ? el("p", { class: "explain", text: meta.explain }) : null,
     meta.code ? el("p", { class: "explain", text: `Name in the model: ${meta.code}` }) : null);
   const tools = el("div", { class: "chart-tools" });
@@ -850,9 +918,9 @@ function chartCard(meta, removable) {
     const cb = el("input", { type: "checkbox", id });
     cb.checked = state.logCharts.has(meta.key);
     cb.addEventListener("change", () => { if (cb.checked) state.logCharts.add(meta.key); else state.logCharts.delete(meta.key); store("log", [...state.logCharts]); drawAllCharts(); });
-    tools.append(el("div", { class: "checkbox" }, cb, el("label", { for: id, text: "Use a log scale (equal steps up mean equal percentage rises)" })));
+    tools.append(el("div", { class: "check" }, cb, el("label", { for: id, text: "Use a log scale (equal steps up mean equal percentage rises)" })));
   }
-  if (removable) tools.append(el("button", { type: "button", class: "button secondary small", text: "Remove chart", "aria-label": `Remove the chart of ${meta.title}`,
+  if (removable) tools.append(el("button", { type: "button", class: "link-btn", text: "Remove chart", "aria-label": `Remove the chart of ${meta.title}`,
     onclick: () => { state.extra = state.extra.filter(k => k !== meta.key); store("extra", state.extra); drawAllCharts(); } }));
   card.append(tools, box);
   const legend = el("ul", { class: "legend" });
@@ -862,7 +930,6 @@ function chartCard(meta, removable) {
 }
 
 function drawAllCharts() {
-  if ($("panel-results").hidden) return;
   const runs = shownRuns();
   $("charts-empty").hidden = runs.length > 0;
   const keys = allKeys();
@@ -888,14 +955,14 @@ function drawAllCharts() {
 
 function drawSeriesChart(c, meta, series) {
   const useLog = meta.log && state.logCharts.has(meta.key);
-  c.legend.replaceChildren(...series.map(s => el("li", {}, el("span", { class: "swatch" + (s.dash ? " dash" : ""), style: `border-color: ${s.colour}` }), s.label)));
+  c.legend.replaceChildren(...series.map(s => el("li", {}, swatch(s.colour, s.dash), s.label)));
   if (series.length < 2) c.legend.hidden = true;
   if (!series.length || series.every(s => !s.pts.some(p => p[1] !== null))) {
     c.box.replaceChildren(el("p", { class: "empty-chart", text: series.length ? "There are no figures for this yet." : "Tick a run in the list of runs to show it here." }));
     c.table.hidden = true;
     return;
   }
-  lineChart(c.box, { title: meta.title, series, unit: meta.unit, yTitle: meta.axis, log: useLog, fixed: meta.fixed });
+  lineChart(c.box, { title: meta.title, series, unit: meta.unit, yTitle: meta.axis, log: useLog, fixed: meta.fixed, height: state.big.has(meta.key) ? 400 : 230 });
   c.table.hidden = false;
   c.table.addEventListener("toggle", () => { if (c.table.open && !c.table.querySelector("table")) c.table.append(dataTable(series, meta.unit)); });
 }
@@ -925,10 +992,10 @@ function tickLabel(v, unit, step) {
 
 function lineChart(box, cfg) {
   const W = Math.max(320, box.clientWidth || 600);
-  const H = 300;
+  const H = cfg.height || 260;
   const narrow = W < 560;
   const direct = !narrow && cfg.series.length >= 2 && cfg.series.length <= 4;
-  const m = { l: 70, r: direct ? 120 : 18, t: 12, b: 52 };
+  const m = { l: 62, r: direct ? 130 : 14, t: 30, b: 46 };
   const all = cfg.series.flatMap(s => s.pts.filter(p => p[1] !== null && isFinite(p[1])));
   let xs = all.map(p => p[0]);
   let x0 = Math.min(...xs), x1 = Math.max(...xs);
@@ -966,7 +1033,7 @@ function lineChart(box, cfg) {
   for (const v of ticks) {
     const y = ty(v);
     s.append(svg("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, class: v === 0 ? "zero" : "grid" }));
-    const t = svg("text", { x: m.l - 8, y: y + 4, "text-anchor": "end" });
+    const t = svg("text", { x: m.l - 8, y: y + 5, "text-anchor": "end" });
     t.textContent = log ? (cfg.unit === "pct" ? fmtValue(v, "pct") : fmtNumber(v)) : tickLabel(v, cfg.unit, tstep);
     s.append(t);
   }
@@ -980,10 +1047,10 @@ function lineChart(box, cfg) {
     s.append(t);
   }
   s.append(svg("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis" }));
-  const xt = svg("text", { x: m.l + (W - m.l - m.r) / 2, y: H - 8, "text-anchor": "middle", class: "axis-title" });
+  const xt = svg("text", { x: W - m.r, y: H - 4, "text-anchor": "end", class: "axis-title" });
   xt.textContent = "Year label, counted from a start labelled " + (state.cat && state.cat.start_year != null ? state.cat.start_year : "1890");
   s.append(xt);
-  const yt = svg("text", { x: 14, y: m.t + (H - m.t - m.b) / 2, "text-anchor": "middle", class: "axis-title", transform: `rotate(-90 14 ${m.t + (H - m.t - m.b) / 2})` });
+  const yt = svg("text", { x: 0, y: 14, "text-anchor": "start", class: "axis-title" });
   yt.textContent = firmify(cfg.yTitle + (log ? " (log scale)" : ""));
   s.append(yt);
   // lines
@@ -1003,9 +1070,9 @@ function lineChart(box, cfg) {
   }
   if (direct) {
     ends.sort((a, b) => a.y - b.y);
-    for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+    for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 17) ends[i].y = ends[i - 1].y + 17;
     for (const e of ends) {
-      const t = svg("text", { x: e.x + 8, y: e.y + 4, class: "end-label" });
+      const t = svg("text", { x: e.x + 8, y: e.y + 5, class: "end-label" });
       const label = firmify(e.label);
       t.textContent = label.length > 16 ? label.slice(0, 15) + "…" : label;
       s.append(t);
@@ -1030,7 +1097,7 @@ function lineChart(box, cfg) {
       const ok = v !== undefined && v !== null && isFinite(v) && (!log || v > 0);
       dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
       if (ok) { dots[k].setAttribute("cx", x); dots[k].setAttribute("cy", ty(v)); }
-      rows.push(el("div", { class: "t-row" }, el("span", {}, el("span", { class: "swatch" + (ser.dash ? " dash" : ""), style: `border-color: ${ser.colour}; width: 16px` }), ser.label),
+      rows.push(el("div", { class: "t-row" }, swatch(ser.colour, ser.dash), el("span", { class: "t-label" }, ser.label),
         el("b", { text: v === undefined ? "no figure" : fmtValue(v, cfg.unit) })));
     });
     tip.replaceChildren(...rows);
@@ -1076,7 +1143,7 @@ function drawGain() {
   const area = $("gain-area");
   const runs = shownRuns();
   const intro = el("p", { text: "Each year differential capitalization rises or falls. This chart shows which modules moved it, and by how much. A line above zero means the module helped the top hundred pull ahead of the average that year. A line below zero means it held them back." });
-  if (!runs.length) { area.replaceChildren(intro, el("p", { class: "inset", text: "Tick a run in the list of runs to show it here." })); return; }
+  if (!runs.length) { area.replaceChildren(intro, el("p", { class: "aside-note", text: "Tick a run in the list of runs to show it here." })); return; }
   if (!runs.some(r => r.meta.id === state.gainRun)) state.gainRun = runs[runs.length - 1].meta.id;
   const run = state.runs[state.gainRun];
   const sel = el("select", { class: "select", id: "gain-run" }, ...runs.map(r => el("option", { value: r.meta.id, text: r.meta.name })));
@@ -1087,7 +1154,7 @@ function drawGain() {
     const r = el("input", { type: "radio", name: "gain-mode", id: "gain-" + v, value: v });
     r.checked = state.gainMode === v;
     r.addEventListener("change", () => { state.gainMode = v; store("gainMode", v); drawGain(); $("gain-" + v).focus(); });
-    modes.append(el("div", { class: "radio" }, r, el("label", { for: "gain-" + v, text })));
+    modes.append(el("div", { class: "choice" }, r, el("label", { for: "gain-" + v, text })));
   }
   const rows = run.rows.filter(r => r.step > 0);
   const totals = {};
@@ -1095,7 +1162,7 @@ function drawGain() {
   const order = Object.keys(totals).sort((a, b) => Math.abs(totals[b]) - Math.abs(totals[a]));
   const keep = order.length > 8 ? order.slice(0, 7) : order;
   const rest = order.filter(k => !keep.includes(k));
-  const groups = keep.map((k, i) => ({ label: sourceLabel(k), colour: seriesColour(i), keys: [k] }));
+  const groups = keep.map((k, i) => ({ label: sourceLabel(k), colour: seriesColour(i), keys: [k], dash: i >= 4 ? DASHES[1] : null }));
   if (rest.length) groups.push({ label: `All other sources (${rest.length})`, colour: cssVar("--other"), keys: rest, dash: "6 4" });
   const series = groups.map(g => {
     let sum = 0;
@@ -1115,9 +1182,9 @@ function drawGain() {
   card.append(el("p", { class: "explain", text: state.gainMode === "total"
     ? "Added up since the start. A total of 0.69 means the module on its own doubled differential capitalization. A total of −0.69 means it halved it."
     : "The change is measured on a log scale. For small values it is close to a percentage change: 0.05 means the module raised differential capitalization by about 5% that year." }));
-  card.append(el("div", { class: "field inline-field" }, el("label", { class: "label small", for: "gain-run", text: "Run" }), sel), modes);
+  card.append(el("div", { class: "gain-controls" }, el("div", { class: "inline-field" }, el("label", { class: "label", for: "gain-run", text: "Run" }), sel), modes));
   const box = el("div", { class: "chart-box" });
-  const legend = el("ul", { class: "legend" }, ...series.map(s => el("li", {}, el("span", { class: "swatch" + (s.dash ? " dash" : ""), style: `border-color: ${s.colour}` }), s.label)));
+  const legend = el("ul", { class: "legend" }, ...series.map(s => el("li", {}, swatch(s.colour, s.dash), s.label)));
   const table = el("details", {}, el("summary", { text: "Show the figures as a table" }));
   card.append(box, legend, table);
   if (rest.length) card.append(el("p", { class: "explain", text: `"All other sources" adds up ${listWords(rest.map(sourceLabel))}.` }));
@@ -1130,7 +1197,13 @@ function drawGain() {
 // ---------------------------------------------------------------- start
 
 function init() {
-  showTab = setupTabs();
+  setSetupOpen(recall("setupOpen", true));
+  $("toggle-setup").addEventListener("click", () => {
+    const open = $("shell").classList.contains("folded");
+    setSetupOpen(open);
+    if (open && narrowScreen()) $("setup").scrollIntoView();
+  });
+  document.querySelector(".toplink").addEventListener("click", e => { e.preventDefault(); const w = $("words"); w.scrollIntoView(); w.focus({ preventScroll: true }); });
   renderGlossary();
   for (const r of document.querySelectorAll('input[name="claims"]')) r.addEventListener("change", () => {
     $("claims-other-box").hidden = !$("claims-other").checked;

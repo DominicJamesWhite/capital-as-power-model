@@ -5,7 +5,7 @@ Start it from the project root:
     .venv\Scripts\python.exe experiments\casp\model\workbench\server.py
 
 and open http://127.0.0.1:8765 in a web browser. The page opens by itself unless --no-browser
-is given. --port N chooses another port.
+is given. --port N chooses another port. --runs FOLDER keeps the saved runs in another folder.
 
 The server only listens on this computer (127.0.0.1) and sends nothing anywhere else. Each run
 of the model happens in its own process (worker.py). Runs wait in a queue and go one at a time.
@@ -294,6 +294,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.static("index.html")
         if parts[:1] == ["static"] and len(parts) == 2:
             return self.static(parts[1])
+        if parts[:2] == ["static", "module_images"] and len(parts) == 3:
+            return self.static(parts[2], "module_images")
         if parts == ["api", "catalogue"]:
             return self.send(*catalogue())
         if parts == ["api", "runs"]:
@@ -321,14 +323,14 @@ class Handler(BaseHTTPRequestHandler):
                                  {"Content-Disposition": f'attachment; filename="{safe}.csv"'})
         return self.send(404, {"error": "Page not found."})
 
-    def static(self, name):
-        if not re.fullmatch(r"[A-Za-z0-9_.-]+", name):
+    def static(self, name, folder=None):
+        if not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.-]*", name):
             return self.send(404, {"error": "Page not found."})
-        path = STATIC / name
+        path = (STATIC / folder / name) if folder else (STATIC / name)
         if not path.is_file():
             return self.send(404, {"error": "Page not found."})
         ctype = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-                 ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml"}.get(path.suffix, "application/octet-stream")
+                 ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png"}.get(path.suffix, "application/octet-stream")
         return self.send(200, path.read_bytes(), ctype)
 
     def do_POST(self):
@@ -381,6 +383,10 @@ def main():
         open_browser = False
     if "--port" in args:
         port = int(args[args.index("--port") + 1])
+    if "--runs" in args:                  # keep runs in another folder, for example to try the workbench out
+        global RUNS
+        RUNS = Path(args[args.index("--runs") + 1]).resolve()
+        RUNS.mkdir(parents=True, exist_ok=True)
     load_all()
     server = None
     for p in range(port, port + 20):

@@ -14,7 +14,7 @@ On Windows you can double-click `start_workbench.bat` in this folder instead.
 
 The page opens in your web browser at http://127.0.0.1:8765. If it does not open, type that address into the browser. To stop the workbench, close its window or press Ctrl and C together.
 
-If port 8765 is in use, the workbench uses the next free port and prints the address. To choose a port, add `--port 8800`. To stop the browser opening by itself, add `--no-browser`.
+If port 8765 is in use, the workbench uses the next free port and prints the address. To choose a port, add `--port 8800`. To stop the browser opening by itself, add `--no-browser`. To keep saved runs in another folder, add `--runs` and the folder's path.
 
 ## What it does
 
@@ -46,5 +46,6 @@ If a module cannot be loaded, the page says so and the other modules still work.
 | `server.py` | The small web server. It serves the page, keeps the queue of runs and saves them. |
 | `worker.py` | Reads the modules from the model, and runs the model in its own process. |
 | `static/` | The page: `index.html`, `app.js` and `style.css`. The charts are drawn on the page, with no outside library. |
+| `static/module_images/` | One image for each module, `<module>.png` and `<module>-dark.png`, shown beside the module's name. The page looks for a file named after each module and shows nothing for a module that has none. |
 | `runs/` | Saved runs. It is made the first time the workbench starts. |
 | `start_workbench.bat` | Starts the workbench on Windows. |
