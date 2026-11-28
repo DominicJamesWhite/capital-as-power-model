@@ -689,8 +689,9 @@ def check_sales_account():
             return [ScaleComponent("push", 1.2 if first else 1.0, self.name),
                     Publish("jobs_created", 5.0 if first else 0.0, self.name)]
 
+    # Here both firms lose the same part (`top_sensitivity` 1); the uneven split is tested below.
     L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
-    m = Model(L, [Push(), Sales(top=1)], top=1)
+    m = Model(L, [Push(), Sales(top=1, top_sensitivity=1.0)], top=1)
     with np.errstate(divide="ignore"):      # with two firms the top group is half the list, which the division of the gain meets as a zero
         r1, r2 = m.step(), m.step()
     assert r1["published"]["unsold"] == 0.0 and r1["published"]["sold_part"] == 1.0     # the opening prices are all paid
@@ -715,6 +716,22 @@ def check_sales_account():
     with np.errstate(divide="ignore"):
         r3 = m.step()                                               # the payout moves half of the way to three quarters of the 146.25 received
     assert np.isclose(r3["published"]["sales_account"]["owners_outlay"], 0.5 * 131.25 + 0.5 * 0.75 * 146.25)
+
+    # The same year with the default split. The firm of dominant capital keeps the part x ** 0.81 of its priced
+    # earnings and the other firm x; together they lose the 33.75 unsold. The dominant firm holds back the unsold
+    # part of its own goods.
+    L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
+    m = Model(L, [Push(), Sales(top=1)], top=1)
+    with np.errstate(divide="ignore"):
+        m.step()
+        r2 = m.step()
+    # the part of its priced earnings each firm received (the core sets a price cut against the standing rise of the same firm)
+    kept_by = L.components[SHORTFALL] * L.components[PRICE_CUT] * L.components["push"] / 1.2
+    priced = np.array([600.0, 400.0]) * 0.18
+    assert np.isclose((priced * (1 - kept_by)).sum(), 33.75)
+    assert np.isclose(kept_by[0], kept_by[1] ** 0.81) and kept_by[0] > 1 - lost > kept_by[1]
+    assert np.isclose(r2["published"]["sales_cut"], 33.75 / 1180 * (1 - kept_by[0]) / lost)
+    split_top, split_rest = 1 - kept_by[0], 1 - kept_by[1]
     # When the equipment of the new jobs costs at least what owners do not lay out, nothing is unsold: with 17
     # new jobs, 131.25 + 51 covers the 180. With no new job, 48.75 is unsold. And when firms pay out all
     # that owners earned, owners lay out the 150 they received, and 30 is unsold. What firms kept is the
@@ -841,7 +858,9 @@ def check_sales_account():
     print(f"14. Sales account: with wages of 1,000, priced earnings of 180, owners who received 150 the year before, "
           f"of which firms kept a quarter, a payout that follows half of the way, and 5 new jobs at 3 years' wages each, "
           f"owners buy 146.25 and 33.75 is unsold. With 17 new jobs nothing is unsold. The firm of dominant capital "
-          f"keeps its price and books the whole loss; the other firm takes half of it out of its price. The capitalist "
+          f"keeps its price and books the whole loss; the other firm takes half of it out of its price. With the default "
+          f"split the dominant firm loses {split_top:.1%} of its priced earnings and the other {split_rest:.1%}, against "
+          f"{lost:.1%} each, and the losses still add up to 33.75. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
           f"record of transfers shows it had. When the government pays out 115 more than a tax set in law collects, "

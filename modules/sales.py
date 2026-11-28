@@ -43,11 +43,14 @@ unsold amount. What they are paid the next year follows that lower income.
 
 Owners then respond, and each response lowers the unsold amount:
 
-  - Every firm loses the same part of its priced earnings.
+  - Firms of dominant capital lose a smaller part of their priced earnings than other firms. In the
+    logarithm, the fall of their sales is `top_sensitivity` times the fall of the others'. The
+    parts are set so that the losses of all firms add up to the unsold amount.
   - A firm outside dominant capital takes half of its loss out of its price, where it stays
     until a later rise restores it. It books the other half once, on the next year's earnings.
   - A firm of dominant capital keeps its price and books its whole loss once. It holds back
-    production: it holds back the unsold part of the employees it would otherwise have. It
+    production: it holds back the unsold part of its own goods from the employees it would
+    otherwise have. It
     seeks the same number of employees by buying firms.
   - No firm books a loss larger than the earnings it priced for. If buyers did not even pay
     back the wage bill, each firm keeps the core's allowance for rounding of its markup, and
@@ -99,8 +102,8 @@ WHAT IS ADDED
 
 The book gives no account of how much can be sold. Everything here is an addition: the account
 itself; that owners lay out all they are paid; that the equipment of a new
-job is bought on top of it; that the shortfall falls on every firm in
-proportion to its priced earnings; how far small sellers cut prices; that dominant capital
+job is bought on top of it; that the shortfall falls on firms by one measure of standing alone,
+whether they are of dominant capital, and on all other firms alike; how far small sellers cut prices; that dominant capital
 cuts its hiring by the unsold part and buys firms in place of the jobs; and the number of
 years over which the two conditions are judged; and that a payment to people out of work is a
 fixed part of the wage, paid by a tax at a rate set once.
@@ -132,6 +135,21 @@ from the national accounts of the United States for 1947 to 2019 (Bureau of Econ
     0.16 before 1984 and 0.11 after it. The 2014 paper names these "automatic stabilizers". In
     terms of power: what wage earners won as a claim on the government for those the firms
     do not employ, which shrank as their organisation weakened after 1980.
+
+WHO BEARS A SHORTFALL
+
+Within one industry the book says little. Nitzan's thesis (1992, chapter 8, "Inflationary
+restructuring: why?") reports the dual-economy finding that firms in the "big economy" enjoyed
+higher returns and that "their performance in terms of key financial indicators was much more
+stable and far less risky". The figure is from outside the tradition: Crouzet and Mehrotra
+(American Economic Review, 2020), from the Quarterly Financial Report of United States
+manufacturing, 1977 to 2014. They find that "a 1 percent drop in GDP is associated with a 2.5
+percent drop in sales at the top 1 percent of firms and a 3.1 percent drop in sales in the bottom
+99 percent", that the difference holds with industry controls, and that it is "concentrated at the
+very top of the distribution", with no measurable difference within the bottom 99 per cent.
+`top_sensitivity`, 0.81, is 2.5 ÷ 3.1; one standard error of their difference gives 0.74 to 0.87. In
+terms of power: the largest firms hold their buyers, and the others bear more of what goes unsold.
+A top 100 of 30,000 to 300,000 firms is the top 0.03 to 0.3 per cent, at the top of their scale.
 
 With the first three figures, the account is the one the paper reports from Kalecki
 and from Baran and Sweezy: the part of owners' income that is not paid out and not built with
@@ -199,7 +217,7 @@ class Sales:
     }
 
     def __init__(self, job_cost=3.0, price_give=0.5, held_back=1.0, buy_instead=1.0, paid_out=0.75,
-                 payout_follows=0.5, benefit=0.13, judged_over=5, significant=0.01, top=100):
+                 payout_follows=0.5, benefit=0.13, judged_over=5, significant=0.01, top=100, top_sensitivity=0.81):
         self.job_cost = job_cost        # money spent on equipment for each new job, in years of the wage
         self.price_give = price_give    # part of its shortfall that a price-cutting seller takes out of its markup within a year
         self.held_back = held_back      # fall in the hiring rate of a firm of dominant capital per unit of the unsold part
@@ -210,6 +228,7 @@ class Sales:
         self.judged_over = judged_over  # years over which each condition of accumulation is judged
         self.significant = significant  # a fall smaller than this part of the level counts as steady
         self.top = top
+        self.top_sensitivity = top_sensitivity  # fall of a dominant firm's sales, in logarithms, for each unit of the fall of the others' (Crouzet and Mehrotra 2020)
         self.payout_follows = payout_follows   # part of the gap between what owners are paid and the paid-out part of the last income that closes in a year
         self.payout = None              # what owners are paid and lay out in a year, in years of the wage
         self.carried = {WAGE_EARNERS: 0.0, GOVERNMENT: 0.0}   # money that found no goods to buy last year
@@ -306,7 +325,10 @@ class Sales:
 
         unsold = a["unsold"] / a["offered"]               # the unsold part of everything offered
         sold = 1.0 - a["unsold"] / a["priced_earnings"]   # the part of priced earnings that was received
-        held_back = self.held_back * unsold
+        total = min(1.0 - sold, 1.0 - ROUNDING)
+        lost = self.split(L.n * asked, dominant, total)
+        # A firm of dominant capital holds back the unsold part of its own goods.
+        held_back = self.held_back * unsold * (float(lost[dominant][0]) / total if total > 0 and dominant.any() else 1.0)
         changes = [Publish("unsold", float(unsold), self.name),
                    Publish("sold_part", float(sold), self.name),
                    # the green-field module takes this off the hiring rate of dominant firms next year
@@ -319,20 +341,42 @@ class Sales:
                    Publish("accumulation_differential", differential, self.name),
                    Publish("accumulation_share", share, self.name),
                    Publish("crisis_of_capital", float(differential + share < 2.0), self.name)]
-        # Every firm loses the same part of its priced earnings. A firm of dominant capital keeps its
-        # price and books the whole loss once, on this year's earnings. Any other firm takes a part of
-        # the loss out of its price, where it stays until a later rise restores it, and books the rest.
-        # A firm cannot book a loss larger than the earnings it priced for. When buyers did not even pay
-        # back the wage bill, the rest of the loss is paid out of what owners hold, which is not part of any
-        # firm's earnings, such as public debt repaid to them, and the firm keeps the core's allowance for
+        # Firms of dominant capital lose a smaller part of their priced earnings than the rest: in the
+        # logarithm, their fall is `top_sensitivity` times the fall of the other firms. The parts are set
+        # so that the losses add up to the unsold amount. A firm of dominant capital keeps its price and
+        # books the whole loss once, on this year's earnings. Any other firm takes a part of the loss out
+        # of its price, where it stays until a later rise restores it, and books the rest. A firm cannot
+        # book a loss larger than the earnings it priced for. When buyers did not even pay back the wage
+        # bill, the rest of the loss is paid out of what owners hold, which is not part of any firm's
+        # earnings, such as public debt repaid to them, and the firm keeps the core's allowance for
         # rounding. The failure module then finds it with no cover for its interest.
-        lost = min(1.0 - sold, 1.0 - ROUNDING)
         price_cut = np.where(dominant, 0.0, self.price_give * lost)
         changes += [SetComponent(SHORTFALL, (1.0 - lost) / (1.0 - price_cut), self.name),
                     SetComponent(CARRIED, asked * (lost - price_cut), self.name)]
-        if lost > 0:
+        if total > 0:
             changes.append(ScaleComponent(PRICE_CUT, 1.0 - price_cut, self.name))
         return changes + self.pay_out_of_work(L)
+
+    def split(self, priced, dominant, total):
+        """Each firm's lost part of its priced earnings, when `total` of all priced earnings went unsold.
+
+        A firm outside dominant capital keeps the part x of its priced earnings and a firm of dominant
+        capital keeps x to the power `top_sensitivity`, with x set so that the losses, weighted by priced
+        earnings, add up to `total`."""
+        r = self.top_sensitivity
+        if total <= 0 or r == 1.0:
+            return np.full(priced.size, total)
+        top, rest = float(priced[dominant].sum()), float(priced[~dominant].sum())
+        target = total * (top + rest)
+        lo, hi = 0.0, 1.0                   # what is lost falls as x rises: find x by halving the interval
+        for _ in range(100):
+            x = 0.5 * (lo + hi)
+            if top * (1.0 - x ** r) + rest * (1.0 - x) > target:
+                lo = x
+            else:
+                hi = x
+        x = 0.5 * (lo + hi)
+        return np.where(dominant, 1.0 - x ** r, 1.0 - x)
 
     def pay_out_of_work(self, L):
         """Part 3a: pay to people out of work, from a tax at a rate set in law in the first year."""
