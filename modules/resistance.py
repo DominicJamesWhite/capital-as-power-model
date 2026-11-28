@@ -46,16 +46,16 @@ class Resistance:
         rise = (self.from_inflation * A.get("inflation_push", 0.0)
                 + self.from_unemployment * max(0.0, A["unemployment"] - self.usual_unemployment)
                 + self.from_power * A["concentration"]
-                + A.get("protection_anger", 0.0)                # anger at bailouts of dominant capital (optional module); 0 without it
-                + A.get("energy_grievance", 0.0)                # a fall in livelihood energy per head (optional module); 0 without it
-                + A.get("externalisation_grievance", 0.0))      # burdens shifted off the books onto employees and communities (optional module); 0 without it
-        repressed = A.get("repression", 0.0) * self.level       # organised force wears resistance down (optional module)
-        repressed = repressed * (1 - A.get("eruption_stays_force", 0.0))   # an eruption stays the hand of force (optional module); 0 without it
-        repressed = repressed + A.get("household_debt_placation", 0.0) * self.level   # new borrowing dampens resentment (optional module); 0 without it
+                + A.get("protection_anger", 0.0)                # anger at bailouts of dominant capital (another module); 0 without it
+                + A.get("energy_grievance", 0.0)                # a fall in livelihood energy per head (another module); 0 without it
+                + A.get("externalisation_grievance", 0.0))      # burdens shifted off the books onto employees and communities (another module); 0 without it
+        repressed = A.get("repression", 0.0) * self.level       # organised force wears resistance down (another module)
+        repressed = repressed * (1 - A.get("eruption_stays_force", 0.0))   # an eruption stays the hand of force (another module); 0 without it
+        repressed = repressed + A.get("household_debt_placation", 0.0) * self.level   # new borrowing dampens resentment (another module); 0 without it
         new = float(np.clip(self.level + rise - self.fade * self.level - repressed, 0.0, 1.0))
         self.roadblocks = float(np.clip(self.roadblocks + self.from_mergers * A.get("merger_volume", 0.0)
                                         - self.fade * self.roadblocks
-                                        # a government organ that owns shares and trails the average wears roadblocks down (optional module); 0 without it
+                                        # a government organ that owns shares and trails the average wears roadblocks down (another module); 0 without it
                                         - A.get("sovereign_relief", 0.0) * self.roadblocks, 0.0, 1.0))
         changes = [Publish("resistance", new, self.name), Publish("roadblocks", self.roadblocks, self.name)]
         if new > self.level:

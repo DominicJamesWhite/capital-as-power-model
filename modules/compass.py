@@ -1,5 +1,7 @@
 """Module 7: the differential compass (Capital as Power, chapters 14, 16 and 17).
 
+It can run in place of the compass that needs a consensus (module 15), which runs by default.
+
 Dominant capital aims to beat the average. Merger is its usual route. The book says that
 "temporary declines in mergers and acquisitions typically were 'compensated' for by sharp
 increases in stagflation", and that stagflation "promptly abated" when amalgamation resumed.
@@ -19,6 +21,7 @@ from core import Publish, readouts
 
 class Compass:
     name = "compass"
+    replaces = ("compass by targets", "compass by lead", "compass by consensus")   # only one compass runs
     reads = ("concentration", "merger_volume", "unemployment")
     supplies = ("cohesion", "stagflation_intensity")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -43,7 +46,7 @@ class Compass:
         # so cohesion rises with slack. That resistance lowers cohesion is an addition.
         A = L.accounts
         slack = 1 + self.slack * (A["unemployment"] - self.usual_unemployment)
-        loosened = A.get("breadth_cohesion", 1.0)   # proletarianization loosens cohesion while it lasts (optional module); 1 without it
+        loosened = A.get("breadth_cohesion", 1.0)   # proletarianization loosens cohesion while it lasts (another module); 1 without it
         return float(np.clip(A["concentration"] * max(slack, 0.0), 0, 1) * (1 - min(1.0, A.get("resistance", 0.0))) * loosened)
 
     def start(self, L):

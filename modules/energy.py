@@ -1,4 +1,4 @@
-"""Optional module: energy capture and hierarchy (a physical account kept beside the ledger).
+"""Module 32: energy capture and hierarchy (a physical account kept beside the ledger).
 
 THE RULE IN PLAIN WORDS
 
@@ -161,7 +161,7 @@ that Fix measures is absent, and so are the churches, schools, courts and police
 lists. The self-employed and businesses that are not corporations are not in the ledger
 either, so the average size of a firm is far above the average size of a firm in Fix's data
 and the level of energy per head is too high. Propaganda is not counted, although the
-optional module on the shaping of wants holds a money outlay for it, because turning money
+module on the shaping of wants holds a money outlay for it, because turning money
 into joules would need a price of energy. The hierarchies that the paper places outside
 formal organisations, in markets and networks, are not counted. The energy lost in
 conversion is not kept apart. The rulers do not respond to the share H, although the paper
@@ -231,7 +231,7 @@ class Energy:
         need = 1.0 + self.containment * min(1.0, max(0.0, A.get("resistance", 0.0)))   # part 4
         hierarchical = energy * self.command_part(L.n) * need                        # parts 3 and 4
         H = hierarchical.sum() / total
-        # part 5: military jobs (optional organised force module; 0 without it), less what is already counted
+        # part 5: military jobs (the organised force module; 0 without it), less what is already counted
         military = A.get("force_jobs", 0.0) * L.shared["workforce"] * total / L.n.sum()
         force = military * (1.0 - H)
         H = (hierarchical.sum() + force) / total

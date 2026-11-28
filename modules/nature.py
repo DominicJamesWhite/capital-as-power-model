@@ -1,4 +1,4 @@
-"""Optional module: ownership of nature.
+"""Module 34: ownership of nature.
 
 THE RULE IN PLAIN WORDS
 

@@ -1,8 +1,8 @@
-"""Optional module: the normal rate of return following employment.
+"""Module 22: the normal rate of return following employment.
 
 THE RULE IN PLAIN WORDS
 
-In the main modules the normal rate of return is one fixed number. This module moves it. The
+Without this module the normal rate of return is one fixed number. This module moves it. The
 module is a rule for the conduct of government organs, which the book treats as bodies of the
 same mode of power as corporations. Nothing in the rule comes from outside the model. The
 growth of employment comes from the hiring that the other modules produce, and the change of

@@ -1,4 +1,4 @@
-"""Optional module: hierarchy inside the firm (a readout; it changes nothing in the ledger).
+"""Module 29: hierarchy inside the firm (a readout; it changes nothing in the ledger).
 
 THE RULE IN PLAIN WORDS
 

@@ -136,9 +136,8 @@ def check_formula():
     """Earnings per employee equal wage x markup + other income for every firm, with many modules on."""
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     names = ["leaders", "protections", "wants", "public_debt", "household_debt", "externalisation"]
-    m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
+    m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(names), seed=0)
     L = m.L
     worst = 0.0
     for _ in range(30):
@@ -185,10 +184,9 @@ def check_ownership():
     # every unit is one the workbench knows. Every number the core names is a readout, or is listed with its source.
     import importlib
     import registry
-    from full import all_modules
     from core import CORE_FIGURES, CORE_FIGURES_ELSEWHERE, FIGURE_UNITS
-    classes = [type(m) for m in all_modules()]
-    classes += [getattr(importlib.import_module(path), name) for path, name in registry.OPTIONAL.values()]
+    classes = [getattr(importlib.import_module(path), name)
+               for path, name in list(registry.MODULES.values()) + list(registry.REPLACEMENTS.values())]
     classes = list(dict.fromkeys(classes))            # two registry names can point at one class
     named = 0
     for cls in classes:
@@ -348,7 +346,7 @@ def check_founding():
 
 
 def check_levels():
-    """Every optional module that takes the place of no other, with the main modules, for 60 years.
+    """The basic set, with every other module that does not do the job of one in it, for 60 years.
 
     The check is a test and not a limit: nothing in the model holds a component inside the range
     tested here. The run is made twice, with the core's netting of the record on and off. If the
@@ -357,16 +355,13 @@ def check_levels():
     rounding errors by one another."""
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     collapsed = False
-    names, seen = [], set()
-    for name, where in registry.OPTIONAL.items():
-        if where not in seen and not getattr(registry.make([name])[0], "replaces", ()):
-            names.append(name)
-        seen.add(where)
+    in_basic = {registry.load(k).name for k in registry.BASIC}
+    names = [k for k in registry.MODULES
+             if k not in registry.BASIC and not set(getattr(registry.load(k), "replaces", ())) & in_basic]
     result = {}
     for netting in True, False:
-        m = Model(starting_ledger(0, 3000), all_modules() + registry.make(names), seed=0, netting=netting)
+        m = Model(starting_ledger(0, 3000), registry.basic() + registry.make(names), seed=0, netting=netting)
         L = m.L
         low, high, furthest, base_low, base_high, beside = np.inf, 0.0, 0.0, np.inf, 0.0, 0.0
         for _ in range(60):
@@ -415,7 +410,7 @@ def check_levels():
     # 4. The test can fail: the gross record, without the netting, does not pass part 2, and its components
     #    stand further from 1.
     assert off["beside"] > 1.0 and off["furthest"] > 5 * on["furthest"]
-    print(f"11. Levels: with the main modules and {len(names)} optional modules on for {ran} steps"
+    print(f"11. Levels: with the basic set and {len(names)} other modules on for {ran} steps"
           f"{'' if ran == 60 else ' (after which fewer than 1 in 20 people had work)' if collapsed else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
@@ -486,10 +481,9 @@ def check_price():
     # 5. In a run with many modules, the stored price of every firm equals the formula in every year.
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     names = ["sales", "leaders", "protections", "wants", "nature", "coalitions", "boundary_contest", "barriers",
              "public_debt", "household_debt", "externalisation", "labour"]
-    m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
+    m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(names), seed=0)
     L = m.L
     worst, lowest, highest = 0.0, np.inf, -np.inf
     for _ in range(30):
@@ -634,11 +628,10 @@ def check_transfers():
     # 5. A run with the modules that propose transfers, in opposite listing orders.
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     names = ["public_debt", "household_debt", "risk_shaping", "privatisation", "labour", "sales"]
     histories, count, largest = [], 0, 0.0
     for order in names, names[::-1]:
-        m = Model(starting_ledger(0, 5000), all_modules() + registry.make(order), seed=0)
+        m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(order), seed=0)
         L = m.L
         for _ in range(40):
             before = dict(L.holds)
@@ -803,7 +796,6 @@ def check_sales_account():
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
               "externalisation", "proletarianization", "wants"]]
@@ -812,8 +804,7 @@ def check_sales_account():
     for names in mixes:
         histories = []
         for order in names, names[::-1]:
-            optional = registry.make(order)
-            m = Model(starting_ledger(0, 5000), all_modules() + optional, seed=0)
+            m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(order), seed=0)
             kept = 0.0
             for step in range(60):
                 try:
@@ -878,7 +869,7 @@ def check_sales_account():
 def check_failure():
     """Firms that fail: what each firm owes, how its debt is carried, who closes, and what the books show afterwards."""
     from stage2 import starting_ledger
-    from full import all_modules
+    import registry
     from modules.failure import Failure, DEBT, INTEREST, UNDER
     from modules.sales import Sales
     from modules.proletarianization import Proletarianization
@@ -1018,7 +1009,7 @@ def check_failure():
     from modules.privatisation import Privatisation
     from modules.public_debt import PublicDebt
     from modules.force import Force
-    m = Model(starting_ledger(0, 5000), all_modules() + [Sales(), Proletarianization(), Privatisation(), PublicDebt(), Force()],
+    m = Model(starting_ledger(0, 5000), registry.basic() + [Sales(), Proletarianization(), Privatisation(), PublicDebt(), Force()],
               seed=0)
     closed = restructured = 0
     for _ in range(60):
@@ -1042,7 +1033,6 @@ def check_payers():
     """The money for military orders, public employment, burdens off the books and advertising has a payer and a receiver."""
     import registry
     from stage2 import starting_ledger
-    from full import all_modules
     from modules.force import ARMED_FORCES
     from modules.wants import OUTLAY
 
@@ -1061,7 +1051,7 @@ def check_payers():
 
     # 2. A run with the four modules and the sales module.
     names = ["sales", "force", "privatisation", "externalisation", "wants"]
-    m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
+    m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(names), seed=0)
     arms = pay = burdens = advertising = short = 0.0
     kept = held = 0.0
     for step in range(45):

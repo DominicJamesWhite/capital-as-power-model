@@ -6,8 +6,8 @@ fault in the model cannot stop the workbench. It has two jobs:
     worker.py catalogue          print, as JSON, every module with its settings and descriptions
     worker.py run spec.json      run the model and print one line of JSON for each year
 
-Nothing about the modules is written here by hand. The list of optional modules comes from
-registry.py, the modules that always run come from full.all_modules(), the settings and their
+Nothing about the modules is written here by hand. The modules that run by default and the
+modules that can run in place of them come from registry.py, the settings and their
 defaults come from each class's constructor, and the descriptions come from modules.md and
 the docstrings. A module added or changed in the model appears here without any change.
 """
@@ -303,7 +303,7 @@ def describe(cls, registry_key, sections):
             section = s
             break
     m = re.match(r"\s*Module (\d+):", mod_doc)
-    if section is None and m and registry_key is None:
+    if section is None and m:
         for s in sections:
             if re.match(rf"{m.group(1)}\.\s", s["heading"]):
                 section = s
@@ -415,8 +415,10 @@ def core_figures(notes):
 
 
 def load_core():
-    import full
-    return full.all_modules()
+    """Every module that runs by default, as (short name, module) pairs in running order."""
+    import registry
+    keys = registry.plan()
+    return list(zip(keys, registry.make(keys)))
 
 
 def catalogue():
@@ -432,21 +434,21 @@ def catalogue():
     try:
         core_mods = load_core()
     except Exception as e:
-        out["problems"].append(f"The modules that always run could not be loaded: {type(e).__name__}: {e}")
+        out["problems"].append(f"The modules that run by default could not be loaded: {type(e).__name__}: {e}")
         core_mods = []
-    for m in core_mods:
+    for key, m in core_mods:
         cls = type(m)
-        entry = {"id": "core:" + m.name, "name": m.name, "class": cls.__name__, "file": cls.__module__,
+        entry = {"id": "core:" + m.name, "name": m.name, "key": key, "class": cls.__name__, "file": cls.__module__,
                  "settings": settings_of(cls), "replaces": [], "error": ""}
         entry.update(links_of(cls))
-        entry.update(describe(cls, None, sections))
-        entry.update(images_of(m.name))
+        entry.update(describe(cls, key, sections))
+        entry.update(images_of(key))
         out["core"].append(entry)
     try:
         import registry
-        optional = dict(registry.OPTIONAL)
+        optional = dict(registry.REPLACEMENTS)
     except Exception as e:
-        out["problems"].append(f"The list of optional modules in registry.py could not be loaded: {type(e).__name__}: {e}")
+        out["problems"].append(f"The list of replacements in registry.py could not be loaded: {type(e).__name__}: {e}")
         optional = {}
     import importlib
     for key, (path, clsname) in optional.items():
@@ -470,8 +472,6 @@ def catalogue():
 # ------------------------------------------------------------------ a run
 
 def build(spec):
-    import importlib
-    import full
     import registry
     warnings = []
     overrides = spec.get("settings", {})
@@ -494,35 +494,30 @@ def build(spec):
             used[name] = _jsonable(given[name]) if name in given else s["default"]
         return obj, used
 
-    chosen = []
+    swap = []
     for key in spec.get("optional", []):
-        if key not in registry.OPTIONAL:
-            raise ValueError(f"The optional module '{key}' is no longer listed in registry.py.")
-        path, clsname = registry.OPTIONAL[key]
-        try:
-            cls = getattr(importlib.import_module(path), clsname)
-        except Exception as e:
-            raise ValueError(f"The optional module '{key}' could not be loaded. The model said: {type(e).__name__}: {e}")
-        chosen.append((key, made(cls, "opt:" + key, key)))
-    taken = {}
-    for key, (obj, _) in chosen:
-        for name in getattr(obj, "replaces", ()):
-            if name in taken:
-                raise ValueError(f"The modules '{taken[name]}' and '{key}' both run in place of '{name}', "
-                                 f"so they cannot run together. Switch one of them off.")
-            taken[name] = key
-    replaced = set(taken)
-    modules, used, left_out = [], {}, []
-    for m in full.all_modules():
-        if m.name in replaced:
-            left_out.append(m.name)
-            continue
-        obj, u = made(type(m), "core:" + m.name, m.name)
+        if key in registry.MODULES or key in registry.ALIASES:
+            warnings.append(f"The module '{key}' now runs in every run, so choosing it changed nothing.")
+        elif key not in registry.REPLACEMENTS:
+            raise ValueError(f"The module '{key}' is no longer listed in registry.py.")
+        else:
+            swap.append(key)
+    try:
+        keys = registry.plan(swap, spec.get("without", []))
+        default = registry.plan()
+        classes = {k: registry.load(k) for k in set(keys) | set(default)}
+    except (KeyError, ValueError) as e:
+        raise ValueError(f"The modules you chose cannot run together. The model said: {str(e).strip(chr(39))}")
+    except Exception as e:
+        raise ValueError(f"A module could not be loaded. The model said: {type(e).__name__}: {e}")
+    modules, used = [], {}
+    left_out = [classes[k].name for k in default if k not in keys]
+    for key in keys:
+        cls = classes[key]
+        mid = "opt:" + key if key in registry.REPLACEMENTS else "core:" + cls.name
+        obj, u = made(cls, mid, key if key in registry.REPLACEMENTS else cls.name)
         modules.append(obj)
-        used["core:" + m.name] = u
-    for key, (obj, u) in chosen:
-        modules.append(obj)
-        used["opt:" + key] = u
+        used[mid] = u
     names = [m.name for m in modules]
     twice = sorted({n for n in names if names.count(n) > 1})
     if twice:

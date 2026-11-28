@@ -1,4 +1,4 @@
-"""Optional module: who holds the public debt and who pays for it.
+"""Module 21: who holds the public debt and who pays for it.
 
 THE RULE IN PLAIN WORDS
 

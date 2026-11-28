@@ -1,4 +1,4 @@
-"""Optional module: the shaping of wants.
+"""Module 30: the shaping of wants.
 
 THE RULE IN PLAIN WORDS
 

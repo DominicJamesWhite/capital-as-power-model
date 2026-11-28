@@ -1,4 +1,4 @@
-"""Optional module: governments as owners.
+"""Module 38: governments as owners.
 
 THE RULE IN PLAIN WORDS
 

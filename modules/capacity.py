@@ -1,4 +1,4 @@
-"""Optional module: plant that stands idle.
+"""Module 12: plant that stands idle.
 
 THE RULE IN PLAIN WORDS
 

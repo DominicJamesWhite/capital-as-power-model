@@ -1,4 +1,4 @@
-"""Optional module: synchronisation of regimes. A readout. It changes no term of any firm.
+"""Module 39: synchronisation of regimes. A readout. It changes no term of any firm.
 
 Sources. Capital as Power (2009), chapter 14, "Spread, integration, oscillation". Chapter 17,
 "Amalgamation versus stagflation", Figure 17.1 with its notes, and the endnote that reports a

@@ -1,4 +1,4 @@
-"""Optional module: the contest over a boundary. It runs in place of module 9 (envelope.py).
+"""Module 14: the contest over a boundary. Module 9 (envelope.py) can run in its place.
 
 THE RULE IN PLAIN WORDS
 
@@ -85,7 +85,7 @@ COST = "rival cost"    # this module's markup component: the markup lost to new 
 
 class BoundaryContest:
     name = "boundary contest"
-    replaces = ("envelope",)      # full.py leaves the envelope module out when this one is switched on
+    replaces = ("envelope",)      # both move the same two boundaries, so only one of them runs
     reads = ("pool_open", "concentration")
     supplies = ("pressure", "boundary_push", "boundary_hold")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -122,7 +122,7 @@ class BoundaryContest:
         commitment = 1.0 - min(1.0, A.get("stagflation_intensity", 0.0))
         push = need * self.sway(L) * commitment
         hold = self.hold * A.get("roadblocks", 0.0)
-        hold = hold * (1.0 - A.get("barrier_bargain", 0.0))   # forced sales at home traded for an opening (optional module); 0 without it
+        hold = hold * (1.0 - A.get("barrier_bargain", 0.0))   # forced sales at home traded for an opening (another module); 0 without it
         net = push - hold
         sector, nation = L.shared.get("perm_sector", 0.0), L.shared.get("perm_nation", 0.0)
         changes = [Publish("pressure", need, self.name),

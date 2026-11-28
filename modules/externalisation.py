@@ -1,4 +1,4 @@
-"""Optional module: externalisation (an account of burdens that no firm's books carry).
+"""Module 33: externalisation (an account of burdens that no firm's books carry).
 
 THE RULE IN PLAIN WORDS
 

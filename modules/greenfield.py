@@ -47,7 +47,7 @@ class Greenfield:
         k, ind, n = L.sector_of.size, L.ind, L.n
         employed = n.sum()
         workforce = L.shared["workforce"] * (1 + L.shared["workforce_growth"])
-        workforce = workforce + L.accounts.get("public_workforce_change", 0.0)   # people entering from, or leaving for, publicly run employment (optional module); 0 without it
+        workforce = workforce + L.accounts.get("public_workforce_change", 0.0)   # people entering from, or leaving for, publicly run employment (another module); 0 without it
         dominant = np.zeros(len(L), dtype=bool)
         dominant[top_positions(L.cap(), np.arange(len(L)), self.top)] = True
         A = L.accounts
@@ -65,7 +65,7 @@ class Greenfield:
         taken = np.where(takers, taken[ind], 0.0)
         rate = rate + taken
         rate = rate - A.get("crisis", 0.0)                      # stagflation's cut in hiring: the crisis
-        # production held back for want of sales (optional module); 0 without it. It is a part of what the firm
+        # production held back for want of sales (another module); 0 without it. It is a part of what the firm
         # would otherwise employ, so a firm that holds back everything keeps nobody and never fewer.
         rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0) * (1 + rate)
         jobs = rate * n
@@ -82,14 +82,14 @@ class Greenfield:
         served = np.bincount(ind, taken * kept_on * n, k)
         sought = (np.bincount(ind, jobs, k) - served) / safe + closed * served / np.maximum(hired, 1e-300)
         room = workforce * (1 - self.floor) - employed - jobs[~up].sum()
-        room = room - A.get("force_hires", 0.0)                  # military hiring planned for this year (optional module)
-        room = room - A.get("privatisation_jobs", 0.0)           # privatised employees arrive with their jobs (optional module); 0 without it
+        room = room - A.get("force_hires", 0.0)                  # military hiring planned for this year (another module)
+        room = room - A.get("privatisation_jobs", 0.0)           # privatised employees arrive with their jobs (another module); 0 without it
         if jobs[up].sum() > room:                                # hiring cannot exceed the working population
             jobs[up] *= max(room, 0.0) / jobs[up].sum()
 
         # part of small firms' hiring founds new firms, less where entry is barred
-        entry = A["entry_open"] * A.get("protection_open", 1.0)   # protections bar entry too (optional module); 1 without it
-        entry = entry * A.get("nature_open", 1.0)                 # owners of nature bar entry too (optional module); 1 without it
+        entry = A["entry_open"] * A.get("protection_open", 1.0)   # protections bar entry too (another module); 1 without it
+        entry = entry * A.get("nature_open", 1.0)                 # owners of nature bar entry too (another module); 1 without it
         to_new = np.where(up & ~dominant, jobs * self.new_firm_share * entry[ind], 0.0)
         # A new firm is measured against the working population for each firm, not against the people whom
         # existing firms still employ: what it takes to enter an industry does not shrink when the firms

@@ -61,23 +61,23 @@ class Sabotage:
         n = np.bincount(L.ind, L.n, k)
         held = np.bincount(L.ind[dominant], L.n[dominant], k)
         priced = L.markup_earnings()          # earnings from the markup alone: interest and other income are left out
-        # The rule works on the markup that firms price for. Where goods were unsold (optional module), each
+        # The rule works on the markup that firms price for. Where goods were unsold (another module), each
         # firm's earnings are divided by the part of them that it received; without that module the division is by 1.
         priced = priced / L.components.get("sales shortfall", 1.0)
         earnings = np.bincount(L.ind, priced, k)
         safe = np.maximum(n, 1e-12)
         markup = np.where(n > 0, earnings / (L.shared["wage"] * safe), self.normal_markup)
         held = held / safe
-        held = np.maximum(held, L.accounts.get("second_country_held", 0.0))   # the part held by a second country's own dominant group (optional module); 0 without it
-        held = np.minimum(1.0, held + L.accounts.get("foreign_held", 0.0))   # the part owned by dominant capital across a border (optional module); 0 without it
+        held = np.maximum(held, L.accounts.get("second_country_held", 0.0))   # the part held by a second country's own dominant group (another module); 0 without it
+        held = np.minimum(1.0, held + L.accounts.get("foreign_held", 0.0))   # the part owned by dominant capital across a border (another module); 0 without it
         return n, held, markup
 
     def hiring(self, L, held, markup, held_rise):
         g = L.shared["workforce_growth"]
-        # the normal markup moves with the normal rate of return (optional module); the number is 1 without it
+        # the normal markup moves with the normal rate of return (another module); the number is 1 without it
         excess = markup - self.normal_markup * L.accounts.get("policy_rate_markup", 1.0)
-        unbarred = L.accounts.get("protection_open", 1.0)   # part of each industry not under a protection (optional module); 1 without it
-        unbarred = unbarred * L.accounts.get("nature_open", 1.0)   # part of each industry that owners of nature leave open (optional module); 1 without it
+        unbarred = L.accounts.get("protection_open", 1.0)   # part of each industry not under a protection (another module); 1 without it
+        unbarred = unbarred * L.accounts.get("nature_open", 1.0)   # part of each industry that owners of nature leave open (another module); 1 without it
         small = g + self.response * excess * np.where(excess > 0, (1 - held) * unbarred, 1.0)   # entry barred where held
         n = np.bincount(L.ind, L.n, L.sector_of.size)
         pack = (small * n * (1 - held)).sum() / max((n * (1 - held)).sum(), 1e-12)
@@ -104,10 +104,10 @@ class Sabotage:
         # that did not take place; 0 when no firm failed.
         growth = growth - L.accounts.get("failed_by_industry", 0.0)
         # Resistance strengthens labour: wages then keep pace with prices at a higher level of unemployment.
-        # The strength of organised labour in each industry (optional module) takes the place of popular resistance here.
+        # The strength of organised labour in each industry (another module) takes the place of popular resistance here.
         labour = L.accounts.get("labour_strength_by_industry", L.accounts.get("resistance", 0.0))
         holds_at = self.labour_holds_at + self.resistance_shift * labour
-        holds_at = holds_at + L.accounts.get("second_country_labour", 0.0)       # a second country's own strength of labour (optional module); 0 without it
+        holds_at = holds_at + L.accounts.get("second_country_labour", 0.0)       # a second country's own strength of labour (another module); 0 without it
         # Part 5. Unemployment sets a level for the capitalist share, and the share moves toward it. What has
         # been gained so far is remembered, so a year of unchanged unemployment adds only what is still missing.
         # When fewer people are without work than at that level, employers compete for them and wage earners press
@@ -117,10 +117,10 @@ class Sabotage:
         gain = (level - self.standing) / self.gain_years
         self.standing = self.standing + gain
         wages = gain * (1 + markup) ** 2          # a share s is a markup of s / (1 - s), so a small rise ds of the share is ds (1 + markup)^2 of markup
-        wages = wages + L.accounts.get("currency_markup", 0.0)                    # a devaluation raises prices against wages (optional currencies module); 0 without it
+        wages = wages + L.accounts.get("currency_markup", 0.0)                    # a devaluation raises prices against wages (the currencies module); 0 without it
         undercut = -(1 - held) * self.erosion * (growth - g)                     # part 2
         grip = 1 - min(1.0, L.accounts.get("resistance", 0.0))                    # coordination weakens under resistance
-        grip = grip * (1 - L.accounts.get("eruption_frees_markups", 0.0))         # an eruption suspends the hold (optional module); 0 without it
+        grip = grip * (1 - L.accounts.get("eruption_frees_markups", 0.0))         # an eruption suspends the hold (another module); 0 without it
         held_rise = held * self.hold * (self.target_markup * grip + self.normal_markup * (1 - grip) - markup)   # part 4
         # Part 4 adds the three changes. A rise is added; a fall is taken out of the margin as a part of what
         # is left, so it can take the markup close to nothing but never through it (squeeze in core.py).

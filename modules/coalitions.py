@@ -1,4 +1,4 @@
-"""Optional module: coalitions inside dominant capital.
+"""Module 16: coalitions inside dominant capital.
 
 THE RULE IN PLAIN WORDS
 

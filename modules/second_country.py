@@ -1,4 +1,4 @@
-"""Optional module: a second country behind capital controls.
+"""Module 35: a second country behind capital controls.
 
 Sources. Capital as Power (2009), chapter 14, Proposition 5; chapter 15, "Breaking the envelope", the
 section "Globalization", and the footnote on South Africa. Nitzan and Bichler, "Going Global:
@@ -91,7 +91,7 @@ class _View:
 
 class SecondCountry:
     name = "second_country"
-    replaces = ("mergers",)      # full.py leaves the merger module out; this module applies its rule to each country
+    replaces = ("mergers",)      # this module applies the merger rule to each country, so only one of them runs
     reads = ()
     supplies = ("merger_volume", "hiring_drag", "pool_open",
                 "second_country_held", "second_country_labour", "border_open", "second_conglomerate",
@@ -213,7 +213,7 @@ class SecondCountry:
         # part 5, second half: small firms change owners across the border
         n_home, n_second = n[home_pos].sum(), n[sec_pos].sum()
         inward = outward = 0.0
-        # the cross-border ownership module (optional) takes over these purchases and moves no employees; 0 without it
+        # the cross-border ownership module takes over these purchases and moves no employees; 0 without it
         if p > 0 and sec_pos.size and not A.get("cross_border_on", 0.0):
             # a firm bought this year is not bought again or made a buyer, and a firm that bought this year
             # is not bought; the merger rule ranks each country's firms afresh, so its buyers and targets can
@@ -241,7 +241,7 @@ class SecondCountry:
         if cross_t:
             changes.append(Merge(np.array(cross_b), np.array(cross_t), "mergers", self.home.risk_cut))
         inward += absorbed_n
-        # employees whose firms changed owners across the border without a merger (optional module); 0 without it
+        # employees whose firms changed owners across the border without a merger (another module); 0 without it
         inward += A.get("cross_border_inward", 0.0) * n.sum()
         outward += A.get("cross_border_outward", 0.0) * n.sum()
         self.bought_in += inward

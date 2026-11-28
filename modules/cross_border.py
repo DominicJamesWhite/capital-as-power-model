@@ -1,4 +1,4 @@
-"""Optional module: cross-border ownership.
+"""Module 36: cross-border ownership.
 
 THE RULE IN PLAIN WORDS
 
@@ -17,8 +17,7 @@ industry, its price and its earnings per employee. No firm is merged and no empl
   2. The openness of the border is the number `border_open` when the second_country module
      supplies it. Without that module nothing in the model raises capital controls, and the
      border is taken to be open. In both cases buying is slowed by the roadblocks of both
-     countries, and it follows the mood of the merger module (hype and eruptions) when those
-     optional modules are on.
+     countries, and it follows the mood of the merger module (hype and eruptions).
   3. Foreign owners also sell back. Each year each foreign-owned firm returns to local owners
      with a chance that is a set rate times one minus the openness of part 2, which counts the
      border, the roadblocks and the mood for mergers together. A
@@ -217,7 +216,7 @@ class CrossBorder:
             pool = np.flatnonzero(sits[other] & ~abroad & ~dominant)
             n_other = n[sits[other]].sum()
             want = self.rate * n[tops[c]].sum() * openness * (n[pool].sum() / n_other if n_other > 0 else 0.0)
-            want = want * A.get("currency_buying_%d" % c, 1.0)     # a cheap currency raises buying, flight lowers it (optional currencies module); 1 without it
+            want = want * A.get("currency_buying_%d" % c, 1.0)     # a cheap currency raises buying, flight lowers it (the currencies module); 1 without it
             pool = rng.permutation(pool)
             run = np.cumsum(n[pool])
             k = int(np.searchsorted(run, want, side="right"))      # firms that fit whole within what is sought
@@ -228,7 +227,7 @@ class CrossBorder:
             buy = pool[:k]
             factor[buy] = ABROAD / LOCAL
             # part 3: sales back to local owners
-            # owners liquidate where earnings growth falls short of the world average (optional currencies module); 0 without it
+            # owners liquidate where earnings growth falls short of the world average (the currencies module); 0 without it
             sell = owned[c][rng.random(owned[c].size) < self.retreat * (1.0 - openness) + A.get("currency_flight_%d" % c, 0.0)]
             factor[sell] = LOCAL / ABROAD
             bought_n[c] = float(n[buy].sum())

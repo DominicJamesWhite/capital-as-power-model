@@ -1,7 +1,7 @@
-"""Optional module: the power index and systemic fear. A readout, with one optional link.
+"""Module 40: the power index and systemic fear. A readout, with one link.
 
 The module changes no term of any firm. It measures two things that Bichler and Nitzan define in
-"A CasP Model of the Stock Market" (2016), and it publishes one number that the optional hype
+"A CasP Model of the Stock Market" (2016), and it publishes one number that the hype
 module reads. With the hype module off, a run with this module gives exactly the figures of the
 run without it.
 

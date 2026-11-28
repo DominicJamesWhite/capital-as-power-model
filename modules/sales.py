@@ -1,8 +1,8 @@
-"""Optional module: what can be sold.
+"""Module 11: what can be sold.
 
 THE RULE IN PLAIN WORDS
 
-The main modules take it that firms sell all they offer. This module keeps an account of
+Without this module the model takes it that firms sell all they offer. This module keeps an account of
 who buys. Once a year it adds up, for the year just ended, the money that each party had and
 what that money bought. The account is kept in money: what firms offer is the wage bill, plus
 the earnings they priced for, plus the costs in their prices that they lay out on what other
@@ -168,7 +168,7 @@ services, pass from owners to owners (the government retires debt with it), so t
 goods and take none away. Two costs in prices are not payments to anybody and are left out:
 the difference that cost cutting makes to a firm's costs, which is a saving or a lag against
 the wage, and this module's own entry for goods left unsold. The part of the gain from burdens
-off the books (optional module) that falls on later years is an entry in a firm's accounts
+off the books (another module) that falls on later years is an entry in a firm's accounts
 and not money, so owners cannot spend it. The services of public employees are not sold, so
 they are not among the goods offered; their pay is counted with what wage earners have.
 """

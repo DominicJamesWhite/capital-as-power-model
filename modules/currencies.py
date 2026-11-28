@@ -1,4 +1,4 @@
-"""Optional module: currencies and devaluation.
+"""Module 37: currencies and devaluation.
 
 THE RULE IN PLAIN WORDS
 

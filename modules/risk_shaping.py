@@ -1,4 +1,4 @@
-"""Optional module: risk shaping.
+"""Module 20: risk shaping.
 
 THE RULE IN PLAIN WORDS
 

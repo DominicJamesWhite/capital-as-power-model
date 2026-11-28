@@ -133,7 +133,7 @@ const firmify = t => String(t || "").replace(/\bdominant capital\b/gi, "the top 
 const human = n => { const t = n.replace(/_/g, " ").replace(/\bclaim\b/g, "firm"); return t.charAt(0).toUpperCase() + t.slice(1); };
 const setLabel = n => SETTING_LABEL[n] || human(n);
 const MODS = {};
-const CORE_ORDER = ["sabotage", "greenfield", "mergers", "cost cutting", "stagflation", "compass", "resistance", "envelope", "debt"];
+const CORE_ORDER = [];   // every module that runs by default, in running order, as the model lists them
 const keyOf = mid => mid.replace(/^(core|opt):/, "");
 const midOf = name => (MODS[name] && MODS[name].core ? "core:" : "opt:") + name;
 const modName = n => n === HUB ? "Ledger" : SHORT[keyOf(n)] || (MODS[keyOf(n)] || {}).title || human(keyOf(n));
@@ -258,7 +258,7 @@ function store(key, value) { try { localStorage.setItem("workbench:" + key, JSON
 function recall(key, fallback) { try { const v = localStorage.getItem("workbench:" + key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
 const STATUS = { finished: "done", running: "running", waiting: "waiting", stopped: "stopped", failed: "failed" };
 // A run records its modules, and their gain, under each module's own name (for example "risk
-// shaping"). The page knows optional modules by their name in registry.py ("risk_shaping"). Two
+// shaping"). The page knows replacements by their name in registry.py ("risk_shaping"). Two
 // registry names can share one module ("compasses" and "compass_consensus"), so prefer the one
 // the run switched on.
 function keyFor(n, optional) {
@@ -737,8 +737,8 @@ function gainTotal(run, name) { return run.rows.reduce((a, r) => a + (r.gain[nam
 function gainIn(run, name, year) { const r = run.rows.find(x => x.year === year); return r ? (r.gain[name === HUB ? "turnover" : name] || 0) : 0; }
 const inRun = (run, name) => name === HUB || run.modules.includes(name);
 const POS = {
-  greenfield: [170, 120], sabotage: [390, 120], compass: [610, 120], mergers: [830, 120],
-  debt: [170, 320], [HUB]: [390, 320], stagflation: [610, 320], envelope: [830, 320],
+  greenfield: [170, 120], sabotage: [390, 120], "compass by consensus": [610, 120], second_country: [830, 120],
+  debt: [170, 320], [HUB]: [390, 320], stagflation: [610, 320], "boundary contest": [830, 320],
   resistance: [390, 520], "cost cutting": [610, 520],
 };
 const SLOTS = [[170, 520], [830, 520], [55, 220], [945, 220], [55, 420], [945, 420], [280, 220], [500, 220], [720, 220],
@@ -931,7 +931,7 @@ function drawInspector() {
     const pic = el("picture", {}, m.image_dark ? el("source", { srcset: m.image_dark, media: "(prefers-color-scheme: dark)" }) : null, el("img", { src: m.image, alt: "" }));
     const wrap = el("div", { class: "pic" }, pic); pic.querySelector("img").addEventListener("error", () => wrap.remove()); kids.push(wrap);
   }
-  const kind = m.core ? "Main module. Always runs." : (m.replaces && m.replaces.length ? `Optional. Runs in place of ${m.replaces.map(r => modName(r).toLowerCase()).join(", ")}.` : "Optional module");
+  const kind = m.core ? "Runs by default." : `Runs in place of ${(m.replaces || []).filter(r => MODS[r] && MODS[r].core).map(r => modName(r).toLowerCase()).join(", ") || "another module"}.`;
   kids.push(el("h2", { text: modName(n) }), el("p", { class: "kind", text: kind }), el("p", { class: "sum", text: LINE[n] || "" }));
   if (marks.added.has(n)) kids.push(el("p", { class: "replaced-note", text: "Added in your set-up. Not run yet." }));
   if (marks.removed.has(n)) kids.push(el("p", { class: "replaced-note", text: "Removed in your set-up. Not run yet." }));
@@ -1185,7 +1185,7 @@ let form = null;
 function newRunForm(from, folder) {
   const src = from && hasData(from) ? from : (byId(state.baseline) || DEFAULT_BASE);
   form = { kind: "run", name: "", claims: src.claims, years: src.years, seed: src.seed, basedOn: src.id,
-    optional: new Set(src.optional), settings: JSON.parse(JSON.stringify(src.settings || {})),
+    optional: new Set((src.optional || []).filter(k => MODS[k] && !MODS[k].core)), settings: JSON.parse(JSON.stringify(src.settings || {})),
     folder: folder && gById(folder) ? folder : gById(state.recent) ? state.recent : groups.length ? groups[groups.length - 1].id : "__new",
     newFolder: "", view: "cards", mapSel: null, pick: new Set(), errors: [] };
 }
@@ -1219,7 +1219,7 @@ function moduleCard(m) {
   const refresh = () => { const n = changedHere(); badge.hidden = !n; badge.textContent = `${n} changed`; card.classList.toggle("changed", !!n); updateFoot(); };
   card.append(el("div", { class: "mcard-top" },
     m.image ? el("img", { src: m.image, alt: "", loading: "lazy", onerror: e => e.target.remove() }) : null,
-    el("div", {}, el("h4", {}, el("button", { class: "modlink", type: "button", "data-tip": "Show on the map", onclick: () => { form.view = "map"; form.mapSel = m.name; renderSetup(); } }, modName(m.name)), badge), el("div", { class: "kind", text: m.core ? "Always runs" : (m.replaces && m.replaces.length ? `Runs in place of ${m.replaces.map(r => modName(r).toLowerCase()).join(", ")}` : "Optional") }))),
+    el("div", {}, el("h4", {}, el("button", { class: "modlink", type: "button", "data-tip": "Show on the map", onclick: () => { form.view = "map"; form.mapSel = m.name; renderSetup(); } }, modName(m.name)), badge), el("div", { class: "kind", text: m.core ? "Runs by default" : `Runs in place of ${(m.replaces || []).filter(r => MODS[r] && MODS[r].core).map(r => modName(r).toLowerCase()).join(", ") || "another module"}` }))),
     ...(m.core ? [] : [el("button", { class: "x", type: "button", "aria-label": `Remove ${modName(m.name)}`, "data-tip": "Remove this module", text: "×", onclick: () => { form.optional.delete(m.name); afterDraftChange(); } })]),
     el("p", { class: "what", text: LINE[m.name] || "" }));
   if (rep) { card.append(el("p", { class: "replaced-note", text: `Replaced by ${modName(rep)}.` })); refreshLater(refresh); return card; }
@@ -1360,7 +1360,7 @@ function renderSetup() {
   let content;
   if (view === "cards") {
     content = el("div", { class: "mcards" }, CORE_ORDER.map(n => moduleCard(MODS[n])), [...form.optional].map(n => moduleCard(MODS[n])),
-      el("button", { class: "addcard", type: "button", onclick: openPicker }, el("b", { text: "+" }), "Add modules", el("span", { class: "small", text: `${CAT.optional.length - nOpt} optional modules` })));
+      el("button", { class: "addcard", type: "button", onclick: openPicker }, el("b", { text: "+" }), "Replace a module", el("span", { class: "small", text: `${CAT.optional.length - nOpt} replacements` })));
   } else { content = el("div", { class: "su-map" }); content.innerHTML = SU_MAP; }
   const body = el("div", {},
     el("div", { class: "basics" }, ...folderFields(),
@@ -1370,9 +1370,9 @@ function renderSetup() {
       el("div", {}, el("label", { class: "lbl", for: "f-years", text: "Years" }), el("input", { class: "input num", id: "f-years", value: form.years, inputmode: "numeric", oninput: e => { form.years = e.target.value.trim(); updateFoot(); } })),
       el("div", {}, el("label", { class: "lbl", for: "f-seed" }, term("seed", "Seed")), el("input", { class: "input num", id: "f-seed", value: form.seed, inputmode: "numeric", oninput: e => { form.seed = e.target.value.trim(); updateFoot(); } }))),
     el("div", { class: "su-sec-head" }, el("h3", { text: "Modules" }), seg, el("span", { class: "spacer" }),
-      view === "map" ? el("button", { class: "btn sm", type: "button", text: "+ Add modules", onclick: openPicker }) : null),
+      view === "map" ? el("button", { class: "btn sm", type: "button", text: "+ Replace a module", onclick: openPicker }) : null),
     el("p", { class: "sub", text: view === "cards"
-      ? `The 10 main modules always run. ${nOpt} optional module${nOpt === 1 ? " is" : "s are"} on. Select a module's name to see it on the map.`
+      ? `Every module runs. ${nOpt} replacement${nOpt === 1 ? " runs" : "s run"} in place of a module. Select a module's name to see it on the map.`
       : "Dashed rings mark changes that have not run yet. Select a module to go to its card." }),
     content);
   setupShell("New run", body, "Start run", startRun);
@@ -1386,7 +1386,7 @@ function jumpToCard(n) {
   if (n === HUB) { toast("The ledger is part of the model. It has no settings."); return; }
   form.view = "cards"; form.mapSel = null; renderSetup();
   const c = $("card-" + n.replace(/\W/g, "-"));
-  if (!c) { toast(`${modName(n)} is not on. Add it with Add modules.`); return; }
+  if (!c) { toast(`${modName(n)} is not on. Choose it with Replace a module.`); return; }
   c.scrollIntoView({ block: "center" }); flash(c);
 }
 function pendingCount() {
@@ -1442,7 +1442,7 @@ async function startRun() {
   } catch (e) { b.disabled = false; showErrors([[e.message]]); }
 }
 
-// ================================================ picker: add several modules at once
+// ================================================ picker: choose modules to run in place of others
 function openPicker() {
   const back = $("picker"); back.hidden = false;
   const errs = {};
@@ -1454,7 +1454,7 @@ function openPicker() {
   const note = el("p", { class: "summary muted", "aria-live": "polite" });
   const matches = () => { const t = q.value.trim().toLowerCase(); return CAT.optional.filter(m => !m.error && (!t || (m.name + " " + modName(m.name) + " " + (LINE[m.name] || "")).toLowerCase().includes(t))); };
   const free = () => matches().filter(m => !form.optional.has(m.name));
-  // Two modules that run in place of the same main module cannot run together, so Select all
+  // Two modules that run in place of the same module cannot run together, so Select all
   // keeps the first of them and leaves the others out.
   const clashes = (m, names) => (m.replaces || []).length && names.find(o => o !== m.name && (MODS[o].replaces || []).some(r => m.replaces.includes(r)));
   const allPicked = ms => ms.some(m => form.pick.has(m.name)) && ms.every(m => form.pick.has(m.name) || clashes(m, [...form.pick, ...form.optional]));
@@ -1467,12 +1467,12 @@ function openPicker() {
       const other = clashes(m, [...form.pick, ...form.optional]);
       if (other) left.push(modName(m.name)); else form.pick.add(m.name);
     }
-    note.textContent = left.length ? `${left.length} left out because another module already runs in place of the same main module: ${left.join(", ")}.` : "";
+    note.textContent = left.length ? `${left.length} left out because another module already runs in place of the same module: ${left.join(", ")}.` : "";
     draw();
   });
   const draw = focusId => {
     const keep = body.scrollTop, t = q.value.trim().toLowerCase();
-    const grpTitles = [["rule", "Add a rule"], ["instead", "Run in place of a main module"], ["measure", "Measure only. Changes no results."]];
+    const grpTitles = [["instead", "Run in place of a module"], ["rule", "Add a rule"], ["measure", "Measure only. Changes no results."]];
     body.replaceChildren(...grpTitles.flatMap(([gk, title]) => {
       const ms = CAT.optional.filter(m => optGroup(m) === gk && (!t || (m.name + " " + modName(m.name) + " " + (LINE[m.name] || "")).toLowerCase().includes(t)));
       if (!ms.length) return [];
@@ -1507,8 +1507,8 @@ function openPicker() {
     if (focusId && $(focusId)) $(focusId).focus({ preventScroll: true });
   };
   q.addEventListener("input", () => { note.textContent = ""; draw(); });
-  back.replaceChildren(el("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": "Add modules" },
-    el("div", { class: "modal-head" }, el("h2", { text: "Add modules" }), el("div", { class: "pick-tools" }, q, allBtn)),
+  back.replaceChildren(el("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": "Replace a module" },
+    el("div", { class: "modal-head" }, el("h2", { text: "Replace a module" }), el("div", { class: "pick-tools" }, q, allBtn)),
     body,
     el("div", { class: "modal-foot" }, el("div", { class: "pick-count" }, count, note), el("button", { class: "btn", type: "button", text: "Close", onclick: closePicker }), addBtn)));
   draw(); setTimeout(() => q.focus());
@@ -1598,8 +1598,8 @@ function toolForm(base) {
     t.mod = t.mod || "core:mergers";
     const m = MODS[keyOf(t.mod)];
     const modSel = el("select", { class: "select", id: "c-mod", onchange: e => { t.mod = e.target.value; t.name = null; renderExpSetup(); } },
-      el("optgroup", { label: "Main modules" }, CORE_ORDER.map(n => el("option", { value: "core:" + n, text: modName(n), selected: t.mod === "core:" + n || null }))),
-      el("optgroup", { label: "Optional modules" }, CAT.optional.map(o => el("option", { value: "opt:" + o.name, text: modName(o.name), selected: t.mod === "opt:" + o.name || null }))));
+      el("optgroup", { label: "Modules" }, CORE_ORDER.map(n => el("option", { value: "core:" + n, text: modName(n), selected: t.mod === "core:" + n || null }))),
+      el("optgroup", { label: "Replacements" }, CAT.optional.map(o => el("option", { value: "opt:" + o.name, text: modName(o.name), selected: t.mod === "opt:" + o.name || null }))));
     const opts = (m.core ? [] : [{ name: "__onoff", label: "On or off" }]).concat(m.settings.filter(x => x.name !== "top").map(x => ({ name: x.name, label: setLabel(x.name) })));
     t.name = t.name && opts.some(o => o.name === t.name) ? t.name : opts[0].name;
     const setSel = el("select", { class: "select", id: "c-set", onchange: e => { t.name = e.target.value; renderExpSetup(); } }, opts.map(o => el("option", { value: o.name, text: o.label, selected: o.name === t.name || null })));
@@ -1754,7 +1754,7 @@ async function boot() {
   for (const m of CAT.core) MODS[m.name] = { ...m, title: firmify(m.title), core: true };
   for (const m of CAT.optional) MODS[m.name] = { ...m, title: firmify(m.title), core: false };
   CORE_ORDER.splice(0, CORE_ORDER.length, ...CAT.core.map(m => m.name));
-  DEFAULT_BASE = { id: "__default", name: "The main modules", claims: 30000, years: 119, seed: 0, optional: [], settings: {}, modules: CAT.core.map(m => m.name), rows: [], step: -1, group: null };
+  DEFAULT_BASE = { id: "__default", name: "Every module", claims: 30000, years: 119, seed: 0, optional: [], settings: {}, modules: CAT.core.map(m => m.name), rows: [], step: -1, group: null };
   buildFigures();
   if ((CAT.problems || []).length) toast(CAT.problems[0]);
   const ticks = recall("ticks", []);

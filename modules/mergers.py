@@ -1,5 +1,8 @@
 """Module 4: mergers and acquisitions (Capital as Power, chapters 14 and 15).
 
+It can run in place of module 35 (second_country.py), which applies this rule to each of two
+countries and runs by default.
+
 Firms in dominant capital acquire firms they can reach. A firm can reach targets in its own
 industry, and targets in its sector and in the rest of the nation to the extent that those
 boundaries are open. The volume acquired falls as dominant capital comes to hold most of what
@@ -18,6 +21,7 @@ from core import Merge, Publish
 
 class Mergers:
     name = "mergers"
+    replaces = ("second_country",)   # that module applies this rule to each country, so only one of them runs
     reads = ()
     supplies = ("merger_volume", "hiring_drag", "pool_open")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -46,7 +50,7 @@ class Mergers:
         open_sector = L.shared.get("perm_sector", 0.0)
         open_nation = L.shared.get("perm_nation", 0.0)
         slow = min(1.0, self.counterforce * L.accounts.get("roadblocks", 0.0))
-        hyped = L.accounts.get("merger_hype", 1.0)     # takeover "thrives on investors' hype" (optional module); 1 without it
+        hyped = L.accounts.get("merger_hype", 1.0)     # takeover "thrives on investors' hype" (another module); 1 without it
 
         n_ind, n_sec = L.sector_of.size, int(L.sector_of.max()) + 1
         appetite = np.broadcast_to(np.asarray(L.accounts.get("merger_appetite", 1.0), dtype=float), n_sec)
@@ -64,10 +68,10 @@ class Mergers:
 
         buyers, targets, acquired = [], [], 0.0
         open_sum = weight_sum = 0.0
-        # a barrier that holds the dominant firms of a sector inside their own industry (optional module); 0 without it
+        # a barrier that holds the dominant firms of a sector inside their own industry (another module); 0 without it
         barred = np.broadcast_to(np.asarray(L.accounts.get("line_barrier", 0.0), dtype=float), n_sec)
         # employees that a buyer seeks by purchase in place of jobs it held back for want of sales, as a
-        # fraction of its own (optional module); 0 without it
+        # fraction of its own (another module); 0 without it
         seek = self.base_rate + L.accounts.get("bought_not_built", 0.0)
         open_sector_all, open_nation_all = open_sector, open_nation
         for a in rng.permutation(top):
@@ -80,9 +84,9 @@ class Mergers:
                 continue
             open_sum += n[a] * free / (free + held); weight_sum += n[a]
             want = seek * n[a] * free / (free + held) * (1 - slow)
-            want = want * appetite[s]      # a coalition's appetite for buying (optional module); 1 without it
+            want = want * appetite[s]      # a coalition's appetite for buying (another module); 1 without it
             want = want * hyped
-            want = want * (1 - L.accounts.get("eruption_stops_buying", 0.0))   # an eruption suspends the buying of firms (optional module); 0 without it
+            want = want * (1 - L.accounts.get("eruption_stops_buying", 0.0))   # an eruption suspends the buying of firms (another module); 0 without it
             reach = np.where(L.sector_of == s, open_sector, open_nation)   # openness toward each industry
             reach[i] = 1.0
             got = 0.0

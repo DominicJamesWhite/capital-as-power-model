@@ -1,4 +1,4 @@
-"""Optional module: eruptions that change the rules.
+"""Module 31: eruptions that change the rules.
 
 THE RULE IN PLAIN WORDS
 
@@ -34,7 +34,7 @@ ordinary years.
      module removes last year's rise before it applies this year's, so the rise lasts only as
      long as the eruption. Every firm is treated alike, so the rise lowers all capitalization
      and leaves differential capitalization nearly unchanged. The module also publishes the
-     level under the name "systemic_fear", which the optional hype and risk shaping modules
+     level under the name "systemic_fear", which the hype and risk shaping modules
      already read.
   6. Readouts. The module publishes the level, the count of years of strain, and the number
      of eruptions so far.
@@ -155,7 +155,7 @@ class Eruptions:
 
     def __init__(self, threshold=0.4, chance=0.1, lasts=3, restore=0.5, least=0.05,
                  frees_markups=1.0, stops_price_rises=1.0, stops_buying=1.0, stays_force=1.0, fear_risk=0.5):
-        self.threshold = threshold    # level of popular resistance that counts as very high (the bouts of the main modules reach 0.4 to 0.5)
+        self.threshold = threshold    # level of popular resistance that counts as very high (the bouts of the basic set in registry.py reach 0.4 to 0.5)
         self.chance = chance          # yearly chance of an eruption for each year in a row that resistance has stood at or above the threshold
         self.lasts = lasts            # years an eruption stands at full strength: the "brief historical moment"
         self.restore = restore        # part of the level that is lost each year after that, as the old rules return

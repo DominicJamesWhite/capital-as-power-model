@@ -6,13 +6,12 @@ The theory is set out in *Capital as Power: A Study of Order and Creorder* (2009
 
 The book describes how owners behave and what follows. It gives no formulas and no rates. Every rule in this file is therefore our own way of writing down what the book describes, and almost every number is our own choice. Each section says which is which.
 
-The file has three parts:
+The file has four parts:
 
-1. the words used throughout, the starting position and what happens in one year
-2. the ten main modules, which always run
+1. the words used throughout, which modules run, the starting position and what happens in one year
+2. modules 1 to 10, which together make up the basic set described below
 3. the rules that all modules share: how a markup is recorded, how a price is worked out, and how payments such as taxes are recorded
-
-The optional modules follow after that.
+4. modules 11 to 42
 
 Every section on a module has the same six headings: what it is about, what the theory says, what the module does each year, its settings, what it reads from other modules and what it gives them, and what is known to be wrong or untested.
 
@@ -34,7 +33,7 @@ A firm with 1,000 employees that earns 2 for each of them, with hype of 1, risk 
 
 **Risk.** How unsure owners are of their own forecast. The book says: "When capitalists are fully confident, δ is 1. Otherwise, δ is bigger than 1, and it increases as confidence decreases" (chapter 11, "The degree of confidence"; δ is the book's symbol for risk). The model follows this: if a rule would take a firm's risk below 1, the model sets it to 1.
 
-**Normal rate of return.** The rate of return that owners feel sure they can get. It is one number for the whole economy, 5 per cent, and none of the main modules changes it.
+**Normal rate of return.** The rate of return that owners feel sure they can get. It is one number for the whole economy, 5 per cent, and only the policy rate module (module 22) changes it.
 
 **Dominant capital.** The book's name for the largest firms and the government bodies allied with them: "the leading corporate–government coalitions" (chapter 14, "Dominant capital"). The book measures it with "the top 100 corporations", which it uses "as a proxy for dominant capital" (chapter 14). The model does the same. In this file, dominant capital means the 100 firms with the highest capitalization in that year, and "small firms" means all the others. The list of 100 is drawn up afresh every year.
 
@@ -55,6 +54,28 @@ A firm with 1,000 employees that earns 2 for each of them, with hype of 1, risk 
 **An addition.** A rule or a number that we made up because the book and the papers do not supply one.
 
 **Year labels.** A run starts in a year labelled 1890. The labels are only labels. The year labelled 1930 is the fortieth year of a run and has nothing to do with the real 1930.
+
+## Which modules run
+
+Every module in this file runs in every run, unless you leave it out or replace it. The model is all of its modules running together. Modules are kept separate so that each one can be replaced by a better version. A module run without the others can give results that mean nothing. For example, the sales module (module 11) with modules 1 to 10 alone gives about 18 per cent unemployment, because nobody in that run borrows.
+
+Three jobs have more than one module. Only one module for each job runs.
+
+| Job | Runs by default | Can run in its place |
+|---|---|---|
+| Buying other firms | `second_country` (module 35), which applies the merger rule to each of two countries | `mergers` (module 4), with one country |
+| Choosing between buying firms and raising prices | `compass_consensus` (module 15) | `compass` (module 7), `compass_targets` and `compass_ahead` (both module 15) |
+| Opening and closing the boundaries around a sector and a country | `boundary_contest` (module 14) | `envelope` (module 9) |
+
+Each default is the one closer to the book. The results played no part in the choice.
+
+- **Buying other firms.** "For amalgamation to run ahead of overall growth, dominant capital must successively break its 'envelopes', spreading from the industry, to the sector, to the national economy, and ultimately to the world as a whole" (chapter 14, Proposition 5). "Without the globalization of ownership, dominant capital cannot break its national envelope; and if it cannot go global, its differential breadth is bound to collapse" (chapter 15, "Foreign investment and differential accumulation"). Module 4 has one country, so its largest firms have no envelope beyond the nation.
+- **Choosing between buying firms and raising prices.** Module 7 compares the mergers of the last 5 years with those of the last 20. Nothing in the book says that the largest firms compare recent years with earlier years, and the book says of the two regimes that "there is nothing automatic or equilibrating about them" (chapter 17, "A new type of cycle"). The compass that needs a consensus follows chapter 16, "The stagflation norm": crises "undermine the ability of most people to resist price increases" and "enable a consensus to emerge within dominant capital that inflation can be used with relative impunity".
+- **Opening and closing boundaries.** Module 9 opens a boundary when the largest firms hold most of what they can reach. The contest over a boundary also follows the book on who pushes and what holds a boundary shut. Dominant capital is "the leading corporate–government coalitions" (chapter 14, "Dominant capital"). It "is often half-hearted about indiscriminate deregulation, particularly when such deregulation allows competitors to undermine its differential margins" (chapter 15, "Capital flow and the creorder of global power"). Module 14 gives the rest.
+
+To run a replacement, name it with `--with`, for example `python full.py 30000 60 0 --with envelope`. To leave a module out for a test, name it with `--without`, for example `--without failure`.
+
+**The basic set** is modules 1 to 10: sabotage, debt, green-field growth, mergers, cost cutting, stagflation, the compass of module 7, resistance, the envelope of module 9 and failure. It runs by itself, and most tests in `checks.py` use it. It has no government, no account of what can be sold and no household debt, so its results are not the model's results. Many figures in this file were measured with it, and they say so. Run it with `python full.py 30000 60 0 --basic`. Add modules to it with `--with`.
 
 ## The starting position
 
@@ -201,16 +222,16 @@ It gives the green-field module three numbers for each industry:
 
 It owns the part of each firm's markup that the code calls the base. "How modules share a quantity" explains what that means.
 
-When optional modules are on, it also reads `second_country_held` and `foreign_held` (both add to the part held), `policy_rate_markup` (moves the normal markup), `protection_open` and `nature_open` (bar small firms' extra hiring), `labour_strength_by_industry` (takes the place of popular resistance in step 1), `second_country_labour` (raises the 5 per cent level), `currency_markup` (adds to every markup) and `eruption_frees_markups` (weakens step 3). With the sales module on, a firm may have received less than it priced for. The sabotage module works on the markup that firms price for, so it puts the part not received back before it measures an industry's markup.
+It also reads, from other modules, `second_country_held` and `foreign_held` (both add to the part held), `policy_rate_markup` (moves the normal markup), `protection_open` and `nature_open` (bar small firms' extra hiring), `labour_strength_by_industry` (takes the place of popular resistance in step 1), `second_country_labour` (raises the 5 per cent level), `currency_markup` (adds to every markup) and `eruption_frees_markups` (weakens step 3). With the sales module on, a firm may have received less than it priced for. The sabotage module works on the markup that firms price for, so it puts the part not received back before it measures an industry's markup.
 
 ### What is known to be wrong or untested
 
-- **A long slump is answered only by a level of the markup and by the rehiring of the people of closed firms.** At 25 per cent unemployment the capitalist share stands 15 points higher, and small firms hire a little faster for it. The firms that are left take on the buyers of firms that close (the green-field module). In a screen of 106 mixes of optional modules from 30,000 firms, 8 of 112 runs ended with fewer than 1,000 firms and none was stopped by the core's guard. The worst are mixes with the sales module: with it and the proletarianization module alone, unemployment averaged about half over the last 20 years, and fewer than 1,000 firms were left.
-- **Unemployment still reaches the lowest level the green-field module allows in some years.** After a bout of stagflation the markup stands above the normal markup and small firms seek more people than there are. Step 1 takes the markup down faster when few people are without work, but not fast enough to keep unemployment above that level. With the main modules alone from 30,000 firms and two seeds, unemployment over the last 20 of 60 years averaged 2.7 per cent in both, and fell below 1 per cent in 23 and 20 per cent of the last 40 years. From 300,000 firms it averaged 5.6 per cent and fell below 1 per cent in 5 per cent of those years. Step 4 takes a fall out of the margin a little more slowly than plain subtraction, so after a bout of stagflation the markup comes down more slowly and small firms go on hiring. In a screen of 100 runs of mixes of optional modules, 1 averaged under 1 per cent. The book reports that unemployment in the United States has averaged about 7 per cent.
-- **The falling side of Figure 12.1 appears only with the sales module on, and it does not last.** This module has no account of how much can be sold, so by itself it shows only the rising side: with the main modules alone the capitalist share averaged 14 per cent in years with unemployment under 5 per cent and 25 per cent in years with 10 to 15 per cent. With the optional sales module alone, in a run from 300,000 firms, unemployment rose from 6 to 22 per cent over five years and the share fell from 12 to 8 per cent, because goods were unsold. Over the next ten years unemployment went on to 50 per cent and the share rose to 34 per cent, because firms closed: step 2 counts their employees as hiring that did not happen and raises the markup of the firms that are left.
-- **How a large fall is taken out of the margin is our own rule.** The book says that a firm does not sell below a normal return, and gives no rule for how fast a margin thins. The shape was chosen by comparing runs of several smooth rules; nothing in the book or the evidence chooses it. With every optional module on, from 30,000 firms for 60 years, small firms that set out after a slump to hire far faster than the working population grows would, by plain subtraction, take an industry's markup below nothing in 677 industry-years. Step 4 left the lowest industry at 0.026.
+- **A long slump is answered only by a level of the markup and by the rehiring of the people of closed firms.** At 25 per cent unemployment the capitalist share stands 15 points higher, and small firms hire a little faster for it. The firms that are left take on the buyers of firms that close (the green-field module). In a screen of 106 mixes of modules from 30,000 firms, 8 of 112 runs ended with fewer than 1,000 firms and none was stopped by the core's guard. The worst are mixes with the sales module: with it and the proletarianization module alone, unemployment averaged about half over the last 20 years, and fewer than 1,000 firms were left.
+- **Unemployment still reaches the lowest level the green-field module allows in some years.** After a bout of stagflation the markup stands above the normal markup and small firms seek more people than there are. Step 1 takes the markup down faster when few people are without work, but not fast enough to keep unemployment above that level. With the basic set alone from 30,000 firms and two seeds, unemployment over the last 20 of 60 years averaged 2.7 per cent in both, and fell below 1 per cent in 23 and 20 per cent of the last 40 years. From 300,000 firms it averaged 5.6 per cent and fell below 1 per cent in 5 per cent of those years. Step 4 takes a fall out of the margin a little more slowly than plain subtraction, so after a bout of stagflation the markup comes down more slowly and small firms go on hiring. In a screen of 100 runs of mixes of modules, 1 averaged under 1 per cent. The book reports that unemployment in the United States has averaged about 7 per cent.
+- **The falling side of Figure 12.1 appears only with the sales module on, and it does not last.** This module has no account of how much can be sold, so by itself it shows only the rising side: with the basic set alone the capitalist share averaged 14 per cent in years with unemployment under 5 per cent and 25 per cent in years with 10 to 15 per cent. With the sales module alone, in a run from 300,000 firms, unemployment rose from 6 to 22 per cent over five years and the share fell from 12 to 8 per cent, because goods were unsold. Over the next ten years unemployment went on to 50 per cent and the share rose to 34 per cent, because firms closed: step 2 counts their employees as hiring that did not happen and raises the markup of the firms that are left.
+- **How a large fall is taken out of the margin is our own rule.** The book says that a firm does not sell below a normal return, and gives no rule for how fast a margin thins. The shape was chosen by comparing runs of several smooth rules; nothing in the book or the evidence chooses it. With every module on, from 30,000 firms for 60 years, small firms that set out after a slump to hire far faster than the working population grows would, by plain subtraction, take an industry's markup below nothing in 677 industry-years. Step 4 left the lowest industry at 0.026.
 - **Two changes to one markup in one year are multiplied.** If this module wants to raise a markup of 0.10 by 0.06 and another module wants to lower it by 0.05, the result is 0.10 × 1.6 × 0.5 = 0.08 and not 0.11.
-- **Strong labour cuts the lead of the largest firms.** With the main modules from 30,000 firms and two seeds, differential capitalization in the last year is 628 and 614 with the steeper low side of step 1, and 754 and 749 with the same slope on both sides. In years with unemployment under 5 per cent, the markup of the top 100 stands 1.58 times the average markup, against 1.63 with one slope. In the model's own division of the gain by source, the difference comes from this module, the green-field module and the stagflation module, and mergers make up part of it. The top 100 still gain on the average throughout the run.
+- **Strong labour cuts the lead of the largest firms.** With the basic set from 30,000 firms and two seeds, differential capitalization in the last year is 628 and 614 with the steeper low side of step 1, and 754 and 749 with the same slope on both sides. In years with unemployment under 5 per cent, the markup of the top 100 stands 1.58 times the average markup, against 1.63 with one slope. In the model's own division of the gain by source, the difference comes from this module, the green-field module and the stagflation module, and mergers make up part of it. The top 100 still gain on the average throughout the run.
 - **Three 5 per cent levels are separate settings.** `labour_holds_at` here and `usual_unemployment` in four other modules all default to 0.05. Changing one does not change the others.
 
 ---
@@ -243,7 +264,7 @@ The book gives no rule for how large the government's debt is, and no figure for
 1. It reports the interest part of owners' income: the interest that firms owed last year as a part of their earnings, which the failure module publishes. Each firm owes interest on its own debt, at the rate at which the debt was lent, so when profit falls interest does not fall with it, and the part rises. Without the failure module the part stays at its first value, 20 per cent.
 2. It reports corporate debt: the debt that firms owed last year, which the failure module publishes. Without the failure module it is the interest part × the earnings of all firms ÷ the normal rate of return. Debt is a promised return, so it is given a risk of 1.
 3. It works out the government's debt. The government's interest payments are taken to be 2 per cent of all income, and the debt is their value: 2 per cent of all income ÷ the normal rate of return.
-4. It adds what the government borrowed for bailouts and what owners lent it, and takes off what it repaid them and what it received from selling public services. The risk shaping module publishes the bailouts and the privatisation module the sales. What owners lent and were repaid is in the core's record of transfers. The government has one account, which the core keeps: each optional module that taxes at a rate set in law (public debt, privatisation, organised force and sales), and step 5 of this module, reports how far its tax falls short of what it makes the government pay, or how much it has to spare. The core adds these up. The government first uses the money it holds, owners lend it the rest, and anything to spare repays its debt, no more than this module last reported it owes. What is left after that the government holds. With those modules off, all of these are zero. If sales ever brought in more than the whole debt, the module would report no debt and set the rest against later borrowing.
+4. It adds what the government borrowed for bailouts and what owners lent it, and takes off what it repaid them and what it received from selling public services. The risk shaping module publishes the bailouts and the privatisation module the sales. What owners lent and were repaid is in the core's record of transfers. The government has one account, which the core keeps: each module that taxes at a rate set in law (public debt, privatisation, organised force and sales), and step 5 of this module, reports how far its tax falls short of what it makes the government pay, or how much it has to spare. The core adds these up. The government first uses the money it holds, owners lend it the rest, and anything to spare repays its debt, no more than this module last reported it owes. What is left after that the government holds. With those modules off, all of these are zero. If sales ever brought in more than the whole debt, the module would report no debt and set the rest against later borrowing.
 5. **The holders of the added debt press for repayment.** The added debt is what step 4 has added, less what it has taken off. In a lasting recovery, the module has the government tax one twentieth of it (`holders_press`), at one rate on all wages and on every firm's earnings. A recovery counts as lasting when unemployment has fallen in each of the last two years (`recovery_years`). In other years the holders press for nothing, as Hager says they resist cutting the debt sharply before a sustained recovery. The tax goes into the government's one account, so it first pays for whatever the other taxes do not cover, such as interest on the debt. What is left repays owners, each firm in proportion to its worth, as holdings of the debt are. Repayment is not income, so it raises no firm's earnings. With nothing added, there is no such tax.
 6. **The government never refuses to pay.** Hager writes that the first holders of the United States debt were a strong force against any refusal to pay it (*Public Debt, Inequality, and Power*, chapter 1). He reports the argument that a government can instead lower its debt quietly, by inflation (chapter 5). Here the debt is kept in money, so rising prices and wages make it smaller as a part of income. When the taxes do not reach, the core pays holders only what the government has. What it does not repay stays owed, and interest it does not pay is lost to them.
 7. It reports the part of the government's debt held by dominant capital. This is taken to be the same as the top 100's part of all capitalization.
@@ -273,20 +294,20 @@ The book gives no rule for how large the government's debt is, and no figure for
 
 ### What it reads from other modules and what it gives them
 
-It reads the record of transfers (`transfers`), the government's account (`government`) and last year's unemployment (`unemployment`) from the core, and `interest_owed` and `debt_owed` from the failure module. When the optional risk shaping and privatisation modules are on, it reads `bailout_borrowing` and `privatisation_proceeds` from them, and when the force module is on, `force_jobs`. From the government's account it reads what the taxes in law asked and the rates in law added up, each as a part of the income it is charged on.
+It reads the record of transfers (`transfers`), the government's account (`government`) and last year's unemployment (`unemployment`) from the core, and `interest_owed` and `debt_owed` from the failure module. When the risk shaping and privatisation modules are on, it reads `bailout_borrowing` and `privatisation_proceeds` from them, and when the force module is on, `force_jobs`. From the government's account it reads what the taxes in law asked and the rates in law added up, each as a part of the income it is charged on.
 
-It publishes six numbers: `interest_share`, `corporate_debt`, `government_debt`, `government_debt_dominant`, and `tax_kept_earnings` and `tax_kept_wages`, each rate in law on earnings and on wages next year as a part of this year's (below 1 after a cut, above 1 after a rise). The failure module reads `interest_share` in the first year only, to set what firms owe. No other main module reads them. The optional public debt module reads the government's debt and decides who is taxed for the interest and who receives it. The public debt, privatisation, organised force and sales modules read the two and multiply their rates by them.
+It publishes six numbers: `interest_share`, `corporate_debt`, `government_debt`, `government_debt_dominant`, and `tax_kept_earnings` and `tax_kept_wages`, each rate in law on earnings and on wages next year as a part of this year's (below 1 after a cut, above 1 after a rise). The failure module reads `interest_share` in the first year only, to set what firms owe. No other module of the basic set reads them. The public debt module reads the government's debt and decides who is taxed for the interest and who receives it. The public debt, privatisation, organised force and sales modules read the two and multiply their rates by them.
 
 ### What is known to be wrong or untested
 
-- **No payment of interest is recorded.** With only the main modules on, the module reports debts and no money moves. The failure module closes firms that could not have paid, but it charges nobody. In particular, when bailouts add to the government's debt and the public debt module is off, nobody pays interest on them, though their holders are repaid.
+- **No payment of interest is recorded.** With only the basic set, the module reports debts and no money moves. The failure module closes firms that could not have paid, but it charges nobody. In particular, when bailouts add to the government's debt and the public debt module is off, nobody pays interest on them, though their holders are repaid.
 - **What counts as a lasting recovery is crude.** Unemployment that falls by a tenth of a point two years running counts, and so does a fall from 40 to 39 per cent. The holders then press at the full rate, and the next year they may press for nothing.
 - **What owners are repaid buys nothing.** Neither does a surplus the government holds. With `cut_surplus` off, the taxes for public employees and for interest stay at their first rates while what they pay for shrinks, because the top 100 take over public services and the debt is repaid. With the sales, privatisation, public debt, organised force and household debt modules, the surplus then grows to about 3 per cent of all income and repays owners, goods go unsold, and many firms outside the top 100 close in the same two or three years: from 30,000 firms over 60 years, 22,305 firms closed (seed 0). With the rates moving as in step 8, the surplus is cut by about a quarter a year and so lasts a few years, and in that mix at most 34 firms close in 60 years.
 - **Each part of the rule raises or lowers unemployment by several points.** In the mix above, from 30,000 firms over 60 years, unemployment over the last 20 years is 7.1 per cent averaged over six seeds (5.5 to 8.1). With seeds 0 and 1 it is 7.4 and 7.7. With the rise that brings in a part of the deficit (`rise_kept` off) it was 5.3 over six seeds, and without the rise in a war 6.5 with seed 0. The rise that takes a part of what is kept brings in more, and more of it from wages, because wages are a larger part of all income in the model than pay is of national product in the record. The government then borrows less: 0.11 of owners' income over the last 20 years with seeds 0 and 1, against 0.20 and 0.19. Cutting the whole surplus at once, with no rise, no yearly fall and holders who press every year, gives 3.0 and 5.5. Cutting a quarter of it gives 5.0 and 8.6, adding the rise gives 6.8 and 11.0, adding the yearly fall gives 6.9 and 7.1, and having the holders wait for a recovery gives 5.5 and 5.4 (all with the older rise). A tax that rises in a slump takes from wages as well as from owners, and what it brings in beyond the deficit's cause repays the holders, who do not spend it. With the sales and proletarianization modules, where unemployment stays near 30 per cent, the rate on wages for people out of work ends 2.7 times and the rate on earnings 23 times as high as they began, the latter at 14 per cent of earnings.
 - **A rate in law comes close to all of earnings only in a collapse.** With the older rise, in one mix of a screen of 100 (sales, price leaders, hype, risk shaping, protections, privatisation, barriers, labour, energy, the second country, cross-border and sovereign funds), the rate for public pay rose to more than 5 times firms' earnings, and unemployment reached 85 per cent. With the rise that takes a part of what is kept, the highest rate of any one tax in that mix is 0.31 of earnings, unemployment peaks at 77 per cent and averages 17.3 over the last 20 years against 24.7. No rate of any one tax in the screen passes 0.5. The collapse itself has other causes.
 - **No cut in a deficit, and no cut after a war.** Cuts in deficits (1981, 2003) come in only through the steady fall of the rate on earnings, and so does the fall of rates after a war. The rise in a war needs the force module, and comes a year after its military hiring. The fit is weak: the rise after a deficit is no larger than its error, and the cut after a surplus 1.5 times its error. The rate measured on wages includes the personal taxes of owners, and the fall of the rate on profits includes profits moved abroad or out of the corporate tax, so the record cannot say exactly who bore the changes.
-- **With every optional module on, a slump remains, and the government borrows for decades after it.** From 30,000 firms, unemployment over the last 20 years is 7.1 and 6.9 per cent (seeds 0 and 1; 7.1 and 7.0 with the older rise), against 10.5 and 8.6 when the whole surplus is cut at once with no rise. Almost all of the difference comes from cutting a quarter of the surplus a year in place of all of it. With seed 0, unsold goods come to a quarter of owners' income by year 27, unemployment reaches 14 per cent in year 37, and from year 39 to year 60 the government borrows 3 to 8 per cent of all income each year, most of it for public pay, while the rates rise every year. The added debt ends at about one year of all income. When the whole surplus is cut at once with no rise, the slump comes near year 50 instead, and it too begins with unsold goods while the account is near balance and the holders press for nothing. From 300,000 firms (seed 0) unemployment over the last 20 years is 10.2 per cent, with a slump to 15 per cent, and 101,195 firms close (10.0 per cent and 88,499 with the older rise). Most of the borrowing pays people whom public hiring took on in the slump; the privatisation module says more.
-- **From 300,000 firms the slump comes later, so more of it falls in the last 20 years.** With every optional module on, unemployment over the last 20 years is 10.2 and 10.7 per cent from 300,000 firms (seeds 0 and 1), against 6.6 to 7.1 from 30,000 (seeds 0 to 5). Over the whole 60 years it is 7.8 against 6.8 to 6.9. The top 100 start with a smaller part of all employees (0.5 per cent against 3 per cent), and in both runs the slump begins when they employ about 22 per cent, which from 300,000 firms comes about six years later: unsold goods pass a tenth of owners' income in year 28 or 29 against year 21 to 23, and unemployment peaks in year 41 or 42 against 35 to 37. The slump is also deeper: unsold goods reach 0.54 of owners' income against 0.34, and unemployment over the 12 years from the peak averages 11.7 per cent against 9.1. Why it is deeper has not been traced.
+- **With every module on, a slump remains, and the government borrows for decades after it.** From 30,000 firms, unemployment over the last 20 years is 7.1 and 6.9 per cent (seeds 0 and 1; 7.1 and 7.0 with the older rise), against 10.5 and 8.6 when the whole surplus is cut at once with no rise. Almost all of the difference comes from cutting a quarter of the surplus a year in place of all of it. With seed 0, unsold goods come to a quarter of owners' income by year 27, unemployment reaches 14 per cent in year 37, and from year 39 to year 60 the government borrows 3 to 8 per cent of all income each year, most of it for public pay, while the rates rise every year. The added debt ends at about one year of all income. When the whole surplus is cut at once with no rise, the slump comes near year 50 instead, and it too begins with unsold goods while the account is near balance and the holders press for nothing. From 300,000 firms (seed 0) unemployment over the last 20 years is 10.2 per cent, with a slump to 15 per cent, and 101,195 firms close (10.0 per cent and 88,499 with the older rise). Most of the borrowing pays people whom public hiring took on in the slump; the privatisation module says more.
+- **From 300,000 firms the slump comes later, so more of it falls in the last 20 years.** With every module on, unemployment over the last 20 years is 10.2 and 10.7 per cent from 300,000 firms (seeds 0 and 1), against 6.6 to 7.1 from 30,000 (seeds 0 to 5). Over the whole 60 years it is 7.8 against 6.8 to 6.9. The top 100 start with a smaller part of all employees (0.5 per cent against 3 per cent), and in both runs the slump begins when they employ about 22 per cent, which from 300,000 firms comes about six years later: unsold goods pass a tenth of owners' income in year 28 or 29 against year 21 to 23, and unemployment peaks in year 41 or 42 against 35 to 37. The slump is also deeper: unsold goods reach 0.54 of owners' income against 0.34, and unemployment over the 12 years from the peak averages 11.7 per cent against 9.1. Why it is deeper has not been traced.
 - **From 300,000 firms the mix of sales, public debt, privatisation, organised force and household debt has one slump.** Unemployment rises to 16 per cent and averages 10.6 per cent over the last 20 years (seed 0; 9.3 with the older rise). 582 firms close, and the number of firms grows to 1.55 million.
 - **The figure for the holders' pressure is not settled by the record.** The figure usually given for Bohn's study and the regression up to 2007 agree, but the first has not been checked against his paper. Over 1960 to 2019 the regression gives a figure below 0.
 - **The link between interest and unemployment that the record shows does not come out of the model.** The failure module says how far off it is.
@@ -317,7 +338,7 @@ The book gives no figure for how much hiring goes to new firms, how large a new 
 ### What the module does each year
 
 1. **The working population grows** by 1.7 per cent.
-2. **Each firm gets a hiring rate.** It is the rate that the sabotage module published for the firm's industry: one rate for top-100 firms and one for small firms. To it the module adds the buyers of firms that closed the year before. The failure module publishes, for each industry, the part of its employees whose firms closed. The firms left in the industry take on those buyers and hire for them, each in proportion to its size (`taken_on`). The book says that "the number of firms in operation" is bounded "by what can be sold at a 'reasonable' profit" (chapter 12): a firm that closes takes a seller away, not what can be sold. If the stagflation module has published a cut in hiring, which this file calls the crisis, the module takes it off every firm's rate. A rate below zero means the firm lets people go. If the optional sales module has published a cut for goods that were unsold, a top-100 firm holds back that part of the employees it would otherwise have. For example, a firm whose rate is −0.5 and that holds back 0.9 keeps 0.5 × 0.1 = 0.05 of its employees. So no firm can be left with fewer than nobody.
+2. **Each firm gets a hiring rate.** It is the rate that the sabotage module published for the firm's industry: one rate for top-100 firms and one for small firms. To it the module adds the buyers of firms that closed the year before. The failure module publishes, for each industry, the part of its employees whose firms closed. The firms left in the industry take on those buyers and hire for them, each in proportion to its size (`taken_on`). The book says that "the number of firms in operation" is bounded "by what can be sold at a 'reasonable' profit" (chapter 12): a firm that closes takes a seller away, not what can be sold. If the stagflation module has published a cut in hiring, which this file calls the crisis, the module takes it off every firm's rate. A rate below zero means the firm lets people go. If the sales module has published a cut for goods that were unsold, a top-100 firm holds back that part of the employees it would otherwise have. For example, a firm whose rate is −0.5 and that holds back 0.9 keeps 0.5 × 0.1 = 0.05 of its employees. So no firm can be left with fewer than nobody.
 3. **Mergers slow hiring.** The mergers module publishes a number called the hiring drag. The module cuts all hiring by that proportion, because money spent on buying firms is not spent on building.
 4. **Hiring cannot outrun the working population.** If the firms together want more people than are available, every firm's hiring is cut in the same proportion. Unemployment cannot fall below 0.5 per cent.
 5. **Part of small firms' hiring founds new firms.** In each industry, 35 per cent of the hiring by small firms goes to new firms. Where dominant capital holds part of the industry, less does: the 35 per cent is multiplied by the part that dominant capital does not hold. Each new firm has 15 per cent of the working population for each firm, which is what the average firm would employ if everybody had work. The measure is not the people whom existing firms employ now, because what it takes to enter an industry does not shrink when the firms in it dismiss people. In a slump a new firm is therefore larger beside the emptied firms, and the same hiring founds fewer firms.
@@ -333,7 +354,7 @@ The book gives no figure for how much hiring goes to new firms, how large a new 
 | `new_firm_share` | 0.35 | The part of small firms' hiring that goes to new firms. | Our own choice |
 | `new_firm_size` | 0.15 | The size of a new firm, as a part of the working population for each firm | Our own choice. The book says only that new firms are smaller than the average |
 | `taken_on` | 1.0 | The part of the buyers of firms that closed whom the firms left in the industry serve and hire for, the year after | Our own choice, from the passage in step 2: all of them. No measurement was found. At 0 the module hires for none of them |
-| `taken_by_top` | on | Whether top-100 firms take on their part of those buyers. Off, only the other firms of the industry do | The book, chapter 15: large firms grow with the rest, "letting employment expand in tandem with the business sector as a whole". Off, unemployment over the last 20 years was higher in all four runs tried (main modules and the sales module alone, 30,000 firms, two seeds) |
+| `taken_by_top` | on | Whether top-100 firms take on their part of those buyers. Off, only the other firms of the industry do | The book, chapter 15: large firms grow with the rest, "letting employment expand in tandem with the business sector as a whole". Off, unemployment over the last 20 years was higher in all four runs tried (the basic set, and the basic set with the sales module, 30,000 firms, two seeds) |
 | `floor` | 0.005 | The lowest unemployment the module allows | A plain limit with no source |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
@@ -350,16 +371,16 @@ It reads:
 
 It publishes:
 
-- `industry_growth`: how fast each industry hired. The optional plant module reads it.
+- `industry_growth`: how fast each industry hired. The plant module reads it.
 - `industry_sought`: how fast the firms of each industry set out to hire, before the size of the working population limited them. The hiring for the buyers of closed firms is counted against the employees the industry had before those firms closed. The sabotage module reads it and takes off the part of the industry that closed, so capacity that only moved from one firm to another counts as no growth.
 - `new_hires`: the total hired, after the cutbacks of firms that shrank are taken off. The run report uses it to compare buying with building.
-- `jobs_created`: the employees added by the firms that grew. The optional sales module reads it to work out what new jobs cost to equip.
+- `jobs_created`: the employees added by the firms that grew. The sales module reads it to work out what new jobs cost to equip.
 
-When optional modules are on, it also reads `sales_cut`, `force_hires`, `privatisation_jobs`, `public_workforce_change`, `protection_open` and `nature_open`.
+It also reads, from other modules, `sales_cut`, `force_hires`, `privatisation_jobs`, `public_workforce_change`, `protection_open` and `nature_open`.
 
 ### What is known to be wrong or untested
 
-- **A new firm starts with gains that other firms made.** The average it is given includes what top-100 firms gained from their own price rises, and some premiums of optional modules. A new firm made none of those gains.
+- **A new firm starts with gains that other firms made.** The average it is given includes what top-100 firms gained from their own price rises, and some premiums of other modules. A new firm made none of those gains.
 - **A new firm's markup is a little low in a year when wages rise.** Its earnings are fixed in money at the start of the year and it is entered at the end. If the wage rises 3 per cent in between, its markup is 3 per cent lower than its industry's.
 - **An industry that hires very little founds no firms.** If the small firms of an industry hire fewer people in a year than one new firm employs, no firm is founded that year, however long this lasts. It happens only in industries that dominant capital holds almost wholly, and at 300,000 firms it stops a handful of foundings out of millions.
 - **The lowest unemployment of 0.5 per cent has no source.**
@@ -370,6 +391,8 @@ When optional modules are on, it also reads `sales_cut`, `force_hires`, `privati
 ## 4. Mergers and acquisitions
 
 Name in the model: `mergers`
+
+This module runs in the basic set. In a full run module 35, the second country, takes its place and applies this module's rule to each country. To run this module in its place, add `--with mergers` to the command.
 
 ### What it is about
 
@@ -421,14 +444,14 @@ It publishes:
 - `hiring_drag`, read by the green-field module
 - `pool_open`, the free part of dominant capital's reach, read by the envelope module
 
-When optional modules are on, it also reads `merger_hype`, `merger_appetite`, `line_barrier`, `eruption_stops_buying` and `bought_not_built`. The last comes from the sales module. It is added to the 15 per cent of its own employees that a buyer seeks each year, and it is zero when that module is off or nothing is unsold.
+It also reads, from other modules, `merger_hype`, `merger_appetite`, `line_barrier`, `eruption_stops_buying` and `bought_not_built`. The last comes from the sales module. It is added to the 15 per cent of its own employees that a buyer seeks each year, and it is zero when that module is off or nothing is unsold.
 
 ### What is known to be wrong or untested
 
 - **Mergers and stagflation do not clearly take turns.** The book says they do. In the model they do not yet do so clearly.
 - **Firms to buy are picked at random.** A real buyer chooses. The choice is an addition.
 - **A merger can leave an odd record.** The part of the buyer's markup called the base can end up lower than the base of either firm before the merger. "How modules share a quantity" explains the base. No earnings are wrong; only the record is odd.
-- **Hype does not respond.** A merger leaves hype alone unless the optional hype module is on.
+- **Hype does not respond.** A merger leaves hype alone unless the hype module is on.
 
 What should happen: inside closed boundaries, buying raises differential capitalization quickly and then slows as the free firms are used up. It picks up again when a boundary opens. If no boundary ever opened, buying would end. The book describes this for South Africa under exchange controls.
 
@@ -463,7 +486,7 @@ In terms of power: for the same people and plant, one firm obtains almost twice 
 ### What the module does each year
 
 1. **It works out the level of each industry.** This is the average markup of the industry's firms, counting only the parts of the markup that any firm can have. Premiums that rest on a hold on buyers, such as a patent, are left out.
-2. **Every firm draws a random gain or loss.** A firm ten times the median size draws about two thirds as much as the median firm, a firm a thousand times the median size about three tenths as much, and a firm a hundredth of the median size about 2.3 times as much. The size of the draws is set each year from the sizes of all firms, so that, once the drift back in step 3 has acted, all the firms of an industry, large and small together, lie as far apart as the plants in Syverson's study: the firm at the 90th percentile has about 1.9 times the markup of the firm at the 10th. In a run of the main modules this gives the median firm a draw of 18 to 20 per cent of its markup: for 18 per cent, two thirds of its draws fall between a loss of 16 per cent and a gain of 20 per cent.
+2. **Every firm draws a random gain or loss.** A firm ten times the median size draws about two thirds as much as the median firm, a firm a thousand times the median size about three tenths as much, and a firm a hundredth of the median size about 2.3 times as much. The size of the draws is set each year from the sizes of all firms, so that, once the drift back in step 3 has acted, all the firms of an industry, large and small together, lie as far apart as the plants in Syverson's study: the firm at the 90th percentile has about 1.9 times the markup of the firm at the 10th. In a run of the basic set this gives the median firm a draw of 18 to 20 per cent of its markup: for 18 per cent, two thirds of its draws fall between a loss of 16 per cent and a gain of 20 per cent.
 3. **Every firm drifts back towards its industry.** Each year three tenths of the gap between the firm's markup and its industry's level disappears.
 4. **The draw changes the firm's cost and not its price.** A firm that gains has lower costs, earns more and charges what it charged before. A saving is taken out of the firm's cost of production, the wage and any saving or lag that still stands, as a part of it, by the same rule the core uses when a markup falls, so that cost is never cut below nothing. Other costs, such as an outlay on advertising, are not cut. A saving that is small against the cost comes to almost the whole gain. If the gain is larger than the firm's whole cost, most of it is a rise of the firm's price.
 5. **The drift back first removes the saving.** As methods spread, a firm that had lower costs loses that saving. If the drift is larger than the saving that is left, the rest of it moves the firm's price towards the prices of its industry.
@@ -495,12 +518,12 @@ It owns two parts of each firm's record: a part of the markup called the cost-cu
 - **The split between cost and price in steps 4 and 5 is an addition.** Chapter 16 lists "lowering unit cost faster than the average" and "increasing unit price faster than the average" as separate routes, and gives no rule.
 - **A firm that cuts costs keeps its price.** The book also allows it to sell more for each employee. The model has no count of goods, so it cannot show that.
 - **The rule has not been read against the book line by line.**
-- **The firms of a run lie a little closer together than Syverson's plants.** The rule aims at a gap of 0.651, but new firms start at the level of their industry and firms that fall far behind close, so at the end of 60 years from 30,000 firms the gap in earnings for each employee within industries is 0.63 to 0.64 with the main modules or the sales module alone, and 0.55 to 0.60 with the sales module and the four modules that run deficits.
+- **The firms of a run lie a little closer together than Syverson's plants.** The rule aims at a gap of 0.651, but new firms start at the level of their industry and firms that fall far behind close, so at the end of 60 years from 30,000 firms the gap in earnings for each employee within industries is 0.63 to 0.64 with the basic set or the sales module alone, and 0.55 to 0.60 with the sales module and the four modules that run deficits.
 - **The smaller draws of large firms raise unemployment a little when the sales module is on, for a reason not yet found.** With the sales module alone, from 30,000 firms over 60 years, unemployment over the last 20 years was 22.1 and 20.4 per cent with `size_scale` at 0.18 and 20.8 and 19.0 per cent at 0, with two seeds. More firms close with the slope (424 and 357 against 181 and 54), but that is too few to explain it, and the markups of firms below the median size are no higher than those of larger firms.
 
-Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads, the organisation of production, apart from what patents and copyrights protect. With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the optional protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.
+Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads, the organisation of production, apart from what patents and copyrights protect. With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.
 
-What should happen: the earnings per employee of the top 100, against the average, stay flat on account of this module. When every firm drew the same size of gain, the draws raised differential capitalization: with the main modules at 300,000 firms it was about 6,300 after 60 years, against about 4,500 with `size_scale` at 0.18. Even with `size_scale` at 0.18 it stays somewhat above a run with almost no draws, and the cause of what is left is not known. If you set the gains to spread slowly or to favour large firms, cost cutting becomes a way to beat the average, and the model then departs from the book.
+What should happen: the earnings per employee of the top 100, against the average, stay flat on account of this module. When every firm drew the same size of gain, the draws raised differential capitalization: with the basic set at 300,000 firms it was about 6,300 after 60 years, against about 4,500 with `size_scale` at 0.18. Even with `size_scale` at 0.18 it stays somewhat above a run with almost no draws, and the cause of what is left is not known. If you set the gains to spread slowly or to favour large firms, cost cutting becomes a way to beat the average, and the model then departs from the book.
 
 ---
 
@@ -576,14 +599,14 @@ It publishes:
 
 It sets the wage. It owns a part of each firm's markup called the stagflation lead (see "How modules share a quantity").
 
-When optional modules are on, it also reads `conflict_spark`, `eruption_stops_price_rises` and `labour_strength`.
+It also reads, from other modules, `conflict_spark`, `eruption_stops_price_rises` and `labour_strength`.
 
 ### What is known to be wrong or untested
 
 - **Stagflation raises capitalization, where the book says it threatens it.** In the model a bout raises earnings and capitalization across the whole economy. The book says inflation is a hazard because risk rises with it. Here the rise in risk does not outweigh the rise in earnings.
 - **The timing of bouts is touchy.** A small change early in a run can move a bout by several years. Two runs compared in a single year can differ widely for that reason alone.
 - **Deflation is missing.** The book's postscript treats falling prices as the point where the rule of dominant capital could break down. The module can only raise prices or do nothing.
-- **A cost other than the wage is not allowed for.** Some optional modules give a firm such a cost. It rises with the wage and not with the firm's price, so that firm's price rises by slightly more or less than step 1 or 2 intended.
+- **A cost other than the wage is not allowed for.** Some modules give a firm such a cost. It rises with the wage and not with the firm's price, so that firm's price rises by slightly more or less than step 1 or 2 intended.
 - **Where wages outrun a firm's price, how the fall is taken out of its margin is our own rule** (see the sabotage module's step 4).
 - **The rule has not been read against the book line by line.**
 
@@ -594,6 +617,8 @@ What should happen: while a bout lasts, the top 100 gain on small firms and owne
 ## 7. The differential compass
 
 Name in the model: `compass`
+
+This module runs in the basic set. In a full run the compass that needs a consensus (module 15) takes its place. To run this module in its place, add `--with compass` to the command.
 
 ### What it is about
 
@@ -649,17 +674,17 @@ It reads:
 It publishes:
 
 - `stagflation_intensity`, read by the stagflation module
-- `cohesion`, read by several optional modules
+- `cohesion`, read by several modules
 
-When the optional proletarianization module is on, it also reads `breadth_cohesion`.
+When the proletarianization module is on, it also reads `breadth_cohesion`.
 
-Any module that publishes these two numbers can take the compass's place. Three optional compasses do so.
+Any module that publishes these two numbers can take the compass's place. Three compasses in module 15 do so, and one of them runs by default.
 
 ### What is known to be wrong or untested
 
-- **Mergers and stagflation do not clearly move in opposite directions as the book reports.** This is the model's clearest disagreement with the theory. In tests with the three optional compasses, the two never moved in opposite directions, and no bout of stagflation ended because a boundary opened to new mergers.
+- **Mergers and stagflation do not clearly move in opposite directions as the book reports.** This is the model's clearest disagreement with the theory. In tests with the three compasses of module 15, the two never moved in opposite directions, and no bout of stagflation ended because a boundary opened to new mergers.
 - **The rule looks back over fixed numbers of years.** A fixed window gives an echo when an old value drops out of it. Bouts of stagflation come about every 22 years in runs. A test with a compass that has no fixed memory still gave bouts every 22 to 24 years, so that rhythm does not come from the window.
-- **One intensity for all of dominant capital** leaves out the rival groups inside it. The optional coalitions module adds them.
+- **One intensity for all of dominant capital** leaves out the rival groups inside it. The coalitions module adds them.
 - **That resistance lowers cohesion is an addition.** So is the 4 in step 4.
 - **The rule has not been read against the book line by line.**
 
@@ -729,14 +754,14 @@ It publishes two numbers.
 | `roadblocks` | Mergers | Cuts how much each buyer seeks |
 | | Envelope | Keeps boundaries shut, and can close them |
 
-When optional modules are on, it also reads `protection_anger`, `energy_grievance` and `externalisation_grievance` (each adds to popular resistance), `repression`, `eruption_stays_force` and `household_debt_placation` (each wears it down) and `sovereign_relief` (wears roadblocks down).
+It also reads, from other modules, `protection_anger`, `energy_grievance` and `externalisation_grievance` (each adds to popular resistance), `repression`, `eruption_stays_force` and `household_debt_placation` (each wears it down) and `sovereign_relief` (wears roadblocks down).
 
 Any module that publishes these two numbers can take this module's place.
 
 ### What is known to be wrong or untested
 
 - **Two numbers stand for everything people do.** The module cannot say who resists, how, or what new form the resistance takes.
-- **Wage earners' losses to tax and interest do not feed resistance.** Some optional modules make wage earners pay tax and interest. The core publishes what they lose, and this module does not read it.
+- **Wage earners' losses to tax and interest do not feed resistance.** Some modules make wage earners pay tax and interest. The core publishes what they lose, and this module does not read it.
 - **The rule has not been read against the book line by line.**
 
 Two levels are needed, and one is not enough. With a single level, anger at inflation keeps every boundary shut, which contradicts the book's statement that the population is "impartial to breadth".
@@ -748,6 +773,8 @@ What should happen: resistance is what ends a bout of stagflation and what makes
 ## 9. Breaking the envelope
 
 Name in the model: `envelope`
+
+This module runs in the basic set. In a full run the contest over a boundary (module 14) takes its place. To run this module in its place, add `--with envelope` to the command.
 
 ### What it is about
 
@@ -791,13 +818,13 @@ It reads `pool_open` from the mergers module and `roadblocks` from the resistanc
 
 It sets the openness of the sector boundary and the national boundary, which the mergers module uses. It publishes `pressure`.
 
-The optional boundary contest module can take this module's place.
+This module and the boundary contest module (module 14) do the same job. The boundary contest runs by default.
 
 ### What is known to be wrong or untested
 
 - **It cannot say what form an opening took.** The module can say that a boundary gave way and when. It cannot say whether the opening was a trust, a conglomerate or the sale of state assets.
-- **There is nothing beyond the nation.** The book's last envelope is the world. The model has one economy unless an optional module adds a second country.
-- **Opening a boundary has not been seen to end a bout of stagflation,** as the book says it should. This was looked for in tests with the three optional compasses.
+- **There is nothing beyond the nation.** The book's last envelope is the world. This module has one economy. The second country module (module 35), which runs by default, adds a second.
+- **Opening a boundary has not been seen to end a bout of stagflation,** as the book says it should. This was looked for in tests with the three compasses of module 15.
 - **The rule has not been read against the book line by line.**
 
 What should happen: a wave of mergers ends as its envelope fills, stagflation follows while pressure builds, and a new wave starts when the boundary gives way. Where roadblocks are strong, a boundary should stay shut for a long time or close again, as the book describes for the 1930s.
@@ -856,7 +883,7 @@ The literature gives no rule for when lenders stop lending. That rule is our own
 | `restructuring_risk` | 0.5 | The rise in the risk of a top-100 firm when its lenders restructure it | Our own choice |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
-You can also leave the module out of a run with `--without failure`.
+You can leave the module out of a run with `--without failure`.
 
 ### What it reads from other modules and what it gives them
 
@@ -875,9 +902,9 @@ It owns no part of a firm's markup and moves no money.
 
 ### What is known to be wrong or untested
 
-- **Far too few firms fail.** Firms of one industry now lie as far apart as plants do in the record (see the cost cutting module), and some fall behind their debts. In runs of 60 years from 30,000 firms with the main modules, 441 and 680 firms closed (two seeds), about 3 in every 100,000 employees a year, and unemployment over the last 20 years was 2.1 per cent in both. From 300,000 firms 6,030 closed and unemployment was 3.4 per cent. Firms that earned less than their interest held about 0.02 per cent of employees outside the top 100. In the record about one listed firm in eight is kept alive by its lenders. Interest is a small part of what nearly every firm earns, so a firm has to fall a long way behind its neighbours before it owes more than it is worth.
-- **The link between interest and unemployment that the record shows does not come out of the model.** The book's Figure 12.4 sets the ratio of interest to profit against unemployment, both averaged over five years. In the United States from 1952 to 2019 the ratio was 7.95 times unemployment, fitted through zero. Measured the same way from year 11 of runs of 60 years from 30,000 firms, it was 2.4 and 2.5 with the main modules, 2.9 from 300,000 firms, about 0.8 with the sales module and 1.8 to 2.0 with every optional module on. Within most runs the ratio falls when unemployment rises, because markups rise in a bout of stagflation while interest does not.
-- **Firms that earn almost nothing are carried as well.** A firm whose markup the sales module has cut to the core's allowance for rounding is carried for three years like any other. In a run of every optional module from 3,000 firms, other modules then raised such a firm's markup by a factor of about a hundred thousand million in a year, and the run broke down in its 55th year.
+- **Far too few firms fail.** Firms of one industry now lie as far apart as plants do in the record (see the cost cutting module), and some fall behind their debts. In runs of 60 years from 30,000 firms with the basic set, 441 and 680 firms closed (two seeds), about 3 in every 100,000 employees a year, and unemployment over the last 20 years was 2.1 per cent in both. From 300,000 firms 6,030 closed and unemployment was 3.4 per cent. Firms that earned less than their interest held about 0.02 per cent of employees outside the top 100. In the record about one listed firm in eight is kept alive by its lenders. Interest is a small part of what nearly every firm earns, so a firm has to fall a long way behind its neighbours before it owes more than it is worth.
+- **The link between interest and unemployment that the record shows does not come out of the model.** The book's Figure 12.4 sets the ratio of interest to profit against unemployment, both averaged over five years. In the United States from 1952 to 2019 the ratio was 7.95 times unemployment, fitted through zero. Measured the same way from year 11 of runs of 60 years from 30,000 firms, it was 2.4 and 2.5 with the basic set, 2.9 from 300,000 firms, about 0.8 with the sales module and 1.8 to 2.0 with every module on. Within most runs the ratio falls when unemployment rises, because markups rise in a bout of stagflation while interest does not.
+- **Firms that earn almost nothing are carried as well.** A firm whose markup the sales module has cut to the core's allowance for rounding is carried for three years like any other. In a run of every module from 3,000 firms, other modules then raised such a firm's markup by a factor of about a hundred thousand million in a year, and the run broke down in its 55th year.
 
 - **Borrowing buys nothing.** A firm's debt follows its sales. Its sales do not follow its debt.
 - **What lenders lose is counted but borne by nobody.** The module publishes it, but the model has no account of lenders' wealth, so the loss changes nothing that any lender does. Nobody receives a closed firm's plant: with the capacity module on, the plant goes with the firm.
@@ -889,11 +916,11 @@ What should happen: few firms close in ordinary years, many after a long fall of
 
 ---
 
-## What the main modules leave out
+## What the basic set leaves out
 
-The main modules leave several things fixed that the theory treats as moving. An optional module covers each one.
+The basic set leaves several things fixed that the theory treats as moving. Another module covers each one.
 
-| What is fixed | What the theory says | Optional module |
+| What is fixed in the basic set | What the theory says | Module |
 |---|---|---|
 | Hype stays at 1 for every firm. | Forecasters "act as a herd", and "active insiders" can shape hype (chapter 11). The book says it refers "to hype and risk only in passing" (chapter 14). | `hype` |
 | Risk has no rule of its own. Mergers lower it, and stagflation, resistance and a restructuring raise it. | Chapter 11 defines risk as the inverse of owners' confidence. The paper "A CasP Model of the Stock Market" (2016) found "no discernable decline in earnings volatility" and draws no conclusion about risk. | `risk_shaping` |
@@ -904,7 +931,7 @@ The main modules leave several things fixed that the theory treats as moving. An
 | There is no war and no organised force. | Chapter 12 lists "the use of force, including military, for differential business ends" among the means of sabotage. Chapter 17 says the 1930s were "marked by the massive use of military force". | `force` |
 | Energy is not counted. | The paper "Growing Through Sabotage" (2020) divides the energy a society captures between livelihood and hierarchy. Its authors call the framework "too rudimentary" for further analysis. | `energy` |
 
-Other optional modules add what can be sold, organised labour, household debt, the public debt, patents and other protections, the shaping of wants, a second country and currencies. Their sections follow.
+Other modules add what can be sold, organised labour, household debt, the public debt, patents and other protections, the shaping of wants, a second country and currencies. Their sections follow the rules that all modules share.
 
 ## Two rules the whole model keeps
 
@@ -963,7 +990,7 @@ A cost component enters the firm's price and never its earnings. "How the price 
 | unsold goods carried | cost | sales | What the firm laid out on goods it did not sell. It equals what the sales shortfall takes from the markup, so the price does not move. |
 | outlay on wants | cost | wants | The outlay of the firm's industry on shaping what buyers want, for each employee. The module marks it as laid out on what other firms sell. |
 
-The base, the stagflation lead, the cost-cutting edge and the cost difference belong to main modules and are always present. The rest appear only when their optional module is on. Three markup components are marked "hold on buyers". The next part explains why they are treated differently. The sales shortfall is alone in a group of its own: it multiplies the markup like any other part, but it is a level that its module sets each year, so the core does not cancel it against the gains and losses of other modules. It is also marked as a part that firms did not receive while their price stayed as it was. A rule that sets a price, such as those of the stagflation, coalitions and nature modules, works on the markup without it, which the core gives as the priced markup. Otherwise a firm that received a millionth of its earnings in a slump would have its markup multiplied a million times by a price rise, and the gain would show in full once its goods sold again.
+The base, the stagflation lead, the cost-cutting edge and the cost difference belong to modules of the basic set. The rest belong to other modules, and each is present only when its module runs. Three markup components are marked "hold on buyers". The next part explains why they are treated differently. The sales shortfall is alone in a group of its own: it multiplies the markup like any other part, but it is a level that its module sets each year, so the core does not cancel it against the gains and losses of other modules. It is also marked as a part that firms did not receive while their price stayed as it was. A rule that sets a price, such as those of the stagflation, coalitions and nature modules, works on the markup without it, which the core gives as the priced markup. Otherwise a firm that received a millionth of its earnings in a slump would have its markup multiplied a million times by a price rise, and the gain would show in full once its goods sold again.
 
 ### How markup components combine
 
@@ -1003,7 +1030,7 @@ A markup is a small number, so a change of a few points is a large proportion of
 
 **What it does not change.** It changes no firm's markup, earnings, price or capitalization. It credits no gain to any module. The division of each year's gain among the modules is worked out first and is not affected. So the gain credited to a module over a run still records everything that module did, and its component records only what is left.
 
-**What the record looks like.** In a run of the main modules over 119 years from 300,000 firms, the base of every firm stayed between 0.032 and 0.59, the stagflation lead between 1 and 2.3, and the cost-cutting edge between 0.23 and 4.7. The lead of the middle firm rose to at most 1.5 in a bout of stagflation. This is what the book says of the gains from inflation: "they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
+**What the record looks like.** In a run of the basic set over 119 years from 300,000 firms, the base of every firm stayed between 0.032 and 0.59, the stagflation lead between 1 and 2.3, and the cost-cutting edge between 0.23 and 4.7. The lead of the middle firm rose to at most 1.5 in a bout of stagflation. This is what the book says of the gains from inflation: "they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
 
 **What is our own here.** The book supports the direction, since it calls the gains of inflation "short-lived". It gives no rule. Three choices are ours. A fall of the markup is taken out of standing gains before it lowers the base, and a rise restores standing losses before it raises the base. When several gains or several losses stand in one firm, each gives up the same proportion. Every stacking component takes part, including those of optional modules. None of the three affects any figure of the model except the values of the components themselves.
 
@@ -1044,7 +1071,7 @@ Four things are still doubtful.
 
 **A new firm** takes the average base of its industry and the no-change value of every other component, unless the module that founds it says otherwise. The green-field module does say otherwise: it gives a new firm the average stacking part of its industry's markup, and that goes into the new firm's base. A new firm has no cost component unless the module that founds it gives one.
 
-**A dissolved firm** takes its components with it. A holding that the optional barriers module forces a firm to sell keeps every component of the seller, and so it keeps the seller's price.
+**A dissolved firm** takes its components with it. A holding that the barriers module forces a firm to sell keeps every component of the seller, and so it keeps the seller's price.
 
 ### How the gain of the overlap group is divided
 
@@ -1104,7 +1131,7 @@ The model holds the book's "units per employee" at one for every firm, because i
 - **The unsold goods carried** belong to the sales module. A firm whose goods were partly unsold paid the wages for all of them and was paid for some. Its earnings fall and its price stays. The module says so by entering, as a cost, exactly what the shortfall takes from the markup. The cost is set afresh each year and is zero when everything was sold.
 - **The outlay on wants** belongs to the wants module. Chapter 9 says that estimates of advertising leave out "sales promoting expenditures buried in the 'cost of production'". Each year the module sets this cost, for every firm of an industry, to the industry's average outlay as a part of earnings, times the industry's markup.
 
-**What the price level shows.** With the main modules, the average price stays within 0.1 per cent of the wage times one plus the average markup. With the wants module on, it stands up to 11.6 per cent above, which is the outlay on wants.
+**What the price level shows.** With the basic set, the average price stays within 0.1 per cent of the wage times one plus the average markup. With the wants module on, it stands up to 11.6 per cent above, which is the outlay on wants.
 
 **What is our own here.** The price is worked out for what one employee makes in a year, with no count of goods. A cost component is counted in wages. Each module decides whether its change to a markup is a change of price or of cost. The cost cutting module's drift back is split between cost and price. A merger adds the costs of the two firms. Nothing keeps a cost inside a range.
 
@@ -1122,7 +1149,7 @@ The model holds the book's "units per employee" at one for every firm, because i
 
 **A transfer is money that passes from a payer to a receiver and is not the price of anything.** A tax is a transfer, and so is interest. A markup is not: whoever buys pays it in the price. The core keeps a record of every transfer, and both sides are always named.
 
-Among the main modules only the debt module proposes transfers, and only once the government has borrowed. Optional modules propose most of them.
+In the basic set only the debt module proposes transfers, and only once the government has borrowed. Other modules propose most of them.
 
 **A loan is a transfer that is no income.** When owners lend the government money, each firm pays its part out of its earnings of the year, and its earnings do not fall: its owners have bought a bond, not lost income. When the government repays them, the firms receive the money and their earnings do not rise. The core settles a loan as it settles any transfer, and the record of the year shows what was lent and repaid. For example, three firms earn 50, 50 and 40. They lend the government 10 each, and the government pays the 30 to wage earners. The firms still earn 50, 50 and 40.
 
@@ -1176,7 +1203,7 @@ One number in the core is an allowance for rounding and not a rule. A firm that 
 **What is doubtful.**
 
 1. With the public debt module off, the debt from bailouts is reported and nobody is taxed for it.
-2. The bailout debt is never repaid, and the worth of a bailout is counted again each year the bailout is renewed. In a run with 28 optional modules, where the crisis never ended, this debt passed a whole year's income.
+2. The bailout debt is never repaid, and the worth of a bailout is counted again each year the bailout is renewed. In a run with 28 of the other modules, where the crisis never ended, this debt passed a whole year's income.
 3. The price of a takeover has no source. The payment changes no firm, because the model does not follow who owns firms. Only the government's debt records it.
 4. The earnings on privatised employees are a markup and are paid in the price. What the government goes on paying to the firms that run a service after a takeover is not in the record.
 5. Two kinds of money still have a side missing: the gain from burdens that firms shift onto later years, which nobody pays, and what the sovereign funds module charges to nobody. Military orders are paid for by tax alone, and no bonds are sold for them.
@@ -1227,7 +1254,7 @@ The message gives the year, how many firms are affected, and which modules chang
 | 8. Attribution with overlap | With two modules in the overlap group, the gain still divides with nothing left over, in either order of listing. |
 | 9. Guard | A change that makes employee counts negative stops the run. |
 | 10. Founding | The green-field module takes no employee from an existing firm, and a new firm starts without a premium it does not hold. |
-| 11. Levels | With the main modules and the optional ones on for 60 years, no firm ends a year with a gain standing beside a loss, and no base lies above the highest markup seen in the run. If the model stops the run, the years before the stop are tested. If fewer than 1 in 20 people still have work, the years before that one are tested. |
+| 11. Levels | With the basic set and every other module that does not do the job of one in it, for 60 years, no firm ends a year with a gain standing beside a loss, and no base lies above the highest markup seen in the run. If the model stops the run, the years before the stop are tested. If fewer than 1 in 20 people still have work, the years before that one are tested. |
 | 12. Price | A firm with a wage of 2, a base of 0.1, premiums of 1.5 and 1.2 in the overlap group and a cost component of 0.03 has a price of 2.36. The core refuses a direct change to a price. Every price equals the formula in every year. |
 | 13. Transfers | The worked examples of transfers above come out as stated. Owners who lend the government keep their earnings, and so do owners who are repaid. Once owners have lent the government 1,000, the debt module has it tax and repay 50 the next year and 47.5 the year after; with nothing lent it proposes nothing. No transfer is paid above what was asked or above what its payer had. Runs with modules listed in opposite orders give identical figures. |
 | 14. Sales account | The worked example of the sales module comes out as stated. In every year of long runs, what firms offered equals what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the record of transfers shows it had. The second worked example, for the tax, comes out as stated, and the government's borrowing in the account equals what the record of transfers shows owners lent. Opposite listing orders give identical figures. |
@@ -1241,15 +1268,13 @@ The message gives the year, how many firms are affected, and which modules chang
 
 ---
 
-## Optional module: What can be sold
+## 11. What can be sold
 
 Name in the model: `sales`
 
-Switch it on by adding `--with sales` to the command.
-
 ### What it is about
 
-The main modules assume that firms sell everything they offer. This module drops that assumption. Each year it works out who had money and what that money bought. If the money does not buy all that firms offered at their prices, some goods stay unsold. Nobody is paid for unsold goods, so the loss falls on owners, and owners respond.
+Without this module the model assumes that firms sell everything they offer. This module drops that assumption. Each year it works out who had money and what that money bought. If the money does not buy all that firms offered at their prices, some goods stay unsold. Nobody is paid for unsold goods, so the loss falls on owners, and owners respond.
 
 Think of a town where a few families own all the shops. The shop workers spend their pay in the shops. The shops decide two things: what they pay the families, about three quarters of what the families earned, and what they pay builders when they open a new shop. What the shops keep is not decided. It is whatever the families earned and were not paid. The families spend what they are paid. In a year when the shops build little and nobody else spends more than they receive, the spending does not buy back all the goods, and some stay on the shelves. The small shops then cut prices. The large shops keep their prices and take on fewer people. The town council pays its staff, and a little to each person out of work, out of a local tax at a rate set by law. When trade is poor, the council's bills stay the same or grow while the tax brings in less, so the council borrows the difference from the families, and the rate is not raised. When trade is good, the tax brings in more than the bills, the council pays the families back, and the families have the rate cut, theirs more than the workers'. The families who lent press the council to tax enough to repay them.
 
@@ -1379,17 +1404,17 @@ With this module off, the green-field and merger modules take the two rates as z
 - **A second country.** The second country's five largest firms add `bought_not_built` to what they seek, although they hold back no hiring unless they are also among the top 100 of both countries together.
 - **Hiring stops through a whole bout of stagflation.** At full intensity the stagflation module takes 6 points off every hiring rate, and an ordinary hiring rate is 2 to 4 per cent a year. So for several years no firm adds a job, and firms build nothing. In the United States accounts firms built less than nothing in one year only of the 60 from 1960 to 2019. The 6 points are a setting of the stagflation module with no source.
 - **Many people can be out of work while both conditions hold.** Differential capitalization falls in most years of a slump, because top-100 firms book their whole loss.
-- **Tested in 112 runs of mixes from 30,000 firms with one seed, eight of them with two, and in three runs from 300,000 firms.** In the 60 runs with this module, mean unemployment over the last 20 years was 20.8 per cent (median 6.3), and 19 runs ended with fewer than 1,000 firms. With every optional module on, it was 1.3 and 1.8 per cent from 30,000 firms with two seeds, and 2.3 per cent from 300,000. There the government borrowed in 42 to 46 years of 60, at most 7 per cent of all income, and repaid in 12 to 16. With the sales, public debt, privatisation and force modules, the government repaid in each of the first 25 years while unemployment fell from 7 to 4 per cent, and borrowed from the slump onward.
+- **Tested in 112 runs of mixes from 30,000 firms with one seed, eight of them with two, and in three runs from 300,000 firms.** In the 60 runs with this module, mean unemployment over the last 20 years was 20.8 per cent (median 6.3), and 19 runs ended with fewer than 1,000 firms. With every module on, it was 1.3 and 1.8 per cent from 30,000 firms with two seeds, and 2.3 per cent from 300,000. There the government borrowed in 42 to 46 years of 60, at most 7 per cent of all income, and repaid in 12 to 16. With the sales, public debt, privatisation and force modules, the government repaid in each of the first 25 years while unemployment fell from 7 to 4 per cent, and borrowed from the slump onward.
 
 What should happen: while firms hire, everything is sold and the module does nothing. In a year when hiring stops and nobody else spends more than they receive, what firms do not pay out buys nothing and some goods stay unsold. Owners receive less than they priced for, firms outside the top 100 cut prices, and top-100 firms hold back hiring and buy firms. The capitalist share falls. The government borrows in a slump, because what it pays out holds while income falls, and repays in a boom. The loss ends when prices have come down to what owners lay out, or when hiring starts again. What happens now is different: without other modules that tax, the slump does not end, because firms close faster than hiring starts again. With them, the government's debt can grow without a limit.
 
 ---
 
-## Optional module: Plant that stands idle
+## 12. Plant that stands idle
 
 Name in the model: `capacity`
 
-Switch it on by adding `--with capacity` to the command. It matters only with the `sales` module on. Without it, it changes nothing and only reports.
+It matters only together with the sales module (module 11). Without that module it changes nothing and only reports.
 
 ### What it is about
 
@@ -1436,7 +1461,7 @@ It keeps one number for each firm, "plant in place": the jobs its plant holds at
 ### What is known to be wrong or untested
 
 - **The module makes the slump of the sales module alone a little longer.** In a slump firms dismiss people and their plant stands idle: up to 12 per cent of all plant beyond the standard use, from 30,000 firms. In the recovery they take people back on into it, and in years when more than 1 per cent of plant stood idle firms built a tenth to a fifth less than the equipment of every new job would have cost. Before the slump nothing is idle, and the module changes nothing. From 30,000 firms over 60 years, unemployment over the last 20 years rose from 22.2 and 21.1 per cent to 24.8 and 22.8 per cent with two seeds, and from 19.2 to 20.3 per cent from 300,000 firms (one seed).
-- **With other modules it moves results little.** With the public debt, privatisation, force and household debt modules as well, unemployment over the last 20 years went from 12.3 and 15.4 per cent to 13.4 and 14.8, and from 10.3 to 10.4 per cent from 300,000 firms. With the proletarianization module as well it stayed at about 31 per cent: there 36 per cent of plant stands idle for decades and nobody builds. With every optional module on it went from 5.4 and 5.3 to 5.4 and 5.1 per cent, and firms closed in 60 years rose from about 28,000 to about 34,000. In 50 random mixes with the sales module, one seed, the median did not move (6.9 and 6.8 per cent), nine moved by more than 2 points (four up, five down) and no run stopped.
+- **With other modules it moves results little.** With the public debt, privatisation, force and household debt modules as well, unemployment over the last 20 years went from 12.3 and 15.4 per cent to 13.4 and 14.8, and from 10.3 to 10.4 per cent from 300,000 firms. With the proletarianization module as well it stayed at about 31 per cent: there 36 per cent of plant stands idle for decades and nobody builds. With every module on it went from 5.4 and 5.3 to 5.4 and 5.1 per cent, and firms closed in 60 years rose from about 28,000 to about 34,000. In 50 random mixes with the sales module, one seed, the median did not move (6.9 and 6.8 per cent), nine moved by more than 2 points (four up, five down) and no run stopped.
 - **In the record most building is not tied to hiring, and in the model all of it is.** In the United States, 1951 to 2019, net building by business came to 0.077 of the private wage bill in a year plus 0.59 years of the wage for each person newly hired (Bureau of Economic Analysis and Bureau of Labor Statistics). In the sales module alone, the same measure gives 0.026 plus 1.5. The module does not change this. The model has no building that goes on whatever the hiring.
 - **The plant of a closed firm is lost.** In the record a failed firm's plant is often sold. Here the firms that take on its buyers build anew.
 - **People hired for military orders need new plant.** Only the public employees whom the top 100 take over arrive with their plant. A holding that a firm is forced to sell (barriers module) takes its part of the seller's plant.
@@ -1444,11 +1469,9 @@ It keeps one number for each firm, "plant in place": the jobs its plant holds at
 
 ---
 
-## Optional module: Price leaders and followers within an industry
+## 13. Price leaders and followers within an industry
 
 Name in the model: `leaders`
-
-Switch it on by adding `--with leaders` to the command.
 
 ### What it is about
 
@@ -1527,11 +1550,11 @@ What should happen: while prices are still, the module does nothing. During a wa
 
 ---
 
-## Optional module: The contest over a boundary
+## 14. The contest over a boundary
 
 Name in the model: `boundary_contest`
 
-Switch it on by adding `--with boundary_contest` to the command. It runs in place of main module 9, "Breaking the envelope", which is left out of the run. The two cannot run together, because both move the same two boundaries.
+It runs by default. Module 9, "Breaking the envelope", can run in its place with `--with envelope`. The two cannot run together, because both move the same two boundaries.
 
 ### What it is about
 
@@ -1611,9 +1634,9 @@ It reads:
 - `government_debt` and `government_debt_dominant`, from the debt module. If no debt is reported, the sway is worked out from `concentration`, the part of all employees who work for the top 100.
 - `stagflation_intensity`, from the compass
 - `roadblocks`, from the resistance module
-- `barrier_bargain`, from the optional barriers module, which lowers the hold. It is zero when that module is off.
+- `barrier_bargain`, from the barriers module, which lowers the hold. It is zero when that module is off.
 
-It sets the openness of the sector boundary and the national boundary, which the mergers module uses. It publishes `pressure`, which is the need of step 1 and has the same meaning as in module 9. It also publishes `boundary_push` and `boundary_hold`. The optional barriers module reads `boundary_push`.
+It sets the openness of the sector boundary and the national boundary, which the mergers module uses. It publishes `pressure`, which is the need of step 1 and has the same meaning as in module 9. It also publishes `boundary_push` and `boundary_hold`. The barriers module reads `boundary_push`.
 
 ### What is known to be wrong or untested
 
@@ -1632,11 +1655,11 @@ What should happen: early in a run the boundary stays shut, because the top 100 
 
 ---
 
-## Optional module: Alternative compasses
+## 15. Three compasses
 
-Name in the model: `compasses`, which holds `compass_targets`, `compass_ahead` and `compass_consensus`
+Name in the model: `compass_consensus`, `compass_targets` and `compass_ahead`, all in `modules/compasses.py`
 
-The file `modules/compasses.py` holds three compasses. Switch one on by adding `--with compass_targets`, `--with compass_ahead` or `--with compass_consensus` to the command. `--with compasses` means the same as `--with compass_consensus`. Each runs in place of main module 7, "The differential compass", which is left out of the run. Only one may be on in a run.
+The file `modules/compasses.py` holds three compasses. The compass that needs a consensus, `compass_consensus`, runs by default. The other two can run in its place: add `--with compass_targets` or `--with compass_ahead` to the command. So can module 7, "The differential compass", with `--with compass`. Only one compass runs at a time. "Which modules run", near the top of this file, says why this one is the default.
 
 ### What it is about
 
@@ -1774,15 +1797,13 @@ What should happen: with the compass that reads the pool of targets, stagflation
 
 ---
 
-## Optional module: Coalitions inside dominant capital
+## 16. Coalitions inside dominant capital
 
 Name in the model: `coalitions`
 
-Switch it on by adding `--with coalitions` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-The main modules treat the 100 largest firms as one group with one interest. The book says they are not. It describes two rival groups among the largest firms. One, built around oil and arms, does well out of conflict and rising prices. The other, built around civilian technology and takeovers, does well out of calm and open markets.
+Without this module the model treats the 100 largest firms as one group with one interest. The book says they are not. It describes two rival groups among the largest firms. One, built around oil and arms, does well out of conflict and rising prices. The other, built around civilian technology and takeovers, does well out of calm and open markets.
 
 This module marks out two such groups and lets them pull in different directions. This file calls them the conflict coalition and the takeover coalition. When the conflict coalition earns less than the other large firms, a level of conflict rises. Conflict raises that coalition's prices and can help to start a bout of stagflation, which is a period of rising prices together with unemployment. In quiet years the takeover coalition buys more firms than other buyers do.
 
@@ -1864,8 +1885,8 @@ It reads `concentration` from the core, which is the part of all employees who w
 It publishes:
 
 - `conflict_spark`, which the stagflation module reads. It counts as zero when this module is off.
-- `merger_appetite`, one number for each sector, which the mergers module and the optional barriers module read. It counts as 1 when this module is off.
-- `conflict`, the level of conflict, which the optional organised force and ownership of nature modules read
+- `merger_appetite`, one number for each sector, which the mergers module and the barriers module read. It counts as 1 when this module is off.
+- `conflict`, the level of conflict, which the organised force and ownership of nature modules read
 - `danger_zone`, the amount by which the conflict coalition falls short of the top 100, for reporting
 - `coalition_conflict_share`, `coalition_takeover_share`, `coalition_conflict_top` and `coalition_takeover_top`, the four sizes of step 8
 
@@ -1879,7 +1900,7 @@ The organised force module also reads the labels.
 - **The measure of the coalitions' weight is ours.** So is making the spark smaller while the top 100 are small.
 - **The takeover coalition's extra buying is ours in its form.** The sources say only that this coalition was "based on" takeovers.
 - **Much of what the sources describe is missing.** OPEC, the governments that imported arms and the governments that backed each coalition are not in the model. The cycle in which oil income pays for arms imports is not modelled. The takeover coalition does not press for the opening of boundaries, although the 2002 book names the lifting of capital controls as the first of its three poles.
-- **Hype plays no part.** The book says that high technology was "firing up both investor's hype and the stock market". Unless the optional hype module is on, hype stays at 1, so the takeover coalition gains only by buying.
+- **Hype plays no part.** The book says that high technology was "firing up both investor's hype and the stock market". Unless the hype module is on, hype stays at 1, so the takeover coalition gains only by buying.
 - **It is not known whether a spark can start a bout.** In trial runs that started with 60,000 firms the largest spark was 0.15. It raised inflation by well under one point a year, and the first bout of stagflation began in the same year with and without the module. In a run of 60 years from 300,000 firms the first bout began about three years earlier with the module. The timing of bouts is very sensitive to small changes, so this does not show that the spark caused it.
 - **The danger zone has never stayed open.** In a trial run of 119 years the conflict coalition fell into the danger zone ten times, each time for one year, and two or three years of conflict lifted it back. This is the pattern the 1995 paper reports. The run did not show what the 2002 book describes for the 1990s, when a danger zone opened and no conflict closed it.
 - **The takeover coalition gains only in the first wave of mergers.** In the same trial run its part of the top 100's capitalization rose from 8 to 14 per cent in the first 25 years. After the year labelled 1950 it rose only from 8.6 to 10.4 per cent in 40 years.
@@ -1889,15 +1910,13 @@ What should happen: during a wave of mergers the takeover coalition should gain 
 
 ---
 
-## Optional module: Organised force
+## 17. Organised force
 
 Name in the model: `force`
 
-Switch it on by adding `--with force` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-The main modules cannot tell a war from an ordinary bout of stagflation, which is a period of rising prices together with unemployment. This module adds the difference. It keeps one number, the level of organised force, between 0 and 1. Nothing sets that number from outside. It follows the stagflation that the largest firms themselves produce.
+Without this module the model cannot tell a war from an ordinary bout of stagflation, which is a period of rising prices together with unemployment. This module adds the difference. It keeps one number, the level of organised force, between 0 and 1. Nothing sets that number from outside. It follows the stagflation that the largest firms themselves produce.
 
 Force does three things that an ordinary bout does not. It gives orders to arms makers, who grow at the expense of every other firm. It puts people to work while prices rise. And it holds down the popular resistance that rising prices provoke. This is how the years of a war differ from the years of a depression: in both, prices can be pushed up, but in a war there are jobs and little open protest.
 
@@ -1985,10 +2004,10 @@ It reads `stagflation_intensity` from the compass. When the coalitions module is
 
 It publishes:
 
-- `force_hires`, the military hiring planned for the year. The green-field module and the optional privatisation module read it. It counts as zero when this module is off.
-- `repression`, the yearly rate of repression. The resistance module and the optional organised labour module read it. It counts as zero when this module is off.
-- `force`, the level of force, which the optional ownership of nature module reads
-- `force_jobs`, military jobs as a part of the working population, which the optional energy module reads
+- `force_hires`, the military hiring planned for the year. The green-field module and the privatisation module read it. It counts as zero when this module is off.
+- `repression`, the yearly rate of repression. The resistance module and the organised labour module read it. It counts as zero when this module is off.
+- `force`, the level of force, which the ownership of nature module reads
+- `force_jobs`, military jobs as a part of the working population, which the energy module reads
 - `force_contractors_top`, the contractors' part of the top 100's capitalization, for reporting
 - `force_tax`, the rate of the tax for military orders, for reporting
 
@@ -1998,12 +2017,12 @@ It owns the income named "tax for military orders", which the core fills in with
 
 - **Every bout of stagflation becomes a war.** The rule makes force follow stagflation in proportion. The book says that depth "requires" more force. It does not say that force follows in proportion. Any likeness between a run and Figure 17.2 is therefore built in and is not a finding.
 - **The rule for the tax is our own.** Chapter 13 says that the government bond capitalizes "the power of government to tax", and that capitalists "financed 'national' wars to multiply their capitalization many times over". No source says how the tax for arms is divided, so the module uses one rate on all income, as the public debt module does, and the top 100 pay the same rate as everybody else. The rate is set when force first rises and orders are still small, so most of a later build-up is paid for by borrowing.
-- **The tax can be twice what the settings describe.** At full force the settings give the contractors orders worth 10 per cent of all income, and the module counts them as 10 per cent of the working population in military jobs. The tax pays for what those jobs make at the contractors' prices. When the contractors' markup stands far above the average, the tax is larger. In runs of 60 years from 30,000 firms with every optional module on, the rate reached 20 and 21 per cent, and wage earners lost up to 27 per cent of their wages to taxes and interest in one year. Nothing in the model responds to that loss.
+- **The tax can be twice what the settings describe.** At full force the settings give the contractors orders worth 10 per cent of all income, and the module counts them as 10 per cent of the working population in military jobs. The tax pays for what those jobs make at the contractors' prices. When the contractors' markup stands far above the average, the tax is larger. In runs of 60 years from 30,000 firms with every module on, the rate reached 20 and 21 per cent, and wage earners lost up to 27 per cent of their wages to taxes and interest in one year. Nothing in the model responds to that loss.
 - **Military spending is counted as jobs.** This is our own device. The model counts employees and has no record of sales.
 - **Besides the tax, force has two costs, and both arise in other modules.** Lower unemployment lets wages gain on prices in the sabotage module. Lower unemployment also loosens the cohesion of the top 100 in the compass, which limits the intensity of stagflation.
 - **Force does not add to price rises.** In trial runs that started with 60,000 firms, inflation was almost the same with and without the module. The book says that conflict contributes to inflation.
 - **Much of what the sources describe is missing.** Soldiers are not counted, so the armed forces take nobody out of the working population. Arms exports and buyers of arms abroad are not in the model, although Figure 17.2 measures exports. The destruction of war is not modelled. The module closes no boundary and slows no merger, although the 2006 paper says war harms the movement of capital. There is no popular resistance to war itself.
-- **Military spending does not absorb unsold goods here.** The optional module "What can be sold" counts the armed forces as a buyer that spends the tax. The tax takes from wage earners and owners what the armed forces spend, so the orders add no spending of their own. Only borrowing for arms could. With the sales module on, a rise in the orders is at first mostly borrowed, because the rate of tax held there follows the rate charged slowly.
+- **Military spending does not absorb unsold goods here.** The module "What can be sold" counts the armed forces as a buyer that spends the tax. The tax takes from wage earners and owners what the armed forces spend, so the orders add no spending of their own. Only borrowing for arms could. With the sales module on, a rise in the orders is at first mostly borrowed, because the rate of tax held there follows the rate charged slowly.
 - **The figures below are from runs without the tax.** No run at the full count has been made with it for this module alone.
 - **With the coalitions module also on, the contractors grow beyond reason.** In a trial run their part of the top 100's capitalization reached 54 per cent, against 20 per cent with the coalitions module alone.
 - **Dismissals after one war may prepare the next bout.** In trial runs the contractors dismissed their extra employees over about 15 years after a bout. That kept unemployment up, which tightened the cohesion of the top 100 again and brought a second bout. A trial with repression alone gave no early second bout, and a trial with military hiring alone did. The full-size run described next ended ten years after its first bout, too soon to show this.
@@ -2013,11 +2032,9 @@ What should happen: with no stagflation, the level of force is zero and the modu
 
 ---
 
-## Optional module: Who owns the firms
+## 18. Who owns the firms
 
 Name in the model: `owners`
-
-Switch it on by adding `--with owners` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -2112,12 +2129,12 @@ It publishes ten numbers, measured at the start of each year. No other module re
 | `owners_reach` | The part of all employees who work in firms where the funds together hold at least a controlling block |
 | `owners_placed` | The part of the funds' new money that found shares to buy |
 
-The optional hype module changes the number this module keeps for each firm. With both on, the direct owners of top-100 firms are treated as insiders who trade shares with the funds.
+The hype module changes the number this module keeps for each firm. With both on, the direct owners of top-100 firms are treated as insiders who trade shares with the funds.
 
 ### What is known to be wrong or untested
 
 - **The funds' money never limits anything.** In trial runs that started with 60,000 firms, at most 9 per cent of the money found shares to buy. The two rates of saving decide only the mix of the two kinds of fund, and that mix moved only from 60 to 55 per cent in funds fed from wages.
-- **Money that finds no shares disappears.** In the sources, money chasing shares would raise their prices. That rise is hype, which stays at 1 unless the optional hype module is on.
+- **Money that finds no shares disappears.** In the sources, money chasing shares would raise their prices. That rise is hype, which stays at 1 unless the hype module is on.
 - **The rule for the passage of ownership is wholly ours.** Steps 1 to 4 have no source.
 - **The funds are two pools, not separate bodies.** The module cannot show three managers holding a fifth of every large firm.
 - **Funds never sell, and pension funds pay nothing out.**
@@ -2135,15 +2152,13 @@ What should happen: the part of capitalization held through funds should start a
 
 ---
 
-## Optional module: Hype as a lever
+## 19. Hype as a lever
 
 Name in the model: `hype`
 
-Switch it on by adding `--with hype` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-Hype is how far owners' expectations run ahead of what a firm will really earn. In the main modules it stays at 1 for every firm: owners expect exactly what comes. This module lets it move, and lets a group of well-placed owners profit from the movement.
+Hype is how far owners' expectations run ahead of what a firm will really earn. Without this module it stays at 1 for every firm: owners expect exactly what comes. This module lets it move, and lets a group of well-placed owners profit from the movement.
 
 Think of a company about to announce a takeover. A few people know. They buy shares quietly. The announcement comes, commentators talk the company up, and the share price rises faster than its earnings. The few who knew sell near the top to people who did not. A year later the earnings come in below what was hoped, and the price falls back. The book calls the few "insiders" and the others "outsiders", and it says that this is why hype matters: it is a way for some owners to gain at the expense of others.
 
@@ -2241,11 +2256,11 @@ It reads:
 
 - `merger_volume`, from the mergers module
 - `cohesion`, from the compass
-- `systemic_fear`, from the optional module on eruptions. Every upward push of steps 4 and 6 is multiplied by one minus this number. It counts as zero when that module is off.
-- `power_fear`, from the optional module on the power index and systemic fear. Every change of the year to a multiple, up or down, is multiplied by one minus this number. It counts as zero when that module is off.
+- `systemic_fear`, from the module on eruptions. Every upward push of steps 4 and 6 is multiplied by one minus this number. It counts as zero when that module is off.
+- `power_fear`, from the module on the power index and systemic fear. Every change of the year to a multiple, up or down, is multiplied by one minus this number. It counts as zero when that module is off.
 - the number that the owners module keeps for each firm, when that module is on
 
-It publishes `merger_hype`, the number of step 7. The mergers module reads it, and so do the optional modules for a second country and for cross-border ownership. It counts as 1 when this module is off.
+It publishes `merger_hype`, the number of step 7. The mergers module reads it, and so do the modules for a second country and for cross-border ownership. It counts as 1 when this module is off.
 
 It also publishes eight numbers for reporting:
 
@@ -2280,15 +2295,13 @@ What should happen: revealed hype for all firms together should stay near 1 over
 
 ---
 
-## Optional module: Risk shaping
+## 20. Risk shaping
 
 Name in the model: `risk_shaping`
 
-Switch it on by adding `--with risk_shaping` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-Every firm in the model has a number called risk. It is 1 when owners are sure of the earnings they expect, and higher when they are less sure. A higher risk means a lower capitalization. In the main modules the risk of the largest firms rises when they raise prices and when the population pushes back, and only a merger lowers it. This module adds what the book says the largest owners do about their own risk: they lower it through their ties to government.
+Every firm in the model has a number called risk. It is 1 when owners are sure of the earnings they expect, and higher when they are less sure. A higher risk means a lower capitalization. Without this module the risk of the largest firms rises when they raise prices and when the population pushes back, and only a merger lowers it. This module adds what the book says the largest owners do about their own risk: they lower it through their ties to government.
 
 Think of a large bank in a crash. The government guarantees the bank, so its owners stop fearing for their earnings. A small firm in the same crash gets no guarantee. The government borrows to pay for the guarantee, and people resent it.
 
@@ -2332,11 +2345,11 @@ These sources give no rule and no rate. The 2016 paper found "no discernable dec
 ### What the module does each year
 
 1. **It measures the tie between the top 100 firms and government.** The tie is the part of all capitalization that the top 100 hold. It is 0 when they hold nothing and 1 when they hold everything.
-2. **It measures how deep the crisis is.** The level of crisis is the largest of three numbers, each between 0 and 1. The first is unemployment above its usual 5 per cent, where 10 per cent or more counts as 1. The second is the intensity of stagflation, which is the compass module's number for how hard the top 100 are raising prices together. The third is the level of systemic fear, which the optional eruptions module publishes.
+2. **It measures how deep the crisis is.** The level of crisis is the largest of three numbers, each between 0 and 1. The first is unemployment above its usual 5 per cent, where 10 per cent or more counts as 1. The second is the intensity of stagflation, which is the compass module's number for how hard the top 100 are raising prices together. The third is the level of systemic fear, which the eruptions module publishes.
 3. **It allows for popular resistance.** Popular resistance is the resistance module's number, between 0 and 1, for how strongly the population pushes back. Every protection in steps 4 and 5 is multiplied by one minus that number. At a resistance of 1 the government can protect nobody.
 4. **Routine protection.** Every top-100 firm loses a part of the amount by which its risk stands above 1. The part is 5 per cent, times the tie, times the number of step 3. This stands for the regulation and policy that large firms and government set together.
 5. **Bailouts.** In a crisis every top-100 firm loses a further part of the amount by which its risk stands above 1. The part is 50 per cent, times the level of crisis, times the tie, times the number of step 3. No other firm receives this. The two protections together cannot remove more than the whole amount above 1.
-6. **A guarantee is worth what the taxes behind it are worth.** The bailout of step 5 is also multiplied by the part of last year's interest on its debt that the government was able to pay. The optional public debt module publishes that part. It is 1 when every taxpayer could pay, and it is taken as 1 when that module is off.
+6. **A guarantee is worth what the taxes behind it are worth.** The bailout of step 5 is also multiplied by the part of last year's interest on its debt that the government was able to pay. The public debt module publishes that part. It is 1 when every taxpayer could pay, and it is taken as 1 when that module is off.
 7. **The government borrows to pay for the bailout.** The module works out what the bailout is worth: the amount by which it raises the capitalization of the top 100 in the year. It publishes that amount as the government's borrowing. The debt module (module 2) adds it to the government's debt in the following year. The debt is never repaid.
 8. **The bailout is resented.** The module works out how far the bailouts alone lowered the risk of the top 100. It publishes that fall, and the resistance module adds it to next year's rise in popular resistance. Higher resistance then weakens the next protection through step 3. The resistance module also raises the risk of the top 100 whenever resistance rises.
 9. **It reports** the numbers listed below.
@@ -2367,8 +2380,8 @@ It reads:
 - `unemployment`, which the core publishes
 - `stagflation_intensity` from the compass module (module 7)
 - `resistance` from the resistance module (module 8)
-- `systemic_fear` from the optional eruptions module, taken as 0 when that module is off
-- `public_debt_service` from the optional public debt module, taken as 1 when that module is off
+- `systemic_fear` from the eruptions module, taken as 0 when that module is off
+- `public_debt_service` from the public debt module, taken as 1 when that module is off
 
 It publishes seven numbers.
 
@@ -2392,7 +2405,7 @@ When the public debt module is on, the interest on the bailout debt is paid from
 - **Measuring crisis by unemployment, stagflation and fear is ours.**
 - **The worth of a bailout is ours.** Taking it as the rise in capitalization that the bailout brings uses no number, but no source says so.
 - **The bailout debt is never repaid.** The Israeli bonds ran for five years.
-- **Step 6 has no passage of its own.** It took effect only in a trial with 28 optional modules on, where it took one twentieth of one per cent off a bailout.
+- **Step 6 has no passage of its own.** It took effect only in a trial with 28 of the other modules on, where it took one twentieth of one per cent off a bailout.
 - **Smaller owners are not made to carry the risk,** although the Israeli case suggests that they were left with the losses.
 - **All hundred firms are protected alike.** No firm is closer to government than another.
 - **The module lowers the risk number directly.** It does not lower the year-to-year variation of earnings, which is what Figure 13.1 measures.
@@ -2405,11 +2418,9 @@ What should happen: during a merger wave the tie should grow, and routine protec
 
 ---
 
-## Optional module: Who holds the public debt and who pays for it
+## 21. Who holds the public debt and who pays for it
 
 Name in the model: `public_debt`
-
-Switch it on by adding `--with public_debt` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -2503,7 +2514,7 @@ It reads:
 - `unemployment` and `transfers`, which the core publishes
 - `resistance` from the resistance module (module 8)
 
-When the optional risk shaping or privatisation module is on, the government's debt includes what the government borrowed for bailouts, less what it received for public services.
+When the risk shaping or privatisation module is on, the government's debt includes what the government borrowed for bailouts, less what it received for public services.
 
 It publishes thirteen numbers. Only the last one is read by another module.
 
@@ -2521,7 +2532,7 @@ It publishes thirteen numbers. Only the last one is read by another module.
 | `public_debt_rich_households` | The part of all interest paid directly to the richest one per cent of households |
 | `public_debt_flight` | How far unemployment stands above 5 per cent, on a scale where 10 per cent is 1 |
 | `public_debt_markup_part` | For each industry, the part of earnings that does not come from the public debt |
-| `public_debt_service` | The part of last year's interest that the government was able to pay. It is 1 unless taxpayers could not pay in full. The optional risk shaping module reads it. |
+| `public_debt_service` | The part of last year's interest that the government was able to pay. It is 1 unless taxpayers could not pay in full. The risk shaping module reads it. |
 
 ### What is known to be wrong or untested
 
@@ -2547,15 +2558,13 @@ What should happen: the capitalist share of income should be higher with the mod
 
 ---
 
-## Optional module: The normal rate of return following employment
+## 22. The normal rate of return following employment
 
 Name in the model: `policy_rate`
 
-Switch it on by adding `--with policy_rate` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-The normal rate of return is the rate that owners feel sure they can get. Every firm's capitalization is its expected earnings divided by this rate, so a lower rate makes every firm worth more. In the main modules the rate is fixed at 5 per cent. This module moves it.
+The normal rate of return is the rate that owners feel sure they can get. Every firm's capitalization is its expected earnings divided by this rate, so a lower rate makes every firm worth more. Without this module the rate is fixed at 5 per cent. This module moves it.
 
 Think of a central bank. When firms hire fast, it raises the rate of interest. When hiring is slow, it lowers the rate, and every share and bond is then worth more. The paper this module rests on argues that owners gain from slow hiring in this way.
 
@@ -2665,11 +2674,9 @@ What should happen: before the change of conduct nothing should differ from a ru
 
 ---
 
-## Optional module: Protections as barred entry
+## 23. Protections as barred entry
 
 Name in the model: `protections`
-
-Switch it on by adding `--with protections` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -2730,7 +2737,7 @@ These sources give no rule and no rate for who obtains a protection, how much it
 
 When one firm buys another, the merged firm keeps the buyer's protection and its remaining years. A protected buyer therefore extends its protection over what it buys, and the protection of a bought firm ends.
 
-The protection premium is one of three premiums that the model treats as holds on the same buyers. The other two belong to the optional price leaders and wants modules. "How markup components combine" above explains what happens when a firm has more than one.
+The protection premium is one of three premiums that the model treats as holds on the same buyers. The other two belong to the price leaders and wants modules. "How markup components combine" above explains what happens when a firm has more than one.
 
 **An example.** A firm is worth 100 times the average firm, so its tie is 100 ÷ (100 + 100) = 0.5.
 
@@ -2794,15 +2801,13 @@ What should happen: early in a run all firms are of similar size, every tie is n
 
 ---
 
-## Optional module: Privatisation
+## 24. Privatisation
 
 Name in the model: `privatisation`
 
-Switch it on by adding `--with privatisation` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-In the main modules the largest firms add employees in two ways: they hire, and they buy other firms. This module adds a third way. It keeps a pool of people who work for the government and for no firm. The largest firms take over parts of that pool when they are able to act together and the population does not stop them.
+Without this module the largest firms add employees in two ways: they hire, and they buy other firms. This module adds a third way. It keeps a pool of people who work for the government and for no firm. The largest firms take over parts of that pool when they are able to act together and the population does not stop them.
 
 Think of a city that runs its own water works. The city hands the water works to a large company for half of what it is worth. The same people do the same work, but now a company earns a markup on it.
 
@@ -2878,7 +2883,7 @@ It reads:
 
 - `cohesion` from the compass module (module 7)
 - `resistance` from the resistance module (module 8)
-- `force_hires` from the optional organised force module, taken as 0 when that module is off. These are people the military plans to hire, and the government does not count them as out of work.
+- `force_hires` from the organised force module, taken as 0 when that module is off. These are people the military plans to hire, and the government does not count them as out of work.
 
 It owns the income named "tax for public employment", which the core fills in with what each firm paid.
 
@@ -2896,7 +2901,7 @@ It publishes nine numbers.
 | `privatised_part_of_top` | The part of the top 100's employees that came from the pool | Nobody |
 | `public_pay_tax` | The rate of the tax of step 8 | Nobody |
 
-When the optional public debt module is on, a smaller government debt means less interest, less tax and less interest paid to the holders of the debt.
+When the public debt module is on, a smaller government debt means less interest, less tax and less interest paid to the holders of the debt.
 
 ### What is known to be wrong or untested
 
@@ -2911,14 +2916,14 @@ When the optional public debt module is on, a smaller government debt means less
 - **The pool has no industries.** Privatised employees take the industry of the firm that receives them.
 - **The door opens widest at the wrong time.** The book places privatisation in a phase of breadth, beside mergers. In trial runs the door opened widest in the first year or two of a bout of stagflation, which is a run of years in which the top 100 raise prices together while hiring is cut. Unemployment had then raised cohesion, and resistance had not yet risen.
 - **Privatisation provokes no resistance of its own.** This follows the book's remark that the population is "impartial to breadth". It may be too kind.
-- **Public hiring in a slump holds unemployment down, and the pool never shrinks back.** Step 7 hires from the people out of work while popular resistance is high, and nothing returns them to firms. Only a takeover empties the pool, and the door stays shut while resistance is above one half. With every optional module on, from 30,000 firms with seeds 0 to 5:
+- **Public hiring in a slump holds unemployment down, and the pool never shrinks back.** Step 7 hires from the people out of work while popular resistance is high, and nothing returns them to firms. Only a takeover empties the pool, and the door stays shut while resistance is above one half. With every module on, from 30,000 firms with seeds 0 to 5:
   - The pool falls from 4.8 to about 2.7 per cent of all working people by year 26 to 29, as the top 100 take it over.
   - In the slump that follows, resistance rises to 0.7 and public hiring takes the pool to 12 to 14 per cent by year 60.
   - Public pay grows from 2.6 to about 12 per cent of all income. The rates in law rise only a little after a deficit (the debt module, step 8), so from year 39 the government borrows about 5 per cent of all income a year for public pay, and 7.5 to 8.8 per cent for all it pays. That is the debt that interest is then paid on.
   - Unemployment over the last 20 years is 6.6 to 7.1 per cent. With `build` at 0 it is 18.3 to 20.3 per cent over seeds 0 to 3, about what the sales module gives alone. Without the module it is 5.6 to 9.1 per cent.
   - So about 12 points of the slump do not show in the count of people out of work: they are paid by the government with money that owners lend.
   In a mix that collapses (sales, price leaders, hype, risk shaping, protections, privatisation, barriers, labour, energy, the second country, cross-border and sovereign funds), resistance reaches 1 and the pool reaches 32 to 34 per cent of all working people. Public pay comes to more than all income in some years, unemployment swings between 0.5 and 79 per cent, and in some years more firms close than the run started with. The book does not say what moves people into or out of public employment, so `build` and the form of step 7 are ours.
-- **Public hiring and military hiring are counted apart.** The government hires only from people out of work whom the optional organised force module does not plan to hire.
+- **Public hiring and military hiring are counted apart.** The government hires only from people out of work whom the organised force module does not plan to hire.
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. The pool fell from 5.0 to 2.6 per cent of all working people in thirty years as the door opened from 0.02 to 0.17. By then one eighth of the top 100's employees had come from the pool, the top 100 employed 21.1 per cent of all employees against 18.4 per cent without the module, and differential capitalization was 501 against 445. The gain credited to privatisation was about 0.05 in each five years at first and 0.02 after thirty years, beside 0.63 falling to 0.14 for mergers. The first bout of stagflation was stronger: at its height the capitalist share of income was 24.1 per cent against 20.2 per cent. It also ended sooner: unemployment five years later was 1.1 per cent against 5.2 per cent. During and after it, popular resistance near one half shut the door, and public hiring raised the pool again to 3.1 per cent. With public hiring switched off the pool fell to 1.4 per cent, and the figures before the bout were nearly the same. After the bout the two runs differ in the timing of later bouts, and that difference cannot be traced to privatisation alone.
 - **At the full count.** In one run of 60 years from 300,000 firms, differential capitalization was 1,631 in the year labelled 1920 against 1,351 without the module, 2,843 in 1935 against 3,077, and 8,522 in 1950 against 8,121. The top 100 employed 13.9 per cent of all employees in 1920 against 11.7 per cent, and 23.7 per cent in 1950 against 19.3 per cent. In 1935, during the first bout of stagflation, the capitalist share of income was 27.1 per cent against 20.2 per cent. The bout ended sooner: unemployment in 1940 was 0.5 per cent against 4.5 per cent.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures to within rounding error.
@@ -2927,15 +2932,15 @@ What should happen: early in a run the top 100 hold little and cohesion is near 
 
 ---
 
-## Optional module: Specific barriers won by resistance
+## 25. Specific barriers won by resistance
 
 Name in the model: `barriers`
 
-Switch it on by adding `--with barriers` to the command. It runs beside the main modules and replaces none of them. It can run together with the optional boundary contest module.
+It can run together with the boundary contest module.
 
 ### What it is about
 
-The main modules keep one number, called roadblocks, for everything that slows mergers down. This module turns that number into barriers against particular groups of firms. A barrier here is a prohibition that keeps the largest firms of one sector inside their own line of business. The line of business of a firm is its industry.
+Without this module the model keeps one number, called roadblocks, for everything that slows mergers down. This module turns that number into barriers against particular groups of firms. A barrier here is a prohibition that keeps the largest firms of one sector inside their own line of business. The line of business of a firm is its industry.
 
 Think of a law that bars banks from owning factories. While the law stands, banks cannot buy outside banking. If the law is strict enough, they must also sell the factories they already own. Years later the banks press to have the law relaxed, and in time it is.
 
@@ -2978,8 +2983,8 @@ These sources give no rule for which group a barrier falls on, how fast it rises
 2. **It works out what raises each barrier.** The counter-force is the level of roadblocks plus half the level of popular resistance, and never more than 1. Both numbers come from the resistance module (module 8): roadblocks rise with the volume of mergers, and popular resistance says how strongly the population pushes back. The exposure of a sector is the outside holdings of its top-100 firms as a part of all employees in the economy, divided by 1 per cent, and never more than 1. Each year the barrier of a sector rises by 0.3, times the counter-force, times the exposure.
 3. **A barrier limits buying.** A top-100 firm can always buy in its own industry. What it can reach beyond depends on how open two boundaries are: one around its sector and one around the rest of the economy. The merger module multiplies both by one minus the barrier of the buyer's sector.
 4. **A high barrier forces sales.** While the barrier of a sector stands above 0.5, each top-100 firm in that sector sells a quarter of each of its outside holdings every year. If a quarter would be smaller than the average small firm, the whole holding is sold. A holding that is itself smaller than the average small firm is not sold. A firm never sells more than nine tenths of itself. Each sold holding becomes a new firm in the industry where it was bought. The new firm takes the seller's markup, other income, costs, price, hype and risk, so the sale changes who holds the employees and leaves total capitalization unchanged. Any top-100 firm that no barrier holds back can buy the new firm again.
-5. **The top 100 wear barriers down.** Each year a barrier falls by 5 per cent of its own height, times the push of the top 100 on their boundaries. The push is the number that the optional boundary contest module publishes. Without that module it is the part of the firms within their reach that the top 100 already hold, which the envelope module (module 9) publishes. A barrier does not fade by itself.
-6. **Forced sales are traded for openings.** The module keeps a running level of forced sales, measured as a part of the top 100's employees. Each year it keeps four fifths of last year's level and adds this year's sales. It publishes the level as the bargain. The optional boundary contest module weakens the hold that keeps the next boundary shut in that proportion.
+5. **The top 100 wear barriers down.** Each year a barrier falls by 5 per cent of its own height, times the push of the top 100 on their boundaries. The push is the number that the boundary contest module publishes. Without that module it is the part of the firms within their reach that the top 100 already hold, which the envelope module (module 9) publishes. A barrier does not fade by itself.
+6. **Forced sales are traded for openings.** The module keeps a running level of forced sales, measured as a part of the top 100's employees. Each year it keeps four fifths of last year's level and adds this year's sales. It publishes the level as the bargain. The boundary contest module weakens the hold that keeps the next boundary shut in that proportion.
 7. **It reports** the numbers listed below.
 
 **An example.** Roadblocks stand at 0.4 and popular resistance at 0.2, so the counter-force is 0.4 + 0.5 × 0.2 = 0.5. The top-100 firms of one sector hold employees outside their own industries equal to 0.5 per cent of all employees, so the exposure of that sector is 0.5.
@@ -3010,16 +3015,16 @@ One number in the code is not a setting. A firm stops selling when the next sale
 It reads:
 
 - `roadblocks` and `resistance` from the resistance module (module 8)
-- `pressure` from the envelope module (module 9), or from the optional boundary contest module when that is on
-- `boundary_push` from the optional boundary contest module, in place of `pressure`
-- `merger_appetite` from the optional coalitions module, taken as 1 when that module is off. It is used only in the estimate of step 1.
+- `pressure` from the envelope module (module 9), or from the boundary contest module when that is on
+- `boundary_push` from the boundary contest module, in place of `pressure`
+- `merger_appetite` from the coalitions module, taken as 1 when that module is off. It is used only in the estimate of step 1.
 
 It publishes eight numbers.
 
 | Name in the code | What it is | Who reads it |
 |---|---|---|
 | `line_barrier` | The barrier of each sector | The merger module, as in step 3 |
-| `barrier_bargain` | The running level of forced sales, times `bargain_rate`, and never more than 1 | The optional boundary contest module multiplies its hold by one minus this number |
+| `barrier_bargain` | The running level of forced sales, times `bargain_rate`, and never more than 1 | The boundary contest module multiplies its hold by one minus this number |
 | `barrier_level` | The average barrier, weighted by where the top 100's employees are | Nobody |
 | `barrier_highest` | The highest barrier | Nobody |
 | `barrier_lowest` | The lowest barrier among sectors that have a top-100 firm | Nobody |
@@ -3040,7 +3045,7 @@ It publishes eight numbers.
 - **A firm that was once in the top 100 and is later bought loses its record of outside holdings.** Those holdings are then counted as part of the buyer's own industry.
 - **Barriers arise in every sector that has a top-100 firm.** They are less specific than the title promises.
 - **Barriers do not rise and then fall.** In a trial of 119 years the barriers stayed between 0.43 and 0.58 from about the seventy-fifth year. Sectors moved in and out of forced sale. The wearing down was too weak to bring any barrier down for long, so the runs show a standing contest at the threshold for forced sales and not the relaxation that the footnote reports. The level at which barriers settle is that threshold, which is a setting.
-- **The module has been tried with the boundary contest module and with no other optional module.**
+- **The module has been tried with the boundary contest module and with no other module.**
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. For thirty years the sector boundary was shut, no barrier appeared, and the figures were identical to those without the module. After sixty years the barriers stood between 0.18 and 0.62 in different sectors, and thirteen of the twenty sectors were under forced sale. Sales in that year were 1.4 per cent of all employees. The top 100 employed 21.8 per cent of all employees against 24.4 per cent without the module, and differential capitalization was 1,398 against 1,564, with a loss of 0.15 over five years credited to this module. After 115 years the top 100 employed 8 per cent of all employees against 46 per cent. The run had three bouts of stagflation after its sixtieth year, where the run without the module had one. With the boundary contest module on, over 60 years, the average barrier passed 0.5 after thirty-five years and stood near 0.95 from the fiftieth. Outside holdings fell from 48 to 5 per cent of the top 100's employees. The top 100 employed 14 per cent of all employees after sixty years against 46 per cent. The sector boundary stood at 0.77 at the end and never closed, where without this module it peaked near 0.39 and had closed again.
 - **At the full count.** In one run of 60 years from 300,000 firms the module hardly acted. The sector boundary opened by no more than 0.03 in the whole run, so the top 100 bought almost nothing outside their own industries. Every printed figure was the same as without the module until the year labelled 1930, and differential capitalization in 1950 was 8,156 against 8,121. The findings above have therefore not been seen at the full count.
 - **The order in which modules are listed makes no difference.** Two trial runs with the boundary contest module on and the modules listed in opposite orders gave identical figures.
@@ -3049,15 +3054,13 @@ What should happen: while the sector boundary is shut, no top-100 firm holds any
 
 ---
 
-## Optional module: Proletarianization
+## 26. Proletarianization
 
 Name in the model: `proletarianization`
 
-Switch it on by adding `--with proletarianization` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-Proletarianization means turning people who live outside wage work into people who must work for a wage. In the main modules the working population grows every year by a fixed 1.7 per cent. This module works that rate out. It keeps a count of people who live outside wage work: on the land, in households, or in other countries. Employers and government draw them in when few hands are idle, and the drawing slows as the outside population is used up.
+Proletarianization means turning people who live outside wage work into people who must work for a wage. Without this module the working population grows every year by a fixed 1.7 per cent. This module works that rate out. It keeps a count of people who live outside wage work: on the land, in households, or in other countries. Employers and government draw them in when few hands are idle, and the drawing slows as the outside population is used up.
 
 Think of a country where half the people still farm for themselves. While factories are short of workers, people leave the land for the towns. Once most have left, that source of new workers runs dry.
 
@@ -3139,7 +3142,7 @@ It publishes seven numbers.
 | Name in the code | What it is | Who reads it |
 |---|---|---|
 | `breadth_cohesion` | The number of step 8 | The compass module multiplies it into cohesion |
-| `proletarianization_rate` | The planned drawing as a part of the working population | The optional organised labour module, which lets newly drawn-in people thin out organisation |
+| `proletarianization_rate` | The planned drawing as a part of the working population | The organised labour module, which lets newly drawn-in people thin out organisation |
 | `outside_population` | The outside population as a part of all people | Nobody |
 | `proletarianization_drive` | The drive of step 3 | Nobody |
 | `proletarianization_barrier` | The stall of step 4 | Nobody |
@@ -3161,7 +3164,7 @@ It publishes seven numbers.
 - **The loosening of cohesion did almost nothing.** The compass decides when stagflation begins from its memory of mergers. In trial runs the first bout came in the same year and at the same strength with the loosening switched off.
 - **Resistance outweighs the want of hands.** After the first bout in trial runs, unemployment fell to its lowest possible level and a stall of 0.96 still held the drawing near zero.
 - **The ceiling was never reached.** In a trial of 119 years the outside population was still 31 per cent of all people at the end. The drawing slowed because unemployment stood near 6 per cent, which leaves a drive of about 0.2, and because standing popular resistance of 0.15 to 0.25 kept the stall between 0.3 and 0.5.
-- **The module has not been tried together with other optional modules.**
+- **How the module acts together with the others has not been studied.**
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. The growth rate that the module set fell from 1.72 per cent in the fifth year to 1.51 per cent in the thirtieth. It fell to 0.80 per cent during the first bout of stagflation, when the drive was zero and 0.2 per cent of the working population fell back each year. It recovered to 1.4 per cent and then declined to 1.09 per cent after 115 years. After sixty years employment was 19.1 million against 23.4 million without the module, and there were 268,000 firms against 395,000. The top 100 employed 25.6 per cent of all employees against 24.4 per cent. Differential capitalization was 1,112 against 1,564, because fewer small firms were founded to lower the average. After 115 years the top 100 employed 70 per cent of all employees against 46 per cent, and differential capitalization was 2,017 against 4,851.
 - **At the full count.** In one run of 60 years from 300,000 firms, differential capitalization was 1,315 in the year labelled 1920 against 1,351 without the module, 2,841 in 1935 against 3,077, and 5,616 in 1950 against 8,121. There were 1.70 million firms in 1950 against 2.32 million. The top 100 employed 19.3 per cent of all employees in both runs. The first bout of stagflation came in the same years in both.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave identical figures.
@@ -3170,15 +3173,13 @@ What should happen: at the start of a run unemployment is 5 per cent, the drive 
 
 ---
 
-## Optional module: Organised labour
+## 27. Organised labour
 
 Name in the model: `labour`
 
-Switch it on by adding `--with labour` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-The main modules keep one number for how strongly the population pushes back, called popular resistance. Two of its jobs concern wages. This module takes over those two jobs. It keeps a count of how far the employees of each industry are organised in unions, it works out how much they strike, and it publishes a number for the strength of labour.
+Without this module the model keeps one number for how strongly the population pushes back, called popular resistance. Two of its jobs concern wages. This module takes over those two jobs. It keeps a count of how far the employees of each industry are organised in unions, it works out how much they strike, and it publishes a number for the strength of labour.
 
 Think of a year in which prices rise faster than wages. Workers join unions. If jobs are easy to find, they strike, and wages catch up. If unemployment is high, they fear for their jobs and stay at work, and a large quiet union counts for little.
 
@@ -3222,11 +3223,11 @@ These sources give no rule for how organisation grows, how often organised emplo
 1. **It keeps the organised part of each industry.** This is the part of the industry's employees who are organised. At the start it is 3 per cent in every industry.
 2. **It measures the grievance.** The real wage is the wage divided by the average price. The module compares this year's real wage with the best real wage of the last ten years. The grievance is the shortfall divided by 5 per cent, and never more than 1. It is the same in every industry, because the model has one wage and one average price.
 3. **Employees organise.** The unorganised part of an industry shrinks by 5 per cent, times the grievance, times a number for the size of the firms in the industry. That number is 0.3 in an industry where the top 100 firms employ nobody and 1 in an industry where they employ everybody.
-4. **Organisation wears down.** The organised part of an industry shrinks by its own size times the sum of three things. The first is a fading of 3 per cent. The second is the repression that the optional organised force module publishes. The third is 5 times the part of the working population that the optional proletarianization module reports as newly drawn in from outside wage work. The second and third are 0 when those modules are off.
+4. **Organisation wears down.** The organised part of an industry shrinks by its own size times the sum of three things. The first is a fading of 3 per cent. The second is the repression that the organised force module publishes. The third is 5 times the part of the working population that the proletarianization module reports as newly drawn in from outside wage work. The second and third are 0 when those modules are off.
 5. **Unemployment mutes strikes.** Discipline is unemployment divided by 25 per cent, and never more than 1. Militancy is the grievance times one minus discipline. The strike activity of an industry is its organised part times militancy. It stands for the part of the industry's employees who are on strike in the year.
 6. **A quiet union counts for less.** An organisation that is not striking counts for half its size. In an industry where the top 100 employ everybody it counts for a quarter, and in between the part falls in proportion. This stands for a large union that has been turned into a restraint on its own members.
 7. **It works out the strength of labour.** The strength in an industry is its organised part, times the sum of the quiet part of step 6 and the remainder multiplied by militancy. When militancy is 1, the strength equals the organised part. The strength in the whole economy is the average over industries, weighted by employees.
-8. **Two main modules use the strength in place of popular resistance.** The sabotage module (module 1) has a level of unemployment at which wages keep pace with prices. It uses the strength in each industry to raise that level, by 5 points at full strength. The stagflation module (module 6) decides what part of each price rise wages obtain. It uses the strength in the whole economy, and at full strength wages obtain the whole rise.
+8. **Two modules of the basic set use the strength in place of popular resistance.** The sabotage module (module 1) has a level of unemployment at which wages keep pace with prices. It uses the strength in each industry to raise that level, by 5 points at full strength. The stagflation module (module 6) decides what part of each price rise wages obtain. It uses the strength in the whole economy, and at full strength wages obtain the whole rise.
 9. **Strikes raise the risk of the firms they hit.** The risk of every firm in an industry is multiplied by 1 plus the strike activity of the industry. Each year the module removes last year's rise before it applies this year's, so the rise lasts only as long as the strikes.
 10. **It reports** the numbers listed below.
 
@@ -3262,8 +3263,8 @@ These sources give no rule for how organisation grows, how often organised emplo
 It reads:
 
 - `unemployment`, which the core publishes
-- `repression` from the optional organised force module, taken as 0 when that module is off
-- `proletarianization_rate` from the optional proletarianization module, taken as 0 when that module is off
+- `repression` from the organised force module, taken as 0 when that module is off
+- `proletarianization_rate` from the proletarianization module, taken as 0 when that module is off
 
 It publishes eight numbers.
 
@@ -3278,7 +3279,7 @@ It publishes eight numbers.
 | `labour_militancy` | The militancy of step 5 | Nobody |
 | `real_wage` | The wage divided by the average price | Nobody |
 
-Both main modules read popular resistance as usual when this module is off.
+Both modules read popular resistance as usual when this module is off.
 
 ### What is known to be wrong or untested
 
@@ -3294,24 +3295,22 @@ Both main modules read popular resistance as usual when this module is off.
 - **Strikes stop too soon.** A bout of stagflation is a run of years in which the top 100 raise prices together while hiring is cut. In trial runs strikes stopped altogether between the years labelled 1935 and 1940, soon after the first bout of stagflation. The real wage had then recovered to the best level of the previous ten years, although it was still far below its level before the bout. The ten years of memory is a setting, and this result depends on it.
 - **Unemployment stays at its lowest possible level for too long.** In trial runs it stayed there ten years longer than without the module, because markups stayed high for longer and small firms went on hiring.
 - **The strength of labour never came near the level at which wages keep pace with prices.** The runs do not show the case of Germany and France.
-- **The module has not been tried together with other optional modules.** Its reading of repression and of newly drawn-in people has not been exercised.
+- **How the module acts together with the others has not been studied.** Its reading of repression and of newly drawn-in people has not been exercised.
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. Until the first bout of stagflation the figures were nearly the same as without the module. The organised part of employees stood between 2.5 and 5 per cent, and the strength of labour between 0.01 and 0.03. In the first bout the grievance became complete. The organised part rose to 21 per cent of all employees and to 40 per cent in the industries where the top 100 employed more than half. Strike activity reached 21 per cent of employees after unemployment had fallen from 10.6 to 0.5 per cent. The strength of labour peaked at 0.21, about half the level of popular resistance that it replaced, so wages recovered more slowly. The capitalist share of income was 31.3 per cent in the year labelled 1930 against 28.7 per cent without the module, and 19.1 per cent in 1940 against 12.6 per cent. Strikes were credited with a loss of differential capitalization of 0.12 over fifteen years and with a gain of 0.13 when they stopped. Differential capitalization was 792 in 1940 against 1,069, and 1,609 in 1950 against 1,564. In a trial of 119 years a low and steady strike activity of 3 to 6 per cent of employees ran for thirty years while markups crept up, and organisation stood near 20 per cent. The last bout began in the same years as without the module and ended with unemployment at 5.5 per cent against 14.1 per cent.
 - **At the full count.** In one run of 60 years from 300,000 firms, differential capitalization was 1,380 in the year labelled 1920 against 1,351 without the module, 2,960 in 1935 against 3,077, and 6,308 in 1950 against 8,121. The capitalist share of income stayed high after the first bout of stagflation: it was 21.6 per cent in 1945 against 17.6 per cent, and 17.4 per cent in 1950 against 12.0 per cent. Unemployment in 1940 was 1.3 per cent against 4.5 per cent.
-- **The order in which modules are listed makes almost no difference.** Two trial runs with the modules listed in opposite orders agreed to thirteen significant figures. The main modules alone differ between the two orders by a rounding error of similar size.
+- **The order in which modules are listed makes almost no difference.** Two trial runs with the modules listed in opposite orders agreed to thirteen significant figures. The basic set alone differs between the two orders by a rounding error of similar size.
 
 What should happen: while mergers proceed and prices are steady, the real wage should slip only slightly, the grievance should stay low, and organisation should stay near its starting level. When the largest firms turn to raising prices, the real wage should fall, the grievance should become complete, and employees should organise, fastest in the industries of the largest firms. Strikes should be muted while unemployment is high and should spread as hiring recovers. The strength of labour should then give wages a larger part of each price rise and lower markups, so the real wage should recover. When it has recovered to the best level in memory, strikes should stop and organisation should fade slowly. The risk of the top 100 should rise more than the average risk during a strike wave, because their industries are the most organised.
 
 ---
 
-## Optional module: Household debt
+## 28. Household debt
 
 Name in the model: `household_debt`
 
-Switch it on by adding `--with household_debt` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-In the main modules, wage earners keep the whole of their wages. This module lets them borrow, and it makes them pay interest out of their wages to the firms.
+Without this module, wage earners keep the whole of their wages. This module lets them borrow, and it makes them pay interest out of their wages to the firms.
 
 Think of a family whose pay buys less each year because prices have risen faster than wages. It takes out a loan to keep up. From then on a part of every pay packet goes to the lender. Households borrow most when wages fall behind prices, and the model produces such years by itself, when the largest firms raise prices together.
 
@@ -3346,7 +3345,7 @@ Hager says what the borrowing does to resistance:
 - "Household debt serves as a compensatory mechanism", and widespread credit "helps to dampen resentment toward the top percentile".
 - He reports that the debts of the lower half of United States households rose from 0.61 of their income in 1989 to 1.37 in 2007.
 
-Chapter 16 says that inflation in the United States "has been associated with a systematic redistribution of income from workers to firms". The main modules produce that lag of wages behind prices, and this module measures it.
+Chapter 16 says that inflation in the United States "has been associated with a systematic redistribution of income from workers to firms". The basic set produces that lag of wages behind prices, and this module measures it.
 
 These sources give no rule for how fast households borrow, what they pay, or which lenders receive it. They give no rates.
 
@@ -3407,8 +3406,8 @@ It publishes thirteen numbers.
 | Name in the code | What it is | Who reads it |
 |---|---|---|
 | `household_debt_placation` | The number of step 9 | The resistance module (module 8) |
-| `household_debt_lent` | The money that lenders handed to wage earners in the year | The optional sales module |
-| `household_debt_repaid` | The money that wage earners paid back in the year | The optional sales module |
+| `household_debt_lent` | The money that lenders handed to wage earners in the year | The sales module |
+| `household_debt_repaid` | The money that wage earners paid back in the year | The sales module |
 | `household_debt` | The price of the debt, from step 10 | Nobody |
 | `household_debt_principal` | The money that households owe | Nobody |
 | `household_debt_pledged` | The year's interest as a part of the wage bill | Nobody |
@@ -3428,15 +3427,15 @@ The module owns the income named "household interest". The core fills it in from
 - **The model has no banks.** Step 7 therefore sends most of the interest to the industries where the largest firms are. Every firm of such an industry gains, including the small ones.
 - **Households stop borrowing ten years after a fall in the wage,** even if the wage never recovers, because the shortfall is measured against the best level of the last ten years.
 - **Di Muzio and Robbins are not Nitzan and Bichler.** Their account of money created as debt is used only to say that lending costs the lender nothing.
-- **What households borrow is spent only in the sales module's account.** Borrowing and repayment change no income here. The module publishes the money lent and the money repaid, and the optional sales module counts both in what wage earners have to spend. With that module off, nothing follows from them.
+- **What households borrow is spent only in the sales module's account.** Borrowing and repayment change no income here. The module publishes the money lent and the money repaid, and the sales module counts both in what wage earners have to spend. With that module off, nothing follows from them.
 - **Interest does not enter prices and does not force growth.** Di Muzio and Robbins hold that it does both.
 - **The debt is not traded.** It has no price apart from the published one.
-- **Debt does not discipline workers.** The optional organised labour module does not read how indebted wage earners are.
+- **Debt does not discipline workers.** The organised labour module does not read how indebted wage earners are.
 - **Mortgages, student loans and card debt are not told apart.**
 - **A newly founded firm receives no interest until the following year.**
 - **The debt stays far below the levels the sources report.** Di Muzio, Robbins and Hager report debts above one year's income. In trial runs the money owed reached a quarter of a year's wages in the first bout of stagflation and 0.44 of a year's wages in a longer run. A bout of stagflation is a run of years in which the 100 largest firms raise prices together while hiring is cut.
 - **The limit of 15 per cent has never been reached.** No debt was written off in any run, so step 6 is untested.
-- **The module has not been tried together with other optional modules.**
+- **How the module acts together with the others has not been studied.**
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, and ran for 60 and 119 years, so they show direction and not size. Before the first bout of stagflation interest took less than 0.2 per cent of the wage bill, and the figures were nearly the same as without the module. In the bout the wage that households kept fell 22 per cent below its best level. New borrowing reached 7 per cent of the wage bill in one year. Interest rose to 2.6 per cent of the wage bill, and 57 to 64 per cent of it went to the top 100. Popular resistance was held down: it stood at 0.21 where it stood at 0.43 without the module. The capitalist share of income stayed higher for longer. A trial with the dampening switched off showed that the interest itself added about one point to the capitalist share, and that the slower recovery of wages came from the dampening of resistance. Over the fifteen years of the bout the module was credited with a gain of 0.09 in differential capitalization, which is the average capitalization of the 100 largest firms divided by the average of all firms, measured as a logarithm. It was credited with a loss of 0.05 over the fifteen years of repayment. In the run of 119 years the last bout was still at full strength at the end, with interest at 4.8 per cent of the wage bill, popular resistance at 0.48 against 0.94, and a capitalist share of 40 per cent against 30 per cent. After the first bout the runs with and without the module differ in the timing of small later bouts. Part of that difference comes from which firms happen to be among the 100 largest, and not from any stated effect of the debt.
 - **At the full count.** In one run of 60 years from 300,000 firms, the figures were nearly the same as without the module until the first bout of stagflation. In the bout the wage that households kept fell 22 per cent below its best level. New borrowing reached 7.3 per cent of the wage bill in one year. Interest rose to 2.5 per cent of the wage bill, which means that households owed a quarter of a year's wages. From the year labelled 1935 on, between 58 and 69 per cent of the interest went to the top 100. Popular resistance was 0.34 in 1940 against 0.46 without the module, and 0.16 in 1950 against 0.30. The capitalist share of income was 30.2 per cent in 1940 against 28.2 per cent, 21.7 per cent in 1945 against 17.6 per cent, and 16.3 per cent in 1950 against 12.0 per cent. Differential capitalization was 1,362 in 1920 against 1,351, 3,140 in 1935 against 3,077, and 7,974 in 1950 against 8,121. No debt was written off.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders agreed to fifteen significant figures.
@@ -3445,11 +3444,9 @@ What should happen: while mergers proceed and prices are steady, wages should sl
 
 ---
 
-## Optional module: Hierarchy inside the firm
+## 29. Hierarchy inside the firm
 
 Name in the model: `hierarchy`
-
-Switch it on by adding `--with hierarchy` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -3548,7 +3545,7 @@ It publishes twelve numbers. Nobody reads any of them.
 - **The levels depend heavily on r.** In trial runs with r at 1.05 the top rank of the 100 largest firms was paid 29 times the wage after 105 years, and the best paid one per cent received 3 per cent of all pay. With 1.2 the figures were 60,000 times and 56 per cent.
 - **Pay at the top depends almost only on the number of ranks.** In trial runs the highest pay of any top rank stood at 109 times the wage for forty years, then at 308, then at 962.
 - **The pay of the top rank in the middle firm falls over a run.** In trial runs it fell from 4.7 to 1.9 times the wage, because the many newly founded firms have only a handful of employees and two or three ranks.
-- **The module has not been tried together with other optional modules.** The only thing it reads that they change is the number of employees.
+- **How the module acts together with the others has not been studied.** The only thing it reads that they change is the number of employees.
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, and ran for 60 and 119 years, so they show direction and not size. The 100 largest firms went from 8 ranks in the year labelled 1890 to 10 by 1920 and to between 11 and 12 by 1990. The pay of their top rank went from 19 times the wage to 109, to 300 around 1970 and to 680 in 1995. The best paid one per cent received 5.5 per cent of all pay in 1890 and 9.1 per cent in 1995. The part of them who worked in the 100 largest firms rose from 1 per cent to 62 per cent, and the fitted exponent fell from 7.4 to 3.0.
 - **At the full count.** In one run of 60 years from 300,000 firms, every printed figure was the same with the module on and off. The 100 largest firms had 8 ranks on average at the start, nearly 11 by the year labelled 1920, and 11 from 1930. The pay of their top rank went from 21 times the wage at the start to 296 times in 1920 and 353 times in 1950. The best paid one per cent received 5.5 per cent of all pay at the start and 6.8 per cent in 1950. The part of them who worked in the 100 largest firms rose from 0.3 per cent to 13 per cent. The fitted exponent fell from 7.4 to 4.3. The Gini index stayed between 0.23 and 0.24. The pay of the top rank in the middle firm fell from 4.7 to 1.9 times the wage.
 
@@ -3556,11 +3553,9 @@ What should happen: at the start, when firms are of similar size, the pay of the
 
 ---
 
-## Optional module: The shaping of wants
+## 30. The shaping of wants
 
 Name in the model: `wants`
-
-Switch it on by adding `--with wants` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -3605,7 +3600,7 @@ The module keeps two numbers for every firm. The outlay part is the part of its 
 3. **A hold is built and lost over years.** Each year a firm's hold moves one fifth of the way toward its part of the year's persuasion. A firm that exists at the start has the hold that its outlay supports. A newly founded firm starts with no hold. A firm that buys another keeps its own hold and does not receive the hold of the firm it buys.
 4. **The module measures each firm's lead.** The lead is the firm's part of all the holds in its industry, divided by its part of the industry's employees, minus one. A firm with a lead above zero holds more of the buyers than of the capacity. The leads of an industry, weighted by employees, add up to zero. The rule counts no lead above 1.
 5. **A lead earns a premium.** The module works out by how much each firm's markup should be multiplied, as a fraction: a fraction of 0.07 multiplies it by about 1.07. The fraction is 0.2 times the lead, less the amount by which the firm's outlay part exceeds the average outlay part of its industry. A firm that spends more than its industry does on average pays the excess from its own earnings. The module then scales the premiums of an industry so that the industry earns what it did. What it gives to some firms it takes from the other firms of the same industry, and each firm loses at most a part of its own markup, as in the price leaders module.
-6. **The premium is recorded as a part of the markup that the module owns.** This part is named "wants premium", and the module sets it afresh every year. A premium therefore ends in the year the lead is lost. The premium is one of three parts of a markup that are holds on the same buyers. The other two are the size premium of the optional price leaders module and the protection premium of the optional protections module. By default only the largest of the three counts in a firm's markup. "How markup components combine" explains this.
+6. **The premium is recorded as a part of the markup that the module owns.** This part is named "wants premium", and the module sets it afresh every year. A premium therefore ends in the year the lead is lost. The premium is one of three parts of a markup that are holds on the same buyers. The other two are the size premium of the price leaders module and the protection premium of the protections module. By default only the largest of the three counts in a firm's markup. "How markup components combine" explains this.
 7. **The industry's outlay goes into its prices.** The module owns a cost named "outlay on wants". Each year it sets that cost, for every firm of an industry, to the industry's average outlay part times the industry's markup. This is the industry's outlay for each employee, counted in wages. The core adds it to the wage and the markup when it works out the price. Buyers pay for their own persuasion. The money goes to the firms that sell persuasion, which are firms of the model like any others, and the module tells the core so.
 8. **Held buyers are predictable buyers.** Each year a firm with a lead above zero loses a part of the amount by which its risk stands above 1. The part is 0.1 times the lead. A firm without a lead gets no relief.
 9. **It reports** five numbers, listed below.
@@ -3659,17 +3654,17 @@ It publishes five numbers. Nobody reads any of them.
 - **The whole gain of the large firms rests on one added number.** The power of 1.25 in step 2 is the only reason why a large firm gains a lead from the same outlay part as a small firm. No passage states it. In a trial run with the power set to 1, the 100 largest firms had a lead below zero and a markup 5 to 7 per cent below their neighbours.
 - **The rule that a trailing firm spends more is our own.** It applies the book's phrase "not to maximize but to exceed" to this one tool. In a trial run without it, the 100 largest firms gained about half as much markup, so half of their gain came from their lead and half from the extra outlay that small firms paid.
 - **The whole average outlay passes into the price.** No source says how much does.
-- **The sellers of persuasion are not told apart.** Buyers pay the outlay in the price, and firms that sell persuasion receive it as sales. Chapter 9 reckons "a 15 per cent markup on these advertising expenditures". The model does not say which firms these are, so the 5 per cent of corporate income that the book ascribes to them does not appear as theirs. With the optional sales module on, the outlay is counted as goods that firms buy from firms.
+- **The sellers of persuasion are not told apart.** Buyers pay the outlay in the price, and firms that sell persuasion receive it as sales. Chapter 9 reckons "a 15 per cent markup on these advertising expenditures". The model does not say which firms these are, so the 5 per cent of corporate income that the book ascribes to them does not appear as theirs. With the sales module on, the outlay is counted as goods that firms buy from firms.
 - **The general effect is left out.** Chapter 9 describes a whole population made predictable for all sellers. The rule lets the gains cancel when all firms do the same.
 - **A firm's markup is not made steadier from year to year.** The relief of step 8 stands in for that. It is small: a trial run without it gave nearly the same result.
 - **A hold does not bar entry.** A new firm is founded as usual and then earns less than its neighbours for a few years.
 - **A hold cannot be bought together with the firm that built it.** A firm that grows fast by buying therefore has a smaller lead than its size suggests.
 - **Fear is not in the rule.** Chapter 9 names it as the second path beside the promise of pleasure.
 - **Popular resistance does not respond to the shaping of wants.** Popular resistance is the model's number for how strongly the population pushes back.
-- **A protected firm pays for a hold that adds nothing to its markup.** With the optional protections module on, only the larger of a firm's wants premium and protection premium counts. In a run of 60 years from 300,000 firms, the 100 largest firms had an average wants premium of 1.17 and an average protection premium of 1.37 in the year labelled 1920, and such a firm still spent the same part of its earnings on wants. With the two premiums multiplied, differential capitalization in 1920 was 2,021 against 1,793. Differential capitalization is the average capitalization of the 100 largest firms divided by the average of all firms.
+- **A protected firm pays for a hold that adds nothing to its markup.** With the protections module on, only the larger of a firm's wants premium and protection premium counts. In a run of 60 years from 300,000 firms, the 100 largest firms had an average wants premium of 1.17 and an average protection premium of 1.37 in the year labelled 1920, and such a firm still spent the same part of its earnings on wants. With the two premiums multiplied, differential capitalization in 1920 was 2,021 against 1,793. Differential capitalization is the average capitalization of the 100 largest firms divided by the average of all firms.
 - **Whether a premium should end at once or fade has no source.** With `fade` at 0.3 in runs of 60 years from 300,000 firms, differential capitalization in the year labelled 1920 was 1,673 against 1,704, and from 1930 on the two runs could not be told apart. A hold already moves only one fifth of the way each year, so a second slowness adds little.
 - **The outlay raises the price level from the first year.** The average price starts at 1.133 where it starts at 1.100 without the module. In a run of 60 years from 300,000 firms the outlay averaged between 0.033 and 0.161 of the wage.
-- **The module has not been tried together with most other optional modules.** The price leaders module also sets differences in markup by size inside an industry.
+- **How the module acts together with most of the others has not been studied.** The price leaders module also sets differences in markup by size inside an industry.
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, and ran for 60 years, so they show direction and not size. During the merger wave the markup of the 100 largest firms stood 5 to 6 per cent above the markup of their own industries, and their risk against the average was 0.88 where it was 0.91 without the module. The outlay rose from one third of earnings to 0.41 within ten years, and to 0.43 among the firms outside the top 100, while the top 100 stayed near one third. The lead of the top 100 was at most 0.21 and fell to 0.02 by the end. They bought employees faster than they built holds, and they came to be most of their own industries. The capitalist share of income, which is the earnings of all firms as a part of all income, was the same with and without the module until the year labelled 1940, and so was unemployment.
 - **At the full count.** In one run of 60 years from 300,000 firms, the earnings for each employee of the 100 largest firms were 1.50 times the average in the year labelled 1920, against 1.32 without the module. Their risk against the average was 0.82 against 0.91. Differential capitalization was 1,704 in 1920 against 1,351, 3,464 in 1935 against 3,077, and 8,463 in 1950 against 8,121. The lead of the top 100 stood between 0.17 and 0.52 until 1930 and fell to 0.04 by 1950. The outlay of all firms rose from one third of earnings to 0.41 within ten years, and to 0.43 among the firms outside the top 100. The capitalist share of income and unemployment stayed within 0.1 of a percentage point of the run without the module in every printed year.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders agreed to fourteen significant figures.
@@ -3678,15 +3673,13 @@ What should happen: at the start all firms are of similar size, every lead shoul
 
 ---
 
-## Optional module: Eruptions that change the rules
+## 31. Eruptions that change the rules
 
 Name in the model: `eruptions`
 
-Switch it on by adding `--with eruptions` to the command. It runs beside the main modules and replaces none of them.
-
 ### What it is about
 
-The main modules keep one number for how strongly the population pushes back, called popular resistance. That resistance works inside the rules: it wins wages, loosens the hold of the largest firms on prices, and raises their risk. This module adds the other kind of resistance, which for a short time puts the rules themselves out of force.
+Without this module the model keeps one number for how strongly the population pushes back, called popular resistance. That resistance works inside the rules: it wins wages, loosens the hold of the largest firms on prices, and raises their risk. This module adds the other kind of resistance, which for a short time puts the rules themselves out of force.
 
 Think of a general strike or a revolution. For a few years nobody can be sure that prices will hold, that orders will be obeyed, or that a share in a company will still be worth anything. Then the old order returns.
 
@@ -3731,10 +3724,10 @@ These sources give no rule and no rate, and they say that there can be none.
 4. **Four rules of other modules are switched off in proportion to the level.**
    - The sabotage module (module 1) holds the markup of an industry toward a high target where the 100 largest firms are strong. During an eruption it loses that hold, and those industries drift toward the normal markup like any other.
    - The stagflation module (module 6) makes the 100 largest firms raise prices together while hiring is cut. A run of such years is called a bout of stagflation. During an eruption the strength of this falls, and at level 1 it stops.
-   - The merger module (module 4) lets each large firm seek other firms to buy. During an eruption each buyer seeks less, and at level 1 nobody buys a firm. The optional second country and cross-border ownership modules stop their buying in the same way.
-   - The resistance module (module 8) lets the repression that the optional organised force module publishes wear resistance down. During an eruption repression wears down less, and at level 1 nothing.
+   - The merger module (module 4) lets each large firm seek other firms to buy. During an eruption each buyer seeks less, and at level 1 nobody buys a firm. The second country and cross-border ownership modules stop their buying in the same way.
+   - The resistance module (module 8) lets the repression that the organised force module publishes wear resistance down. During an eruption repression wears down less, and at level 1 nothing.
 5. **Every firm's risk rises.** The risk of every firm is multiplied by 1 plus one half of the level. Each year the module removes last year's rise before it applies this year's, so the rise lasts only as long as the eruption. Every firm is treated alike, so all capitalization falls and differential capitalization is nearly unchanged. Differential capitalization is the average capitalization of the 100 largest firms divided by the average of all firms.
-6. **It reports** the level, the count of years and the number of eruptions so far. It also publishes the level under the name `systemic_fear`, which the optional hype and risk shaping modules read.
+6. **It reports** the level, the count of years and the number of eruptions so far. It also publishes the level under the name `systemic_fear`, which the hype and risk shaping modules read.
 
 When the eruption fades, the old rules return exactly as they were.
 
@@ -3744,7 +3737,7 @@ When the eruption fades, the old rules return exactly as they were.
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `threshold` | 0.4 | The level of popular resistance that counts as very high | Our own choice. In the main modules popular resistance peaks between 0.4 and 0.5 in an ordinary bout of stagflation, so a higher figure would give no eruption in a run of 60 years. |
+| `threshold` | 0.4 | The level of popular resistance that counts as very high | Our own choice. In the basic set popular resistance peaks between 0.4 and 0.5 in an ordinary bout of stagflation, so a higher figure would give no eruption in a run of 60 years. |
 | `chance` | 0.1 | The yearly chance of an eruption for each year in a row at or above the threshold | Our own choice |
 | `lasts` | 3 | The years an eruption stands at full strength | Our own choice. The 2020 paper says only "a brief historical moment". |
 | `restore` | 0.5 | The part of the level that is lost each year after that | Our own choice |
@@ -3765,9 +3758,9 @@ It publishes eight numbers.
 |---|---|---|
 | `eruption_frees_markups` | The level times the setting `frees_markups` | The sabotage module (module 1) |
 | `eruption_stops_price_rises` | The level times the setting `stops_price_rises` | The stagflation module (module 6) |
-| `eruption_stops_buying` | The level times the setting `stops_buying` | The merger module (module 4), and the optional second country and cross-border ownership modules |
+| `eruption_stops_buying` | The level times the setting `stops_buying` | The merger module (module 4), and the second country and cross-border ownership modules |
 | `eruption_stays_force` | The level times the setting `stays_force` | The resistance module (module 8). It matters only when the organised force module is on. |
-| `systemic_fear` | The level | The optional hype and risk shaping modules |
+| `systemic_fear` | The level | The hype and risk shaping modules |
 | `eruption` | The level | Nobody |
 | `eruption_strain` | The count of years of step 1 | Nobody |
 | `eruption_count` | The number of eruptions so far | Nobody |
@@ -3787,7 +3780,7 @@ Every module that reads one of these numbers reads 0 when this module is off.
 - **In trial runs an eruption rescued the largest firms.** In a trial of 119 years a second eruption began while a bout of stagflation was under way. Prices stopped rising at once, and unemployment fell from 18.7 to 8.3 per cent in four years. Differential capitalization ended higher than without the module, at 8,551 against 6,822. Every bout of stagflation in this model lowers differential capitalization, and the eruption cut the bout short. So the eruption did not shatter differential accumulation.
 - **The old rules returned into the same conditions.** Popular resistance stayed above 0.85 through that second eruption, because unemployment was still high, and the largest firms were raising prices together again five years later.
 - **Whether an eruption changes much depends on one setting and on the draw.** In an ordinary bout the resistance that works inside the rules ends the bout at about the level where the threshold stands. In the trial runs the first eruption began when the bout was already over, so it had no bout left to stop. A trial with the threshold at 0.3 began it only one year earlier.
-- **The stop to repression has never been exercised.** With the organised force module also on, popular resistance peaked at 0.27 in 60 years and no eruption occurred. The module has not been tried with other optional modules.
+- **The stop to repression has never been exercised.** With the organised force module also on, popular resistance peaked at 0.27 in 60 years and no eruption occurred. How the module acts together with the others has not been studied.
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, and ran for 60 and 119 years, so they show direction and not size. Until the first eruption every figure was the same as without the module. During it no firm was bought for three years, and capitalization measured against the wage fell by a third and recovered. Afterwards the top 100 employed a smaller part of all employees, 16.2 per cent against 17.3 per cent, and differential capitalization was lower, 694 against 751 two years into the eruption and 1,400 against 1,564 at the end of 60 years. A small later bout of stagflation that the run without the module had did not occur, because the years without buying lowered the amount of mergers that the compass module (module 7) treats as usual.
 - **At the full count.** In one run of 60 years from 300,000 firms, every figure was the same as without the module through the year labelled 1940. Popular resistance reached 0.4 in 1940, and one eruption began in 1944. By then resistance inside the rules had already ended the bout of stagflation, so the eruption had no bout left to stop. No firm was bought in 1945. In 1950 the top 100 employed 17.5 per cent of all employees against 19.3 per cent without the module. The capitalist share of income, which is the earnings of all firms as a part of all income, was 11.1 per cent against 12.0 per cent. Differential capitalization was 7,427 against 8,121.
 - **The order in which modules are listed makes no difference.** Two trial runs, each with one eruption and with the modules listed in opposite orders, printed identical figures.
@@ -3796,11 +3789,9 @@ What should happen: while popular resistance is low, the level should be zero an
 
 ---
 
-## Optional module: Energy capture and hierarchy
+## 32. Energy capture and hierarchy
 
 Name in the model: `energy`
-
-Switch it on by adding `--with energy` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -3863,7 +3854,7 @@ In the steps below, "per head" means for each member of the working population, 
 2. **It works out the managers' part of each firm.** Every firm is treated as a chain of command in which each rank holds 2.5 times the people of the rank above. The people in the third rank from the bottom and above are managers. Their part of the firm's employees follows from Fix's equations. It is zero in a firm of fewer than six employees, which is too small to have three ranks. It is 15 per cent in a firm of 100 and approaches 16 per cent in a very large firm.
 3. **The managers' part of a firm's energy is hierarchical energy.**
 4. **Resistance raises it.** The hierarchical energy of step 3 is multiplied by one plus the level of popular resistance. At full resistance a hierarchy needs twice the energy.
-5. **Military jobs are added.** If the optional organised force module is on, the energy converted in military jobs is hierarchical energy too. A military job is counted as converting what the average employee converts. The part that steps 3 and 4 already counted is not counted twice.
+5. **Military jobs are added.** If the organised force module is on, the energy converted in military jobs is hierarchical energy too. A military job is counted as converting what the average employee converts. The part that steps 3 and 4 already counted is not counted twice.
 6. **It works out the two flows.** Hierarchical energy is the sum of steps 3 to 5. Livelihood energy is all energy less hierarchical energy. The share H is hierarchical energy divided by all energy.
 7. **It names the path.** The module compares the share H, livelihood energy per head and all energy per head with their values five years earlier. It names the path with the four names of the paper. Crisis has two forms: "tentative crisis" when all energy per head has risen and "full crisis" when it has fallen. Democratizing has the same two forms.
 8. **A fall in livelihood energy feeds resistance.** When livelihood energy per head falls from one year to the next, the module publishes one half of the fall, as a fraction. The resistance module (module 8) adds that number to the year's rise in popular resistance.
@@ -3896,7 +3887,7 @@ In the steps below, "per head" means for each member of the working population, 
 It reads:
 
 - `resistance`, the level of popular resistance, from the resistance module (module 8)
-- `force_jobs`, the military jobs as a part of the working population, from the optional organised force module, taken as 0 when that module is off
+- `force_jobs`, the military jobs as a part of the working population, from the organised force module, taken as 0 when that module is off
 - each firm's employees and capitalization, and the size of the working population
 
 It publishes ten numbers.
@@ -3926,7 +3917,7 @@ The resistance module reads 0 for the grievance when this module is off.
 - **The rule takes one observer's view.** The paper says that no view of what counts as hierarchical energy is the objective one.
 - **The limit that the authors stress is not built.** Nothing holds a merger back for want of energy, because the sources give no rule for how much energy can be had. The opposite effect, in which too much hierarchy lowers the energy captured, appears only through unemployment.
 - **Much of hierarchy is absent.** The list of firms holds no government bodies, so the government employment that Fix measures is missing, and so are the churches, schools, courts and police that the paper lists. The hierarchies that the paper places outside formal organisations, in markets and networks, are not counted.
-- **Propaganda is not counted.** The optional module on the shaping of wants holds a money outlay for it. Turning money into joules would need a price of energy.
+- **Propaganda is not counted.** The module on the shaping of wants holds a money outlay for it. Turning money into joules would need a price of energy.
 - **The energy lost in conversion is not kept apart.**
 - **The rulers do not respond to the share H,** although the paper says that the share is what they judge by.
 - **The name "democratizing" is given to years in which resistance only faded.** Nothing in the model has become more democratic in those years.
@@ -3940,11 +3931,9 @@ What should happen: during a merger wave, energy per head should rise, because t
 
 ---
 
-## Optional module: Externalisation
+## 33. Externalisation
 
 Name in the model: `externalisation`
-
-Switch it on by adding `--with externalisation` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -4069,24 +4058,22 @@ The resistance module reads 0 for the grievance when this module is off.
 - **That wage earners pay in money is our own.** Cochrane says that the burdens are "imposed on vulnerable communities" and does not say in what form they are borne. Here wage earners pay the same amount that the firm gains. No bearer loses health, land or employment in the model.
 - **A burden that the state takes on is not told apart.** The book reports the view that the state "serves to absorb, temporarily or permanently, the bloating social cost of accumulation" (chapter 4, "The state imperative"). Here wage earners pay directly, and no tax is raised.
 - **A disaster strikes one firm.** Cochrane shows that the halt to drilling after the spill lowered the value of other oil companies as well.
-- **The gain from burdens on later years is paid by nobody.** Reading it as an entry in the accounts and not as money is our own. With the optional sales module on, owners cannot spend it.
+- **The gain from burdens on later years is paid by nobody.** Reading it as an entry in the accounts and not as money is our own. With the sales module on, owners cannot spend it.
 - **The size of every effect follows from the added limit.** In trial runs the limit let burdens reach nearly a fifth of all earnings.
 - **The burden on later years never falls for the economy as a whole.** A firm struck by a disaster is free to begin again the next year.
 - **The standing resistance of quiet years is the grievance alone.** In a trial run with `grievance` at 0, popular resistance before the first bout of stagflation was the same as without the module. A bout of stagflation is a run of years in which the 100 largest firms raise prices together while hiring is cut.
-- **The module has not been tried together with any other optional module.**
+- **How the module acts together with the others has not been studied.**
 - **What trial runs show.** These trials started with 60,000 firms, a fifth of the full count, and ran for 60 years, so they show direction and not size. The burdens off the books grew through the merger wave, fell by three quarters when popular resistance rose in the first bout of stagflation, and grew again afterwards. The 100 largest firms carried 2.1 times the average burden for each employee in the first years and 1.2 times after forty-five years. The module was credited with a small gain in differential capitalization in the first ten years and with almost nothing afterwards, so externalisation let the largest firms beat the average only at the beginning. Differential capitalization is the average capitalization of the 100 largest firms divided by the average of all firms. Popular resistance stood a little higher throughout, and the later course differed in timing. The burden on later years reached about 0.95 per cent of the wage and stayed there. Its stock reached 0.28 years of the wage for each employee after 60 years. Disasters rose from 18 firms a year to about 1,900 firms a year, with between none and four of the 100 largest firms struck in any year.
 - **At the full count.** In one run of 60 years from 300,000 firms, the burdens off the books grew to 17 per cent of all earnings by the year labelled 1920. They fell to 5 per cent in 1940, when popular resistance stood at 0.54, and stood at 10 per cent in 1950. The capitalist share of income was 11.6 per cent in 1920 against 9.8 per cent without the module. The 100 largest firms carried 2.4 times the average burden for each employee at the start and 1.2 times from 1940. Popular resistance stood at 0.05 in 1920 against 0.01, and at 0.54 in 1940 against 0.46. Unemployment in 1940 was 5.7 per cent against 4.5 per cent. The burden on later years reached 0.98 per cent of the wage, and its stock reached 0.28 years of the wage. Disasters struck 49 firms in 1895 and 9,900 firms in 1950, out of 2.3 million, with between none and five of the 100 largest firms struck in any printed year. Differential capitalization was 1,380 in 1920 against 1,351, 3,037 in 1935 against 3,077, and 8,310 in 1950 against 8,121.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave identical figures.
 
-What should happen: at the start no bearer resists, so every firm should move burdens off its books, and the larger firms should move more for each employee. The module should be credited with a small gain in differential capitalization, and the gain should shrink as the limit is approached. The burdens on employees and communities should raise popular resistance a little in quiet years, where the main modules alone leave it near zero. Higher resistance should send burdens back to the books, and it should send more back from the largest firms, so the credit to the module should turn negative during a bout of stagflation. The burden on later years should not return through resistance at all. It should build up and return only through disasters, which should become more frequent as the stock grows. A disaster in one of the 100 largest firms should cost that firm about half of its capitalization for a few years.
+What should happen: at the start no bearer resists, so every firm should move burdens off its books, and the larger firms should move more for each employee. The module should be credited with a small gain in differential capitalization, and the gain should shrink as the limit is approached. The burdens on employees and communities should raise popular resistance a little in quiet years, where the basic set alone leaves it near zero. Higher resistance should send burdens back to the books, and it should send more back from the largest firms, so the credit to the module should turn negative during a bout of stagflation. The burden on later years should not return through resistance at all. It should build up and return only through disasters, which should become more frequent as the stock grows. A disaster in one of the 100 largest firms should cost that firm about half of its capitalization for a few years.
 
 ---
 
-## Optional module: Ownership of nature
+## 34. Ownership of nature
 
 Name in the model: `nature`
-
-Switch it on by adding `--with nature` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -4136,7 +4123,7 @@ These sources give directions and one figure that can be used, the "three to fou
 
 1. **A setting names the resource industries.** By default they are three of the 400 industries. Every firm in a named industry is an owner of the resource, and so is every firm that is later founded there.
 2. **It measures how tightly each resource industry is owned.** The tightness is the part of the industry's employees who work for its seven largest firms. It rises when firms of the industry are bought up, and it falls when new firms enter.
-3. **It reads the violence of the year.** Three other modules each publish a number between 0 and 1 for a kind of violence that the largest firms produce. The stagflation module (module 6) publishes how strongly prices are being raised together. The optional coalitions module publishes a level of conflict. The optional organised force module publishes a level of force. The module takes the highest of the three.
+3. **It reads the violence of the year.** Three other modules each publish a number between 0 and 1 for a kind of violence that the largest firms produce. The stagflation module (module 6) publishes how strongly prices are being raised together. The coalitions module publishes a level of conflict. The organised force module publishes a level of force. The module takes the highest of the three.
 4. **A rise in violence creates an atmosphere of crisis.** The atmosphere is a number between 0 and 1. When the violence rises from one year to the next, the atmosphere rises by the same amount. Every year the atmosphere loses 30 per cent of itself, whether the violence has ended or goes on. A crisis that continues without getting worse therefore stops frightening buyers and stops uniting sellers.
 5. **It works out the cohesion of the owners.** The cohesion is the tightness of ownership, plus the atmosphere of crisis times the part that tight ownership leaves over. A few owners can act together without a crisis. Many owners can act together only while an atmosphere of crisis lasts.
 6. **The markup follows the cohesion.** With no cohesion a resource industry sells at the normal markup of 0.10. With full cohesion it sells at a markup of 2.85, which makes its price 3.5 times the price at the normal markup. The markup that the owners aim at lies between the two in proportion to their cohesion. Each year the markup of the industry closes a quarter of the gap to that aim, so it stays between its old level and the aim, and never reaches nothing. The markup counted is the one that prices ask, as in the sabotage module: with the sales module on, what firms did not receive is left out. Every firm of the industry receives the same proportional change. The module records the change in a part of the markup that it owns, named "resource premium", and the price follows the markup.
@@ -4158,7 +4145,7 @@ These sources give directions and one figure that can be used, the "three to fou
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `industries` | 0, 20 and 40 | The industries that stand for resource industries | Our own choice. They lie in the sector that the optional coalitions module gives to oil and arms. |
+| `industries` | 0, 20 and 40 | The industries that stand for resource industries | Our own choice. They lie in the sector that the coalitions module gives to oil and arms. |
 | `core_owners` | 7 | The number of largest firms whose part of the industry measures tight ownership | A plain setting. Seven is the number of large oil companies that the 1995 paper names, the "Seven Sisters". That is the count of one historical group, and the paper does not give it as a measure. |
 | `free_flow_markup` | 0.10 | The markup of a resource industry whose owners have no cohesion | Our own choice. It is the normal markup of the sabotage module. |
 | `price_multiple` | 3.5 | The price at full cohesion as a multiple of the price at the normal markup | A plain setting. The 1995 paper's "three to four times" compares the real price of crude oil in the late 1980s and early 1990s with the 1960s. That is one observation, and the paper does not give it as the price that full cohesion brings. The paper also reports an "eighteen-fold rise" of the money price from 1972 to 1982, so 3.5 is a low reading. |
@@ -4174,7 +4161,7 @@ These sources give directions and one figure that can be used, the "three to fou
 It reads:
 
 - `stagflation_intensity` from the stagflation module (module 6)
-- `conflict` from the optional coalitions module and `force` from the optional organised force module, each taken as 0 when its module is off
+- `conflict` from the coalitions module and `force` from the organised force module, each taken as 0 when its module is off
 - the wage, and each firm's employees, industry, markup, earnings, price and capitalization
 
 It owns the markup part named "resource premium". This part multiplies with the other parts of a firm's markup, as "How markup components combine" describes.
@@ -4219,15 +4206,15 @@ What should happen: in quiet years the markup of the resource industries should 
 
 ---
 
-## Optional module: A second country
+## 35. A second country
 
 Name in the model: `second_country`
 
-Switch it on by adding `--with second_country` to the command. It runs in place of module 4, the merger module, which is left out of the run. It applies the merger module's own rule once to each country.
+It runs by default and takes the place of module 4, the merger module. It applies the merger module's own rule once to each country. To run module 4 instead, with one country, add `--with mergers` to the command.
 
 ### What it is about
 
-The main modules describe one country. This module marks off a tenth of the firms as a second, smaller country. At first no firm can be bought across the border between the two. The book calls such a ban capital controls. The small country has its own group of largest firms, which are five in number.
+Without this module the model describes one country. This module marks off a tenth of the firms as a second, smaller country. At first no firm can be bought across the border between the two. The book calls such a ban capital controls. The small country has its own group of largest firms, which are five in number.
 
 Think of South Africa or Israel before the 1990s. A handful of large groups could not buy companies abroad, so they bought up their own industries and then spread into every other industry at home. When they owned most of what there was to own, they pressed for the border to be opened. After that they bought abroad, and foreign owners bought at home.
 
@@ -4268,7 +4255,7 @@ The merger rule of module 4 lets each of a country's largest firms seek other fi
 5. **Pressure opens the boundary between industries first.** The pressure of the five is the part of what they can reach that they already hold, less one half, less the roadblocks. While it is above zero and the boundary between industries is not fully open, that boundary opens by 0.2 times the pressure each year. This is the five becoming conglomerates.
 6. **Pressure then opens the border.** The border has an openness between 0 and 1. It starts at 0, which stands for full capital controls. Once the boundary between industries is fully open, the same pressure of the five opens the border by 0.2 times the pressure each year. The hundred can press on the border too. Their pressure counts once the first country's own national boundary is fully open, and it is the part of their reach that they hold, less one half, less the second country's roadblocks. The border opens by 0.2 times the larger of the two pressures. The pressure of the hundred can open the border even while the boundary between industries is partly closed, in a year when the five exert no pressure of their own.
 7. **Roadblocks can close what was opened.** When there is no pressure, and the second country's roadblocks exceed the part of their reach that the five hold by more than 0.3, the border closes. It closes each year by 0.2 times the amount beyond 0.3. If the border is already shut, the boundary between industries closes instead.
-8. **Firms change owners across an open border.** While the border is open at all, the hundred buy small firms of the second country, and the five buy small firms of the first country. Each buyer seeks 15 per cent of its own employees, times the openness of the border, times the part of the other country's employees who work for firms still free to be bought. The roadblocks of both countries slow each purchase. An eruption, from the optional eruptions module, stops it. A firm that was bought in the year, or that bought in step 2, is not bought again, and a firm of the five that was bought cannot buy.
+8. **Firms change owners across an open border.** While the border is open at all, the hundred buy small firms of the second country, and the five buy small firms of the first country. Each buyer seeks 15 per cent of its own employees, times the openness of the border, times the part of the other country's employees who work for firms still free to be bought. The roadblocks of both countries slow each purchase. An eruption, from the eruptions module, stops it. A firm that was bought in the year, or that bought in step 2, is not bought again, and a firm of the five that was bought cannot buy.
 9. **One of the five may be swallowed whole.** Each year each of the five has a chance of 5 per cent, times the openness of the border, of being bought by one of the hundred that is larger than it.
 10. **It tells the sabotage module who is strong where.** The module publishes, for each industry of the second country, the part of its employees who work for the five. The sabotage module (module 1) treats that part as held by the largest firms, so it keeps markups high there and bars entry, as it does for the hundred in the first country.
 11. **It reports.** The module publishes differential capitalization for the first country, for the second country and for the two together. Differential capitalization is the average capitalization of a country's largest firms divided by the average of all its firms. It also publishes the numbers that the merger module would have published, so the other modules run as usual.
@@ -4306,8 +4293,8 @@ It reads:
 
 - `roadblocks`, the first country's roadblocks, from the resistance module (module 8)
 - the openness of the first country's national boundary, which the envelope module (module 9) sets
-- `merger_hype` from the optional hype module, taken as 1 when that module is off, and `eruption_stops_buying` from the optional eruptions module, taken as 0 when that module is off
-- `cross_border_on`, `cross_border_inward` and `cross_border_outward` from the optional cross-border ownership module. When that module is on, it takes over the purchases of step 8.
+- `merger_hype` from the hype module, taken as 1 when that module is off, and `eruption_stops_buying` from the eruptions module, taken as 0 when that module is off
+- `cross_border_on`, `cross_border_inward` and `cross_border_outward` from the cross-border ownership module. When that module is on, it takes over the purchases of step 8.
 - each firm's employees, industry and capitalization
 
 It publishes 21 numbers.
@@ -4319,9 +4306,9 @@ It publishes 21 numbers.
 | `pool_open` | The part of their reach that the hundred do not yet hold | The same |
 | `second_country_held` | For each industry, the part of its employees who work for the five | The sabotage module (module 1) |
 | `second_country_labour` | For each industry, the setting `labour_shift` in the second country and 0 elsewhere | The sabotage module (module 1) |
-| `border_open` | The openness of the border | The optional cross-border ownership module |
-| `second_roadblocks` | The second country's roadblocks | The optional cross-border ownership module |
-| `bought_inward`, `bought_outward` | The employees bought across the border so far, into the second country and out of it, as a part of all employees | The optional currencies module |
+| `border_open` | The openness of the border | The cross-border ownership module |
+| `second_roadblocks` | The second country's roadblocks | The cross-border ownership module |
+| `bought_inward`, `bought_outward` | The employees bought across the border so far, into the second country and out of it, as a part of all employees | The currencies module |
 | `second_conglomerate` | The openness of the boundary between industries in the second country | Nobody |
 | `second_pool_open` | The part of their reach that the five do not yet hold | Nobody |
 | `second_merger_volume` | The employees bought inside the second country in the year, as a part of its employees | Nobody |
@@ -4347,7 +4334,7 @@ The sabotage module reads 0 for both of its numbers when this module is off.
 - **With looser settings the whole sequence appears, and then the measure breaks down.** A trial of 119 years let a boundary of the second country give way when the five held 0.3 of their reach, and let its roadblocks rise by one times the employees bought. The boundary between industries opened over 65 years. The five then employed 87 per cent of their country's employees. The border opened fully in the next ten years. Thirty-five years later the five had bought firms abroad with 2.2 per cent of all employees, and foreign owners had bought 0.3 per cent. The differential capitalization of the second country rose to about 3,000 and then fell to 1, because five firms came to employ everybody in the country and so became its average.
 - **A border that starts open is closed by roadblocks.** In a trial with `start_permeability` at 1, foreign purchases lifted the second country's roadblocks to between 0.8 and 0.95. The openness of the border fell from 1 to 0.2 within 40 years, and the second country's part of all employees fell from 10 to 3 per cent.
 - **Stronger labour lowers the earnings of the five.** In a trial with `labour_shift` at 0.03, the earnings for each employee of the five, against their country's average, were 1.29 after 60 years where they were 1.51 without the shift.
-- **The module has not been run together with most other optional modules.**
+- **How the module acts together with most of the others has not been studied.**
 - **These trials started with 60,000 firms,** a fifth of the full count, so they show direction and not size. With the default settings the figures for the two countries together stayed close to a run without the module, and the bouts of stagflation fell in the same years. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut.
 - **At the full count.** In one run of 60 years from 300,000 firms with the default settings, the border stayed shut. The five held half of what they could reach by the year labelled 1920 and two thirds from 1925 on. The second country's roadblocks stood between 0.11 and 0.18 from 1920, and the boundary between industries opened by only 0.015 in 60 years. In 1950 the five employed 12.7 per cent of their country's employees, against 20.0 per cent for the hundred in the first country. The differential capitalization of the second country was 11,300 and that of the first country 6,900. For the two countries together it was 1,356 in 1920 against 1,351 without the module, 3,048 in 1935 against 3,077, and 7,918 in 1950 against 8,121.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
@@ -4356,11 +4343,11 @@ What should happen: with the border shut, the five should first buy up the indus
 
 ---
 
-## Optional module: Cross-border ownership
+## 36. Cross-border ownership
 
 Name in the model: `cross_border`
 
-Switch it on by adding `--with cross_border` to the command. It is meant to run together with the second country module, as `--with second_country,cross_border`. That module marks off a tenth of the firms as a second, smaller country behind a border. Run without it, this module draws the same border itself, around the firms of the last two of the twenty sectors, and treats the border as open.
+It runs together with the second country module, which marks off a tenth of the firms as a second, smaller country behind a border. Run without that module, this module draws the same border itself, around the firms of the last two of the twenty sectors, and treats the border as open.
 
 ### What it is about
 
@@ -4406,7 +4393,7 @@ These sources give no rule and no rate for how much is bought across a border in
 In the steps below, "the hundred" are the 100 firms of the first country with the highest capitalization, and "the five" are the five firms of the second country with the highest capitalization. A firm that is owned from abroad cannot be one of its country's hundred or five. The book's name for the largest firms and their allies in government is dominant capital.
 
 1. **It records who owns each firm.** Every firm carries a number: 1 if owners of its own country hold it, and 2 if the largest firms of the other country hold it. Every firm starts at 1, and so does every newly founded firm.
-2. **It works out how open the border is.** It starts from the openness of the border that the second country module publishes, which runs from 0 for full capital controls to 1 for none. Without that module it uses 1. Resistance to mergers, which the model calls roadblocks, lowers the figure: the module multiplies it by one minus the roadblocks of the first country, and again by one minus the roadblocks of the second country. If the optional hype module is on, the figure is also multiplied by that module's mood for mergers. If the optional eruptions module reports an eruption, buying stops.
+2. **It works out how open the border is.** It starts from the openness of the border that the second country module publishes, which runs from 0 for full capital controls to 1 for none. Without that module it uses 1. Resistance to mergers, which the model calls roadblocks, lowers the figure: the module multiplies it by one minus the roadblocks of the first country, and again by one minus the roadblocks of the second country. If the hype module is on, the figure is also multiplied by that module's mood for mergers. If the eruptions module reports an eruption, buying stops.
 3. **The hundred buy in the second country, and the five buy in the first.** A group seeks firms whose employees add up to 2 per cent of the group's own employees, times the openness from step 2, times the free part of the other country. The free part is the part of that country's employees who work for firms that are still locally owned and are not among its own largest firms. The module draws targets at random from those firms until the amount is reached. The last firm drawn usually does not fit whole. It is bought with a chance equal to the part of it that fits.
 4. **A purchase changes the owner and nothing else.** The firm's number changes from 1 to 2. It keeps its employees, its industry, its price and its earnings. No firm is merged and no employee moves.
 5. **Foreign owners also sell back.** Each year each foreign-owned firm returns to local owners with a chance of 5 per cent, times one minus the openness from step 2. At a fully open border with no roadblocks nothing is sold back. A foreign-owned firm also returns to local owners when a local firm buys it in a merger.
@@ -4438,11 +4425,11 @@ In the steps below, "the hundred" are the 100 firms of the first country with th
 
 It reads:
 
-- `border_open` and `second_roadblocks` from the optional second country module. Without that module it uses the setting `open_alone` and 0.
+- `border_open` and `second_roadblocks` from the second country module. Without that module it uses the setting `open_alone` and 0.
 - `roadblocks` from the resistance module (module 8)
 - `new_hires`, the number of people newly hired in the year, from the green-field module (module 3)
-- `merger_hype` from the optional hype module, taken as 1 when that module is off, and `eruption_stops_buying` from the optional eruptions module, taken as 0 when that module is off
-- from the optional currencies module, a multiplier on what each group seeks (`currency_buying_1`, `currency_buying_2`) and an added chance of sale (`currency_flight_1`, `currency_flight_2`). They are 1 and 0 when that module is off.
+- `merger_hype` from the hype module, taken as 1 when that module is off, and `eruption_stops_buying` from the eruptions module, taken as 0 when that module is off
+- from the currencies module, a multiplier on what each group seeks (`currency_buying_1`, `currency_buying_2`) and an added chance of sale (`currency_flight_1`, `currency_flight_2`). They are 1 and 0 when that module is off.
 - each firm's employees, industry, earnings and capitalization
 
 It publishes 22 numbers. In the names, "home" means the first country and "second" the second.
@@ -4486,17 +4473,17 @@ The sabotage module reads 0 for `foreign_held` when this module is off, and the 
 - **At the full count.** In one run of 60 years from 300,000 firms, with the module alone, foreign owners held 41 per cent of the second country's capitalization and 6.6 per cent of all capitalization in the year labelled 1950. The five held 0.3 per cent of the first country's capitalization. Foreign earnings were 16 per cent of the earnings of the hundred. Their differential capitalization, measured against the locally owned firms of the first country, was 7,438 with holdings abroad and 6,498 without. The gross flow was between 1 and 8 per cent of new hiring, and the net flow was close to it. The openness from step 2 fell from 0.99 to 0.78 as roadblocks rose. The model's own differential capitalization was 1,346 in 1920 against 1,351 without the module, 3,034 in 1935 against 3,077, and 7,020 in 1950 against 8,121. The capitalist share of income in 1950 was 13.1 per cent against 12.0.
 - **At the full count with the second country module.** At that module's default settings the border stayed shut for all 60 years, and every printed figure equalled the run with the second country module alone.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
-- **The module has not been run together with most other optional modules.**
+- **How the module acts together with most of the others has not been studied.**
 
 What should happen: buying across the border should be small while the largest firms are small, and should grow as they grow, because the amount they seek is a part of their own size. The foreign-owned part should build up over the years even when the yearly flow ebbs. The hundred should come to own a large part of the small country, and the five should own very little of the large one, so the gross flow and the net flow should be close to each other. Differential capitalization measured with holdings abroad should be higher than without them. Where foreign owners hold a large part of an industry, its markup should rise.
 
 ---
 
-## Optional module: Currencies and devaluation
+## 37. Currencies and devaluation
 
 Name in the model: `currencies`
 
-Switch it on by adding `--with currencies` to the command. It needs owners who cross the border between the model's two countries, so run it as `--with cross_border,currencies`, or with the second country module as well. Run alone it changes nothing.
+It needs owners who cross the border between the model's two countries, which the cross-border ownership module and the second country module provide. Without them it changes nothing.
 
 ### What it is about
 
@@ -4620,17 +4607,15 @@ The cross-border ownership module reads 0 for the two chances and 1 for the two 
 - **With the second country module on.** At that module's default settings the border stayed shut in a trial and the currency stayed at 1. With the border open from the start, the currency rose to 1.37 and fell to 1.11 by 1950.
 - **At the full count the collapse did not come within 60 years.** In one run of 60 years from 300,000 firms with the cross-border ownership module, the module's numbers were read every fifth year. The second country's currency was higher at each reading: 1.29 in the year labelled 1920 and 1.82 in 1950. At none of the readings was there a shortfall or an added chance of sale. The dear currency slowed buying instead. By 1950 the hundred sought 0.55 of what they would otherwise seek, and foreign owners held 30 per cent of the second country's capitalization, against 41 per cent without currencies. Counted in the first country's currency, the second country's part of all capitalization rose from 10 to 22 per cent. The model's own differential capitalization was 1,364 in 1920, 3,061 in 1935 and 7,176 in 1950, against 1,346, 3,034 and 7,020 with the cross-border ownership module alone.
 - **The order in which modules are listed makes no difference.** Two trial runs with the modules listed in opposite orders gave the same figures.
-- **The module has not been run together with most other optional modules.**
+- **How the module acts together with most of the others has not been studied.**
 
 What should happen: while the hundred are buying into the second country, its currency should rise. The rise itself counts as earnings growth for the foreign owners, because they count earnings in their own currency. A dearer currency should slow their buying. When the buying slows, the currency should stop rising, the country's earnings growth should fall below that of the two countries together, and the foreign owners should start to sell. Their sales should lower the currency, the lower currency should lower the earnings they count, and the selling should feed itself until little is left to sell. The cheap currency should then draw buyers back. A fall of the currency should raise markups and prices in the second country.
 
 ---
 
-## Optional module: Governments as owners
+## 38. Governments as owners
 
 Name in the model: `sovereign_funds`
-
-Switch it on by adding `--with sovereign_funds` to the command. It runs beside the main modules and replaces none of them.
 
 ### What it is about
 
@@ -4717,7 +4702,7 @@ It publishes nine numbers.
 
 - **The sources supply the outline and no rule.** They supply the reserve held in government bonds, the move into shares, buying by an index, the minority stakes, the test against a benchmark, and the statement that governments lock themselves into the order of capital. Every number is our own.
 - **Step 6 as a whole is our own.** The book says that the decisions of such an owner would not differ from business as usual. It does not name roadblocks or any other act of government.
-- **Feeding the reserve from the earnings of firms is our own.** The book speaks of foreign currency received by the governments of exporting countries, and the model has one country unless an optional module adds a second.
+- **Feeding the reserve from the earnings of firms is our own.** The book speaks of foreign currency received by the governments of exporting countries, and the model has one country unless the second country module runs.
 - **The fund is judged against the average of all firms.** That is a choice. The fund is nearly the same thing as the list of firms it buys, so it could not be judged against that list.
 - **Nobody pays the money the reserve receives.** It is taken from no firm and from no wage, because the model has no taxes of this kind.
 - **The fund's buying does not raise the price of shares.**
@@ -4735,17 +4720,17 @@ It publishes nine numbers.
 - **At the full count the same sequence came later and was milder.** In one run of 60 years from 300,000 firms, the fund held 5 per cent of the 100 largest firms and was worth more than any firm from the first reading, in the year labelled 1895. It was 0.8 per cent of all capitalization in 1920 and 1.8 per cent in 1950. The verdict was favourable by 7 to 18 per cent a year until 1930 and unfavourable by 8 per cent in 1935, during the first bout. Until then every printed figure equalled the run without the module. In 1940 the government body was wearing down 5.5 per cent of the roadblocks a year, and they stood at 0.18 against 0.23. In 1945 mergers were 0.42 of new hiring against 0.33. In 1950 the top 100 employed 20.7 per cent of all employees against 19.3, and differential capitalization was 8,661 against 8,121. No second bout had come by the end of the run. The reserve grew from 2 to 12 per cent of all capitalization between 1920 and 1950, and the part of the body's assets held as shares fell from 0.27 to 0.13.
 - **With `relief` at 0 the run is the run without the module.** A trial confirmed it.
 - **The order in which modules are listed makes no difference.** Two trial runs of 40 years from 20,000 firms, with the modules listed in opposite orders, gave the same figures.
-- **The module has not been run together with most other optional modules.**
+- **How the module acts together with most of the others has not been studied.**
 
 What should happen: the fund should reach its limit of 5 per cent of the 100 largest firms within a few years, because those firms are small at the start. After that the fund's part of all capitalization should follow the top 100's part. The verdict should be close to the differential accumulation of the top 100, which is the book's name for their growth against the average, because the fund holds the top 100. It should be favourable during a wave of mergers and unfavourable during a bout of stagflation. The government body should wear roadblocks down only during and just after a bout. Lower roadblocks should let mergers resume sooner and let boundaries open a little further. More mergers should raise concentration, and that should bring the next bout sooner.
 
 ---
 
-## Optional module: Synchronisation of regimes
+## 39. Synchronisation of regimes
 
 Name in the model: `synchronisation`
 
-Switch it on by adding `--with synchronisation` to the command. It only measures. A run with it gives exactly the figures of a run without it.
+It only measures. A run with it gives exactly the figures of a run without it.
 
 ### What it is about
 
@@ -4789,7 +4774,7 @@ These sources give no measure of how closely the regimes of different sectors mo
 A module sees the list of firms only as it stood at the start of the year, so everything below describes the year before.
 
 1. **It finds the firms that were bought.** It gives every firm a serial number. A firm that was in the list a year ago and is gone now was bought in a merger, because no module removes firms in any other way. The module counts that firm's employees as merger volume of the sector the firm was in.
-2. **It records two numbers for each of the twenty sectors.** The first is the employees of the firms bought, as a part of the sector's employees. The second is the rise in the sector's price level, which is the average price of its firms weighted by their employees. When the optional second country module is on, it records the same two numbers for each country.
+2. **It records two numbers for each of the twenty sectors.** The first is the employees of the firms bought, as a part of the sector's employees. The second is the rise in the sector's price level, which is the average price of its firms weighted by their employees. When the second country module is on, it records the same two numbers for each country.
 3. **It records the book's two indices for the whole economy.** The amalgamation index is the employees of the firms bought, divided by the number of people newly hired. The stagflation index is the average of standardized unemployment and standardized inflation.
 4. **It smooths every series.** Each reading becomes the average of the last five years. Each correlation is then taken over the last thirty smoothed readings. Until thirty exist, which takes 35 years, the module publishes blanks.
 5. **It publishes seven correlations and shares.** The table under "What it reads from other modules and what it gives them" lists them.
@@ -4816,7 +4801,7 @@ It reads:
 - `merger_volume`, the employees of the firms bought in the year as a part of all employees, from the merger module (module 4)
 - `new_hires`, the number of people newly hired, from the green-field module (module 3)
 - `unemployment`, which the core publishes
-- the country number that the optional second country module gives each firm
+- the country number that the second country module gives each firm
 - each firm's employees, sector and price
 
 It publishes eight numbers. No module reads any of them.
@@ -4853,11 +4838,11 @@ What should happen: if the theory holds inside the model, the correlation betwee
 
 ---
 
-## Optional module: The power index and systemic fear
+## 40. The power index and systemic fear
 
 Name in the model: `fear`
 
-Switch it on by adding `--with fear` to the command. Run that way it only measures, and the run gives exactly the figures of a run without it. Run together with the optional hype module, as `--with hype,fear`, it also changes how owners price firms.
+Alone it only measures, and the run gives exactly the figures of a run without it. Together with the hype module (module 19) it also changes how owners price firms.
 
 ### What it is about
 
@@ -4937,7 +4922,7 @@ It publishes seven numbers.
 
 | Name in the code | What it is | Who reads it |
 |---|---|---|
-| `power_fear` | The degree of fear from step 5, times the setting `link` | The optional hype module. It reads 0 when this module is off. |
+| `power_fear` | The degree of fear from step 5, times the setting `link` | The hype module. It reads 0 when this module is off. |
 | `power_index` | The power index from step 1 | Nobody |
 | `power_index_100` | The power index with the average of the run so far set to 100 | Nobody |
 | `power_distance` | The distance of the index from its average, in standard deviations | Nobody |
@@ -4945,7 +4930,7 @@ It publishes seven numbers.
 | `power_years_at_ceiling` | The number of years so far in which the index stood at or above the limit | Nobody |
 | `fear_index` | The fear index from step 4. It is blank until ten years of changes exist. | Nobody |
 
-The hype module also reads a number named `systemic_fear`, which the optional eruptions module publishes. The two numbers are separate and have different names.
+The hype module also reads a number named `systemic_fear`, which the eruptions module publishes. The two numbers are separate and have different names.
 
 ### What is known to be wrong or untested
 
@@ -4962,17 +4947,17 @@ The hype module also reads a number named `systemic_fear`, which the optional er
 - **The tie changes a run long after it acts.** In the trial a second bout came near 1945, and differential capitalization ended at 1,063 against 1,760. One run does not show whether that is a pattern.
 - **At the full count the limit is reached in the wave of mergers, not in a bout.** In one run of 60 years from 300,000 firms with the module alone, every printed figure equalled the run without it, and the fear index lay between 0.90 and 1.00 at every fifth year from the year labelled 1905. But the power index stood 2.2 standard deviations above its average in 1920, which is the first year in which the distance is reported. It stayed at or above the limit in 22 years. Until 1920 the index had only risen slowly and steadily as the top 100 grew by mergers. So thirty readings do not prevent a slow early rise from being read as the limit.
 - **With the hype module at the full count.** The degree of fear was 0.71 in 1920 and 0.88 in 1925, before the first bout, and 1 in 1930, during it. The index stood at or above the limit in 7 years. The fear index was minus 0.81 in 1920, 0.76 in 1925 and 0.93 or more at every fifth year from 1930. Differential capitalization was 2,138 in 1920, 3,545 in 1935 and 6,019 in 1950, against 2,138, 3,317 and 6,314 with the hype module alone.
-- **The module has not been run together with most other optional modules.**
+- **How the module acts together with most of the others has not been studied.**
 
 What should happen: without the hype module the run should be unchanged, and the fear index should stand near 1 in every year. With the hype module on and `link` at 0, the fear index should be well below 1, because multiples then move apart from current earnings. With `link` at 1, the fear index should be higher in the years when the power index stands above its average. The power index should reach its limit in a bout of stagflation, because a bout raises earnings for each employee faster than the wage.
 
 ---
 
-## Optional module: Capitalization against plant and equipment
+## 41. Capitalization against plant and equipment
 
 Name in the model: `plant`
 
-Switch it on by adding `--with plant` to the command. It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it.
+It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it.
 
 ### What it is about
 
@@ -5078,23 +5063,23 @@ It publishes thirteen numbers. No module reads any of them.
 - **The capitalization of all firms stands for the book's "stocks and bonds".** The debt module (module 2) divides a firm's earnings into interest and profit, so the capitalization of a firm already covers both.
 - **The correlation and its thirty years are our own.** The book shows a chart and reports no figure.
 - **The record is one sum for the whole economy.** A record kept firm by firm would lose the plant of every firm that is bought. The module therefore cannot show the book's comparison of Microsoft with General Motors, and it cannot report the ratio for the largest firms alone.
-- **Some hiring is not counted as building:** people hired by the optional organised force module, and people who arrive through the optional privatisation module.
+- **Some hiring is not counted as building:** people hired by the organised force module, and people who arrive through the privatisation module.
 - **The ratio leaves 1 and wanders, in trials.** These trials started with 60,000 firms, a fifth of the full count, so they show direction and not size. In a trial of 119 years the ratio rose from 1.00 to 1.24 during the wave of mergers. It reached 2.98 in the first bout of stagflation near the year labelled 1930, fell back to 1.13 by 1955, and reached 3.08 in the last bout. A bout of stagflation is a run of years in which the largest firms raise prices together while hiring is cut. The average was 1.62. The book's figures are 1.24, 0.6 and 2.8.
 - **The model contradicts the book's Figure 10.4.** In the same trial the two growth rates moved together and not in opposite directions. Their correlation lay between 0.27 and 0.99 in every reading taken at five-year intervals. Both were highest during stagflation, when capitalization grew by 16 per cent a year and the record by 7 per cent. The reason is that a bout of stagflation in the model raises prices, which raises the record, and raises markups faster than prices, which raises capitalization more. The book reports that in the 1940s and 1970s, when the value of plant grew fastest, the growth of capitalization dwindled.
-- **Three optional modules did not bring the opposite movement.** With the module for the normal rate of return added, the ratio swung between 0.66 and 5.02 and the correlation stayed between 0.43 and 0.97. With the hype and risk shaping modules added, it stayed between 0.45 and 0.72.
+- **Three modules did not bring the opposite movement.** With the module for the normal rate of return added, the ratio swung between 0.66 and 5.02 and the correlation stayed between 0.43 and 0.97. With the hype and risk shaping modules added, it stayed between 0.45 and 0.72.
 - **The comparison with buying and building is unsteady.** In the trial the correlation of Figure 15.3 had no steady sign, between minus 0.59 and 0.82. It cannot be worked out for a period that includes a year without any net hiring.
 - **At the full count.** In one run of 60 years from 300,000 firms, every printed figure equalled the run without the module. The ratio rose from 1.00 to 1.24 by the year labelled 1930, reached 2.95 in the first bout near 1940 and fell back to 1.28 by 1950. Its average was 1.36. The ratio at cost reached 4.26. The correlation between the two growth rates was 0.98 in 1930 and 0.70 in 1950, so the two again moved together. Plant with no employee was at most 4 per cent of the record. The correlation of Figure 15.3 was 0.87 in 1925 and 0.76 in 1930, and could not be worked out afterwards.
 - **The order in which modules are listed makes no difference.** A trial run with the modules listed in reverse order gave the same readings.
 
-What should happen: the ratio should leave 1 and not return to it, because nothing in the model ties capitalization to plant. The book's opposite movement is not expected from the main modules. They hold the normal rate of return fixed and hold hype at 1, so the model has little that could lower capitalization while prices rise. The opposite movement might appear with the optional modules for the normal rate of return, for hype and for risk.
+What should happen: the ratio should leave 1 and not return to it, because nothing in the model ties capitalization to plant. The book's opposite movement is not expected from the basic set. It holds the normal rate of return fixed and hold hype at 1, so the model has little that could lower capitalization while prices rise. The opposite movement might appear with the modules for the normal rate of return, for hype and for risk.
 
 ---
 
-## Optional module: Other measures of concentration
+## 42. Other measures of concentration
 
 Name in the model: `concentration_measures`
 
-Switch it on by adding `--with concentration_measures` to the command. It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it. The table that `full.py` prints has no column for them. To print them every five years, run the module's own file: `python modules/concentration_measures.py 60000 119`, where the numbers are the number of firms at the start, the number of years and, if you add a third, the seed.
+It only measures. No module reads its numbers, and a run with it gives exactly the figures of a run without it. The table that `full.py` prints has no column for them. To print them every five years, run the module's own file: `python modules/concentration_measures.py 60000 119`, where the numbers are the number of firms at the start, the number of years and, if you add a third, the seed.
 
 ### What it is about
 

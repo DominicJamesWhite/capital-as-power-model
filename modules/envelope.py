@@ -1,5 +1,7 @@
 """Module 9: breaking the envelope (Capital as Power, chapters 14 and 15).
 
+It can run in place of the contest over a boundary (module 14), which runs by default.
+
 Dominant capital opens its own boundaries: "to take advantage of this broader pool, dominant
 capital has to break through its original 'envelope'". The model is not told when.
 
@@ -17,6 +19,7 @@ from core import Set, Publish
 
 class Envelope:
     name = "envelope"
+    replaces = ("boundary contest",)   # both move the same two boundaries, so only one of them runs
     reads = ("pool_open",)
     supplies = ("pressure",)
     figures = {                   # what the workbench calls each published number: label, unit, note

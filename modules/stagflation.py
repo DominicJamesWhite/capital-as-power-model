@@ -47,8 +47,8 @@ class Stagflation:
         return {"crisis": 0.0, "inflation_push": 0.0}
 
     def propose(self, L, rng):
-        x = max(L.accounts["stagflation_intensity"], L.accounts.get("conflict_spark", 0.0))   # a coalition's spark (optional module)
-        x = x * (1 - L.accounts.get("eruption_stops_price_rises", 0.0))   # an eruption suspends concerted price rises (optional module); 0 without it
+        x = max(L.accounts["stagflation_intensity"], L.accounts.get("conflict_spark", 0.0))   # a coalition's spark (another module)
+        x = x * (1 - L.accounts.get("eruption_stops_price_rises", 0.0))   # an eruption suspends concerted price rises (another module); 0 without it
         changes = [Publish("crisis", self.crisis * x, self.name),
                    Publish("inflation_push", self.max_rise * x, self.name)]
         self.years = self.years + 1 if x > 0 else 0
@@ -57,7 +57,7 @@ class Stagflation:
         dominant = np.zeros(len(L), dtype=bool)
         dominant[top_positions(L.cap(), np.arange(len(L)), self.top)] = True
         push = self.max_rise * x
-        # The strength of organised labour (optional module) takes the place of popular resistance here.
+        # The strength of organised labour (another module) takes the place of popular resistance here.
         resistance = min(1.0, L.accounts.get("labour_strength", L.accounts.get("resistance", 0.0)))
         # The parts are not fixed: the outcome depends on "the relative power of the leading firms,
         # capital in general and labour groups" (chapter 16). Wages do better where resistance is
@@ -69,7 +69,7 @@ class Stagflation:
         price_rise = np.where(dominant, push, push * small_part)
         wage = L.shared["wage"]
         # The rule moves prices, so it works on the markup that each firm's price asks. Where goods were unsold
-        # (optional module), a firm received less than that this year, and the part it did not receive is no
+        # (another module), a firm received less than that this year, and the part it did not receive is no
         # part of its price.
         markup = L.priced_markup()
         # The new markup is the one at which the firm's wage and markup together have risen by its price

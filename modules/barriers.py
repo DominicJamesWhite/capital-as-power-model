@@ -1,8 +1,8 @@
-"""Optional module: specific barriers won by resistance.
+"""Module 25: specific barriers won by resistance.
 
 THE RULE IN PLAIN WORDS
 
-The main modules hold one number for all roadblocks against mergers. This module turns that
+Without this module the model holds one number for all roadblocks against mergers. This module turns that
 number into barriers against particular groups. A barrier here is a prohibition that holds the
 dominant firms of one sector inside their own line of business. The line of business of a
 firm is its industry. The module keeps one barrier for each sector, a number between 0 and 1.

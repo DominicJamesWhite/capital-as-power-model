@@ -1,8 +1,8 @@
-"""Optional module: organised labour.
+"""Module 27: organised labour.
 
 THE RULE IN PLAIN WORDS
 
-The main modules hold one number for popular resistance, and that number does several jobs. Two
+Without this module the model holds one number for popular resistance, and that number does several jobs. Two
 of the jobs concern wages: in the sabotage module it raises the level of unemployment at which
 wages keep pace with prices, and in the stagflation module it raises the part of each price
 rise that wages obtain. This module takes over those two jobs. It keeps a count of how far the

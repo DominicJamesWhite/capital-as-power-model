@@ -1,4 +1,4 @@
-"""Optional module: capitalization against plant and equipment. A readout. It changes nothing.
+"""Module 41: capitalization against plant and equipment. A readout. It changes nothing.
 
 The module keeps a record, in money, of the plant and equipment that green-field hiring has paid
 for. It reports the ratio of all capitalization to that record, and the growth rates of the two.

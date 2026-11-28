@@ -1,8 +1,8 @@
-"""Optional module: household debt.
+"""Module 28: household debt.
 
 THE RULE IN PLAIN WORDS
 
-The main modules pay the whole wage bill to wage earners. This module pledges a part of the wage
+Without this module the whole wage bill goes to wage earners. This module pledges a part of the wage
 bill as interest on the debts of households. The interest becomes part of the earnings of the
 firms in the ledger, and most of all of the firms that sit in the industries that dominant
 capital holds. Nothing in the rule comes from outside the model. Prices, wages and employment
@@ -118,7 +118,7 @@ costs the lender nothing.
 WHAT IS MISSING
 
 Repayment and new borrowing change no income in the model. The module publishes the money lent
-and the money repaid in the year, and the optional sales module counts them in what wage
+and the money repaid in the year, and the sales module counts them in what wage
 earners have to spend; with that module off, nothing follows from them. Di Muzio and Robbins hold that
 the cost of interest forces growth and is passed into prices; the rule has neither. Household debt is
 not traded and has no price of its own apart from the published capitalized value. The

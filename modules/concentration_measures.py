@@ -1,4 +1,4 @@
-r"""Optional module: other measures of concentration. A readout. It changes nothing.
+r"""Module 42: other measures of concentration. A readout. It changes nothing.
 
 Each year the module measures the same ledger in four ways: the share of the hundred largest
 firms in the total, the differential measure, the Gini index and the Herfindahl-Hirschman
@@ -216,12 +216,13 @@ class ConcentrationMeasures:
 
 
 if __name__ == "__main__":
-    # Prints the measures every five years for a run of the main modules with this readout added.
+    # Prints the measures every five years for a run of every module.
     import full
     argv = [int(a) for a in sys.argv[1:]]
     count, years, seed = (argv + [60_000, 60, 0][len(argv):])[:3]
-    readout = ConcentrationMeasures()
-    full.run(count, years, seed, modules=full.all_modules() + [readout], quiet=True)
+    mods = full.all_modules()
+    readout = next(m for m in mods if isinstance(m, ConcentrationMeasures))
+    full.run(count, years, seed, modules=mods, quiet=True)
     every = 5
     print("Each line describes the ledger at the start of the year. The last three columns are the change")
     print("over the five years before in the logarithm of the share, the differential measure and the")

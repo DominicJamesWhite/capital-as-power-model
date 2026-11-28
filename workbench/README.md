@@ -36,10 +36,10 @@ Diff and Experiment need 2 or more ticked runs.
 
 Select "+ New".
 
-- **New run** sets up one run. Choose the experiment it goes into, the number of firms and years, the seed, and each module's settings. Select "Add modules" to switch on optional modules. Select "Map" to see your changes on the map before you start.
+- **New run** sets up one run. Choose the experiment it goes into, the number of firms and years, the seed, and each module's settings. Every module runs. Select "Replace a module" to run a module in place of another, for example the envelope in place of the contest over a boundary. Select "Map" to see your changes on the map before you start.
 - **New experiment** sets up several runs as a table. Each row is one run. Add a column for each setting you want to vary, then use "Fill column" and "Repeat for seeds" to fill the table.
 
-The server runs 3 runs at once and queues the rest. The page fills in as each run goes. A run of 30,000 firms for 119 years takes about 10 seconds. A run of 300,000 firms takes about 10 minutes.
+The server runs 3 runs at once and queues the rest. The page fills in as each run goes. A run of 30,000 firms for 60 years takes under a minute. A run of 300,000 firms for 60 years takes about 13 minutes.
 
 If the model stops a run, the page shows the model's message beside the run and above the charts.
 
@@ -47,8 +47,7 @@ If the model stops a run, the page shows the model's message beside the run and 
 
 The workbench does not hold its own list of modules. It reads them from the model each time the page loads:
 
-- the optional modules from `registry.py`
-- the modules that always run from `all_modules()` in `full.py`
+- the modules that run by default, and the modules that can run in place of them, from `registry.py`
 - each module's settings and defaults from its class
 - each module's figures, and the figures it reads from other modules
 - each module's description from `modules.md`, or from its docstring

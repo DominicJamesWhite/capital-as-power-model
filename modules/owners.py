@@ -1,4 +1,4 @@
-"""Optional module: who owns the firms.
+"""Module 18: who owns the firms.
 
 THE RULE IN PLAIN WORDS
 

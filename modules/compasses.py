@@ -1,4 +1,4 @@
-"""Optional module: three alternative compasses. Each runs in place of module 7 (compass.py).
+"""Module 15: three compasses. The third runs by default; the other two, and module 7 (compass.py), can run in its place.
 
 WHY
 
@@ -14,19 +14,19 @@ shows the effect of the trigger alone. All three still limit the intensity by co
 
 THE THREE RULES IN PLAIN WORDS
 
-1. TargetsCompass (--with compass_targets). The turn depends on a state, not on a history.
+1. TargetsCompass (compass_targets in registry.py). The turn depends on a state, not on a history.
    The merger module reports the part of its reach that dominant capital does not yet hold.
    While dominant capital holds more than a set part of its reach, the gains from breadth have
    dried up and the intensity of stagflation rises each year. While it holds less, because a
    boundary has opened or new firms have refilled the pool, the intensity falls each year.
 
-2. AheadCompass (--with compass_ahead). The turn depends on this year's figures only. The rule
+2. AheadCompass (compass_ahead in registry.py). The turn depends on this year's figures only. The rule
    compares the rate at which dominant capital grew by buying (employees acquired, as a
    fraction of its own employees) with the rate at which total employment grew over the same
    year. While buying runs ahead of overall growth, the intensity falls. While it does not,
    the intensity rises.
 
-3. ConsensusCompass (--with compass_consensus, and also --with compasses). The motive is the
+3. ConsensusCompass (compass_consensus in registry.py, which runs by default). The motive is the
    same as in rule 1: dominant capital holds more than a set part of its reach. A motive is not
    enough. The large owners are hesitant, so with a motive alone the intensity creeps up
    slowly. It rises fast only when people cannot resist: when unemployment is above its usual
@@ -100,7 +100,6 @@ from modules.compass import Compass
 
 class _Replacement:
     """What the three compasses share: the cohesion of compass.py and the limit it sets."""
-    replaces = ("compass",)       # full.py leaves compass.py out when one of these is switched on
 
     def __init__(self, rise=0.15, fall=0.10, concert=4.0, slack=20.0, usual_unemployment=0.05):
         self.rise = rise          # yearly rise in intensity while the trigger holds (same figure as compass.py)
@@ -134,6 +133,7 @@ class _Replacement:
 class TargetsCompass(_Replacement):
     """Rule 1: the turn comes when the pool of takeover targets within reach is used up."""
     name = "compass by targets"
+    replaces = ("compass", "compass by lead", "compass by consensus")
     reads = ("concentration", "unemployment", "pool_open")
     supplies = ("cohesion", "stagflation_intensity", "breadth_dried")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -157,6 +157,7 @@ class TargetsCompass(_Replacement):
 class AheadCompass(_Replacement):
     """Rule 2: the turn comes in any year in which buying does not run ahead of overall growth."""
     name = "compass by lead"
+    replaces = ("compass", "compass by targets", "compass by consensus")
     reads = ("concentration", "unemployment", "merger_volume")
     supplies = ("cohesion", "stagflation_intensity", "breadth_lead")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -180,6 +181,7 @@ class AheadCompass(_Replacement):
 class ConsensusCompass(_Replacement):
     """Rule 3: a motive, and a consensus that crisis lets form and that growth and resistance dissolve."""
     name = "compass by consensus"
+    replaces = ("compass", "compass by targets", "compass by lead")
     reads = ("concentration", "unemployment", "pool_open")
     supplies = ("cohesion", "stagflation_intensity", "impunity")
     figures = {                   # what the workbench calls each published number: label, unit, note

@@ -1,4 +1,4 @@
-"""Optional module: hype as a lever.
+"""Module 19: hype as a lever.
 
 WHAT HYPE IS HERE
 
@@ -101,14 +101,14 @@ module on it also scales that module's attribute "held_directly".
 
 THE LINKS TO SYSTEMIC FEAR
 
-The module reads L.accounts.get("systemic_fear", 0.0). The optional eruptions module supplies
+The module reads L.accounts.get("systemic_fear", 0.0). The eruptions module supplies
 that number, and it is 0 when that module is off. When the number is 0 the read has no effect.
 When it is above 0, every upward push of parts 4 and 6 is multiplied by one minus the
 number. This rests on Bichler and Nitzan, "A CasP Model of the Stock Market" (2016): when
 "the level of hype" is "already high", "increasing it further ... becomes harder and
 harder". The form of the link is an addition.
 
-The module also reads L.accounts.get("power_fear", 0.0), which the optional module on the power
+The module also reads L.accounts.get("power_fear", 0.0), which the module on the power
 index and systemic fear supplies. Every change that this module makes to hype in a year is
 multiplied by one minus that number. It is 0, and has no effect, when that module is off.
 
@@ -219,7 +219,7 @@ WHAT THE RULE LEAVES OUT ON PURPOSE
     as the cycle it observed in the errors of strategists for one index. It is an outcome, so
     it may not be a setting.
   - A measure of systemic fear of its own. The two standard deviations in the 2016 paper belong
-    to the share price index divided by the wage rate. The optional module on the power index
+    to the share price index divided by the wage rate. The module on the power index
     and systemic fear measures that.
 """
 import numpy as np
@@ -288,11 +288,11 @@ class Hype:
         change = -self.herd * herd_err - self.own * (err - herd_err)
 
         # part 4: acquisitions of the year before raise the multiples of dominant capital
-        # (the optional link to the power index and systemic fear module weakens upward pushes; 0, no effect, when that module is off)
+        # (the link to the power index and systemic fear module weakens upward pushes; 0, no effect, when that module is off)
         fear = float(np.clip(A.get("systemic_fear", 0.0), 0.0, 1.0))
         merged = self.goodwill * A["merger_volume"] * n.sum() / n[top].sum() * (1 - fear)
         change = change + np.where(dominant, merged, 0.0)
-        # (optional link to the fear module: near the ceiling of the power index owners hold the multiple of current
+        # (the link to the fear module: near the ceiling of the power index owners hold the multiple of current
         # earnings still, so every change of the year is multiplied by one minus "power_fear"; 0, no effect, without that module)
         hold = 1.0 - float(np.clip(A.get("power_fear", 0.0), 0.0, 1.0))
         change = change * hold

@@ -1,4 +1,4 @@
-"""Optional module: protections as barred entry.
+"""Module 23: protections as barred entry.
 
 THE RULE IN PLAIN WORDS
 
@@ -26,7 +26,7 @@ protection, which is the thing the book says is capitalized.
      the industry that is not under protection. The part under protection is the protected
      firms' part of the industry's employees. The green-field module founds fewer new firms
      in proportion, and the sabotage module allows less of the extra hiring that a high markup
-     would otherwise bring. These are two optional reads, and the number is 1 when this module
+     would otherwise bring. Both modules read the number, and it is 1 when this module
      is off.
   5. Lapse and renewal. When the fifteen years are over, the protection is renewed for
      another fifteen with a probability equal to the firm's tie. Otherwise it lapses. The

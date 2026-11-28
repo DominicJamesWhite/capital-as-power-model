@@ -2,7 +2,7 @@
 
 This is a computer simulation of an economy, built on the theory of capital as power by Jonathan Nitzan and Shimshon Bichler.
 
-You can use it to see what each part of the theory does. You switch parts on and off, run the simulation, and compare the results.
+You can use it to see what each part of the theory does. You can replace a part or leave it out, run the simulation again, and compare the results.
 
 It is unfinished. It does not predict anything, and it does not yet reproduce history. See "What works and what does not" below.
 
@@ -63,7 +63,11 @@ The model also reports unemployment, prices, and the share of all income that go
 
 The list of firms does nothing by itself. Every change comes from a module.
 
-Each module describes one way that power is used. Ten modules always run.
+Each module describes one way that power is used. Every module runs in every run. The model is all of them working together.
+
+Modules are kept separate so that each one can be replaced by a better version, not so that it can be left out. A module run without the others can give results that mean nothing. For example, the sales module with only the ten modules below gives about 18 per cent unemployment, because nobody in that run borrows.
+
+These ten make up the basic set, the smallest group of modules that runs by itself:
 
 | Module | What it does |
 |---|---|
@@ -78,7 +82,19 @@ Each module describes one way that power is used. Ten modules always run.
 | Debt | Records lending. |
 | Failure | Each firm carries a debt. Lenders lend a firm what it cannot pay, but close it once it has owed more than it is worth for three years, and its employees lose their jobs. Small firms pay lenders more than large ones. |
 
-More than 30 other modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
+About 30 more modules cover things such as what can be sold, public debt, organised labour, advertising, patents, war and a second country. `registry.py` lists every module in the order in which they run, and `modules.md` describes each one.
+
+In a full run, three of these ten are replaced by fuller versions. Only one module for each job runs:
+
+| Job | Runs by default | Can run in its place |
+|---|---|---|
+| Buying other firms | Second country: the merger rule, applied to each of two countries | Mergers, with one country |
+| Choosing between buying firms and raising prices | The compass that needs a consensus | The compass of the basic set, and two others |
+| Opening and closing boundaries | The contest over a boundary | Envelope |
+
+Each default is the one closer to the book. `modules.md` says why, under "Which modules run".
+
+The tests in `checks.py` use the basic set. It has no government, no account of what can be sold and no household debt, so its results are not the model's results.
 
 You can replace any module with a different version. This is deliberate. The theory describes relations between people, and there is often more than one reasonable way to write such a relation as a rule.
 
@@ -93,24 +109,31 @@ You can replace any module with a different version. This is deliberate. The the
 
 You need Python 3 and the `numpy` package.
 
-Run the ten main modules for 60 years, starting with 30,000 firms:
+Run the model for 60 years, starting with 30,000 firms:
 
 ```
 python full.py 30000 60
 ```
 
-The three numbers you can give are the number of firms, the number of years and a seed for the random numbers. If you leave them out, the model runs 300,000 firms for 119 years. That takes about 10 minutes.
+The three numbers you can give are the number of firms, the number of years and a seed for the random numbers. If you leave them out, the model runs 300,000 firms for 119 years. From 300,000 firms, 60 years take about 13 minutes, and 119 years take longer. From 30,000 firms, 60 years take under a minute.
 
-Add optional modules by name:
+Run a module in place of another by naming it, for example the envelope in place of the contest over a boundary:
 
 ```
-python full.py 30000 60 0 --with labour,public_debt
+python full.py 30000 60 0 --with envelope
 ```
 
-Leave a main module out by name, for example to see a run in which no firm fails:
+Leave a module out by name, for example to see a run in which no firm fails:
 
 ```
 python full.py 30000 60 0 --without failure
+```
+
+Run the basic set alone, or with some modules added:
+
+```
+python full.py 30000 60 0 --basic
+python full.py 30000 60 0 --basic --with sales
 ```
 
 Small runs are faster but less reliable. With fewer firms, the top 100 are a bigger part of the whole, and the results change.
@@ -136,14 +159,14 @@ The page opens at http://127.0.0.1:8765. It runs on your own computer and sends 
 What works:
 
 - The bookkeeping is exact. The model can say how much of any year's change came from each module.
-- The ten main modules run together and produce waves of mergers, periods of rising prices with unemployment, and resistance, without anyone entering them by hand.
-- Each optional module runs when it is switched on alone.
+- Every module runs together with the others for 60 years, from 30,000 or 300,000 firms, without the core's checks stopping the run.
+- The basic set produces waves of mergers, periods of rising prices with unemployment, and resistance, without anyone entering them by hand.
 
 What does not work yet:
 
-- **Many modules together.** With every optional module on, unemployment over the last 20 of 60 years is about 7 per cent from 30,000 firms and about 10 per cent from 300,000. That figure hides a slump much like the one the sales module gives alone. Public hiring in the privatisation module takes about a tenth of all working people off the count of people out of work, and the government borrows to pay them for decades. With public hiring switched off, unemployment is about 19 per cent. `modules.md` says more under the privatisation module.
-- **The sales module.** With the optional `sales` module alone, a slump leaves about a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although very few firms close. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
-- **Too few firms fail.** With the ten main modules alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year.
+- **The full run hides a slump.** With every module on, unemployment over the last 20 of 60 years is about 7 per cent from 30,000 firms and about 10 per cent from 300,000. That figure hides a slump much like the one the sales module gives alone. Public hiring in the privatisation module takes about a tenth of all working people off the count of people out of work, and the government borrows to pay them for decades. With public hiring switched off, unemployment is about 19 per cent. `modules.md` says more under the privatisation module.
+- **The sales module with too few others.** With the basic set and the `sales` module alone, a slump leaves about a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although very few firms close. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
+- **Too few firms fail.** With the basic set alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
 - **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.
@@ -154,7 +177,7 @@ What does not work yet:
 |---|---|
 | `core.py` | The list of firms and the bookkeeping. |
 | `modules/` | One file for each module. |
-| `registry.py` | The names of the optional modules. |
+| `registry.py` | The names of every module, in the order in which they run, the modules that can run in place of them, and the basic set. |
 | `full.py` | Runs the model. |
 | `stage2.py` | Runs only three modules: sabotage, green-field growth and mergers. |
 | `checks.py` | Tests of the bookkeeping. |
@@ -174,8 +197,20 @@ A module is one Python file in `modules/` that holds one class. Look at `modules
 3. Put every setting in the class's `__init__`, with a default value.
 4. Write a `propose` method. Each year it looks at the firms and returns a list of the changes it wants. The module never changes a firm directly.
 5. Optionally, name the numbers it publishes in `figures`. For each number in `supplies`, give a label, a unit and one sentence that says what it measures. The unit is one of `share`, `rate`, `times`, `index` or `number`. The workbench uses these to name and scale charts, and lists them under "Add a chart" before anyone has run the module. Look at `modules/labour.py` for an example.
-6. Add the module to `registry.py`, so that people can switch it on by name.
+6. Add the module to `registry.py`: to `MODULES` if it does a job no other module does, so that it runs by default, or to `REPLACEMENTS` if it does the job of a module already there.
 7. Describe the module in `modules.md`.
+
+### Replace a module with your own
+
+A replacement does the same job as a module that is already there, in its own way.
+
+1. Write the new module as above. Give it a new `name`.
+2. Make it publish the same numbers as the module it replaces, under the same names. Other modules read those numbers, so they must still be there.
+3. Name the module it replaces in `replaces`, by that module's own `name`. For example, `modules/envelope.py` has `replaces = ("boundary contest",)`. Then only one of the two runs.
+4. Add it to `REPLACEMENTS` in `registry.py`, for example `REPLACEMENTS["my_envelope"] = ("modules.my_envelope", "MyEnvelope")`.
+5. Run it in place of the other with `python full.py 30000 60 0 --with my_envelope`, and compare the result with a run of `python full.py 30000 60 0`.
+
+If your version is closer to the book or to the evidence than the default, it can become the default. Move it to `MODULES` and the old module to `REPLACEMENTS`.
 
 ### What we ask of a module
 

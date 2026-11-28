@@ -1,4 +1,4 @@
-"""Optional module: price leaders and followers within an industry.
+"""Module 13: price leaders and followers within an industry.
 
 THE RULE IN PLAIN WORDS
 

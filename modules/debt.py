@@ -20,7 +20,7 @@ concentrated in the hands of large owners and paid for by taxes levied broadly. 
 therefore reports the part of the government's debt held by dominant capital, taken to equal
 dominant capital's part of all capitalization. It does not pay that interest to those firms.
 
-Optional modules change the government's debt, and the numbers they publish are 0 when they
+Other modules change the government's debt, and the numbers they publish are 0 when they
 are off. The risk shaping module publishes what the government borrows to bail out dominant
 capital. The modules that tax at a rate set in law (public debt, privatisation, organised
 force, sales, and this module) report what they leave the government short of or with to
@@ -52,7 +52,7 @@ checked against it. The same regression on the national accounts gives 0.07 (giv
 2008, so the record supports anything from a little below 0 to about 0.1. With federal military
 spending held apart as well, as Bohn does, it is 0.061 (give or take 0.032) for 1960 to 2007. In terms of power:
 what the holders of the debt can make the government collect from everybody else, for them.
-With no added debt the tax is nothing, so the main modules alone are unchanged.
+With no added debt the tax is nothing, so a run without the modules that add debt is unchanged.
 
 The holders press only in a lasting recovery: when unemployment has fallen in each of the last
 `recovery_years` years, 2. Hager writes that "Any effort to drastically reduce the debt without a
@@ -216,7 +216,7 @@ class Debt:
     def propose(self, L, rng):
         A = L.accounts
         # Last year's borrowing for bailouts and in place of tax, less last year's repayment and proceeds of
-        # privatisation (optional modules; 0 without them).
+        # privatisation (other modules; 0 without them).
         lent = sum(row.get("lent_to_government", 0.0) for row in A.get("transfers", {}).values())
         self.added += A.get("bailout_borrowing", 0.0) + lent - A.get("privatisation_proceeds", 0.0)
         # What firms owed last year and the debt they owed (the failure module).
