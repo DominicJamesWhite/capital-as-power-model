@@ -27,10 +27,12 @@ firms sell.
      the wage (`benefit`), from a tax at one rate on the wage bill and on earnings, set in law
      in the first year in the same way. Their pay is counted with what wage earners have.
   4. Owners lay out on goods what firms pay out to them, kept level against the wage. Firms
-     keep a part of what owners earn. What they pay out follows the rest part of the way each
-     year. The part that firms keep buys goods only as the equipment of the year's new jobs,
-     and that equipment is bought whether or not the part kept covers it. Owners here are the
-     owners of the firms and every party that receives payments as a holder of debt.
+     decide two outlays: what they pay out, which moves each year part of the way toward a
+     part of what owners earned (`paid_out`), and the equipment of the year's new jobs, which
+     they buy whatever they have kept. What firms keep is not decided. It is worked out at the
+     end of the year, as what owners earned less what was paid out to them, and published as a
+     result. Owners here are the owners of the firms and every party that receives payments as
+     a holder of debt.
   5. Firms buy from firms. A cost in a price that a module marks as laid out on what firms
      sell, such as the outlay on advertising, is collected from buyers and spent in the same
      year. It is on both sides of the account and is never unsold.
@@ -108,15 +110,19 @@ FOUR FIGURES FROM THE NATIONAL ACCOUNTS
 Neither the book nor the papers give the four figures the account needs, so they are measured
 from the national accounts of the United States for 1947 to 2019 (Bureau of Economic Analysis).
 
-  - `retained`, 0.25. Firms kept a quarter of owners' income: net saving of domestic business
-    divided by corporate profit before tax plus net interest, which is the capitalist income
-    of the book's Figure 12.2. In half of the years it lay between 0.20 and 0.29, and in all
-    of them between 0.12 and 0.37. The figure leaves out what owners save out of the income
-    paid to them, which the accounts do not separate from the saving of wage earners. If all
-    private saving were theirs it would be 0.70.
-  - `payout_follows`, 0.5. What was paid out (the same income less what firms kept), as a
-    part of private wages, kept 0.49 of its value of the year before, give or take 0.12,
-    and moved the rest of the way to the paid-out part of the income of the year before.
+  - `paid_out`, 0.75, and `payout_follows`, 0.5. What firms paid out (corporate profit before
+    tax plus net interest, which is the capitalist income of the book's Figure 12.2, less the
+    net saving of domestic business), as a part of private wages, set against its own value a
+    year before and the income of a year before, 1948 to 2019: it kept 0.49 of its earlier
+    value, give or take 0.12, and in the long run paid out 0.75 of the income (0.73 in 1948 to
+    1979, 0.77 in 1980 to 2019). With firms' net investment of the year before added to the
+    fit, 1961 to 2019, the payout moves by 0.02 for each unit built: firms do not pay out less
+    in order to build. What firms kept, 0.25 of owners' income in the same accounts (0.20 to
+    0.29 in half of the years), is the result that this module publishes as `kept_part`, and
+    a test of the account, not a setting. In the accounts it is what others spent beyond what
+    they received: firms' keeping less their building moved with the government's borrowing
+    (correlation 0.75 from year to year). The figures leave out what owners save out of the
+    income paid to them, which the accounts do not separate from the saving of wage earners.
   - `job_cost`, 3.0. The plant and equipment of private business, at what it would cost to
     replace, came to 3.0 years of the wages and salaries that private business paid. In half
     of the years it lay between 2.7 and 3.3, and in all of them between 2.5 and 3.6.
@@ -128,9 +134,9 @@ from the national accounts of the United States for 1947 to 2019 (Bureau of Econ
     do not employ, which shrank as their organisation weakened after 1980.
 
 With the first three figures, the account is the one the paper reports from Kalecki
-and from Baran and Sweezy: the part of owners' income that is kept and not built with buys
-nothing, and that much stays unsold. Setting `retained` to 0 and `payout_follows` to 1 gives the other reading,
-in which owners as a class lay out all they receive a year late.
+and from Baran and Sweezy: the part of owners' income that is not paid out and not built with
+buys nothing, and that much stays unsold. Setting `paid_out` and `payout_follows` to 1 gives
+the other reading, in which owners as a class lay out all they receive a year late.
 
 WHAT IS LEFT OUT
 
@@ -177,13 +183,14 @@ BENEFIT_LENT = "lent to the government for pay to people out of work"   # below 
 class Sales:
     name = "sales"
     reads = ("jobs_created", "party_flows", "transfers", "capital_share", "unemployment")
-    supplies = ("unsold", "sold_part", "sales_cut", "bought_not_built", "sales_account",
+    supplies = ("unsold", "sold_part", "sales_cut", "bought_not_built", "sales_account", "kept_part",
                 "deficit_part", "benefit_paid", "accumulation_differential", "accumulation_share", "crisis_of_capital")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "unsold": ("Unsold part", "share", "Part of the value that firms offered last year that nobody bought."),
         "sold_part": ("Priced earnings received", "share", "Part of the earnings that firms priced for last year that owners received."),
         "sales_cut": ("Hiring held back for unsold goods", "rate", "Fall in the hiring rate of the top 100 firms because goods were unsold."),
         "bought_not_built": ("Buying in place of building", "rate", "Employees that a top 100 firm seeks by buying firms in place of jobs it held back, as a part of its own."),
+        "kept_part": ("Kept by firms", "share", "What owners earned last year less what firms paid out to them, as a part of the earnings that firms priced for."),
         "deficit_part": ("Government borrowing", "share", "What owners lent the government last year, less what it repaid them, as a part of the wages and priced earnings of the year."),
         "benefit_paid": ("Pay to people out of work", "share", "What the government pays people out of work this year, as a part of the wage bill."),
         "accumulation_differential": ("Differential accumulation holds", "index", "1 if differential capitalization has not fallen over the years judged, 0 if it has."),
@@ -191,13 +198,13 @@ class Sales:
         "crisis_of_capital": ("Crisis for capital", "index", "1 if either condition of accumulation fails, 0 if both hold."),
     }
 
-    def __init__(self, job_cost=3.0, price_give=0.5, held_back=1.0, buy_instead=1.0, retained=0.25,
+    def __init__(self, job_cost=3.0, price_give=0.5, held_back=1.0, buy_instead=1.0, paid_out=0.75,
                  payout_follows=0.5, benefit=0.13, judged_over=5, significant=0.01, top=100):
         self.job_cost = job_cost        # money spent on equipment for each new job, in years of the wage
         self.price_give = price_give    # part of its shortfall that a price-cutting seller takes out of its markup within a year
         self.held_back = held_back      # fall in the hiring rate of a firm of dominant capital per unit of the unsold part
         self.buy_instead = buy_instead  # employees that such a firm seeks by purchase for each job it holds back
-        self.retained = retained        # part of owners' money income that firms keep; it buys goods only as the equipment of new jobs
+        self.paid_out = paid_out        # part of owners' money income that firms pay out to them in the long run
         self.benefit = benefit          # pay to each person out of work, as a part of the wage (unemployment insurance, 1960 to 2019)
         self.benefit_rate = None        # the rate of tax for that pay, set in law in the first year and kept
         self.judged_over = judged_over  # years over which each condition of accumulation is judged
@@ -214,7 +221,7 @@ class Sales:
         L.add_component(SHORTFALL, self.name, group=SHORTFALL, unpriced=True)
         L.add_component(CARRIED, self.name, kind="cost")
         L.add_component(BENEFIT_TAX, self.name, kind="income", transfers=True)
-        return {"unsold": 0.0, "sold_part": 1.0, "sales_cut": 0.0, "bought_not_built": 0.0, "sales_account": {},
+        return {"unsold": 0.0, "sold_part": 1.0, "sales_cut": 0.0, "bought_not_built": 0.0, "sales_account": {}, "kept_part": 0.0,
                 "deficit_part": 0.0, "benefit_paid": 0.0, "accumulation_differential": 1.0, "accumulation_share": 1.0, "crisis_of_capital": 0.0}
 
     def reckon(self, L, asked):
@@ -266,13 +273,14 @@ class Sales:
             by_owners, unsold = rest, 0.0
         income = priced - unsold + to_firms + holders     # owners' money income of the year
         # What is paid out to owners moves part of the way toward the paid-out part of the year's income.
-        self.payout += self.payout_follows * ((1.0 - self.retained) * income / wage - self.payout)
+        # What firms kept is the result: what owners earned less what was paid out to them.
+        self.payout += self.payout_follows * (self.paid_out * income / wage - self.payout)
         return {"offered": offered, "wages": wages, "priced_earnings": priced,
                 "bought_by_wage_earners": by_wages, "bought_by_government": by_government,
                 "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
                 "wage_earners_had": has_wages, "government_had": has_government,
                 "owners_had": income - borrowed + repaid - lent, "owners_income": income,
-                "owners_outlay": outlay, "building": building, "lent": lent, "repaid": repaid,
+                "owners_outlay": outlay, "kept": income - outlay, "building": building, "lent": lent, "repaid": repaid,
                 "borrowed_by_government": borrowed,
                 "kept_for_next_year": self.carried[WAGE_EARNERS] + self.carried[GOVERNMENT]}
 
@@ -306,6 +314,7 @@ class Sales:
                    # the merger module adds this to the employees each buyer seeks next year
                    Publish("bought_not_built", float(self.buy_instead * held_back), self.name),
                    Publish("sales_account", dict(a), self.name),
+                   Publish("kept_part", float(a["kept"] / a["priced_earnings"]), self.name),
                    Publish("deficit_part", float(a["borrowed_by_government"] / (a["wages"] + a["priced_earnings"])), self.name),
                    Publish("accumulation_differential", differential, self.name),
                    Publish("accumulation_share", share, self.name),

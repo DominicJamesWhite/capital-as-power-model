@@ -716,22 +716,29 @@ def check_sales_account():
         r3 = m.step()                                               # the payout moves half of the way to three quarters of the 146.25 received
     assert np.isclose(r3["published"]["sales_account"]["owners_outlay"], 0.5 * 131.25 + 0.5 * 0.75 * 146.25)
     # When the equipment of the new jobs costs at least what owners do not lay out, nothing is unsold: with 17
-    # new jobs, 131.25 + 51 covers the 180. With no new job, 48.75 is unsold. And when firms keep nothing,
-    # owners lay out the 150 they received, and 30 is unsold.
-    for jobs, retained, unsold in (17.0, 0.25, 0.0), (0.0, 0.25, 48.75), (0.0, 0.0, 30.0):
+    # new jobs, 131.25 + 51 covers the 180. With no new job, 48.75 is unsold. And when firms pay out all
+    # that owners earned, owners lay out the 150 they received, and 30 is unsold. What firms kept is the
+    # result: what owners earned less what was paid out, as a part of the priced earnings.
+    for jobs, paid_out, unsold in (17.0, 0.75, 0.0), (0.0, 0.75, 48.75), (0.0, 1.0, 30.0):
         class Jobs(Push):
             def propose(self, L, rng, jobs=jobs):
                 first, self.done = not self.done, True
                 return [ScaleComponent("push", 1.2 if first else 1.0, self.name),
                         Publish("jobs_created", jobs if first else 0.0, self.name)]
         m = Model(Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0]),
-                  [Jobs(), Sales(top=1, retained=retained)], top=1)
+                  [Jobs(), Sales(top=1, paid_out=paid_out)], top=1)
         with np.errstate(divide="ignore"):
             m.step()
-            assert np.isclose(m.step()["published"]["sales_account"]["unsold"], unsold)
+            r = m.step()["published"]
+            a = r["sales_account"]
+            assert np.isclose(a["unsold"], unsold)
+            assert np.isclose(a["kept"], a["owners_income"] - a["owners_outlay"])
+            assert np.isclose(r["kept_part"], a["kept"] / a["priced_earnings"])
+            if jobs == 0.0:            # with nothing built and no deficit, owners received only what was laid out
+                assert np.isclose(a["kept"], 0.0, atol=1e-9)
 
     # A tax set in law. A stand-in module pays wage earners 115 in the first year and 230 in the second, taxes them 115
-    # in both, and has owners lend the difference of 115 in the second. Firms keep nothing, so owners lay out all they
+    # in both, and has owners lend the difference of 115 in the second. Firms pay out all that owners earn, so owners lay out all they
     # receive and nothing is unsold in the first year. In the second, the government had 230 to spend and owners
     # 115 less than they received; nothing is unsold, because the loan is spent by the government. In the third year
     # the pay falls to 0 and the 115 repays owners, who do not spend it.
@@ -755,7 +762,7 @@ def check_sales_account():
             return out
 
     L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
-    m = Model(L, [Levy(), Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)], top=1)
+    m = Model(L, [Levy(), Sales(top=1, paid_out=1.0, payout_follows=1.0, benefit=0.0)], top=1)
     with np.errstate(divide="ignore"):
         rs = [m.step() for _ in range(4)]      # each year's account is of the year before
     a, b = rs[2]["published"]["sales_account"], rs[3]["published"]["sales_account"]
@@ -768,7 +775,7 @@ def check_sales_account():
     Levy.start = lambda self, L: (L.add_component("levy income", self.name, kind="income", transfers=True),
                                   {"jobs_created": 0.0, "government_debt": 50.0})[1]
     m = Model(Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0]),
-              [Levy(), Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)], top=1)
+              [Levy(), Sales(top=1, paid_out=1.0, payout_follows=1.0, benefit=0.0)], top=1)
     with np.errstate(divide="ignore"):
         r3 = [m.step() for _ in range(3)][-1]
     assert np.isclose(m.L.accounts["transfers"][REPAID]["lent_to_government"], -50.0) and np.isclose(r3["parties"][GOVERNMENT]["holds"], 65.0)
@@ -1228,7 +1235,7 @@ def check_no_earnings():
                     + lend_to_government("repaid", -500.0, L, GOVERNMENT, self.name))
 
     L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
-    sales = Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)
+    sales = Sales(top=1, paid_out=1.0, payout_follows=1.0, benefit=0.0)
     m = Model(L, [Repay(), sales], top=1)
     with np.errstate(divide="ignore"):
         rs = [m.step() for _ in range(4)]
