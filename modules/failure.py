@@ -97,13 +97,32 @@ when it has owed more than it is worth for `patience` years, 3, which is the spa
 Banerjee and Hofmann count a firm as kept alive by its lenders, which is their definition and
 not a measure of how long lenders wait; what a restructuring writes off; the proportions of
 one country in one year for every year; and the sizes that divide the groups, fixed in the
-first year. `term`, 5 years, is our own choice. It lies between the medians of the time left
-to run on rated debt of firms outside finance across the world that S&P Global Ratings gave
-for 1 January 2024: 5.9 years for investment grade and 3.9 years for speculative grade. These
-cover rated debt only, not bank loans, and were read from the publisher's summary, because
-the report itself could not be downloaded.
+first year. `term`, 7.5 years, is our own choice within a range from a source. When one part
+in `term` of every debt falls due each year, half of what a firm owes falls due within about
+0.69 x `term` years. S&P Global Ratings give the median time left to run on a debt instrument
+of firms outside finance across the world as 5.9 years for investment grade (1 January 2024)
+and 3.9 years for speculative grade (1 July 2023). These match a `term` of about 9 and about 6,
+and 7.5 lies halfway. The figures cover rated debt only, not bank loans, and were read from the
+publisher's summaries, because the reports could not be downloaded.
+
+THE COUNT OF FIRMS KEPT ALIVE BY LENDERS
+
+The module also counts firms the way Banerjee and Hofmann do, to compare the model with the
+record: firms at least `zombie_age` years in the list (10) that have earned less than their
+interest for at least `zombie_years` years in a row (3), as a part of all firms at least 10
+years in the list (`zombie_share`), and the part of last year's such firms that are still so
+(`zombie_stay`). The count changes nothing. The firms of the first year start at 0 years, so
+nothing is counted before the tenth year.
 
 WHAT IS MISSING
+
+The count of firms kept alive by lenders is almost nil in the full run, never above 1 firm in
+10,000 in a year from 30,000 firms, against about 12 per cent of listed firms in the record. For a firm that borrows at the normal rate of return or less,
+earning less than its interest means that it is worth less than it owes, unless owners expect
+much more than it now earns. So three years short of its interest are three years in which it
+owes more than it is worth, and lenders close it before it can be counted. In the record such
+firms are often valued above other firms: owners expect them to recover.
+
 
 Nobody receives a failed firm's plant: with the capacity module on, the plant is lost with the
 firm. Borrowing buys nothing: the firm's debt follows its sales, and its sales do not
@@ -115,13 +134,15 @@ from core import Dissolve, Scale, Publish, SetAttribute, top_positions
 DEBT = "debt"            # each firm's debt, in money
 INTEREST = "interest"    # the interest a firm owes on it in a year, in money, at the rates at which it was lent
 UNDER = "years owing more than worth"   # the years in a row that a firm has owed more than it is worth
+AGE = "years in the list"                # the years a firm has been in the list; the firms of the first year start at 0
+BELOW = "years earning less than interest"   # the years in a row that a firm has earned less than its interest
 
 
 class Failure:
     name = "failure"
     reads = ("interest_share",)
     supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_owed",
-                "debt_owed", "debt_lost", "short_of_cover", "interest_cover")
+                "debt_owed", "debt_lost", "short_of_cover", "interest_cover", "zombie_share", "zombie_stay")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "failures": ("Firms that failed", "number", "Firms outside the top 100 that closed in the year."),
         "failed_employees": ("Employees of failed firms", "share", "Employees of the firms that closed in the year, as a part of all employees."),
@@ -131,11 +152,13 @@ class Failure:
         "debt_lost": ("Debt lost by lenders", "share", "Debt of firms that closed, and debt written off in restructurings, as a part of all debt owed before them."),
         "short_of_cover": ("Firms carried by lenders", "share", "Employees of firms outside the top 100 whose earnings fell short of their interest, as a part of all their employees."),
         "interest_cover": ("Interest cover", "times", "Earnings divided by interest owed, over the firms outside the top 100."),
+        "zombie_share": ("Firms kept alive by lenders", "share", "Firms at least 10 years in the list that earned less than their interest for at least 3 years in a row, as a part of all firms at least 10 years in the list. Counted the way Banerjee and Hofmann count listed firms."),
+        "zombie_stay": ("Firms kept alive that stay so", "share", "Of last year's firms kept alive by lenders, the part that are still so this year. A firm that closed or was bought counts as one that left."),
     }
 
     def __init__(self, on=True, small_burden=5.92, medium_burden=3.48, large_burden=1.90,
                  small_rate=7.8, medium_rate=5.1, large_rate=3.9, small_part=0.5, large_part=0.1,
-                 term=5.0, patience=3, restructuring_risk=0.5, top=100):
+                 term=7.5, patience=3, restructuring_risk=0.5, top=100, zombie_years=3, zombie_age=10):
         self.on = on                                  # False switches the module off: no firm fails and nothing else changes
         self.small_burden = small_burden              # interest paid by a small firm for each 100 of its sales in the first year; only the proportions among the three count
         self.medium_burden = medium_burden            # the same for a firm that is neither small nor large
@@ -149,17 +172,22 @@ class Failure:
         self.patience = patience                      # years in a row that lenders carry a firm that owes more than it is worth
         self.restructuring_risk = restructuring_risk  # rise in the risk of a firm of dominant capital when its lenders restructure it
         self.top = top                                # the number of firms counted as dominant capital, as in the book
+        self.zombie_years = zombie_years              # for the measure only: years in a row of earning less than interest
+        self.zombie_age = zombie_age                  # for the measure only: the years a firm must have been in the list
+        self.zombies = 0.0                            # last year's count of firms kept alive by lenders
         self.terms = None                             # the two sizes that divide the groups, set in the first year
 
     def register(self, L):
         L.add_attribute(DEBT, 0.0, 0.0, adds=True, owner=self.name)
         L.add_attribute(INTEREST, 0.0, 0.0, adds=True, owner=self.name)
         L.add_attribute(UNDER, 0.0, 0.0, owner=self.name)
+        L.add_attribute(AGE, 0.0, 0.0, owner=self.name)
+        L.add_attribute(BELOW, 0.0, 0.0, owner=self.name)
 
     def start(self, L):
         return {"failures": 0.0, "failed_employees": 0.0, "failed_by_industry": np.zeros(L.sector_of.size),
                 "closed_employees": np.zeros(L.sector_of.size), "restructurings": 0.0, "debt_lost": 0.0, "short_of_cover": 0.0,
-                "interest_cover": 0.0}
+                "interest_cover": 0.0, "zombie_share": 0.0, "zombie_stay": 0.0}
 
     def groups(self, L):
         """Each firm's group by size: 0 small, 1 in between, 2 large."""
@@ -230,8 +258,19 @@ class Failure:
         earnings = n * np.maximum(L.e, 0.0)
         left = ~closes
         under = np.where(restructured, 0.0, under)
+        # The measure of Banerjee and Hofmann, counted over firms, before any firm closes. It changes nothing.
+        was = (L.extra[BELOW] >= self.zombie_years) & (L.extra[AGE] >= self.zombie_age)
+        below = np.where(short, L.extra[BELOW] + 1.0, 0.0)
+        age = L.extra[AGE] + 1.0
+        old = age >= self.zombie_age
+        zombie = old & (below >= self.zombie_years)
+        stay = float((was & zombie).sum() / self.zombies) if self.zombies > 0 else 0.0
+        self.zombies = float(zombie.sum())
         changes = [SetAttribute(DEBT, debt, self.name), SetAttribute(INTEREST, owed, self.name),
                    SetAttribute(UNDER, under, self.name),
+                   SetAttribute(AGE, age, self.name), SetAttribute(BELOW, below, self.name),
+                   Publish("zombie_share", float(zombie.sum() / old.sum()) if old.any() else 0.0, self.name),
+                   Publish("zombie_stay", stay, self.name),
                    Publish("failures", float(closes.sum()), self.name),
                    Publish("failed_employees", float(n[closes].sum() / max(employed, 1e-300)), self.name),
                    # the sabotage module counts this next year as capacity that has left the industry

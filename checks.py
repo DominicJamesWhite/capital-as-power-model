@@ -937,7 +937,7 @@ def check_failure():
     assert np.isclose(r["published"]["failed_by_industry"] @ np.bincount(np.arange(400) % 20, before, 20), 500.0)
     assert np.isclose(r["published"]["debt_owed"], m.L.extra[DEBT].sum())
 
-    # A firm whose sales halve still owes what it borrowed. A fifth of its debt falls due, and it repays what its
+    # A firm whose sales halve still owes what it borrowed. One part in `term` of its debt falls due, and it repays what its
     # earnings leave after interest; lenders lend it the rest again. A firm whose sales are unchanged owes the same.
     L = ledger()
     L.accounts["interest_share"] = 0.2
@@ -1020,7 +1020,7 @@ def check_failure():
     assert closed > 0
     print(f"15. Failure: in the first year the interest that firms owe adds up to the total, a small firm owes 5.92 for "
           f"each 1.90 that a large firm owes on the same sales, and the rates stand as 7.8, 5.1 and 3.9; a firm whose "
-          f"sales halve still owes its interest and repays a fifth of its debt; firms short of cover are lent the "
+          f"sales halve still owes its interest and repays the part of its debt that falls due; firms short of cover are lent the "
           f"shortfall and stay, firms that owe more than they are worth for three years close and their employees are "
           f"without work, "
           f"and nobody else's debt moves; in a merger the buyer takes on its targets' debt, and only the owner may set "
