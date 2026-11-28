@@ -142,8 +142,8 @@ What works:
 What does not work yet:
 
 - **Many modules together.** With most optional modules on, unemployment reaches levels that are not believable.
-- **The sales module.** With the optional `sales` module alone, a slump leaves more than a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although no firm closes. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
-- **Too few firms fail.** With the ten main modules alone no firm fails at all, and the number of firms grows about fivefold in 60 years. In the record some firms fail every year.
+- **The sales module.** With the optional `sales` module alone, a slump leaves about a sixth of people out of work for decades, and with `proletarianization` as well, about three in ten, although very few firms close. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
+- **Too few firms fail.** With the ten main modules alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
 - **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.

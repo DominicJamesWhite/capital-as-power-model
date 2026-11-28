@@ -413,29 +413,34 @@ Name in the model: `cost cutting`
 
 ### What it is about
 
-Every firm tries to cut its costs, and this module shows why that does not put large firms ahead. A haulage firm that finds a cheaper route earns more for a year or two. Then its rivals find the same route and the advantage is gone. The module gives every firm a small random gain or loss each year and then lets the difference fade. The size of the firm makes no difference to its luck.
+Every firm tries to cut its costs, and this module shows why that does not put large firms ahead. A haulage firm that finds a cheaper route earns more for a year or two. Then its rivals find the same route and the advantage is gone. The module gives every firm a random gain or loss each year and then lets the difference fade. The size of the firm makes no difference to its luck.
+
+It is also what sets firms of one industry apart. Some firms earn much more for each employee than their neighbours, and some much less, and the differences last for some years. A firm that falls far enough behind its neighbours may come to owe more than it is worth, and then the failure module and its lenders decide whether it goes on.
 
 ### What the theory says
 
 Chapter 14, Table 14.2, "Internal Depth", and Proposition 6. Chapter 16, "Cost cutting", "'Productivity' gains" and "Input prices".
 
 - Large firms pursue cost cutting "with much zeal" but "can rarely use it to get ahead".
-- Production methods are "notoriously difficult to monopolize", and lower input prices "quickly tend to spill over to other firms".
 - Better ways of organising production "tend to proliferate easily, and this rapid spread quickly dilutes the initial advantage of whoever implemented them first".
 - The net effect "commonly is to meet the average rather than to beat it" (chapter 14).
-- From 1954 to 1993 the sales per employee of the largest United States firms, against all firms, rose by "a 20 per cent increase – miniscule when compared to the nineteenfold increase in differential profit per firm".
 
-The book gives no size for the gains and no speed for their spread.
+The book gives no size for the gains and no speed for their spread. Both come from a study outside the tradition, Chad Syverson, "What determines productivity?" (NBER working paper 15712, 2010, published in 2011):
+
+- "the average difference in logged total factor productivity (TFP) between an industry's 90th and 10th percentile plants is 0.651", within industries of United States manufacturing, measured from what plants sell.
+- "Regressing a producer's current TFP on its one-year-lagged TFP yields autoregressive coefficients on the order of 0.6 to 0.8".
+
+In terms of power: for the same people and plant, one firm obtains almost twice what a neighbour obtains, and about three tenths of that difference goes each year as methods spread, which is the book's "rapid spread".
 
 ### What the module does each year
 
 1. **It works out the level of each industry.** This is the average markup of the industry's firms, counting only the parts of the markup that any firm can have. Premiums that rest on a hold on buyers, such as a patent, are left out.
-2. **Every firm draws a random gain or loss** of about 2 per cent of its markup. Two thirds of draws fall between a loss of 2 per cent and a gain of 2 per cent.
+2. **Every firm draws a random gain or loss** of about 18 per cent of its markup. Two thirds of draws fall between a loss of 16 per cent and a gain of 20 per cent. With the drift back in step 3, the markups of one industry's firms then lie as far apart as the plants in Syverson's study: the firm at the 90th percentile has about 1.9 times the markup of the firm at the 10th.
 3. **Every firm drifts back towards its industry.** Each year three tenths of the gap between the firm's markup and its industry's level disappears.
-4. **The draw changes the firm's cost and not its price.** A firm that gains has lower costs, earns more and charges what it charged before.
+4. **The draw changes the firm's cost and not its price.** A firm that gains has lower costs, earns more and charges what it charged before. A saving is taken out of the firm's cost of production, the wage and any saving or lag that still stands, as a part of it, by the same rule the core uses when a markup falls, so that cost is never cut below nothing. Other costs, such as an outlay on advertising, are not cut. A saving that is small against the cost comes to almost the whole gain. If the gain is larger than the firm's whole cost, most of it is a rise of the firm's price.
 5. **The drift back first removes the saving.** As methods spread, a firm that had lower costs loses that saving. If the drift is larger than the saving that is left, the rest of it moves the firm's price towards the prices of its industry.
 
-**An example.** The wage is 1. A firm and its industry both have a markup of 0.10, so the firm's price is 1.10. The firm draws a gain of 2 per cent. Its markup becomes 0.102 and its cost falls by 0.002, so its price is still 1.10. Next year, leaving aside the new draw, three tenths of the gap closes. The markup falls to 0.1014, the saving shrinks to 0.0014, and the price is still 1.10.
+**An example.** The wage is 1. A firm and its industry both have a markup of 0.10, so the firm's price is 1.10. The firm draws a gain of 20 per cent. Its markup becomes 0.12 and its cost falls by almost 0.02, so its price is still about 1.10. Next year, leaving aside the new draw, three tenths of the gap closes. The markup falls to about 0.1135, the saving shrinks to about 0.0135, and the price is still about 1.10.
 
 Step 5 matters for a firm that stands above its industry for another reason. Top-100 firms gain from their own price rises during stagflation, and this module wears that gain away too. That wearing away is recorded as a fall of the firm's price against the wage and not as a rise in its costs.
 
@@ -443,8 +448,8 @@ Step 5 matters for a firm that stands above its industry for another reason. Top
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `gain` | 0.02 | The typical yearly gain or loss of one firm against its neighbours | Our own choice |
-| `spread` | 0.3 | The part of any difference from the industry that disappears each year | Our own choice |
+| `gain` | 0.18 | The typical yearly gain or loss of one firm against its neighbours, in logarithms of its markup | Syverson (2011): a gap of 0.651 between the 90th and 10th percentile is a spread of 0.254, and with `spread` at 0.3 the draws that keep it are 0.254 × √(1 − 0.7²) = 0.18. The range 0.6 to 0.8 for the persistence gives 0.15 to 0.20. |
+| `spread` | 0.3 | The part of any difference from the industry that disappears each year | Syverson (2011): one less the yearly persistence of 0.6 to 0.8, so 0.2 to 0.4 |
 | `wears_holds` | off | A switch kept for comparisons. When it is on, the drift back also wears down premiums that rest on a hold on buyers. | Our own choice. The book supports leaving it off (see below). |
 
 ### What it reads from other modules and what it gives them
@@ -460,7 +465,7 @@ It owns two parts of each firm's record: a part of the markup called the cost-cu
 - **A firm that cuts costs keeps its price.** The book also allows it to sell more for each employee. The model has no count of goods, so it cannot show that.
 - **The rule has not been read against the book line by line.**
 
-Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads apart from what is protected: "Unlike final commodities that can often be protected through patents, copyrights and other exclusionary threats, improvements in the social organization of production tend to proliferate easily". With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the optional protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.
+Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads, the organisation of production, apart from what patents and copyrights protect. With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the optional protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.
 
 What should happen: the earnings per employee of the top 100, against the average, stay flat on account of this module. If you set the gains to spread slowly or to favour large firms, cost cutting becomes a way to beat the average, and the model then departs from the book.
 
@@ -836,7 +841,7 @@ It owns no part of a firm's markup and moves no money.
 
 ### What is known to be wrong or untested
 
-- **With the main modules alone no firm fails.** Their markups move together across a whole industry, so no firm falls behind its own debt for three years. In runs of 60 years from 30,000 firms no firm closed (two seeds), unemployment over the last 20 years was 3.5 and 2.7 per cent, and the number of firms grew to about 180,000. From 300,000 firms unemployment was 6.0 per cent. With the sales module alone no firm closed either, and unemployment was 20.6 and 18.3 per cent. In the record some firms fail every year, and about one listed firm in eight is kept alive by its lenders. In a screen of 100 mixes of optional modules (30,000 firms, one seed), firms that closed held 0.6 per cent of employees in an average year, nearly all in mixes with the sales module.
+- **Far too few firms fail.** Firms of one industry now lie as far apart as plants do in the record (see the cost cutting module), and some fall behind their debts. In runs of 60 years from 30,000 firms with the main modules, 441 and 680 firms closed (two seeds), about 3 in every 100,000 employees a year, and unemployment over the last 20 years was 2.1 per cent in both. From 300,000 firms 6,030 closed and unemployment was 3.4 per cent. Firms that earned less than their interest held about 0.02 per cent of employees outside the top 100. In the record about one listed firm in eight is kept alive by its lenders. Interest is a small part of what nearly every firm earns, so a firm has to fall a long way behind its neighbours before it owes more than it is worth.
 - **The link between interest and unemployment that the record shows does not come out of the model.** The book's Figure 12.4 sets the ratio of interest to profit against unemployment, both averaged over five years. In the United States from 1952 to 2019 the ratio was 7.95 times unemployment, fitted through zero. Measured the same way from year 11 of runs of 60 years from 30,000 firms, it was 2.4 and 2.5 with the main modules, 2.9 from 300,000 firms, about 0.8 with the sales module and 1.8 to 2.0 with every optional module on. Within most runs the ratio falls when unemployment rises, because markups rise in a bout of stagflation while interest does not.
 - **Firms that earn almost nothing are carried as well.** A firm whose markup the sales module has cut to the core's allowance for rounding is carried for three years like any other. In a run of every optional module from 3,000 firms, other modules then raised such a firm's markup by a factor of about a hundred thousand million in a year, and the run broke down in its 55th year.
 

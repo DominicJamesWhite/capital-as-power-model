@@ -6,7 +6,13 @@ each firm's earnings per employee drift back toward the level of its industry. T
 draw does not depend on the size of the firm. Cost cutting therefore lets dominant capital
 "meet the average, not beat it", and the module exists to show that.
 
-Additions to the book: the size of the draws and the speed at which gains spread.
+The book gives no size for the draws and no speed for the spread. Both come from a study outside the
+tradition, Syverson, "What determines productivity?" (2011): within industries "the average difference in
+logged total factor productivity (TFP) between an industry's 90th and 10th percentile plants is 0.651", and
+the yearly persistence is "on the order of 0.6 to 0.8". In terms of power: for the same people and plant one
+firm obtains almost twice what a neighbour obtains, and the difference fades as methods spread. The draws
+are the ones that keep the markups of an industry's firms that far apart. They are also what sets a firm
+behind its neighbours, so that some firms come to owe more than they are worth (see the failure module).
 
 The module owns one markup component, the cost-cutting edge. The drift back is reckoned on the
 part of a firm's markup that stacks (see "How modules share a quantity" in modules.md). Premiums
@@ -31,7 +37,7 @@ cost. It does so in two steps, and both are additions, because the book gives no
      against the wage, and not a rise of its costs.
 """
 import numpy as np
-from core import ScaleComponent, SetComponent
+from core import ScaleComponent, SetComponent, squeeze
 
 # What still stands of a firm's edge over its industry from cutting costs, or of its lag behind
 # it. A markup component that stacks. The drift back toward the industry is proposed to this
@@ -50,9 +56,13 @@ class CostCutting:
     supplies = ()
     figures = {}           # nothing it supplies is a single yearly figure
 
-    def __init__(self, gain=0.02, spread=0.3, wears_holds=False):
-        self.gain = gain        # typical yearly gain or loss of one firm against its neighbours
-        self.spread = spread    # part of any difference from the industry that disappears each year
+    def __init__(self, gain=0.18, spread=0.3, wears_holds=False):
+        self.gain = gain        # typical yearly gain or loss of one firm against its neighbours, in logarithms of its markup.
+                                # Set so that firms of one industry lie as far apart as plants of one industry do in
+                                # Syverson (2011): a gap of 0.651 in logarithms between the 90th and 10th percentile,
+                                # a spread of 0.254, and 0.254 x sqrt(1 - 0.7 x 0.7) = 0.18
+        self.spread = spread    # part of any difference from the industry that disappears each year: 1 less the
+                                # yearly persistence of 0.6 to 0.8 that Syverson (2011) reports
         self.wears_holds = wears_holds   # a switch for comparisons, off unless a run asks for it.
                                          # Off: the drift back is reckoned on the part of the markup that stacks, so a
                                          # premium that rests on a hold on buyers is not worn down. On: the drift back is
@@ -78,7 +88,13 @@ class CostCutting:
         whole = L.markup()
         drawn = whole * (draw - 1.0)                   # step 1: the draw is a movement of cost
         drift = whole * draw * (back - 1.0)            # the drift back, reckoned after the draw
-        cost = L.components[COST] - drawn
+        # A saving is taken out of the firm's cost of production, the wage and this module's own cost difference,
+        # as a part of it, by the core's rule for a fall (squeeze), so that cost is never cut through nothing. Other
+        # costs, such as an outlay on wants, are not costs of production and are not cut. A small saving comes to
+        # almost the whole draw. What a large saving leaves of the draw is a rise of the firm's price, because the
+        # core adds markup and cost.
+        unit = 1.0 + L.components[COST]
+        cost = squeeze(unit, -drawn) - 1.0
         # step 2: the drift back removes the cost difference that stands, and no more than stands.
         # A drift downward removes a saving (a cost below 0); a drift upward removes a lag (a cost
         # above 0). The rest of the drift moves the price, because the core adds markup and cost.

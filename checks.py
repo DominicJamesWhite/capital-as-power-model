@@ -1427,13 +1427,34 @@ def check_markups_near_nothing():
     kept = [c for c in w.propose(m2.L, np.random.default_rng(0)) if isinstance(c, SetComponent) and c.name == WANTS][0].values
     r, n = m2.L.stacking_markup(), m2.L.n
     assert (kept > 0).all() and np.isclose((n * r * kept).sum(), (n * r).sum(), rtol=1e-12) and kept.min() < 0.9
+    # 5. Cost cutting. A small saving is taken out of the cost in full, so the price stays put. A firm with a markup
+    #    of 50 whose markup rises by a factor of e in one year, a gain of 86 wages, keeps a cost above nothing, and the
+    #    rest of its gain is a rise of its price.
+    from modules.costcutting import CostCutting
+    class Draws:                                   # stands in for the random numbers: one draw for each firm
+        def __init__(self, values):
+            self.values = np.array(values)
+        def normal(self, mean, sd, size):
+            return self.values
+    L = Ledger(employees=[1000.0, 1000.0], epe=0.10, industry=[0, 0], sector_of_industry=[0])
+    L.components["base"][1] = 50.0                 # the second firm's markup is 50
+    L.refresh()
+    cc = CostCutting(spread=0.0)
+    m3 = Model(L, [cc], top=1)
+    changes = cc.propose(m3.L, Draws([0.001, 1.0]))
+    unit = 1.0 + [c for c in changes if isinstance(c, SetComponent)][0].values
+    assert np.isclose(1.0 - unit[0], 0.1 * (np.exp(0.001) - 1.0), rtol=1e-3)   # a small saving is taken in full
+    assert 0 < unit[1] < 0.01                                                # a large one never cuts the cost through nothing
+    lowest = unit[1]
     print(f"23. Markups near nothing: a rise is added, and a small fall comes to almost the same as subtracting it; a fall as large as the markup "
           f"leaves 41 per cent of it, and one a million times as large leaves {tiny:.1e} of it. The part of the markup that firms did "
           f"not receive is left out of the markup that prices are set from, and only a markup component in an overlap "
           f"group of its own can be such a part. In a bout of stagflation the markup of a firm that received a millionth "
           f"of its earnings rises by a factor of {f[1]:.3f}, as it would if the firm had received them all. Where "
           f"wages rise faster than its price, a firm with a markup of 0.010 keeps {left:.4f}. A firm far behind its "
-          f"industry's hold on buyers keeps {kept.min():.3f} of its markup, and the industry earns what it earned.")
+          f"industry's hold on buyers keeps {kept.min():.3f} of its markup, and the industry earns what it earned. "
+          f"A small saving from cost cutting is taken out of the cost in full, and a firm with a markup of 50 that "
+          f"gains 86 wages in a year keeps a cost of {lowest:.4f} of the wage.")
 
 
 if __name__ == "__main__":
