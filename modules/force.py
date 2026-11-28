@@ -167,8 +167,9 @@ class Force:
         self.level = 0.0                    # the level of organised force, from 0 to 1
         self.jobs = 0.0                     # military jobs now on the contractors' books
         self.planned = 0.0                  # hiring (+) or dismissals (-) planned last year for this year
-        self.rate = 0.0                     # the tax for military orders, as a part of the wage bill and of earnings; set in law once
+        self.rate = 0.0                     # the tax for military orders, as a part of earnings; set in law once, then cut only as the debt module orders
         self.in_law = False                 # whether the rate has been set
+        self.wage_rate = 0.0                # the rate on wages: the same as the rate on earnings when set, then cut as the debt module orders
 
     def contractors(self, L):
         """Positions of the arms contractors, and the top hundred."""
@@ -235,17 +236,22 @@ class Force:
         orders = self.jobs * price
         wages = L.shared["wage"] * employed
         base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
-        # The rate is set in law in the first year with orders, to cover them, and stays put. The tax goes to
+        # The rate is set in law in the first year with orders, to cover them. The tax goes to
         # the government, which pays the armed forces for the orders. The difference is lent by owners, or
-        # repays them.
+        # repays them. Once in law, the rates are cut as the debt module orders after a surplus.
+        if self.in_law:
+            self.rate *= L.accounts.get("tax_kept_earnings", 1.0)
+            self.wage_rate *= L.accounts.get("tax_kept_wages", 1.0)
         if not self.in_law and orders > 0:
             self.rate, self.in_law = float(orders / (wages + base.sum())), True
+            self.wage_rate = self.rate
         if self.in_law:
-            tax = self.rate * (wages + base.sum())
+            taxed = (self.rate * base.sum(), self.wage_rate * wages)
             changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=GOVERNMENT, source=self.name),
                         Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
-                                 amount=self.rate * wages)]
-            changes += lend_to_government(LENT, float(orders - tax), L, GOVERNMENT, self.name)
+                                 amount=self.wage_rate * wages)]
+            tax = self.rate * (wages + base.sum()) if self.wage_rate == self.rate else sum(taxed)
+            changes += lend_to_government(LENT, float(orders - tax), L, GOVERNMENT, self.name, taxed)
             if orders > 0:
                 changes.append(Transfer(ORDERS, payer=GOVERNMENT, receiver=ARMED_FORCES, source=self.name, amount=orders))
         return changes + self.readouts(L)

@@ -1534,6 +1534,44 @@ def check_idle_plant():
           f"equipment of {building:.0f} wages for the 20 jobs that plant did not hold.")
 
 
+def check_tax_cut():
+    """Owners have the rates in law cut by the surplus of the taxes at those rates, once, and the rate on
+    earnings falls faster than the rate on wages; a deficit and the tax pressed by the holders order no cut."""
+    from modules.debt import Debt, REPAID as PRESSED_REPAID
+    d = Debt()
+    # Taxes in law asked 100 of earnings and 200 of wages and brought in 30 more than they paid for; the holders
+    # pressed 50, which is not counted.
+    G = {"gaps": {"x": -30.0, PRESSED_REPAID: -50.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0}
+    ke, kw = (c.value for c in d.order_cut(G))
+    assert np.isclose(100 * (1 - ke) + 200 * (1 - kw), 30.0) and np.isclose(np.log(ke), d.owners_pace * np.log(kw))
+    # The next year's record was made before that cut acted: it shows the same surplus, and no second cut is ordered.
+    assert [c.value for c in d.order_cut(G)] == [1.0, 1.0]
+    # A deficit orders no cut and no rise; a surplus as large as all the taxes leaves no rate.
+    assert [c.value for c in d.order_cut({"gaps": {"x": 40.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [1.0, 1.0]
+    assert [c.value for c in d.order_cut({"gaps": {"x": -300.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [0.0, 0.0]
+    assert Debt(cut_surplus=False).order_cut(G) == []
+
+    # Through the core: a stand-in pays wage earners 10 and taxes them 30 at a rate in law. The core records what
+    # the tax asked of wages, and the next year the debt module orders the rate on wages cut to a third.
+    class Stand:
+        name = "stand"
+
+        def propose(self, L, rng):
+            return [Transfer("tax", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=30.0),
+                    Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=10.0)] + \
+                lend_to_government("gap", -20.0, L, GOVERNMENT, self.name, (0.0, 30.0))
+
+    L = Ledger(employees=[100.0, 100.0, 80.0], epe=0.5, industry=[0, 0, 0], sector_of_industry=[0])
+    m = Model(L, [Debt(), Stand()], top=1)
+    m.step()
+    assert np.isclose(m.L.accounts["government"]["taxed_wages"], 30.0) and np.isclose(m.L.accounts["government"]["gaps"]["gap"], -20.0)
+    p = m.step()["published"]
+    assert np.isclose(p["tax_kept_wages"], 1.0 / 3.0) and np.isclose(p["tax_kept_earnings"], (1.0 / 3.0) ** 2.3)
+    print(f"25. Tax cut: taxes in law that ask 100 of earnings and 200 of wages and bring in 30 more than they pay for "
+          f"keep {ke:.3f} of the rate on earnings and {kw:.3f} of the rate on wages; the same record a year later, a "
+          f"deficit and the tax pressed by the holders of the debt order no cut.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1559,4 +1597,5 @@ if __name__ == "__main__":
     check_government_account()
     check_markups_near_nothing()
     check_idle_plant()
-    print("All twenty-four checks passed.")
+    check_tax_cut()
+    print("All twenty-five checks passed.")

@@ -221,19 +221,25 @@ class Transfer:
 class GovernmentGap:
     """What a module makes the government pay in the year, less the tax it collects for it. Above 0
     the government is short; below 0 it has collected more than it pays. The core adds up the gaps
-    of every module and keeps one account for the government (see Model._government_loans)."""
+    of every module and keeps one account for the government (see Model._government_loans).
+    `taxed_earnings` and `taxed_wages` are what the module's tax at a rate set in law asks of firms'
+    earnings and of wages in the year; the core only records them."""
     label: str
     gap: float
     source: str
+    taxed_earnings: float = 0.0
+    taxed_wages: float = 0.0
 
 
-def lend_to_government(label, gap, L, receiver, source):
+def lend_to_government(label, gap, L, receiver, source, taxed=(0.0, 0.0)):
     """The gap between what a module makes the government pay and the tax it collects for it, as a
     change for the core. `L` and `receiver` are kept so that every module calls it in the same way.
+    `taxed` is what a tax at a rate set in law asks of firms' earnings and of wages, for the record.
     Returns a list."""
-    if not (gap != 0.0 and np.isfinite(gap)):
+    e, w = float(taxed[0]), float(taxed[1])
+    if not (gap != 0.0 and np.isfinite(gap)) and not (e > 0 or w > 0):
         return []
-    return [GovernmentGap(label, float(gap), source)]
+    return [GovernmentGap(label, float(gap) if np.isfinite(gap) else 0.0, source, e, w)]
 
 
 # ---------------------------------------------------------------- components
@@ -660,7 +666,7 @@ class Model:
     applied in the alphabetical order of their sources, and components are combined in the
     alphabetical order of their names.
     """
-    CORE_SUPPLIES = ("unemployment", "capital_share", "concentration", "transfers", "wage_earners_net", "party_flows")
+    CORE_SUPPLIES = ("unemployment", "capital_share", "concentration", "transfers", "wage_earners_net", "party_flows", "government")
 
     def __init__(self, ledger, modules=(), top=100, seed=0, overlap=None, netting=True, discounts_overlap=()):
         self.L = ledger
@@ -671,6 +677,7 @@ class Model:
                         for m in self.modules}
         self.history = []
         self.settlement = {"transfers": [], "parties": {}}     # the record of the last year's transfers
+        self.government = {"gaps": {}, "held": 0.0, "lent": 0.0, "taxed_earnings": 0.0, "taxed_wages": 0.0}
         supplied = set(self.CORE_SUPPLIES)
         for m in self.modules:
             supplied.update(getattr(m, "supplies", ()))
@@ -715,9 +722,13 @@ class Model:
         # "party_flows": for each party that is not a firm, what it received and paid in transfers in the last
         # year and what it holds. It is empty in a year with no transfers.
         flows = {p: dict(row) for p, row in self.settlement["parties"].items()}
+        # "government": the government's one account in the last year: each label's gap, what it held at the
+        # start, what it borrowed (below 0: repaid), and what the taxes at rates in law asked of firms' earnings
+        # and of wages (see Model._government_loans).
+        gov = {k: (dict(v) if isinstance(v, dict) else v) for k, v in self.government.items()}
         self.L.accounts.update(unemployment=r["unemployment"], capital_share=r["capital_share"],
                                concentration=r["top_share_employees"], transfers=paid, wage_earners_net=net,
-                               party_flows=flows)
+                               party_flows=flows, government=gov)
 
     def _lndk(self, group=None):
         K = self.L.cap()
@@ -1008,6 +1019,7 @@ class Model:
         published = {c.key: c.value for c in changes if isinstance(c, Publish)}
         L.accounts.update(published)
         self._guard(touched, "after the year's mergers, dissolutions and foundings")
+        self.government = {k: government[k] for k in ("gaps", "held", "lent", "taxed_earnings", "taxed_wages")}
         self._core_accounts()
 
         r = readouts(L, self.top)
@@ -1038,11 +1050,14 @@ class Model:
         transfers under "loans"."""
         L = self.L
         by_label = {}
-        for g in sorted(gaps, key=lambda g: (g.source, g.label)):
+        gaps = sorted(gaps, key=lambda g: (g.source, g.label))
+        for g in gaps:
             by_label[g.label] = by_label.get(g.label, 0.0) + g.gap
         held = float(L.holds[GOVERNMENT])
-        record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": []}
-        if not gaps:
+        record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": [],
+                  "taxed_earnings": sum(g.taxed_earnings for g in gaps),   # asked by the taxes at rates in law
+                  "taxed_wages": sum(g.taxed_wages for g in gaps)}
+        if not any(g.gap != 0.0 for g in gaps):
             return record
         need = sum(by_label[k] for k in sorted(by_label)) - held
         if need > 0 and have.sum() > 0:

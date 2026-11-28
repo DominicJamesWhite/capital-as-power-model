@@ -77,18 +77,24 @@ REPAID = "repaid to the holders of the public debt"
 class Debt:
     name = "debt"
     reads = ("transfers",)
-    supplies = ("interest_share", "corporate_debt", "government_debt", "government_debt_dominant")
+    supplies = ("interest_share", "corporate_debt", "government_debt", "government_debt_dominant",
+                "tax_kept_earnings", "tax_kept_wages")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "interest_share": ("Interest terms", "share", "Interest that firms owe, as a part of their earnings (the failure module); without it, the part of the first year."),
         "corporate_debt": ("Corporate debt", "number", "The debt that firms owe, in money (the failure module); without it, the interest capitalized at the normal rate of return."),
         'government_debt': ('Government debt', 'number', "Capitalized value of the government's interest payments, in money."),
         'government_debt_dominant': ('Government debt held by the top 100', 'number', "Taken to equal the top 100's part of all capitalization, in money."),
+        "tax_kept_earnings": ("Rate on earnings kept", "share", "The part of each rate of tax in law on firms' earnings that is kept next year, after owners have it cut for last year's surplus."),
+        "tax_kept_wages": ("Rate on wages kept", "share", "The part of each rate of tax in law on wages that is kept next year, after owners have it cut for last year's surplus."),
     }
 
-    def __init__(self, government_part=0.02, start=0.20, holders_press=0.05):
+    def __init__(self, government_part=0.02, start=0.20, holders_press=0.05, cut_surplus=True, owners_pace=2.3):
         self.government_part = government_part   # government interest payments as a part of all income
         self.share = start
         self.holders_press = holders_press   # tax pressed by the holders of the added debt, as a part of it in a year (Bohn 1998)
+        self.cut_surplus = cut_surplus       # owners have the rates in law cut by what they bring in beyond what the government pays (Hager 2016, chapter 4)
+        self.owners_pace = owners_pace       # how many times as fast the rate on earnings falls as the rate on wages, in proportion (Hager 2016, chapter 4: effective rates of the largest corporations and of households)
+        self.ordered = (1.0, 1.0)            # the cut ordered last year: the part of the rate on earnings and of the rate on wages to be kept
         self.debt = None                  # the debt that firms owe (the failure module); None without it
         self.added = 0.0                  # debt added by bailouts and by borrowing to spend, less debt retired with the proceeds of privatisation, in money
 
@@ -110,7 +116,7 @@ class Debt:
 
     def start(self, L):
         L.add_component(PRESSED, self.name, kind="income", transfers=True)
-        return self.accounts(L)
+        return dict(self.accounts(L), tax_kept_earnings=1.0, tax_kept_wages=1.0)
 
     def propose(self, L, rng):
         A = L.accounts
@@ -135,4 +141,37 @@ class Debt:
                         Transfer(PRESSED_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
                                  amount=rate * wages)]
             changes += lend_to_government(REPAID, -press, L, GOVERNMENT, self.name)
+        changes += self.order_cut(A.get("government", {}))
         return changes
+
+    def order_cut(self, G):
+        """Owners have the rates in law cut by what the taxes at those rates brought in last year beyond
+        what the government paid for with them, less what the cut ordered last year will already take
+        off. The tax pressed by the holders of the debt is not counted: it is collected to repay them.
+        The rate on earnings falls `owners_pace` times as fast as the rate on wages, in proportion, and
+        the cut is sized so that last year's taxes would have come to exactly what was paid. A deficit
+        orders no cut and no rise. The modules that tax at a rate in law apply the cut the next year."""
+        if not self.cut_surplus:
+            return []
+        te, tw = float(G.get("taxed_earnings", 0.0)), float(G.get("taxed_wages", 0.0))
+        gaps = G.get("gaps", {})
+        surplus = -sum(gaps[k] for k in sorted(gaps) if k != REPAID)
+        ke, kw = self.ordered
+        want = surplus - te * (1.0 - ke) - tw * (1.0 - kw)
+        self.ordered = (1.0, 1.0)
+        if want > 0 and te + tw > 0:
+            a = self.owners_pace
+            if want >= te + tw:              # the taxes brought in more than all they pay for: no rate is left
+                self.ordered = (0.0, 0.0)
+            else:
+                taken = lambda k: te * (1.0 - np.exp(-a * k)) + tw * (1.0 - np.exp(-k))
+                lo, hi = 0.0, 1.0
+                while taken(hi) < want:
+                    hi *= 2.0
+                for _ in range(100):         # what is taken rises with k: find k by halving the interval
+                    mid = 0.5 * (lo + hi)
+                    lo, hi = (mid, hi) if taken(mid) < want else (lo, mid)
+                k = 0.5 * (lo + hi)
+                self.ordered = (float(np.exp(-a * k)), float(np.exp(-k)))
+        return [Publish("tax_kept_earnings", self.ordered[0], self.name),
+                Publish("tax_kept_wages", self.ordered[1], self.name)]
