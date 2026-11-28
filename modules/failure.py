@@ -41,9 +41,11 @@ THE RULE IN PLAIN WORDS
      are left in the industry take on the closed firms' buyers and hire for them, and the
      sabotage module counts the closure as capacity that left and the hiring as capacity that
      came back.
-  8. Its lenders. A firm that closes takes its debt with it, and lenders lose it. The module
-     publishes the interest that the firms left owe, as a part of their earnings, and the
-     debt that they owe, and the debt module reports both.
+  8. Its lenders. A firm that closes takes its debt with it, and lenders lose it. A
+     restructuring loses them the part written off. Neither is a payment: a claim on a firm's
+     future earnings ends, and nobody receives anything. The module publishes what lenders
+     lost, as a part of all debt owed, the interest that the firms left owe, as a part of their
+     earnings, and the debt that they owe, and the debt module reports the last two.
 
 The module moves no money. Interest is a division of a firm's earnings between its lenders and
 its owners, and the module only keeps count of it.
@@ -103,8 +105,8 @@ the report itself could not be downloaded.
 
 WHAT IS MISSING
 
-Nobody receives a failed firm's plant, and its lenders lose what it owed without any payment
-being recorded. Borrowing buys nothing: the firm's debt follows its sales, and its sales do not
+Nobody receives a failed firm's plant: with the capacity module on, the plant is lost with the
+firm. Borrowing buys nothing: the firm's debt follows its sales, and its sales do not
 follow its debt.
 """
 import numpy as np
@@ -119,13 +121,14 @@ class Failure:
     name = "failure"
     reads = ("interest_share",)
     supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_owed",
-                "debt_owed", "short_of_cover", "interest_cover")
+                "debt_owed", "debt_lost", "short_of_cover", "interest_cover")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "failures": ("Firms that failed", "number", "Firms outside the top 100 that closed in the year."),
         "failed_employees": ("Employees of failed firms", "share", "Employees of the firms that closed in the year, as a part of all employees."),
         "restructurings": ("Top 100 firms restructured", "number", "Top 100 firms that failed in the year and were kept going by their lenders."),
         "interest_owed": ("Interest owed", "share", "Interest that the firms left owe, as a part of their earnings."),
         "debt_owed": ("Debt owed by firms", "number", "The debt that the firms left owe, in money."),
+        "debt_lost": ("Debt lost by lenders", "share", "Debt of firms that closed, and debt written off in restructurings, as a part of all debt owed before them."),
         "short_of_cover": ("Firms carried by lenders", "share", "Employees of firms outside the top 100 whose earnings fell short of their interest, as a part of all their employees."),
         "interest_cover": ("Interest cover", "times", "Earnings divided by interest owed, over the firms outside the top 100."),
     }
@@ -155,7 +158,7 @@ class Failure:
 
     def start(self, L):
         return {"failures": 0.0, "failed_employees": 0.0, "failed_by_industry": np.zeros(L.sector_of.size),
-                "closed_employees": np.zeros(L.sector_of.size), "restructurings": 0.0, "short_of_cover": 0.0,
+                "closed_employees": np.zeros(L.sector_of.size), "restructurings": 0.0, "debt_lost": 0.0, "short_of_cover": 0.0,
                 "interest_cover": 0.0}
 
     def groups(self, L):
@@ -217,6 +220,8 @@ class Failure:
         written = np.where(restructured, average * np.maximum(K, 0.0) / (1.0 + self.restructuring_risk), debt)
         with np.errstate(divide="ignore", invalid="ignore"):
             owed = np.where(restructured, np.where(debt > 0, owed * written / debt, 0.0), owed)
+        lost = float(debt[closes].sum() + (debt - written)[restructured].sum())   # lenders' claims that end this year
+        before = float(debt.sum())
         debt = written
         employed = n.sum()
         small = ~dominant
@@ -238,6 +243,7 @@ class Failure:
                    Publish("interest_owed", float(interest[left].sum() / earnings[left].sum()) if earnings[left].sum() > 0 else 0.0,
                            self.name),
                    Publish("debt_owed", float(debt[left].sum()), self.name),
+                   Publish("debt_lost", lost / before if before > 0 else 0.0, self.name),
                    Publish("short_of_cover", float((n[small] * short[small]).sum() / small_n), self.name),
                    Publish("interest_cover", float(earnings[small].sum() / interest[small].sum())
                            if interest[small].sum() > 0 else 0.0, self.name)]

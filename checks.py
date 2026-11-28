@@ -932,8 +932,10 @@ def check_failure():
         assert r["published"]["failures"] == 0 and len(m.L) == 400
         assert np.isclose(r["published"]["short_of_cover"], 1500.0 / (before.sum() - 50000.0))   # the 150 cut are all short
     assert (m.L.extra[UNDER][100:150] == 2).all() and (m.L.extra[UNDER][:100] == 0).all()
+    owed_before = m.modules[1].year(m.L)[1]          # what each firm owes this year before anyone closes
     r = m.step()
     assert r["published"]["failures"] == 50 and len(m.L) == 350
+    assert np.isclose(r["published"]["debt_lost"], owed_before[100:150].sum() / owed_before.sum(), rtol=1e-12)
     assert np.array_equal(m.L.n[:100], before[:100]) and np.array_equal(m.L.n[100:], before[150:])
     assert (m.L.extra[DEBT][:100] > d1[:100]).all() and (m.L.extra[DEBT][:100] < m.L.cap()[:100]).all()   # the shortfall was lent
     assert np.allclose(m.L.extra[DEBT][100:], d1[150:], rtol=1e-12) and np.allclose(m.L.extra[INTEREST][100:], i1[150:], rtol=1e-12)
@@ -978,10 +980,13 @@ def check_failure():
     L.components[BASE][-1] = 0.003                   # one of the largest firms earns a thirtieth of what the others earn
     L.refresh()
     m = Model(L, [Lenders(), Failure(top=40)], seed=0)
-    for _ in range(3):
-        r = m.step()
+    for _ in range(2):
+        m.step()
+    owed_before = m.modules[1].year(m.L)[1]
+    r = m.step()
     assert len(m.L) == 400 and m.L.n[-1] == 5000.0 and np.isclose(m.L.d[-1], 1.5) and m.L.extra[UNDER][-1] == 0
     assert r["published"]["restructurings"] == 1 and r["published"]["failures"] == 0
+    assert np.isclose(r["published"]["debt_lost"], (owed_before[-1] - m.L.extra[DEBT][-1]) / owed_before.sum(), rtol=1e-9)
     K = m.L.cap()
     assert np.isclose(m.L.extra[DEBT][-1] / K[-1], m.L.extra[DEBT][:-1].sum() / K[:-1].sum(), rtol=1e-9)
 

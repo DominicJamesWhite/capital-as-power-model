@@ -804,6 +804,7 @@ The literature gives no rule for when lenders stop lending. That rule is our own
 5. **A top-100 firm that lenders refuse is restructured.** It keeps all its employees, and its risk rises by half. Its lenders write its debt down to the debt that the average firm has for what it is worth.
 6. **It says how much of each industry closed.** The next year the green-field module has the firms left in the industry take on the closed firms' buyers and hire for them. The sabotage module counts the closure as capacity that left and that hiring as capacity that came back, so a closure whose buyers are all served again moves no markup.
 7. **It tells the debt module what firms owe:** the interest that the firms left owe this year, as a part of their earnings, and their debt.
+8. **It says what lenders lost:** the debt of the firms that closed and the part written off in restructurings, as a part of all the debt owed that year. This is not a payment. A claim on a firm's future earnings ends, and nobody pays or receives anything.
 
 **An example.** A small firm sells 100,000 a year and earns 8,000 from its markup. In the first year it owes 5,500 in interest at 7.8 per cent, so its debt is 70,500. It is worth 160,000 (8,000 ÷ 0.05). Its markup halves: it earns 4,000 and sells 96,000. It still owes 5,500 in interest. Against its lower sales lenders lend only 67,700, so it has to repay 2,800. It is 4,300 short, and lenders lend it that at 7.8 per cent. It now owes 72,000 and is worth 80,000, so lenders go on. If its markup halves again, it is worth 40,000 and owes more than that. If it is still in that state in the third year, its lenders refuse it and it closes.
 
@@ -833,12 +834,12 @@ It reads `interest_share` from the debt module, in the first year only.
 
 It keeps three numbers for each firm in the list: its debt, the interest it owes in a year, and the years in a row it has owed more than it is worth. In a merger the buyer takes on its targets' debt and interest.
 
-It publishes nine numbers.
+It publishes ten numbers.
 
 - `failed_by_industry`: for each industry, the part of its employees whose firms closed. The sabotage and green-field modules read it.
 - `closed_employees`: for each industry, the employees of the firms that closed. The green-field module reads it.
 - `interest_owed` and `debt_owed`: the interest that the firms left owe this year, as a part of their earnings, and the debt they owe. The debt module reads both.
-- `failures`, `failed_employees`, `restructurings`, `short_of_cover` and `interest_cover`: the number of firms closed, the part of all employees in them, the number of top-100 firms restructured, the part of employees outside the top 100 in firms that earned less than their interest, and the earnings of the firms outside the top 100 divided by their interest. No module reads these.
+- `failures`, `failed_employees`, `restructurings`, `debt_lost`, `short_of_cover` and `interest_cover`: the number of firms closed, the part of all employees in them, the number of top-100 firms restructured, the part of all debt that lenders lost, the part of employees outside the top 100 in firms that earned less than their interest, and the earnings of the firms outside the top 100 divided by their interest. No module reads these.
 
 It owns no part of a firm's markup and moves no money.
 
@@ -849,7 +850,7 @@ It owns no part of a firm's markup and moves no money.
 - **Firms that earn almost nothing are carried as well.** A firm whose markup the sales module has cut to the core's allowance for rounding is carried for three years like any other. In a run of every optional module from 3,000 firms, other modules then raised such a firm's markup by a factor of about a hundred thousand million in a year, and the run broke down in its 55th year.
 
 - **Borrowing buys nothing.** A firm's debt follows its sales. Its sales do not follow its debt.
-- **Lenders lose without a payment being recorded.** The debt of a closed firm leaves the total, and no loss is charged to any party. Nobody receives a closed firm's plant.
+- **What lenders lose is counted but borne by nobody.** The module publishes it, but the model has no account of lenders' wealth, so the loss changes nothing that any lender does. Nobody receives a closed firm's plant: with the capacity module on, the plant goes with the firm.
 - **The buyers of a closed firm go to every firm left in its industry, in proportion to size.** No study was found of where they go.
 - **The figures are those of one country in one year.** Baines and Hager find that United States firms of all sizes paid alike in the 1950s and drew apart after 1980.
 - **The sizes that divide the groups are those of the first year.** As firms grow, more of them count as large.
@@ -972,7 +973,7 @@ A markup is a small number, so a change of a few points is a large proportion of
 
 **What it does not change.** It changes no firm's markup, earnings, price or capitalization. It credits no gain to any module. The division of each year's gain among the modules is worked out first and is not affected. So the gain credited to a module over a run still records everything that module did, and its component records only what is left.
 
-**What the record looks like.** In a run of the main modules over 119 years from 300,000 firms, the base of every firm stayed between 0.077 and 0.62, the stagflation lead between 1 and 3.0, and the cost-cutting edge between 0.73 and 1.59. The lead of the middle firm rose to between 2 and 2.7 in each bout of stagflation and fell back to 1 within five to ten years. This is what the book says of the gains from inflation: "they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
+**What the record looks like.** In a run of the main modules over 119 years from 300,000 firms, the base of every firm stayed between 0.032 and 0.59, the stagflation lead between 1 and 2.3, and the cost-cutting edge between 0.23 and 4.7. The lead of the middle firm rose to at most 1.5 in a bout of stagflation. This is what the book says of the gains from inflation: "they last only as long as the underlying bout of inflation continues" (chapter 16, "Capitalization risk").
 
 **What is our own here.** The book supports the direction, since it calls the gains of inflation "short-lived". It gives no rule. Three choices are ours. A fall of the markup is taken out of standing gains before it lowers the base, and a rise restores standing losses before it raises the base. When several gains or several losses stand in one firm, each gives up the same proportion. Every stacking component takes part, including those of optional modules. None of the three affects any figure of the model except the values of the components themselves.
 
