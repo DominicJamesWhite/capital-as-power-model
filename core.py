@@ -854,6 +854,7 @@ class Model:
                                       f"SetComponent or ScaleComponent.")
                 changes.append(c)
         changes.sort(key=lambda c: c.source)     # a stable sort: listing order cannot matter, a module's own order is kept
+        self._check_mergers([c for c in changes if isinstance(c, Merge)])
         attribution = {}
 
         def credit(source, amount):
@@ -861,7 +862,6 @@ class Model:
 
         ln0 = self._lndk()
         K0 = L.cap()
-        have0 = np.maximum(L.n * L.e, 0.0)      # what owners have at the start of the year, before the year's changes
         count = len(L)
         group = top_positions(K0, np.arange(count), self.top)
         touched = {}                    # for the guard: which firms each source changed in this step
@@ -899,12 +899,11 @@ class Model:
         for c in changes:
             if isinstance(c, Dissolve):
                 closing[np.asarray(c.positions, dtype=int)] = True
-        government = self._government_loans([c for c in changes if isinstance(c, GovernmentGap)],
-                                            np.where(closing, 0.0, have0), np.where(closing, 0.0, K0))
-        transfers += government.pop("loans")
+        gaps = [c for c in changes if isinstance(c, GovernmentGap)]
+        government = None
         recording = sorted(name for name, c in L.info.items() if c.settled)    # the components that record transfers
         self.settlement = {"transfers": [], "parties": {}}
-        if comp_changes or wage_sets or recording or transfers:
+        if comp_changes or wage_sets or recording or transfers or gaps:
             w0, e0, m0 = L.shared["wage"], L.e.copy(), L.markup().copy()
             old = {name: L.components[name].copy() for name in {c.name for c in comp_changes} | set(recording)}
             for c in comp_changes:
@@ -918,7 +917,32 @@ class Model:
                 L.shared["wage"] = c.value
             w1 = L.shared["wage"]
             L.refresh()
-            if recording or transfers:      # after the year's scalings, markups and wage: what each payer has is now known
+            # After the year's scalings, markups and wage, what each payer has is known. Owners lend the government
+            # out of what their firm has in the year, less what the year's other transfers ask of it: the same
+            # money the settlement lets the firm pay with.
+            # The tax that does not reach the government is borrowed as well: what firms that close in the year
+            # were asked, what firms whose earnings fell below what they were asked cannot pay, and what wage
+            # earners asked for more than the wage bill cannot pay. The settlement works these out by the same rule.
+            # What a firm has is its earnings without last year's transfers, which the settlement replaces.
+            settled = sum((L.components[name] for name in recording), np.zeros(count))
+            means = np.where(closing, 0.0, np.maximum(L.n * (L.e - settled), 0.0) * (1.0 - ROUNDING))
+            by_firms = [(t, np.broadcast_to(np.asarray(t.payer, dtype=float), count))
+                        for t in transfers if not isinstance(t.payer, str)]
+            asked_all = sum((np.where(closing, 0.0, ask) for _, ask in by_firms), np.zeros(count))
+            able = np.where(asked_all > means, means / np.maximum(asked_all, 1e-300), 1.0)
+            uncollected = sum(float(ask.sum() - (np.where(closing, 0.0, ask) * able).sum())
+                              for t, ask in by_firms if t.receiver == GOVERNMENT and not t.loan)
+            of_wages = [t for t in transfers if isinstance(t.payer, str) and t.payer == WAGE_EARNERS]
+            asked_wages = sum(float(t.amount) for t in of_wages)
+            wage_bill = L.shared["wage"] * L.n[~closing].sum()
+            if asked_wages > wage_bill:
+                uncollected += sum(float(t.amount) for t in of_wages if t.receiver == GOVERNMENT) * (1.0 - wage_bill / asked_wages)
+            left = np.maximum(means - asked_all, 0.0)
+            government = self._government_loans(gaps, left, np.where(closing, 0.0, K0), uncollected)
+            # for the record: what all firms had before any transfer, and what owners had left to lend after taxes
+            government["firms_had"], government["could_lend"] = float(means.sum()), float(left.sum())
+            transfers += government.pop("loans")
+            if recording or transfers:
                 self.settlement = self._settle(transfers, group, closing)
             for name in old:
                 touch(L.info[name].owner, L.components[name] != old[name])
@@ -1034,6 +1058,10 @@ class Model:
         published = {c.key: c.value for c in changes if isinstance(c, Publish)}
         L.accounts.update(published)
         self._guard(touched, "after the year's mergers, dissolutions and foundings")
+        if government is None:          # no module reported a gap, so nothing was lent or repaid
+            government = self._government_loans([], np.zeros(count), K0)
+            government.pop("loans")
+            government["firms_had"] = government["could_lend"] = 0.0
         self.government = {k: government[k] for k in ("gaps", "held", "lent", "taxed_earnings", "taxed_wages",
                                                       "rate_earnings", "rate_wages")}
         self._core_accounts()
@@ -1050,35 +1078,39 @@ class Model:
 
     # ---- transfers
 
-    def _government_loans(self, gaps, have, K):
+    def _government_loans(self, gaps, have, K, uncollected=0.0):
         """The government's one account. Each module that taxes at a rate set in law reports its gap:
-        what it makes the government pay less the tax it collects for it. The core adds up the gaps
-        and sets against them the money the government holds from earlier years.
+        what it makes the government pay less the tax it collects for it. The core adds up the gaps,
+        adds the tax that firms closing in the year were asked and do not pay (`uncollected`), and
+        sets against them the money the government holds from earlier years.
 
           - If the sum is more than the government holds, owners lend it the rest, each firm in
-            proportion to its earnings at the start of the year, which is what its owners have.
+            proportion to `have`: its earnings in the year, after the year's changes to markups and
+            the wage and before any transfer, less what the year's other transfers ask of it. This is what its owners have
+            to lend, and it is the money the settlement lets the firm pay with, so no firm is asked
+            to lend more than it has unless all firms together have less than the government needs.
           - If it is less, the government repays its debt with what is left over, each firm in
             proportion to its capitalization, as holdings of the debt are (Hager 2015). It repays no
             more than the debt last published by the debt module. What is left after that it holds.
 
         The loans are transfers marked as loans: no income to anybody. Returns the record: each
-        module's gap, what the government held, and the amount lent (below 0: repaid), with the
-        transfers under "loans"."""
+        module's gap, the tax not collected from closing firms, what the government held, and the
+        amount lent (below 0: repaid), with the transfers under "loans"."""
         L = self.L
         by_label = {}
         gaps = sorted(gaps, key=lambda g: (g.source, g.label))
         for g in gaps:
             by_label[g.label] = by_label.get(g.label, 0.0) + g.gap
         held = float(L.holds[GOVERNMENT])
-        record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": [],
+        record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": [], "uncollected": float(uncollected),
                   "taxed_earnings": sum(g.taxed_earnings for g in gaps),   # asked by the taxes at rates in law
                   "taxed_wages": sum(g.taxed_wages for g in gaps),
                   # the rates in law added up, each as a part of the income it is charged on
                   "rate_earnings": sum(g.taxed_earnings / g.base_earnings for g in gaps if g.base_earnings > 0),
                   "rate_wages": sum(g.taxed_wages / g.base_wages for g in gaps if g.base_wages > 0)}
-        if not any(g.gap != 0.0 for g in gaps):
+        if not gaps or (not any(g.gap != 0.0 for g in gaps) and uncollected <= 0.0):
             return record
-        need = sum(by_label[k] for k in sorted(by_label)) - held
+        need = sum(by_label[k] for k in sorted(by_label)) + uncollected - held
         if need > 0 and have.sum() > 0:
             record["lent"] = need
             record["loans"] = [Transfer(LENT, payer=need * have / have.sum(), receiver=GOVERNMENT,
@@ -1290,6 +1322,22 @@ class Model:
             shares[owner] = shares.get(owner, 0.0) + total
         return shares
 
+    def _check_mergers(self, mergers):
+        """Refuse a year's mergers, before any change is made, if one of them names a firm that cannot
+        take part: a target named twice, a firm named as both buyer and target, or a firm that a
+        merger earlier in the year's order has already bought. The message names the module."""
+        bought = np.zeros(len(self.L), dtype=bool)
+        for c in sorted(mergers, key=lambda c: c.source):      # the order in which the core applies them
+            b, t = np.asarray(c.buyers, dtype=int), np.asarray(c.targets, dtype=int)
+            fault = ("the same firm as the target of two mergers" if np.unique(t).size < t.size else
+                     "a firm as both buyer and target" if np.isin(t, b).any() else
+                     "a firm that another merger of this step has already bought" if bought[t].any() or bought[b].any()
+                     else None)
+            if fault:
+                raise LedgerError(f"The run was stopped in step {len(self.history) + 1}, before the year's changes. "
+                                  f"Module '{c.source}' named {fault}.")
+            bought[t] = True
+
     def _merge(self, c, remove):
         """Buyers absorb targets. Employees, earnings and expected earnings add, so totals are kept.
         Each income component adds, and so does each cost component, so the value of what the two
@@ -1300,9 +1348,6 @@ class Model:
         b, t = np.asarray(c.buyers), np.asarray(c.targets)
         if t.size == 0:
             return
-        assert np.unique(t).size == t.size, "a target was acquired twice"
-        assert not np.isin(t, b).any(), "a firm was both buyer and target"
-        assert not remove[t].any() and not remove[b].any()
         nrr, wage = L.shared["nrr"], L.shared["wage"]
         K, E = L.cap(), L.earnings()
         EH = E * L.h

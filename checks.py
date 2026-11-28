@@ -297,7 +297,24 @@ def check_guard():
         raise AssertionError("the guard let a negative employee count pass")
     assert "3 of 3000 firms have employees that are negative" in message
     assert "bystander, wrecker" in message
-    print(f"9. Guard: a change that makes three employee counts negative stops the run. The message reads: \"{message}\"")
+    # A module that names one firm as the target of two mergers, or a firm another module's merger bought, is
+    # refused before any change of the year is made.
+    cases = [([Fixed("twice", lambda L: [Merge([0, 1], [5, 5], "twice")])], "Module 'twice' named the same firm as the target of two mergers"),
+             ([Fixed("a", lambda L: [Merge([0], [5], "a")]), Fixed("b", lambda L: [Merge([5], [6], "b")])],
+              "Module 'b' named a firm that another merger of this step has already bought"),
+             ([Fixed("self", lambda L: [Merge([5], [5], "self")])], "Module 'self' named a firm as both buyer and target")]
+    for modules, expected in cases:
+        m = Model(make_ledger(), modules)
+        before = m.L.n.copy()
+        try:
+            m.step()
+            raise AssertionError("a merger that names a firm twice was accepted")
+        except LedgerError as stop:
+            assert expected in str(stop), str(stop)
+            merger_message = str(stop)
+        assert np.array_equal(m.L.n, before) and not m.history
+    print(f"9. Guard: a change that makes three employee counts negative stops the run. The message reads: \"{message}\" "
+          f"A merger that names a firm twice is refused before any change: \"{merger_message}\"")
 
 
 def check_founding():
@@ -349,8 +366,8 @@ def check_levels():
     """The basic set, with every other module that does not do the job of one in it, for 60 years.
 
     The check is a test and not a limit: nothing in the model holds a component inside the range
-    tested here. The run is made twice, with the core's netting of the record on and off. If the
-    core's guard stops the run, the years before the stop are tested. If fewer than 1 in 20 people
+    tested here. The run is made twice, with the core's netting of the record on and off. A stop by
+    the core's guard, or a markup that is not a number, fails the check. If fewer than 1 in 20 people
     still have work, the years before that one are tested: after it the figures are divisions of
     rounding errors by one another."""
     import registry
@@ -365,18 +382,14 @@ def check_levels():
         L = m.L
         low, high, furthest, base_low, base_high, beside = np.inf, 0.0, 0.0, np.inf, 0.0, 0.0
         for _ in range(60):
-            try:
-                m.step()
-            except LedgerError:          # the guard stopped the run: the years so far are tested
-                break
+            m.step()                     # a stop by the guard fails the check
             last = m.history[-1]
-            if not np.isfinite(last["markup"]) or not all(np.isfinite(v) for v in last["attribution"].values())                     or not np.isfinite(L.stacking_markup()).all():
-                m.history.pop()                  # a markup has run beyond what numbers can hold: the years before are tested
-                break
-            if m.history[-1]["unemployment"] > 0.95:     # fewer than 1 in 20 still have work: the years before are tested
+            if last["unemployment"] > 0.95:     # fewer than 1 in 20 still have work: the years before are tested
                 m.history.pop()
                 collapsed = True
                 break
+            assert np.isfinite(last["markup"]) and all(np.isfinite(v) for v in last["attribution"].values()) \
+                and np.isfinite(L.stacking_markup()).all(), "a markup or a part of the gain is not a number"
             stacking = L.stacking_markup()
             low, high = min(low, stacking.min()), max(high, stacking.max())
             others = [n for n, c in L.info.items() if c.kind == "markup" and c.group is None and n != BASE]
@@ -409,9 +422,9 @@ def check_levels():
     assert on["furthest"] <= width
     # 4. The test can fail: the gross record, without the netting, does not pass part 2, and its components
     #    stand further from 1.
-    assert off["beside"] > 1.0 and off["furthest"] > 5 * on["furthest"]
+    assert off["beside"] > 1.0 and off["furthest"] > 10 * on["furthest"]
     print(f"11. Levels: with the basic set and {len(names)} other modules on for {ran} steps"
-          f"{'' if ran == 60 else ' (after which fewer than 1 in 20 people had work)' if collapsed else ' (the guard then stopped the run, in which almost every firm had closed)'}, the stacking part of "
+          f"{' (after which fewer than 1 in 20 people had work)' if collapsed else ''}, the stacking part of "
           f"a markup lay between {on['low']:.4f} and {on['high']:.2f}. The base markup of every firm stayed between "
           f"{on['base_low']:.4f} and {on['base_high']:.2f}, and no other stacking component stood further from 1 than a "
           f"factor of {on['furthest']:.0f}. No firm ended a year with a gain standing beside a loss. The same run "
@@ -799,10 +812,11 @@ def check_sales_account():
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
               "externalisation", "proletarianization", "wants", "barriers"]]
-    years_unsold = years = stopped = years_borrowed = years_repaid = 0
+    years_unsold = years = collapsed = years_borrowed = years_repaid = 0
     largest = largest_gap = 0.0
     lowest_saved = np.inf
-    largest_short = 0.0
+    largest_short = firms_short = 0.0
+    years_too_little = 0
     for names in mixes:
         histories = []
         for order in names, names[::-1]:
@@ -811,12 +825,25 @@ def check_sales_account():
             for step in range(60):
                 # what the firms' components that record transfers hold, which the account reads this year
                 held_by_firms = sum(float((m.L.n * m.L.components[k]).sum()) for k in m.L.info if m.L.info[k].settled)
-                try:
-                    r = m.step()
-                except LedgerError:      # the guard stopped the run: the years so far are tested
-                    stopped += 1
+                r = m.step()             # a stop by the guard fails the check
+                if r["unemployment"] > 0.95:     # fewer than 1 in 20 still have work: the years before are tested
+                    m.history.pop()
+                    collapsed += 1
                     break
                 a, pub_now = r["published"]["sales_account"], r["published"]
+                # Every transfer of the year is paid in full, except a tax a firm cannot pay from its earnings of the
+                # year: owners lend the government out of what their firms have after the year's changes and taxes,
+                # and the government borrows the tax it does not collect. Only when owners together have less to
+                # lend than the government needs is anything else paid short, and then every firm pays all it has.
+                g, tol_t = r["government"], 1e-9 * a["offered"]
+                if g["lent"] > g["could_lend"] + tol_t:
+                    years_too_little += 1
+                    assert abs(sum(t["paid"] for t in r["transfers"] if t["payer"] == "firms") - g["firms_had"]) <= tol_t
+                else:
+                    for t in r["transfers"]:
+                        assert t["payer"] == "firms" and not t["loan"] or abs(t["paid"] - t["asked"]) <= tol_t, t["label"]
+                        if t["payer"] == "firms" and t["asked"] > 0:
+                            firms_short = max(firms_short, 1.0 - t["paid"] / t["asked"])
                 tol = 1e-9 * a["offered"]
                 bought = (a["bought_by_wage_earners"] + a["bought_by_government"] + a["bought_by_owners"]
                           + a["bought_by_firms"])
@@ -880,7 +907,11 @@ def check_sales_account():
           f"{lost:.1%} each, and the losses still add up to 33.75. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
-          f"record of transfers shows it had. What firms received in transfers was the same in the record and in the "
+          f"record of transfers shows it had. The government, wage earners and lenders paid every transfer in full; "
+          f"firms paid every tax in full except where their earnings of the year fell short (at most {firms_short:.0e} "
+          f"of what was asked), and the government borrowed what it did not collect. The exception: in "
+          f"{years_too_little} years owners together had less to lend than the government needed, and every firm "
+          f"then paid all it had. What firms received in transfers was the same in the record and in the "
           f"firms' own books (largest difference {largest_gap:.1e} of priced earnings). Wage earners and the government "
           f"bought with what they had and carried the rest; owners bought with what they had after lending and saved "
           f"the rest, which was never below zero by more than {max(-lowest_saved, 0.0):.0e} of what was offered. Unless wage earners and the government "
@@ -891,7 +922,8 @@ def check_sales_account():
           f"The loans lower no earnings. In the long runs the government borrowed in {years_borrowed} of those years and "
           f"repaid in {years_repaid}. Goods were unsold in {years_unsold} of those years, at most {largest:.1%} of "
           f"what was offered. Opposite listing orders gave identical figures."
-          + (f" The guard stopped {stopped} of the 4 runs before the 60th year." if stopped else ""))
+          + (f" In {collapsed} of the 4 runs fewer than 1 in 20 people had work before the 60th year, and the years "
+             f"before that one were tested." if collapsed else ""))
 
 
 def check_failure():
@@ -1082,6 +1114,7 @@ def check_payers():
     m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(names), seed=0)
     arms = pay = burdens = advertising = short = 0.0
     kept = held = 0.0
+    too_little = 0
     for step in range(45):
         outlay = float((m.L.n * m.L.shared["wage"] * m.L.components[OUTLAY]).sum())
         owed = max(float(m.L.accounts.get("government_debt", 0.0)), 0.0)    # what the government owes at the start of the year
@@ -1094,11 +1127,19 @@ def check_payers():
         tax = rows["military orders paid by the government"]["paid"] if "military orders paid by the government" in rows else 0.0
         assert abs(parties[ARMED_FORCES]["received"] - tax) <= tol and parties[ARMED_FORCES]["holds"] is None
         collected = rows["pay of public employees"]["paid"]
-        # Firms whose earnings fell during the year may lend or pay a little less than they were asked, and the
-        # government then pays a little less in the same proportion.
-        for k in ("pay of public employees", "military orders paid by the government", "pay to people out of work"):
-            if k in rows:
-                short = max(short, 1.0 - rows[k]["paid"] / rows[k]["asked"])
+        # Every transfer of the year is paid in full, except a tax a firm cannot pay from its earnings of the year.
+        # Owners lend out of what their firms have after the year's changes and taxes, and the government borrows
+        # the tax it does not collect, so it has what it needs and pays all it was asked. Only when owners together
+        # have less to lend than it needs does it pay less, and then every firm pays all it has.
+        g = r["government"]
+        if g["lent"] > g["could_lend"] + tol:
+            too_little += 1
+            assert abs(sum(t["paid"] for t in r["transfers"] if t["payer"] == "firms") - g["firms_had"]) <= tol
+        else:
+            for t in r["transfers"]:
+                assert t["payer"] == "firms" and not t["loan"] or abs(t["paid"] - t["asked"]) <= tol, t["label"]
+                if t["asked"] > 0:
+                    short = max(short, 1.0 - t["paid"] / t["asked"])
         # What it holds rises only in a year when it collected more beyond its spending than all it owed, and
         # repaid all of that (the rule of lend_to_government in core.py). What it holds is not spent later.
         repaid = sum(t["paid"] for t in r["transfers"] if t["payer"] == GOVERNMENT and t["receiver"] == "firms")
@@ -1131,15 +1172,13 @@ def check_payers():
         income = r["employment"] * m.L.shared["wage"] / (1 - r["capital_share"])
         arms, pay = max(arms, tax / income), max(pay, collected / income)
         burdens, advertising = max(burdens, b["paid"] / income), max(advertising, a["bought_by_firms"] / a["offered"])
-    # How far short the government's payments fall depends on the path of the run (what owners had to lend), not on the
-    # bookkeeping, so it is reported and not bounded.
-    assert arms > 0 and pay > 0 and burdens > 0 and advertising > 0 and 0.0 <= short < 1.0
+    assert arms > 0 and pay > 0 and burdens > 0 and advertising > 0
     print(f"16. Payers: a party that spends all it receives holds nothing. In a run of 45 years from 5,000 firms with "
           f"the sales, force, privatisation, externalisation and wants modules, the armed forces received exactly the "
           f"military orders that the government paid (at most {arms:.1%} of all income) and the sales account counted "
           f"them as bought by the government; the government paid out all it collected and borrowed, and added to the money "
           f"it holds (at most {held:.1%} of the wage bill) only in years when it had repaid all it owed, "
-          f"public employees (at most {pay:.1%}) among them, short of what was asked by at most {short:.2%} in a year; wage earners paid in full for the burdens on employees and communities (at most "
+          f"public employees (at most {pay:.1%}) among them; it paid every transfer in full, and so did lenders, while firms paid every tax in full except where their earnings fell short (the largest shortfall of any transfer was {short:.0e} of what was asked){f', except in {too_little} years in which owners together had less to lend than it needed and every firm paid all it had' if too_little else ''}; wage earners paid in full for the burdens on employees and communities (at most "
           f"{burdens:.1%}); and the outlay on advertising (at most {advertising:.1%} of what firms offered) was on "
           f"both sides of the sales account.")
 
