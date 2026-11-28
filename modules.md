@@ -1205,6 +1205,7 @@ The message gives the year, how many firms are affected, and which modules chang
 | 18. Second country | With the border open and 26 firms of the second country tied for fifth place in capitalization, the second country module's purchases never name a firm bought in the same year, and never buy a firm that bought. |
 | 19. Public debt tax | Firms whose earnings, after what they paid other modules the year before, are below nothing are asked for no tax for interest on the public debt. With 60 firms, all of them in the top 100, every readout of the module stays a number. |
 | 20. No earnings | When wage earners pay 500 of a wage bill of 1,000 to owners who do not spend it, 500 is unsold against priced earnings of 150. Each firm keeps the allowance for rounding of its markup, the run goes on, and the next year owners, paid below nothing, buy no goods. A top-100 firm whose rate is −0.5 and that holds back 0.9 for want of sales keeps 0.05 of its employees. |
+| 24. Idle plant | A firm with plant for 100 jobs that dismisses 50 people and takes 30 back on builds nothing, and its 50 idle jobs' plant wears to 45 in a year. A buyer takes over its target's plant. When another firm hires 20 people beyond its plant, the sales module counts equipment of 60 wages. |
 
 ---
 
@@ -1245,7 +1246,7 @@ At the start of each year the module works out the account of the year just ende
 2. **It works out what wage earners bought.** Wage earners spend all the money they have. That is their wages, plus payments they received, less the taxes and interest they paid, plus what households borrowed, less what they paid back. The payments come from the core's record of transfers. The household debt module publishes the money lent and repaid.
 3. **It works out what the government bought.** The government buys through a body that a module names as spending all it receives, such as the armed forces, which spends all of it. Money that the government holds buys nothing. Each module that taxes (public debt, privatisation, organised force, and this module for people out of work) sets its rate in law once, in its first year with anything to pay, to cover that year, and keeps it. One rate is charged on the wage bill and on every firm's earnings. When what the government pays out grows faster than income, as in a slump, the tax falls short. The core adds up what every module leaves the government short of or with to spare. The government first uses the money it holds, and owners lend it the rest, each firm in proportion to its earnings. What they lend, they do not spend. When the taxes bring in more than is paid out, the government repays owners, who do not spend what is repaid either. It repays no more than the debt it owes; anything beyond that it holds, and uses before it borrows again. These loans are in the core's record of transfers, and the debt module adds them to the government's debt.
 3a. **It pays people out of work.** Each year the government pays each person without paid work 13 per cent of the wage (`benefit`). The tax for it is set in law in the first year, in the same way. What people out of work receive is counted with what wage earners have.
-4. **It works out what owners bought.** Firms decide what they pay out to owners and what they build. The payout does not follow earnings at once: each year it moves half of the way from last year's payout to three quarters of last year's income (`paid_out`). Owners lay out all that they are paid. The amount is kept level against the wage: if the wage has risen by 5 per cent, so has the outlay. On top of this, firms pay for the equipment of the year's new jobs, at 3 years of the wage for each job, whatever they have kept. What firms keep is worked out at the end of the year: what owners earned less what was paid out to them. The module publishes it as `kept_part`. Owners cannot buy more than is left after wage earners and the government have bought. After a year in which owners lost more than they earned, what they are paid is below nothing: they are paying money into the firms to meet the wages that sales did not pay back, and they buy no goods.
+4. **It works out what owners bought.** Firms decide what they pay out to owners and what they build. The payout does not follow earnings at once: each year it moves half of the way from last year's payout to three quarters of last year's income (`paid_out`). Owners lay out all that they are paid. The amount is kept level against the wage: if the wage has risen by 5 per cent, so has the outlay. On top of this, firms pay for the equipment of the year's new jobs, at 3 years of the wage for each job, whatever they have kept. With the capacity module on, a firm pays only for the jobs that its plant did not already hold: people taken back on into idle plant need no equipment. What firms keep is worked out at the end of the year: what owners earned less what was paid out to them. The module publishes it as `kept_part`. Owners cannot buy more than is left after wage earners and the government have bought. After a year in which owners lost more than they earned, what they are paid is below nothing: they are paying money into the firms to meet the wages that sales did not pay back, and they buy no goods.
 5. **What is left is unsold.** The unsold part is the unsold amount divided by all that was offered. The wages were paid in full, so the whole loss falls on owners. Their money income for the year is the priced earnings less the unsold amount, plus the interest and other payments that firms and holders of debt received. Next year's payout follows that income.
 6. **Top-100 firms lose a smaller part of their priced earnings than other firms.** The largest firms hold their buyers best. Measured in logarithms, the fall of a top-100 firm's sales is 0.81 times the fall of every other firm's (`top_sensitivity`). The two parts are set so that the losses of all firms add up to the unsold amount. Firms outside the top 100 all lose the same part, whatever their size.
    - A top-100 firm keeps its price. It books the whole loss once, on this year's earnings.
@@ -1301,6 +1302,7 @@ The example has no tax, so the government borrows nothing.
 It reads:
 
 - `jobs_created`, from the green-field module: the employees added last year by the firms that grew
+- "plant in place", from the capacity module when it is on: each firm's plant, in jobs. The module then counts the equipment of the jobs beyond it in place of `jobs_created`
 - `party_flows`, from the core: what wage earners, the government and every other party received and paid last year
 - `transfers`, from the core: the record of last year's transfers, which shows what owners lent the government and what it repaid
 - `capital_share` and `unemployment`, from the core
@@ -1348,6 +1350,65 @@ With this module off, the green-field and merger modules take the two rates as z
 - **Tested in 112 runs of mixes from 30,000 firms with one seed, eight of them with two, and in three runs from 300,000 firms.** In the 60 runs with this module, mean unemployment over the last 20 years was 20.8 per cent (median 6.3), and 19 runs ended with fewer than 1,000 firms. With every optional module on, it was 1.3 and 1.8 per cent from 30,000 firms with two seeds, and 2.3 per cent from 300,000. There the government borrowed in 42 to 46 years of 60, at most 7 per cent of all income, and repaid in 12 to 16. With the sales, public debt, privatisation and force modules, the government repaid in each of the first 25 years while unemployment fell from 7 to 4 per cent, and borrowed from the slump onward.
 
 What should happen: while firms hire, everything is sold and the module does nothing. In a year when hiring stops and nobody else spends more than they receive, what firms do not pay out buys nothing and some goods stay unsold. Owners receive less than they priced for, firms outside the top 100 cut prices, and top-100 firms hold back hiring and buy firms. The capitalist share falls. The government borrows in a slump, because what it pays out holds while income falls, and repays in a boom. The loss ends when prices have come down to what owners lay out, or when hiring starts again. What happens now is different: without other modules that tax, the slump does not end, because firms close faster than hiring starts again. With them, the government's debt can grow without a limit.
+
+---
+
+## Optional module: Plant that stands idle
+
+Name in the model: `capacity`
+
+Switch it on by adding `--with capacity` to the command. It matters only with the `sales` module on. Without it, it changes nothing and only reports.
+
+### What it is about
+
+A firm that dismissed people in a slump still has their machines and buildings. When it takes people back on, it needs no new equipment. Only a firm that grows beyond the plant it already has must build. This module keeps, for each firm, the number of jobs its plant can hold, so that the sales module counts as building only the jobs that plant did not already hold.
+
+For example, a firm with plant for 100 jobs dismisses 50 people. The next year it takes 30 back on: it builds nothing. A firm next to it with plant for 100 jobs hires 20 more people: it equips 20 jobs, at 3 years of the wage each, which is 60 wages of spending on what other firms sell.
+
+### What the theory says
+
+Chapter 12, "The pace of industry", "In sum" and an endnote. Chapter 14, on mergers, and Proposition 3.
+
+- **Business does not run its plant to the full.** The book says that "business can tolerate neither full-capacity utilization nor maximum growth" (chapter 12). Owners limit industry "by pricing products toward earning a target rate of return at some standard capacity utilization". An endnote adds that conventional measures "usually estimate normal utilization to be in the 70–90 per cent range". In the module a firm's plant is counted at that standard use, so "idle" means idle beyond the standard.
+- **Buying adds no plant, and building adds to the threat of too much.** In a merger "no new capacity is created", and "Mergers and acquisitions alleviate the problem whereas greenfield aggravates it" (chapter 14). In the module a buyer takes over its target's plant and builds nothing for it.
+
+The book gives no rule for how much plant a firm holds, how fast idle plant wears or what happens to the plant of a firm that closes. Those are below, with their sources.
+
+### What the module does each year
+
+1. **At the start of a run** every firm holds plant for the people it employs. Nothing is idle.
+2. **It counts what was built.** A firm that employs more people than its plant holds built the difference in the year just ended. The module publishes those jobs as a part of all employees.
+3. **Idle plant wears out.** A firm that employs fewer people than its plant holds has idle plant. Each year 8 per cent of it wears out and is not replaced (`wear`). Plant in use is kept up.
+4. **Plant moves with firms.** A buyer takes over its target's plant, idle or not. A firm that closes takes its plant with it, as the sabotage module counts a closed firm's capacity as capacity that left its industry. A new firm builds all of its plant. When the top 100 take over public services (privatisation module), the public employees arrive with their plant.
+5. **The sales module reads the plant.** It counts the equipment of the jobs that plant did not hold, at 3 years of the wage each (its `job_cost`), in place of the equipment of every job added by firms that grew.
+
+### Settings
+
+| Name in the code | Default | What it means | Where the figure comes from |
+|---|---|---|---|
+| `wear` | 0.08 | The part of idle plant that wears out in a year | Bureau of Economic Analysis, fixed assets of the United States, 1951 to 2019: the depreciation of private nonresidential fixed assets at current cost, divided by the net stock at the end of the year before. The median year is 0.081, and every year lies between 0.064 and 0.092 (0.072 before 1980 and 0.086 after). That idle plant wears at the rate of all plant is our own reading. |
+
+The cost of equipping a job stays the sales module's `job_cost`: 3 years of the wage, the plant behind each job in the record.
+
+### What it reads from other modules and what it gives them
+
+It reads `privatisation_jobs`, from the privatisation module when it is on: the public employees the top 100 take over this year.
+
+It keeps one number for each firm, "plant in place": the jobs its plant holds at standard use. The sales module reads it.
+
+| Name in the code | What it is | Who reads it |
+|---|---|---|
+| `idle_part` | The part of all plant that stands idle beyond the standard use | Nobody |
+| `places_built` | The jobs equipped in the year just ended that plant did not hold, as a part of all employees | Nobody |
+
+### What is known to be wrong or untested
+
+- **The module makes the slump of the sales module alone a little longer.** In a slump firms dismiss people and their plant stands idle: up to 12 per cent of all plant beyond the standard use, from 30,000 firms. In the recovery they take people back on into it, and in years when more than 1 per cent of plant stood idle firms built a tenth to a fifth less than the equipment of every new job would have cost. Before the slump nothing is idle, and the module changes nothing. From 30,000 firms over 60 years, unemployment over the last 20 years rose from 22.2 and 21.1 per cent to 24.8 and 22.8 per cent with two seeds, and from 19.2 to 20.3 per cent from 300,000 firms (one seed).
+- **With other modules it moves results little.** With the public debt, privatisation, force and household debt modules as well, unemployment over the last 20 years went from 12.3 and 15.4 per cent to 13.4 and 14.8, and from 10.3 to 10.4 per cent from 300,000 firms. With the proletarianization module as well it stayed at about 31 per cent: there 36 per cent of plant stands idle for decades and nobody builds. With every optional module on it went from 5.4 and 5.3 to 5.4 and 5.1 per cent, and firms closed in 60 years rose from about 28,000 to about 34,000. In 50 random mixes with the sales module, one seed, the median did not move (6.9 and 6.8 per cent), nine moved by more than 2 points (four up, five down) and no run stopped.
+- **In the record most building is not tied to hiring, and in the model all of it is.** In the United States, 1951 to 2019, net building by business came to 0.077 of the private wage bill in a year plus 0.59 years of the wage for each person newly hired (Bureau of Economic Analysis and Bureau of Labor Statistics). In the sales module alone, the same measure gives 0.026 plus 1.5. The module does not change this. The model has no building that goes on whatever the hiring.
+- **The plant of a closed firm is lost.** In the record a failed firm's plant is often sold. Here the firms that take on its buyers build anew.
+- **People hired for military orders need new plant.** Only the public employees whom the top 100 take over arrive with their plant. A holding that a firm is forced to sell (barriers module) takes its part of the seller's plant.
+- **The idle part has not been set beside the record.** The book's endnote gives a normal use of 70 to 90 per cent. No measure of capacity use is on disk.
 
 ---
 

@@ -29,7 +29,8 @@ firms sell.
   4. Owners lay out on goods what firms pay out to them, kept level against the wage. Firms
      decide two outlays: what they pay out, which moves each year part of the way toward a
      part of what owners earned (`paid_out`), and the equipment of the year's new jobs, which
-     they buy whatever they have kept. What firms keep is not decided. It is worked out at the
+     they buy whatever they have kept. With the capacity module on, a job needs equipment only
+     where the firm's plant did not already hold it. What firms keep is not decided. It is worked out at the
      end of the year, as what owners earned less what was paid out to them, and published as a
      result. Owners here are the owners of the firms and every party that receives payments as
      a holder of debt.
@@ -174,6 +175,7 @@ they are not among the goods offered; their pay is counted with what wage earner
 import numpy as np
 from core import (ScaleComponent, SetComponent, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS,
                   GOVERNMENT, ROUNDING)
+from modules.capacity import PLANT
 
 # The part of a firm's markup given up by cutting its price for want of sales, as far as no later
 # rise has restored it. A later rise of the firm's markup, from any rule, restores this component
@@ -274,7 +276,11 @@ class Sales:
         # The government buys through the organs that a module names as buyers. What it collects and does not
         # pay out it holds, and uses before it borrows: money held buys nothing.
         has_government = organs + self.carried[GOVERNMENT]
-        building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
+        # The equipment of the jobs that firms added last year. With the capacity module on, only the jobs that
+        # plant did not already hold need equipment: people taken back on into idle plant need none.
+        held = L.extra.get(PLANT)
+        added = float(A.get("jobs_created", 0.0)) if held is None else float(np.maximum(n - held, 0.0).sum())
+        building = self.job_cost * wage * added
         # What is paid out is below nothing after a year in which owners lost more than they earned: they
         # then pay money into the firms to meet the wages that sales did not pay back, and buy no goods.
         outlay = max(self.payout, 0.0) * wage
@@ -327,6 +333,10 @@ class Sales:
         sold = 1.0 - a["unsold"] / a["priced_earnings"]   # the part of priced earnings that was received
         total = min(1.0 - sold, 1.0 - ROUNDING)
         lost = self.split(L.n * asked, dominant, total)
+        kept = 1.0 - lost
+        if total >= 1.0 - ROUNDING:                       # buyers did not even pay back the wage bill: every firm
+            kept = np.full(len(L), ROUNDING)              # keeps exactly the allowance for rounding
+            lost = 1.0 - kept
         # A firm of dominant capital holds back the unsold part of its own goods.
         held_back = self.held_back * unsold * (float(lost[dominant][0]) / total if total > 0 and dominant.any() else 1.0)
         changes = [Publish("unsold", float(unsold), self.name),
@@ -351,7 +361,7 @@ class Sales:
         # earnings, such as public debt repaid to them, and the firm keeps the core's allowance for
         # rounding. The failure module then finds it with no cover for its interest.
         price_cut = np.where(dominant, 0.0, self.price_give * lost)
-        changes += [SetComponent(SHORTFALL, (1.0 - lost) / (1.0 - price_cut), self.name),
+        changes += [SetComponent(SHORTFALL, kept / (1.0 - price_cut), self.name),
                     SetComponent(CARRIED, asked * (lost - price_cut), self.name)]
         if total > 0:
             changes.append(ScaleComponent(PRICE_CUT, 1.0 - price_cut, self.name))

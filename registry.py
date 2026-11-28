@@ -43,7 +43,8 @@ OPTIONAL["currencies"] = ("modules.currencies", "Currencies")   # needs owners c
 OPTIONAL["sovereign_funds"] = ("modules.sovereign_funds", "SovereignFunds")   # the resistance module reads the number it publishes
 OPTIONAL["synchronisation"] = ("modules.synchronisation", "Synchronisation")   # a readout; it changes no term of any firm
 OPTIONAL["fear"] = ("modules.fear", "Fear")   # a readout; with the hype module on it also weakens upward pushes on hype
-OPTIONAL["plant"] = ("modules.plant", "Plant")   # a readout; it changes nothing and no module reads it
+OPTIONAL["capacity"] = ("modules.capacity", "Capacity")   # alone a readout; the sales module reads its plant
+OPTIONAL["plant"] =("modules.plant", "Plant")   # a readout; it changes nothing and no module reads it
 OPTIONAL["concentration_measures"] = ("modules.concentration_measures", "ConcentrationMeasures")   # a readout; it changes nothing and no module reads it
 
 

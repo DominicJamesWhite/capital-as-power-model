@@ -122,6 +122,7 @@ counted as part of its own industry.
 """
 import numpy as np
 from core import Scale, Found, Publish, top_positions
+from modules.capacity import PLANT
 
 ID = "barrier_firm_number"     # the added per-firm number that lets the module see which firms disappeared
 
@@ -283,8 +284,14 @@ class Barriers:
             changes.append(Scale("employees", factor, self.name))
             # a holding that is sold keeps every component of the firm that sold it: markup, other income
             # and named costs. Its price is therefore the seller's, and the core works it out.
+            # With the capacity module on, the holding takes its part of the seller's plant: a forced sale
+            # moves plant from one owner to another and builds none.
+            extra = None
+            if PLANT in L.extra:
+                changes.append(Scale(PLANT, factor, self.name))
+                extra = {PLANT: L.extra[PLANT][src] * np.array(new_n) / L.n[src]}
             changes.append(Found(np.array(new_n), None, L.h[src].copy(), L.d[src].copy(),
-                                 np.array(new_ind, dtype=int), self.name,
+                                 np.array(new_ind, dtype=int), self.name, extra=extra,
                                  components=L.components_of(src)))
 
         # Part 2: the counter-force and each sector's exposure raise its barrier.

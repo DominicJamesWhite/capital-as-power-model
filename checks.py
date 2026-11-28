@@ -17,6 +17,8 @@ Check 20 tests that when buyers do not even pay back the wage bill, no firm book
 and no firm that holds back production is left with fewer than no employees.
 Check 22 tests the government's one account: it uses the money it holds before it borrows, and
 several modules together repay no more than the government owes.
+Check 24 tests the capacity module: people taken back on into idle plant need no equipment, and a
+buyer takes over its target's plant.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
@@ -1490,6 +1492,34 @@ def check_markups_near_nothing():
           f"size draws {np.log(edge[2]) / np.log(edge[0]):.3f} of the typical firm's gain.")
 
 
+def check_idle_plant():
+    """A firm that takes people back on into idle plant builds nothing, idle plant wears, a buyer takes over its
+    target's plant, and the sales module counts as building only the jobs that plant did not hold."""
+    from modules.capacity import Capacity, PLANT
+    from modules.sales import Sales
+    plan = {1: lambda L: [Scale("employees", np.array([0.5, 1.2, 1.0, 1.0]), "hand")],
+            2: lambda L: [Scale("employees", np.array([1.6, 1.0, 1.0, 1.0]), "hand"),
+                          Merge(buyers=[2], targets=[3], source="hand")]}
+    year = {"n": 0}
+    def hand(L):
+        year["n"] += 1
+        return plan.get(year["n"], lambda L: [])(L)
+    L = Ledger(employees=[100.0, 100.0, 100.0, 10.0], epe=0.10, industry=[0, 0, 0, 0], sector_of_industry=[0],
+               shared={"workforce": 1000.0})
+    m = Model(L, [Capacity(wear=0.1), Fixed("hand", hand)], top=1)
+    m.step()                                      # firm 0 dismisses half its people, firm 1 hires a fifth more
+    building = Sales().reckon(m.L, m.L.markup())["building"]
+    assert np.isclose(building, 3.0 * 20.0)       # only firm 1's 20 new jobs need equipment
+    r2 = m.step()                                 # firm 0 takes 30 back on into idle plant; firm 2 buys firm 3
+    assert np.isclose(r2["published"]["places_built"], 20.0 / 280.0)
+    assert np.allclose(m.L.extra[PLANT], [95.0, 120.0, 110.0])     # 50 idle wore by a tenth; the buyer holds both plants
+    r3 = m.step()
+    assert np.isclose(r3["published"]["places_built"], 0.0) and np.isclose(r3["published"]["idle_part"], 15.0 / 325.0)
+    print(f"24. Idle plant: a firm that dismisses half its people and takes some back on builds nothing, its idle "
+          f"plant wears by a tenth a year, a buyer takes over its target's plant, and the sales module counts "
+          f"equipment of {building:.0f} wages for the 20 jobs that plant did not hold.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1514,4 +1544,5 @@ if __name__ == "__main__":
     check_leaders()
     check_government_account()
     check_markups_near_nothing()
-    print("All twenty-three checks passed.")
+    check_idle_plant()
+    print("All twenty-four checks passed.")
