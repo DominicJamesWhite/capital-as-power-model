@@ -21,11 +21,15 @@ and the crisis, the concentration and the resistance come from the other rules.
      unemployment above the usual level count as a complete crisis.
   5. The tax. The whole interest of the year is paid from a tax of the same year. The tax is
      one rate on all income: on the wage bill, and on each firm's earnings before any income
-     from the public debt.
+     from the public debt. A tax on income takes a part of income, so a firm whose earnings
+     are below nothing (because it paid other modules more than it now earns) pays none, and a
+     firm whose capitalization is below nothing holds no debt.
   6. The tax advantage. Dominant capital pays a lower rate than everybody else. Its rate,
      as a part of the rate of others, is one minus the top hundred's part of all
      capitalization, and the reduction shrinks when popular resistance is high. Wages and the
-     other firms make up what dominant capital does not pay.
+     other firms make up what dominant capital does not pay. When 100 firms or fewer are left,
+     all of them are dominant capital and hold all capitalization, so with no resistance they
+     pay no tax and wages carry all of it.
   7. The change to the ledger. The module proposes six transfers, and the core settles them
      (see "The record of transfers" in modules.md). Two are the tax: each firm pays its tax
      to the government, and wage earners pay theirs. Four are the interest, which the
@@ -40,7 +44,9 @@ and the crisis, the concentration and the resistance come from the other rules.
      keeps it apart from the markup.
   8. Readouts. The module publishes who holds, who receives and who pays (listed in
      `supplies` below). It also publishes, for each industry, the part of earnings that comes
-     from sources other than public-debt income. No module reads that number.
+     from sources other than public-debt income. No module reads that number. A readout that
+     is a part of something that is nothing, such as the gain of the firms outside the top
+     hundred when there are none, is 0.
 
 The wage in the ledger is not changed. Wage earners are a party to the transfers: the core
 records what they pay and what they receive, and no entry in the ledger stands for
@@ -206,7 +212,10 @@ class PublicDebt:
         A = L.accounts
         K, E = L.cap(), L.earnings()
         count, k = len(L), L.sector_of.size
-        base = E - L.n * L.components[INCOME]                # earnings before public-debt income
+        # Earnings before public-debt income. A firm whose earnings, after what it paid other modules
+        # last year, are below nothing has no income to tax and pays no tax on it.
+        base = np.maximum(E - L.n * L.components[INCOME], 0.0)
+        K = np.maximum(K, 0.0)                               # a firm worth nothing holds no public debt
         wages = L.shared["wage"] * L.n.sum()
         top = top_positions(K, np.arange(count), self.top)
         dominant = np.zeros(count, dtype=bool)
@@ -257,17 +266,21 @@ class PublicDebt:
         by_industry = np.bincount(L.ind, after, k)
         markup_part = np.where(by_industry > 0, np.bincount(L.ind, base, k) / np.maximum(by_industry, 1e-300), 1.0)
         to_others = to_wages
+
+        def part(a, b):         # a as a part of b; 0 when there is nothing to measure against, as when no firm is left outside the top hundred
+            return float(a / b) if b > 0 else 0.0
+
         out = {
             "public_debt_markup_part": markup_part,                                        # by industry; no module reads it
             "public_debt_dominant": float(self.firms_part * holding[top].sum()),          # top hundred's part of the whole public debt
             "public_debt_dominant_of_firms": float(holding[top].sum()),                   # top hundred's part of what firms hold
-            "public_debt_tax_dominant": float(paid[top].sum() / max(paid.sum() + wage_tax, 1e-300)),               # part of the tax that the top hundred pay
-            "public_debt_tax_wages": float(wage_tax / max(paid.sum() + wage_tax, 1e-300)),                         # part of the tax that is paid from wages
+            "public_debt_tax_dominant": part(paid[top].sum(), paid.sum() + wage_tax),     # part of the tax that the top hundred pay
+            "public_debt_tax_wages": part(wage_tax, paid.sum() + wage_tax),               # part of the tax that is paid from wages
             "public_debt_relative_tax": relative,                                          # dominant capital's rate as a part of the rate of others
-            "public_debt_net_dominant": float((received[top] - paid[top]).sum() / base[top].sum()),          # net gain of the top hundred, as a part of their other earnings
-            "public_debt_net_others": float((received[~dominant] - paid[~dominant]).sum() / base[~dominant].sum()),   # the same for all other firms
-            "public_debt_net_firms": float((received - paid).sum() / (base.sum() + wages)),                 # net gain of all firms, as a part of all income
-            "public_debt_net_wages": float((to_others - wage_tax) / wages),                # interest to households outside the richest one per cent less the tax on wages, as a part of the wage bill
+            "public_debt_net_dominant": part((received[top] - paid[top]).sum(), base[top].sum()),            # net gain of the top hundred, as a part of their other earnings
+            "public_debt_net_others": part((received[~dominant] - paid[~dominant]).sum(), base[~dominant].sum()),   # the same for all other firms
+            "public_debt_net_firms": part((received - paid).sum(), base.sum() + wages),   # net gain of all firms, as a part of all income
+            "public_debt_net_wages": part(to_others - wage_tax, wages),                   # interest to households outside the richest one per cent less the tax on wages, as a part of the wage bill
             "public_debt_rich_households": float(self.household_part * self.rich_households),   # part of all interest paid directly to the richest one per cent of households
             "public_debt_flight": crisis,                                                  # the level of crisis that drives the flight to safety
             "public_debt_service": float(service),                                         # the part of last year's interest that was paid; read by the risk shaping module

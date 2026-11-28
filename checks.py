@@ -1114,6 +1114,46 @@ def check_second_country_purchases():
           f"after it had bought.")
 
 
+def check_public_debt_tax():
+    """The public debt module asks no negative tax of a firm whose earnings, after what it paid other
+    modules, are below nothing, and its readouts stay numbers when no firm is left outside the top 100."""
+    from stage2 import starting_ledger
+    from modules.public_debt import PublicDebt, TAX_EARNINGS
+
+    class Charges:          # publishes a government debt, and owns an income that records payments to the government
+        name, supplies = "charges", ("government_debt",)
+
+        def start(self, L):
+            L.add_component("charges", self.name, kind="income", transfers=True)
+            return {"government_debt": 0.5 * float(L.earnings().sum() + L.shared["wage"] * L.n.sum())}
+
+        def propose(self, L, rng):
+            return []
+
+    seen = {}
+    for count in 3000, 60:
+        m = Model(starting_ledger(0, count), [Charges(), PublicDebt()], seed=0)
+        m.step()
+        L = m.L
+        e0 = float(L.e[0])
+        L.components["charges"][:5] = -3.0 * L.e[:5]     # five firms paid other modules three times what they now earn
+        L.refresh()
+        asks = [c for c in m.modules[1].propose(L, np.random.default_rng(0)) if getattr(c, "label", None) == TAX_EARNINGS]
+        ask = np.asarray(asks[0].payer, dtype=float)
+        assert np.all(np.isfinite(ask)) and (ask >= 0).all() and (ask[:5] == 0).all()
+        assert ask[5:].sum() > 0 or count <= 100     # with 100 firms or fewer all are dominant capital, whose rate is 0 here
+        for _ in range(3):
+            r = m.step()        # the core accepts every payment, and every readout is a number
+        vals = [v for k, v in m.L.accounts.items() if k.startswith("public_debt_")]
+        assert all(np.all(np.isfinite(v)) for v in vals), count
+        seen[count] = (e0, m.L.accounts["public_debt_net_others"])
+    assert seen[60][1] == 0.0               # with 60 firms every firm is in the top 100, and nothing is left to measure
+    print(f"19. Public debt tax: five firms whose earnings after last year's payments are three times below nothing "
+          f"are asked for no tax, and the others are. With 60 firms, all in the top 100, the run goes on and every "
+          f"readout of the module is a number; the top 100 then hold all capitalization, so their tax advantage is "
+          f"whole and wages carry the tax.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1133,4 +1173,5 @@ if __name__ == "__main__":
     check_payers()
     check_unemployment_level()
     check_second_country_purchases()
-    print("All eighteen checks passed.")
+    check_public_debt_tax()
+    print("All nineteen checks passed.")
