@@ -63,10 +63,14 @@ Owners then respond, and each response lowers the unsold amount:
     free competition free of power?").
 
 Owners' money is accounted for in full. What owners had, after what they lent the government,
-households and firms, is what they bought plus what they saved (`owners_saved`). When owners
-and firms seek more goods than are left, the part they could not buy is reported
-(`owners_unspent`). It is saved like the rest of what they do not spend: nothing carries it into
-the next year.
+households and firms, is what they bought plus what they saved (`owners_saved`). Owners save
+nothing unless wage earners and the government bought every good offered. The reason is that
+owners' income is the priced earnings less what was unsold, plus the transfers they received.
+In a year when something is unsold, that income equals what owners laid out. In a year when
+nothing is unsold, it equals the goods left after wage earners and the government bought. So
+owners never hold money that found no goods, and nothing is carried for them into the next
+year. When owners and firms plan to lay out more than is left, the part of the plan they could
+not carry out is reported (`owners_short`). It is a plan they had no money for, not money.
 
 When nothing is unsold, none of these happens. The module also reports each year whether the
 two conditions of accumulation hold: differential capitalization that is not falling, and a
@@ -326,7 +330,7 @@ class Sales:
                 "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
                 "wage_earners_had": has_wages, "government_had": has_government,
                 "owners_had": had, "owners_income": income, "owners_saved": had - by_owners,
-                "owners_unspent": max(outlay + building - by_owners, 0.0), "lent_to_firms": beyond,
+                "owners_short": max(outlay + building - by_owners, 0.0), "lent_to_firms": beyond,
                 "owners_outlay": outlay, "kept": income - outlay, "building": building, "lent": lent, "repaid": repaid,
                 "borrowed_by_government": borrowed, "to_firms": to_firms,
                 "kept_for_next_year": self.carried[WAGE_EARNERS] + self.carried[GOVERNMENT]}

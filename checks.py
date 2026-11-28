@@ -802,6 +802,7 @@ def check_sales_account():
     years_unsold = years = stopped = years_borrowed = years_repaid = 0
     largest = largest_gap = 0.0
     lowest_saved = np.inf
+    largest_short = 0.0
     for names in mixes:
         histories = []
         for order in names, names[::-1]:
@@ -855,6 +856,12 @@ def check_sales_account():
                            - a["lent_to_firms"] - a["owners_had"]) <= tol
                 assert abs(a["owners_had"] - a["bought_by_owners"] - a["owners_saved"]) <= tol and a["owners_saved"] >= -tol
                 lowest_saved = min(lowest_saved, a["owners_saved"] / a["offered"])
+                # Owners hold no money that found no goods, unless wage earners and the government bought everything.
+                # What owners and firms planned beyond what they bought is a plan they had no money for.
+                if a["kept_for_next_year"] <= tol:
+                    assert a["owners_saved"] <= tol
+                    assert abs(a["owners_short"] - max(a["owners_outlay"] + a["building"] - a["owners_had"], 0.0)) <= tol
+                    largest_short = max(largest_short, a["owners_short"] / a["priced_earnings"])
                 kept = a["kept_for_next_year"]
                 years += 1
                 years_unsold += a["unsold"] > 0
@@ -876,7 +883,9 @@ def check_sales_account():
           f"record of transfers shows it had. What firms received in transfers was the same in the record and in the "
           f"firms' own books (largest difference {largest_gap:.1e} of priced earnings). Wage earners and the government "
           f"bought with what they had and carried the rest; owners bought with what they had after lending and saved "
-          f"the rest, which was never below zero by more than {max(-lowest_saved, 0.0):.0e} of what was offered. When the government pays out 115 more than a tax set in law collects, "
+          f"the rest, which was never below zero by more than {max(-lowest_saved, 0.0):.0e} of what was offered. Unless wage earners and the government "
+          f"bought everything, owners saved nothing, and what owners and firms planned beyond what they bought was a plan they had no money "
+          f"for, at most {largest_short:.0%} of priced earnings. When the government pays out 115 more than a tax set in law collects, "
           f"owners lend it 115, have 115 less to spend, and nothing is unsold; when the pay stops, the tax repays them, "
           f"but no more than the government owes. "
           f"The loans lower no earnings. In the long runs the government borrowed in {years_borrowed} of those years and "
