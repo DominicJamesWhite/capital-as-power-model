@@ -72,12 +72,14 @@ WHAT IT RESTS ON
     "consistently negative profit margins" for decades. Parts 1, 2 and 4 use these figures.
   - Ryan Banerjee and Boris Hofmann, "The rise of zombie firms: causes and consequences" (BIS
     Quarterly Review, September 2018), a study from outside the tradition that Baines and Hager
-    cite. Firms whose interest cover "has been less than one for at least three consecutive
-    years" were about 12 per cent of listed firms in 14 advanced economies in 2016, and the
-    chance that such a firm was still one the next year rose from 60 to 85 per cent, because
-    "banks have incentives to roll over loans to non-viable firms rather than writing them
-    off". In terms of power: whether a firm that cannot pay goes on is the lenders' choice. Part
-    4 rests on this.
+    cite. Listed firms outside finance, at least 10 years old, whose interest cover "has been
+    less than one for at least three consecutive years" were about 12 per cent of such firms in
+    14 advanced economies in 2016, against about 2 per cent in the late 1980s, and the chance
+    that such a firm was still one the next year rose from 60 to 85 per cent. The authors
+    measure lower interest rates as one cause, and take from earlier studies that weak "banks
+    have incentives to roll over loans to non-viable firms rather than writing them off". In
+    terms of power: whether a firm that cannot pay goes on is the lenders' choice. Part 4 rests
+    on this.
   - Chapter 13, "The mega-machine resurrected: capital": "large-scale capitalist organizations
     are usually able to resurrect themselves through merger, restructuring and the
     securitization of debt". Part 6 rests on this.
@@ -90,11 +92,14 @@ by their lenders for years, and that large firms come back. It gives no rule for
 stop. These are additions: that lenders lend against sales at the first year's terms for each
 size; that the firm in between borrows at the normal rate of return; that a firm is refused
 when it has owed more than it is worth for `patience` years, 3, which is the span over which
-Banerjee and Hofmann count a firm as kept alive by its lenders; what a restructuring writes off; the proportions of one
-country in one year for every year; and the sizes that divide the groups, fixed in the first
-year. `term`, 5 years, lies between the median remaining maturity of rated debt of United
-States firms that S&P Global Ratings reported for 1 January 2024: 5.9 years for investment
-grade and 3.9 years for speculative grade, read from a summary of that report.
+Banerjee and Hofmann count a firm as kept alive by its lenders, which is their definition and
+not a measure of how long lenders wait; what a restructuring writes off; the proportions of
+one country in one year for every year; and the sizes that divide the groups, fixed in the
+first year. `term`, 5 years, is our own choice. It lies between the medians of the time left
+to run on rated debt of firms outside finance across the world that S&P Global Ratings gave
+for 1 January 2024: 5.9 years for investment grade and 3.9 years for speculative grade. These
+cover rated debt only, not bank loans, and were read from the publisher's summary, because
+the report itself could not be downloaded.
 
 WHAT IS MISSING
 
