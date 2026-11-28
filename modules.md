@@ -53,7 +53,7 @@ A firm with 1,000 employees that earns 2 for each of them, with hype of 1, risk 
 
 **An addition.** A rule or a number that we made up because the book and the papers do not supply one.
 
-**Year labels.** A run starts in a year labelled 1890. The labels are only labels. The year labelled 1930 is the fortieth year of a run and has nothing to do with the real 1930.
+**Year labels.** A run from the stated start counts its years from 0. A run from the 1950 start counts from 1950, and a run from the present start from 2025. Only the first year of those two is historical. Many results in this file give the years of a run from the stated start as labels that count from 1890. The year labelled 1930 is year 40 of such a run and has nothing to do with the real 1930.
 
 ## Which modules run
 
@@ -79,11 +79,23 @@ To run a replacement, name it with `--with`, for example `python full.py 30000 6
 
 ## The starting position
 
-A run has to start somewhere. The start is meant to resemble what the book calls "the golden age of 'free competition'" (chapter 12): many small firms of similar size and no large ones. All of these figures are our own choices.
+A run can start in one of three ways. `starts.py` holds them, and `python full.py 30000 60 0 --start 1950` picks one.
+
+- **Stated** (the default). The model states its own conditions, set out in the table below.
+- **1950.** The conditions of the United States in 1950, taken from the files in `data/`.
+- **Present.** The conditions of the United States in the last five years of data, 2021 to 2025, and the firm sizes of 2023.
+
+A start sets only states: how many people are out of work, how fast the working population grows, how many employees are organised, and how firms differ in size. It does not set results such as the capitalist share of income, differential capitalization or the pace of mergers. A run from a historical start prints those figures for its first year beside the data, so the two can be compared.
+
+### The stated start
+
+The stated start is meant to resemble what the book calls "the golden age of 'free competition'" (chapter 12, "From price taking to price making"): many small firms of similar size and no large ones. All of these figures are our own choices.
+
+With `--draws`, each seed takes the unemployment, the growth of the working population and the organised part of employees of one year picked at random from the US data of 1950 to 2025. The three figures come from the same year, so they fit together. This gives the stated start a spread, so a result can be shown for several draws. The firms and every other figure stay as in the table.
 
 | What | Value at the start |
 |---|---|
-| Number of firms | 300,000. This was chosen to be about the number of corporations in the United States in the 1910s. That figure has not been checked against a source. |
+| Number of firms | 300,000, about the number of corporations in the United States in the 1910s: the IRS counted 341,253 in 1916 (`data/corporations.csv`). |
 | Employees of each firm | Drawn at random. The middle firm has 100. About two thirds of firms have between 45 and 220. |
 | Industries and sectors | 400 industries in 20 sectors. Each firm is placed in an industry at random. |
 | Markup | 0.10 for every firm |
@@ -94,6 +106,39 @@ A run has to start somewhere. The start is meant to resemble what the book calls
 | Unemployment | 5 per cent |
 | Growth of the working population | 1.7 per cent a year, for the whole run |
 | Sector boundary and national boundary | Both closed |
+| Organised employees | 3 per cent, the labour module's setting `start` (Brennan's figure for 1900) |
+
+### The historical starts
+
+The 1950 and present starts change four figures of the stated start. Everything else in the table above stays the same, including the markup of 0.10 and the closed boundaries.
+
+| What | 1950 | Present | Source in `data/` |
+|---|---|---|---|
+| Unemployment | 5.2 per cent | 4.2 per cent, the mean of 2021 to 2025 | `unemployment.csv` (BLS) |
+| Growth of the working population | 1.2 per cent a year | 1.2 per cent a year, the mean of 2021 to 2025 | `labour_force.csv` (BLS) |
+| Organised employees, the labour module's `start` | 30.4 per cent | 10.1 per cent, the mean of 2021 to 2025 | `union_membership.csv`: union members as a part of wage and salary workers (Mayer 2004; BLS) |
+| Employees of each firm | as the stated start | drawn with the spread of US employer firms in 2023 | `firm_sizes.csv` (Census) |
+
+For the present start, each firm falls in one of the Census size classes with the part of firms that the Census counts in that class. Inside a class it is drawn evenly on a log scale between the bounds of the class. Inside the open top class, 10,000 employees or more, it is drawn from a Pareto curve whose mean is that class's employees for each firm, 33,972. In a draw of 200,000 firms, 59.9 per cent have fewer than 5 employees, against 59.7 per cent in the data. The mean firm has 27.7 employees, against 24.5.
+
+What the historical starts leave as in the stated start, and why:
+
+- **Firm sizes in 1950.** The Census series of firm sizes starts in 1978, so the 1950 start keeps the stated sizes. Its 100 largest firms earn 2.7 per cent of all earnings in the first year, against 26.4 per cent of all corporate profit in 1954 in the data (30,000 firms).
+- **The markup.** The capitalist share of income is a result, so the start does not set it. At the start it is 9.1 per cent, against 14.7 per cent in 1950 and 17.7 per cent in 2021 to 2025.
+- **The number of firms.** It stays the first number given to `full.py`. The data count 629,314 corporations in 1950 and 6.8 million in 2022. With fewer firms than the data, the 100 largest are a bigger part of the whole, so differential capitalization cannot be compared with the data directly.
+- **Public and corporate debt.** The debt module sets the government's debt from its interest setting, which also fixes the interest of every later year. Each firm's debt follows from the failure module's settings. Neither can take a total from the data yet.
+- **Boundaries, public employees and household debt.** No figure for them is in `data/`, so they start as in the stated start.
+
+What runs from each start show, with every module, from 30,000 firms over 60 years:
+
+| Start | Seeds | Unemployment, last 20 years | Differential capitalization at the end | Firms at the end |
+|---|---|---|---|---|
+| Stated | 0 to 5 | 6.6 to 7.3 per cent | 237 to 302 | 51,364 to 54,464 |
+| Stated, with draws | 0 to 5 | 5.8 to 6.6 per cent | 234 to 292 | 43,169 to 53,758 |
+| 1950 | 0 to 2 | 6.2 to 6.3 per cent | 226 to 307 | 46,398 to 50,681 |
+| Present | 0 to 2 | 21.5 to 25.8 per cent | 5 to 9 | 476 to 963 |
+
+The present start falls into a slump from year 2. By year 10, 17 to 26 per cent of people are out of work, and up to 13,000 firms close in one year. The run from seed 2 stops in year 29, when the core's checks find an impossible value. The slump comes from the sales module: with it left out, unemployment in year 10 is 6.8 per cent against 17.1 (seed 0). With the basic set alone, the present start keeps unemployment near 6 per cent for 25 years.
 
 ## What happens in one year
 
@@ -3289,7 +3334,7 @@ These sources give no rule for how organisation grows, how often organised emplo
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `start` | 0.03 | The organised part of employees at the start | Brennan 2016: "In 1900, unionization was below 3 percent" |
+| `start` | 0.03 | The organised part of employees at the start. The 1950 and present starts set it from the data: 0.304 and 0.101 | Brennan 2016: "In 1900, unionization was below 3 percent" |
 | `memory` | 10 | The years over which the best real wage is remembered | Our own choice |
 | `full_grievance` | 0.05 | The shortfall of the real wage below its remembered best at which the grievance is complete | Our own choice |
 | `organise` | 0.05 | The part of the unorganised employees who organise in a year of complete grievance, in an industry where the top 100 employ everybody | Our own choice |

@@ -136,6 +136,15 @@ python full.py 30000 60 0 --basic
 python full.py 30000 60 0 --basic --with sales
 ```
 
+Start from the conditions of the United States in 1950, or in the last five years of data:
+
+```
+python full.py 30000 60 0 --start 1950
+python full.py 30000 60 0 --start present
+```
+
+Only the first year of such a run is historical. Every later year is made by the modules. The run prints, for its first year, the figures the model produces beside the same figures in the data. The default start, `stated`, uses conditions the model states for itself and counts its years from 0. Add `--draws` to give each seed the conditions of one year of US data picked at random, so that a result can be shown for several draws. `modules.md` says more under "The starting position".
+
 Small runs are faster but less reliable. With fewer firms, the top 100 are a bigger part of the whole, and the results change.
 
 Check that the bookkeeping is correct:
@@ -169,7 +178,7 @@ What does not work yet:
 - **Too few firms fail.** With the basic set alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year. And almost no firm in the model earns less than its interest for three years in a row, against about one listed firm in eight in the record: lenders close such a firm first, because by then it owes more than it is worth.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
-- **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.
+- **History.** A run from 1950 or from the present takes only its first year from the data. It does not yet reproduce what came after. A start from the present falls into a deep slump within ten years. In three runs from 30,000 firms, unemployment averaged 24 per cent over the last 20 of 60 years, fewer than 1,000 firms were left, and one run stopped in year 29. Without the sales module, unemployment in year 10 is 7 per cent.
 
 ## What is in this folder
 
@@ -179,11 +188,12 @@ What does not work yet:
 | `modules/` | One file for each module. |
 | `registry.py` | The names of every module, in the order in which they run, the modules that can run in place of them, and the basic set. |
 | `full.py` | Runs the model. |
+| `starts.py` | The three starts: stated, 1950 and present. |
 | `stage2.py` | Runs only three modules: sabotage, green-field growth and mergers. |
 | `checks.py` | Tests of the bookkeeping. |
 | `modules.md` | What each module does, and the passage in the book it is based on. |
 | `workbench/` | A page in your web browser for running the model and comparing runs. |
-| `data/` | Published US series for a start from 1950 or from the present, and for comparing runs with history. The model does not read them yet. `data/README.md` lists the sources. |
+| `data/` | Published US series. The 1950 and present starts read them, and runs can be compared with them. `data/README.md` lists the sources. |
 
 ## How to contribute
 

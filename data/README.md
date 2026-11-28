@@ -1,6 +1,6 @@
 # Historical data
 
-This folder holds published series for the United States. A start from 1950 or from the present needs them, and runs can be compared with them. The model does not read these files yet.
+This folder holds published series for the United States. The 1950 and present starts in `starts.py` read them, and runs can be compared with them.
 
 Each file is a small CSV table with one row for each year. A blank cell means the source has no figure for that year.
 
@@ -55,13 +55,16 @@ The book's notes to Figure 14.2 define the first ratio as "the average market ca
 
 Some figures can set the state of the model in its first year. Others are results of a run: the model must produce them, and a run is compared with them. Feeding a result in as a cause would assume what the model is meant to show.
 
-Figures that can set the start:
+Figures that set the start. `starts.py` reads them; `modules.md` gives the values under "The starting position":
 
-- **Number of firms.** A run takes the number of firms as its first argument. The model has 300,000 firms by default, against 629,314 corporations in 1950 and 6.8 million in 2022. A run from 6.8 million firms would be very slow, so a start from the present needs firms scaled down with the same spread of sizes.
-- **Firm sizes.** The start draws each firm's employees at random around 100, a fixed rule in `stage2.py` with no setting. In 2023, 60% of employer firms had fewer than 5 employees and 30% of employees worked in firms with 10,000 or more. Census figures start in 1978, so a start from 1950 has no figure for this.
-- **Unemployment.** The start sets the working population so that unemployment equals the sabotage module's setting `labour_holds_at`, which is 5%. It has no setting of its own.
-- **Growth of the working population.** The start fixes it at 1.7% a year in `stage2.py`. It has no setting.
-- **Organised labour.** The labour module's setting `start` is the part of employees who are organised, now 3%, Brennan's figure for 1900. A start from 1950 would use 30.4% and a start from the present 10.0%.
+- **Unemployment.** The 1950 start uses 5.2% and the present start 4.2%, the mean of 2021 to 2025. The stated start uses the sabotage module's setting `labour_holds_at`, 5%.
+- **Growth of the working population.** 1.2% a year in both historical starts, against 1.7% in the stated start.
+- **Organised labour.** The labour module's setting `start`, the part of employees who are organised: 30.4% in 1950 and 10.1% for the present, against Brennan's 3% for 1900 in the stated start.
+- **Firm sizes.** The present start draws firms with the spread of the Census size classes of 2023. In 2023, 60% of employer firms had fewer than 5 employees and 30% of employees worked in firms with 10,000 or more. Census figures start in 1978, so the 1950 start keeps the stated sizes.
+
+Figures that could set the start but do not yet:
+
+- **Number of firms.** A run takes the number of firms as its first argument. The model has 300,000 firms by default, against 629,314 corporations in 1950 and 6.8 million in 2022. A run from 6.8 million firms would be very slow, so the present start keeps the count given and draws that many firms with the spread of sizes of 2023.
 - **Public debt.** The debt module values the government's debt as the interest it pays divided by the normal rate of return. The interest is its setting `government_part`, 2% of all income, so the debt starts at 40% of a year's income. The data give debt as a part of GDP, which is larger than national income: in 1950, 73% of GDP was 82% of national income. The same setting also fixes the interest paid in every later year, so it cannot set the start alone.
 
 Figures the model cannot yet take:

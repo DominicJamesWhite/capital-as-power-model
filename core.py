@@ -970,12 +970,14 @@ class Model:
             asked_all = sum((np.where(closing, 0.0, ask) for _, ask in by_firms), np.zeros(count))
             able = np.where(asked_all > means, means / np.maximum(asked_all, 1e-300), 1.0)
             uncollected = sum(float(ask.sum() - (np.where(closing, 0.0, ask) * able).sum())
-                              for t, ask in by_firms if t.receiver == GOVERNMENT and not t.loan)
+                              for t, ask in by_firms if isinstance(t.receiver, str) and t.receiver == GOVERNMENT
+                              and not t.loan)
             of_wages = [t for t in transfers if isinstance(t.payer, str) and t.payer == WAGE_EARNERS]
             asked_wages = sum(float(t.amount) for t in of_wages)
             wage_bill = L.shared["wage"] * L.n[~closing].sum()
             if asked_wages > wage_bill:
-                uncollected += sum(float(t.amount) for t in of_wages if t.receiver == GOVERNMENT) * (1.0 - wage_bill / asked_wages)
+                uncollected += sum(float(t.amount) for t in of_wages
+                                 if isinstance(t.receiver, str) and t.receiver == GOVERNMENT) * (1.0 - wage_bill / asked_wages)
             left = np.maximum(means - asked_all, 0.0)
             government = self._government_loans(gaps, left, np.where(closing, 0.0, K0), uncollected)
             # for the record: what all firms had before any transfer, and what owners had left to lend after taxes

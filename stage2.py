@@ -15,6 +15,7 @@ from core import Ledger, Model, LedgerError
 from modules.sabotage import Sabotage
 from modules.greenfield import Greenfield
 from modules.mergers import Mergers
+import starts
 
 YEARS = 80
 COLUMNS = [("firms", "firms", "{:>7.0f}"), ("unemployment", "unemp", "{:>6.1%}"),
@@ -24,21 +25,12 @@ COLUMNS = [("firms", "firms", "{:>7.0f}"), ("unemployment", "unemp", "{:>6.1%}")
            ("price_level", "prices", "{:>6.3f}")]
 
 
-COUNT = 300_000      # about the number of United States corporations in the 1910s
+COUNT = starts.COUNT
 
 
 def starting_ledger(seed=0, count=None, industries=400, sectors=20):
-    """Many small firms of similar size: the book's 'golden age of free competition'."""
-    count = count or COUNT
-    rng = np.random.default_rng(seed)
-    employees = rng.lognormal(np.log(100), 0.8, count)
-    sab = Sabotage()
-    u0 = sab.labour_holds_at     # start where wages keep pace with prices
-    return Ledger(employees=employees, epe=sab.normal_markup, risk=2.0,
-                  industry=rng.integers(0, industries, count),
-                  sector_of_industry=np.arange(industries) % sectors,
-                  shared={"workforce": employees.sum() / (1 - u0), "workforce_growth": 0.017,
-                          "perm_sector": 0.0, "perm_nation": 0.0})
+    """Many small firms of similar size: the stated start in starts.py."""
+    return starts.starting_ledger(seed, count or COUNT, industries, sectors)
 
 
 def run(label, modules, events=None, seed=0):

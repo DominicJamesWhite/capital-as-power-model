@@ -1726,6 +1726,45 @@ def check_tax_cut():
           f"after two years running of falling unemployment.")
 
 
+def check_starts():
+    """The three starts take their first year from the data in data/, and the stated start is unchanged."""
+    import starts
+    from stage2 import starting_ledger
+    from modules.labour import Labour
+    a, b = starting_ledger(3, 2000), starts.starting_ledger(3, 2000)
+    assert np.array_equal(a.n, b.n) and np.array_equal(a.ind, b.ind) and a.shared == b.shared
+    old = starts.conditions("stated")
+    assert old["year"] == 0 and old["organised"] is None and old["unemployment"] == 0.05 and old["growth"] == 0.017
+    c = starts.conditions("1950")
+    assert c["year"] == 1950 and np.allclose([c["unemployment"], c["growth"], c["organised"]], [0.052, 0.011841, 0.304])
+    L = starts.starting_ledger(0, 5000, start=c)
+    assert np.isclose(L.n.sum() / L.shared["workforce"], 0.948) and L.shared["workforce_growth"] == c["growth"]
+    p = starts.conditions("present")
+    assert np.isclose(p["unemployment"], 0.042) and np.isclose(p["organised"], 0.1006)
+    n = starts.starting_ledger(0, 200_000, start=p).n
+    classes = starts.size_classes()
+    small = classes[0][2] / sum(k[2] for k in classes)
+    mean = sum(k[3] for k in classes) / sum(k[2] for k in classes)
+    assert abs((n < 5).mean() - small) < 0.005 and abs(n.mean() / mean - 1) < 0.2
+    mods = [Labour()]
+    starts.apply(c, mods)
+    assert mods[0].start_level == c["organised"]
+    starts.apply(old, mods)
+    assert mods[0].start_level == c["organised"]             # the stated start leaves the setting as it is
+    drawn = [starts.conditions("stated", seed, draws=True)["drawn_from"] for seed in range(5)]
+    assert len(set(drawn)) > 1 and all(1950 <= y <= 2025 for y in drawn)
+    try:
+        starts.conditions("1960")
+        raise AssertionError("a start that does not exist was accepted")
+    except ValueError:
+        pass
+    print(f"26. Starts: the stated start gives the same firms as before; the 1950 start takes unemployment of 5.2%, "
+          f"growth of {c['growth']:.2%} and organised employees of 30.4%; the present start takes the means of 2021 "
+          f"to 2025 and firm sizes of 2023, with {(n < 5).mean():.1%} of firms under 5 employees against "
+          f"{small:.1%} in the data and {n.mean():.1f} employees for each firm against {mean:.1f}; draws give "
+          f"years {', '.join(map(str, drawn))}; an unknown start is refused.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1752,4 +1791,5 @@ if __name__ == "__main__":
     check_markups_near_nothing()
     check_idle_plant()
     check_tax_cut()
-    print("All twenty-five checks passed.")
+    check_starts()
+    print("All twenty-six checks passed.")

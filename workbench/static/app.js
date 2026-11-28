@@ -277,7 +277,7 @@ function toRun(sm, old) {
 }
 async function fetchRows(r) {
   const d = await api(`/api/runs/${encodeURIComponent(r.id)}?since=${r.rows.length}`);
-  for (const x of d.rows || []) if (x.year != null || x.step != null) r.rows.push({ year: x.year ?? (CAT.start_year || 1890) + x.step, v: x.values || {}, gain: keyedGain(x.gain, r.optional) });
+  for (const x of d.rows || []) if (x.year != null || x.step != null) r.rows.push({ year: x.year ?? (CAT.start_year ?? 0) + x.step, v: x.values || {}, gain: keyedGain(x.gain, r.optional) });
   r.step = r.rows.length - 1;
   r.errorYear = d.error_year; r.guard = d.guard;
 }
