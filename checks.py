@@ -1453,6 +1453,12 @@ def check_markups_near_nothing():
     assert np.isclose(1.0 - unit[0], 0.1 * (np.exp(0.001) - 1.0), rtol=1e-3)   # a small saving is taken in full
     assert 0 < unit[1] < 0.01                                                # a large one never cuts the cost through nothing
     lowest = unit[1]
+    # A firm a thousand times the typical size draws a thousand to the power -0.18 of the typical firm's draw.
+    L = Ledger(employees=[1000.0, 1000.0, 1e6], epe=0.10, industry=[0, 0, 0], sector_of_industry=[0])
+    cc = CostCutting(spread=0.0)
+    m4 = Model(L, [cc], top=1)
+    edge = [c for c in cc.propose(m4.L, Draws([0.1, 0.1, 0.1])) if isinstance(c, ScaleComponent)][0].factor
+    assert np.allclose(np.log(edge), [0.1, 0.1, 0.1 * 1000 ** -0.18], rtol=1e-12)
     print(f"23. Markups near nothing: a rise is added, and a small fall comes to almost the same as subtracting it; a fall as large as the markup "
           f"leaves 41 per cent of it, and one a million times as large leaves {tiny:.1e} of it. The part of the markup that firms did "
           f"not receive is left out of the markup that prices are set from, and only a markup component in an overlap "
@@ -1461,7 +1467,8 @@ def check_markups_near_nothing():
           f"wages rise faster than its price, a firm with a markup of 0.010 keeps {left:.4f}. A firm far behind its "
           f"industry's hold on buyers keeps {kept.min():.3f} of its markup, and the industry earns what it earned. "
           f"A small saving from cost cutting is taken out of the cost in full, and a firm with a markup of 50 that "
-          f"gains 86 wages in a year keeps a cost of {lowest:.4f} of the wage.")
+          f"gains 86 wages in a year keeps a cost of {lowest:.4f} of the wage. A firm a thousand times the typical "
+          f"size draws {np.log(edge[2]) / np.log(edge[0]):.3f} of the typical firm's gain.")
 
 
 if __name__ == "__main__":

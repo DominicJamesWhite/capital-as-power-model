@@ -2,9 +2,11 @@
 
 Every firm tries to cut costs, and each year each firm draws a small gain in earnings per
 employee. The gains do not last: methods spread and cheaper inputs become available to all, so
-each firm's earnings per employee drift back toward the level of its industry. The size of the
-draw does not depend on the size of the firm. Cost cutting therefore lets dominant capital
-"meet the average, not beat it", and the module exists to show that.
+each firm's earnings per employee drift back toward the level of its industry. A large firm is many parts whose luck partly cancels
+out, so its draw is smaller (Amaral and others, 1997: the spread of firms' yearly growth falls as size
+to the power -0.18; the book: mergers "stabilize earnings growth", chapter 15). The luck of the draws
+therefore does less for the largest firms. Cost cutting lets dominant capital "meet the average, not beat
+it", and the module exists to show that.
 
 The book gives no size for the draws and no speed for the spread. Both come from a study outside the
 tradition, Syverson, "What determines productivity?" (2011): within industries "the average difference in
@@ -56,13 +58,17 @@ class CostCutting:
     supplies = ()
     figures = {}           # nothing it supplies is a single yearly figure
 
-    def __init__(self, gain=0.18, spread=0.3, wears_holds=False):
+    def __init__(self, gain=0.18, spread=0.3, size_scale=0.18, wears_holds=False):
         self.gain = gain        # typical yearly gain or loss of one firm against its neighbours, in logarithms of its markup.
                                 # Set so that firms of one industry lie as far apart as plants of one industry do in
                                 # Syverson (2011): a gap of 0.651 in logarithms between the 90th and 10th percentile,
                                 # a spread of 0.254, and 0.254 x sqrt(1 - 0.7 x 0.7) = 0.18
         self.spread = spread    # part of any difference from the industry that disappears each year: 1 less the
                                 # yearly persistence of 0.6 to 0.8 that Syverson (2011) reports
+        self.size_scale = size_scale   # how fast the draw shrinks with the size of a firm, against the typical (median)
+                                       # firm: Amaral and others (1997) find the spread of firms' yearly growth falls as
+                                       # size to the power -0.18 +/- 0.03, measured in employees. Independent parts
+                                       # would give 0.5; 0 gives every firm the same draw
         self.wears_holds = wears_holds   # a switch for comparisons, off unless a run asks for it.
                                          # Off: the drift back is reckoned on the part of the markup that stacks, so a
                                          # premium that rests on a hold on buyers is not worn down. On: the drift back is
@@ -82,7 +88,12 @@ class CostCutting:
         m = L.markup() if self.wears_holds else L.stacking_markup()
         level = np.bincount(L.ind, L.n * m, k) / np.maximum(np.bincount(L.ind, L.n, k), 1e-12)
         back = (level[L.ind] / m) ** self.spread
-        draw = np.exp(rng.normal(0.0, self.gain, len(L)))
+        # A firm is many parts, and the luck of its parts partly averages out: the typical firm draws `gain`, and a
+        # firm k times its size draws gain / k^size_scale (step 1a). A firm with no employees has no parts to average.
+        n = L.n
+        typical = np.median(n[n > 0]) if (n > 0).any() else 1.0
+        parts = np.where(n > 0, n / typical, 1.0)
+        draw = np.exp(rng.normal(0.0, self.gain, len(L)) * parts ** -self.size_scale)
         # The edge stacks, so the firm's whole markup moves by the same factor as the edge. The
         # movement is divided into the draw and the drift back, each as an amount in wages.
         whole = L.markup()
