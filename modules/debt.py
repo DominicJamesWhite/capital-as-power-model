@@ -49,7 +49,8 @@ States rose by about 0.05 of national income for each year of national income th
 held by the public came to, 1916 to 1995; the paper is not on disk and the figure has not been
 checked against it. The same regression on the national accounts gives 0.07 (give or take
 0.035) for 1960 to 2007 and below 0 for 1960 to 2019, when holders accepted more debt after
-2008, so the record supports anything from a little below 0 to about 0.1. In terms of power:
+2008, so the record supports anything from a little below 0 to about 0.1. With federal military
+spending held apart as well, as Bohn does, it is 0.061 (give or take 0.032) for 1960 to 2007. In terms of power:
 what the holders of the debt can make the government collect from everybody else, for them.
 With no added debt the tax is nothing, so the main modules alone are unchanged.
 
@@ -60,7 +61,11 @@ Flipping?"). How many years of falling unemployment make a recovery lasting is o
 the United States record, 1981 to 2017, the change of federal receipts that came from changes of
 effective rates rose with the debt held by the public in such years (0.003 of the debt, give or
 take 0.008) and fell with it in other years (0.027, give or take 0.014), so the record leans the
-same way, weakly. With `recovery_years` at 0 the holders press every year.
+same way, weakly. The record does not settle the number of years: in the regression of the
+primary surplus on the debt, split by whether unemployment had fallen in each of the last 1 to 4
+years, holders pressed harder in recovery years over 1960 to 2007, the more so the longer the
+recovery (by 0.04 of the debt after one year, 0.07 after two, 0.10 after three), but less hard over
+1960 to 1989 alone and over 1990 to 2019 alone. With `recovery_years` at 0 the holders press every year.
 
 The government never refuses to pay. Hager writes of the first holders of the United States
 debt that they "would provide a powerful force against repudiation" (chapter 1), and reports
@@ -89,7 +94,13 @@ the rate on earnings down by `owners_resist` of itself a year: in the same fit t
 on profits fell by 3.9 per cent of itself a year apart from the balance (give or take 1.8), and
 the rate on wages did not fall. The rise after deficits and this fall belong together: with the
 average deficit of those years, 2.2 per cent of national product, they give a fall of the rate
-on profits of 1.7 per cent of itself a year, against 1.9 in the record from 1951 to 2017. In
+on profits of 1.7 per cent of itself a year, against 1.9 in the record from 1951 to 2017. Part
+of that fall may be profits taxed abroad, which the model does not have. About a third of it came
+after 1984 (the rate fell from 22 to 14 per cent), and Hager and Baines ("The Tax Advantage of Big
+Business", 2020) find from company accounts that after 1984 "the domestic ETR of the top decile
+increases slightly over the entire period, from 30 percent in 1984-89 to 34 percent in 2010-18",
+while the rate paid abroad fell from 47 to 25 per cent. So `owners_resist` may be too high by up
+to a third for a model with no abroad; the fit has not been redone on profits earned at home. In
 terms of power: how much of what the government lacks owners let it take back, how much of what
 it does not need they take for themselves, and their steady power to resist being taxed.
 
