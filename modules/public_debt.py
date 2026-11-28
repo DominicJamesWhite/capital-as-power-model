@@ -194,8 +194,8 @@ class PublicDebt:
         self.tax_advantage = tax_advantage      # fall in dominant capital's tax rate, as a part of the rate of others, per unit of the top hundred's part of all capitalization
         self.wage_tax = wage_tax                # the rate on wages as a part of the rate on earnings; 1 means one rate on all income
         self.top = top
-        self.rate = None                        # the rate of tax on earnings for interest, set in law in the first year and then cut only as the debt module orders
-        self.wage_rate = None                   # the rate on wages: wage_tax times the rate on earnings when set, then cut as the debt module orders
+        self.rate = None                        # the rate of tax on earnings for interest, set in law in the first year and then moved only as the debt module orders
+        self.wage_rate = None                   # the rate on wages: wage_tax times the rate on earnings when set, then moved as the debt module orders
 
     def start(self, L):
         # No firm, old or new, starts with public-debt income. The core sets the component each year
@@ -237,7 +237,7 @@ class PublicDebt:
         relative = 1.0 - float(np.clip(self.tax_advantage * tie * (1.0 - resistance), 0.0, 1.0))
         liable = base * np.where(dominant, relative, 1.0)
         taxable = self.wage_tax * wages + liable.sum()
-        if self.rate is not None:               # once in law, the rates are cut as the debt module orders after a surplus
+        if self.rate is not None:               # once in law, the rates move as the debt module orders after a surplus or a deficit
             self.rate *= A.get("tax_kept_earnings", 1.0)
             self.wage_rate *= A.get("tax_kept_wages", 1.0)
         if self.rate is None and interest > 0:  # the rate in law covers the first year's interest
@@ -247,7 +247,7 @@ class PublicDebt:
         wage_rate = self.wage_rate or 0.0
         paid = rate * liable
         wage_tax = wage_rate * wages
-        same = wage_rate == rate * self.wage_tax       # no cut yet: the one rate of the law
+        same = wage_rate == rate * self.wage_tax       # not moved yet: the one rate of the law
 
         # part 7: the transfers. The tax goes to the government, and the government pays the interest
         # out of it. The core limits each payment to what its payer has.

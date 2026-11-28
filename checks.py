@@ -559,7 +559,8 @@ def check_transfers():
 
     # 1c. The holders of the debt. A stand-in lends the government 1,000 once. The debt module adds it to the debt
     #     the next year, and from then on taxes wages and earnings at one rate for holders_press times what is added,
-    #     and repays that much to owners, so the added debt falls by a twentieth each year.
+    #     and repays that much to owners, so the added debt falls by a twentieth each year. The holders press here
+    #     in every year, not only in a lasting recovery.
     from modules.debt import Debt
     def lend_once(L):
         if not getattr(L, "_lent", False):
@@ -569,7 +570,7 @@ def check_transfers():
         return []
     def lender_start(L):
         L.add_component("lender income", "lender", kind="income", transfers=True)
-    m = Model(make_ledger(), [Debt(), Fixed("lender", lend_once, lender_start)])
+    m = Model(make_ledger(), [Debt(recovery_years=0), Fixed("lender", lend_once, lender_start)])
     rs = [m.step() for _ in range(4)]
     debt = m.modules[0] if isinstance(m.modules[0], Debt) else m.modules[1]
     pressed = [sum(t["paid"] for t in r["transfers"] if t["label"].startswith("tax on")) for r in rs]
@@ -1397,7 +1398,7 @@ def check_government_account():
             return [Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=30.0)] + \
                 lend_to_government("short", 30.0, L, GOVERNMENT, self.name)
 
-    m = Model(make_ledger(), [Debt(), Short()])
+    m = Model(make_ledger(), [Debt(recovery_years=0), Short()])   # the holders press in every year
     m.step()
     r = m.step()
     rows = {t["label"]: t["paid"] for t in r["transfers"]}
@@ -1536,24 +1537,44 @@ def check_idle_plant():
 
 
 def check_tax_cut():
-    """Owners have the rates in law cut by the surplus of the taxes at those rates, once, and the rate on
-    earnings falls faster than the rate on wages; a deficit and the tax pressed by the holders order no cut."""
+    """Owners have the rates in law cut by a part of the surplus of the taxes at those rates, the rate on earnings
+    falling faster than the rate on wages; a deficit raises them by a part of it, the rate on earnings rising
+    faster; what was ordered the year before is allowed for, and the tax pressed by the holders is not counted."""
     from modules.debt import Debt, REPAID as PRESSED_REPAID
-    d = Debt()
+    d = Debt(owners_resist=0.0)
     # Taxes in law asked 100 of earnings and 200 of wages and brought in 30 more than they paid for; the holders
     # pressed 50, which is not counted.
     G = {"gaps": {"x": -30.0, PRESSED_REPAID: -50.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0}
+    taken = lambda ke, kw: 100 * (1 - ke) + 200 * (1 - kw)
     ke, kw = (c.value for c in d.order_cut(G))
-    assert np.isclose(100 * (1 - ke) + 200 * (1 - kw), 30.0) and np.isclose(np.log(ke), d.owners_pace * np.log(kw))
-    # The next year's record was made before that cut acted: it shows the same surplus, and no second cut is ordered.
-    assert [c.value for c in d.order_cut(G)] == [1.0, 1.0]
-    # A deficit orders no cut and no rise; a surplus as large as all the taxes leaves no rate.
-    assert [c.value for c in d.order_cut({"gaps": {"x": 40.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [1.0, 1.0]
-    assert [c.value for c in d.order_cut({"gaps": {"x": -300.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [0.0, 0.0]
+    assert np.isclose(taken(ke, kw), d.cut_part * 30.0) and np.isclose(np.log(ke), d.owners_pace * np.log(kw))
+    # The next year's record was made before that cut acted: the cut ordered then is for what that one leaves.
+    ke2, kw2 = (c.value for c in d.order_cut(G))
+    assert np.isclose(taken(ke2, kw2), d.cut_part * (30.0 - taken(ke, kw)))
+    # A deficit of 40 raises the rates to bring in a part of it, the rate on earnings faster.
+    D = {"gaps": {"x": 40.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0}
+    re_, rw_ = (c.value for c in Debt(owners_resist=0.0).order_cut(D))
+    assert re_ > rw_ > 1.0 and np.isclose(-taken(re_, rw_), Debt().rise_part * 40.0)
+    assert np.isclose(np.log(re_), Debt().rise_pace * np.log(rw_))
+    # With the whole surplus cut and no rise: one cut, none for the same record,
+    # none in a deficit, and no rate left after a surplus as large as all the taxes.
+    w = Debt(cut_part=1.0, rise_part=0.0, owners_resist=0.0)
+    ke1, kw1 = (c.value for c in w.order_cut(G))
+    assert np.isclose(taken(ke1, kw1), 30.0) and [c.value for c in w.order_cut(G)] == [1.0, 1.0]
+    assert [c.value for c in w.order_cut(D)] == [1.0, 1.0]
+    assert [c.value for c in w.order_cut({"gaps": {"x": -300.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [0.0, 0.0]
     assert Debt(cut_surplus=False).order_cut(G) == []
+    # Whatever the balance, owners wear down the rate on earnings by a part of itself each year.
+    assert np.allclose([c.value for c in Debt().order_cut({})], [np.exp(-Debt().owners_resist), 1.0])
+    # The holders press only when unemployment has fallen in each of the last two years; at 0 years, always.
+    h = Debt()
+    for u, ok in ((0.10, False), (0.09, False), (0.08, True), (0.085, False), (0.07, False), (0.06, True)):
+        h.jobless.append(u)
+        assert h.recovering() == ok
+    assert Debt(recovery_years=0).recovering()
 
     # Through the core: a stand-in pays wage earners 10 and taxes them 30 at a rate in law. The core records what
-    # the tax asked of wages, and the next year the debt module orders the rate on wages cut to a third.
+    # the tax asked of wages, and the next year the debt module orders the rate on wages cut by a part of the 20.
     class Stand:
         name = "stand"
 
@@ -1567,10 +1588,13 @@ def check_tax_cut():
     m.step()
     assert np.isclose(m.L.accounts["government"]["taxed_wages"], 30.0) and np.isclose(m.L.accounts["government"]["gaps"]["gap"], -20.0)
     p = m.step()["published"]
-    assert np.isclose(p["tax_kept_wages"], 1.0 / 3.0) and np.isclose(p["tax_kept_earnings"], (1.0 / 3.0) ** 2.3)
-    print(f"25. Tax cut: taxes in law that ask 100 of earnings and 200 of wages and bring in 30 more than they pay for "
-          f"keep {ke:.3f} of the rate on earnings and {kw:.3f} of the rate on wages; the same record a year later, a "
-          f"deficit and the tax pressed by the holders of the debt order no cut.")
+    kept = 1.0 - Debt().cut_part * 20.0 / 30.0
+    assert np.isclose(p["tax_kept_wages"], kept) and np.isclose(p["tax_kept_earnings"], kept ** 2.3 * np.exp(-Debt().owners_resist))
+    print(f"25. Tax cut and rise: taxes in law that ask 100 of earnings and 200 of wages and bring in 30 more than they "
+          f"pay for keep {ke:.3f} of the rate on earnings and {kw:.3f} of the rate on wages; a deficit of 40 raises them "
+          f"to {re_:.3f} and {rw_:.3f}; the same record a year later is answered only for what the first change leaves; whatever the balance the rate "
+          f"on earnings loses {1 - np.exp(-Debt().owners_resist):.3f} of itself a year; and the holders of the debt press only "
+          f"after two years running of falling unemployment.")
 
 
 if __name__ == "__main__":

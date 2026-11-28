@@ -226,8 +226,8 @@ class Sales:
         self.buy_instead = buy_instead  # employees that such a firm seeks by purchase for each job it holds back
         self.paid_out = paid_out        # part of owners' money income that firms pay out to them in the long run
         self.benefit = benefit          # pay to each person out of work, as a part of the wage (unemployment insurance, 1960 to 2019)
-        self.benefit_rate = None        # the rate of tax on earnings for that pay, set in law in the first year and then cut only as the debt module orders
-        self.benefit_wage_rate = None   # the rate on wages: the same when set, then cut as the debt module orders
+        self.benefit_rate = None        # the rate of tax on earnings for that pay, set in law in the first year and then moved only as the debt module orders
+        self.benefit_wage_rate = None   # the rate on wages: the same when set, then moved as the debt module orders
         self.judged_over = judged_over  # years over which each condition of accumulation is judged
         self.significant = significant  # a fall smaller than this part of the level counts as steady
         self.top = top
@@ -396,7 +396,7 @@ class Sales:
         wages = wage * employed
         pay = self.benefit * wage * max(L.shared["workforce"] - employed, 0.0)
         base = np.maximum(L.earnings() - L.n * L.components[BENEFIT_TAX], 0.0)
-        if self.benefit_rate is not None:   # once in law, the rates are cut as the debt module orders after a surplus
+        if self.benefit_rate is not None:   # once in law, the rates move as the debt module orders after a surplus or a deficit
             self.benefit_rate *= L.accounts.get("tax_kept_earnings", 1.0)
             self.benefit_wage_rate *= L.accounts.get("tax_kept_wages", 1.0)
         if self.benefit_rate is None and pay > 0:

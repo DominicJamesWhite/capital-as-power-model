@@ -192,9 +192,9 @@ class Privatisation:
         self.planned_build = 0.0        # public hiring planned last year for this year, in employees
         self.taken = 0.0                # employees of the top hundred that came from the pool (grows with the working population)
         self.door = 0.0
-        self.rate = 0.0                 # the tax for the pay of public employees, as a part of earnings; set in law once, then cut only as the debt module orders
+        self.rate = 0.0                 # the tax for the pay of public employees, as a part of earnings; set in law once, then moved only as the debt module orders
         self.in_law = False             # whether the rate has been set
-        self.wage_rate = 0.0            # the rate on wages: the same as the rate on earnings when set, then cut as the debt module orders
+        self.wage_rate = 0.0            # the rate on wages: the same as the rate on earnings when set, then moved as the debt module orders
 
     def readouts(self, L, held):
         W = L.shared["workforce"]
@@ -257,7 +257,7 @@ class Privatisation:
         base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
         # The rate is set in law in the first year with public pay, to cover that year's pay.
         # The difference between the pay and the tax at that rate is lent by owners, or repays them.
-        # Once in law, the rates are cut as the debt module orders after a surplus.
+        # Once in law, the rates move as the debt module orders after a surplus or a deficit.
         if self.in_law:
             self.rate *= L.accounts.get("tax_kept_earnings", 1.0)
             self.wage_rate *= L.accounts.get("tax_kept_wages", 1.0)

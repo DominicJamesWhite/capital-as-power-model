@@ -53,6 +53,15 @@ checked against it. The same regression on the national accounts gives 0.07 (giv
 what the holders of the debt can make the government collect from everybody else, for them.
 With no added debt the tax is nothing, so the main modules alone are unchanged.
 
+The holders press only in a lasting recovery: when unemployment has fallen in each of the last
+`recovery_years` years, 2. Hager writes that "Any effort to drastically reduce the debt without a
+sustained recovery would likely encounter resistance from dominant owners" (chapter 4, "Fixing or
+Flipping?"). How many years of falling unemployment make a recovery lasting is our own choice. In
+the United States record, 1981 to 2017, the change of federal receipts that came from changes of
+effective rates rose with the debt held by the public in such years (0.003 of the debt, give or
+take 0.008) and fell with it in other years (0.027, give or take 0.014), so the record leans the
+same way, weakly. With `recovery_years` at 0 the holders press every year.
+
 The government never refuses to pay. Hager writes of the first holders of the United States
 debt that they "would provide a powerful force against repudiation" (chapter 1), and reports
 the argument that a government can instead lower its debt by inflation, a "default by
@@ -60,10 +69,35 @@ stealth" (chapter 5). Here the debt is kept in money, so rising prices and wages
 part of income. When the taxes do not reach, the core pays holders only what the government
 has; what it does not repay stays owed, and interest it does not pay is lost to them.
 
+The rates of the taxes set in law move with the government's account. After a surplus, owners
+have them cut by `cut_part` of it, theirs faster: Hager, after Streeck, writes of the "successful
+tax resistance waged on the part of increasingly powerful elites" (chapter 4). After a deficit
+the rates rise to bring in `rise_part` of it; most of the time governments "come to rely on
+borrowing from elites instead of taxing them" (the same chapter). Both parts and the pace of the
+rise come from the United States federal accounts, 1951 to 2017: the change of receipts that came
+from changes of effective federal rates on corporate profits and on the pay of employees, as a
+part of national product, against last year's federal balance, with the wars, the growth of
+profits against wages, and the year's change of unemployment held apart. The last is held apart
+because effective rates also move by themselves with the cycle, as incomes move between brackets,
+and rates set in law in the model do not. A surplus of 1 per cent of national product was
+followed by cuts that took 0.24 per cent off receipts (give or take 0.15), and a deficit of 1 per
+cent by rises that brought in 0.045 per cent (give or take 0.033). The rise came as much after a
+deficit run in a slump as after one run in a recovery. After a deficit the effective rate on
+profits rose 5.2 times as fast as the rate on wages, in proportion, and the rise of the rate on
+wages is smaller than its error, so that figure is loose. Whatever the balance, owners also wear
+the rate on earnings down by `owners_resist` of itself a year: in the same fit the effective rate
+on profits fell by 3.9 per cent of itself a year apart from the balance (give or take 1.8), and
+the rate on wages did not fall. The rise after deficits and this fall belong together: with the
+average deficit of those years, 2.2 per cent of national product, they give a fall of the rate
+on profits of 1.7 per cent of itself a year, against 1.9 in the record from 1951 to 2017. In
+terms of power: how much of what the government lacks owners let it take back, how much of what
+it does not need they take for themselves, and their steady power to resist being taxed.
+
 Additions to the book: the interest part of the first year, the government's interest stream
 as a fixed part of all income, the stock that bailouts add to the debt and proceeds take from
-it, the tax pressed by the holders of the added debt and its single rate on all income, and
-repaying them in proportion to capitalization.
+it, the tax pressed by the holders of the added debt and its single rate on all income, the
+number of years of falling unemployment before they press, and repaying them in proportion to
+capitalization.
 """
 import numpy as np
 from core import Publish, Transfer, lend_to_government, WAGE_EARNERS, GOVERNMENT
@@ -76,7 +110,7 @@ REPAID = "repaid to the holders of the public debt"
 
 class Debt:
     name = "debt"
-    reads = ("transfers",)
+    reads = ("transfers", "unemployment")
     supplies = ("interest_share", "corporate_debt", "government_debt", "government_debt_dominant",
                 "tax_kept_earnings", "tax_kept_wages")
     figures = {                   # what the workbench calls each published number: label, unit, note
@@ -84,17 +118,24 @@ class Debt:
         "corporate_debt": ("Corporate debt", "number", "The debt that firms owe, in money (the failure module); without it, the interest capitalized at the normal rate of return."),
         'government_debt': ('Government debt', 'number', "Capitalized value of the government's interest payments, in money."),
         'government_debt_dominant': ('Government debt held by the top 100', 'number', "Taken to equal the top 100's part of all capitalization, in money."),
-        "tax_kept_earnings": ("Rate on earnings kept", "share", "The part of each rate of tax in law on firms' earnings that is kept next year, after owners have it cut for last year's surplus."),
-        "tax_kept_wages": ("Rate on wages kept", "share", "The part of each rate of tax in law on wages that is kept next year, after owners have it cut for last year's surplus."),
+        "tax_kept_earnings": ("Rate on earnings kept", "share", "Each rate of tax in law on firms' earnings next year, as a part of this year's: below 1 after a surplus, above 1 after a deficit."),
+        "tax_kept_wages": ("Rate on wages kept", "share", "Each rate of tax in law on wages next year, as a part of this year's: below 1 after a surplus, above 1 after a deficit."),
     }
 
-    def __init__(self, government_part=0.02, start=0.20, holders_press=0.05, cut_surplus=True, owners_pace=2.3):
+    def __init__(self, government_part=0.02, start=0.20, holders_press=0.05, cut_surplus=True, owners_pace=2.3,
+                 cut_part=0.24, rise_part=0.045, rise_pace=5.2, owners_resist=0.039, recovery_years=2):
         self.government_part = government_part   # government interest payments as a part of all income
         self.share = start
         self.holders_press = holders_press   # tax pressed by the holders of the added debt, as a part of it in a year (Bohn 1998)
         self.cut_surplus = cut_surplus       # owners have the rates in law cut by what they bring in beyond what the government pays (Hager 2016, chapter 4)
         self.owners_pace = owners_pace       # how many times as fast the rate on earnings falls as the rate on wages, in proportion (Hager 2016, chapter 4: effective rates of the largest corporations and of households)
-        self.ordered = (1.0, 1.0)            # the cut ordered last year: the part of the rate on earnings and of the rate on wages to be kept
+        self.cut_part = cut_part             # the part of a surplus that the cut takes away in a year (United States federal accounts, 1951 to 2017)
+        self.rise_part = rise_part           # the part of a deficit that a rise of the rates brings in, in a year (the same accounts)
+        self.rise_pace = rise_pace           # how many times as fast the rate on earnings rises as the rate on wages, in proportion (the same accounts)
+        self.owners_resist = owners_resist   # the part of itself by which the rate on earnings falls each year whatever the balance, in proportion (the same accounts)
+        self.recovery_years = recovery_years # years running of falling unemployment before the holders press (Hager 2016, chapter 4; the number is our own)
+        self.jobless = []                    # unemployment of past years, as the core published it
+        self.ordered = (1.0, 1.0)            # the change ordered last year: each rate on earnings and on wages next year, as a part of this year's
         self.debt = None                  # the debt that firms owe (the failure module); None without it
         self.added = 0.0                  # debt added by bailouts and by borrowing to spend, less debt retired with the proceeds of privatisation, in money
 
@@ -130,9 +171,11 @@ class Debt:
         if "debt_owed" in A:
             self.debt = float(A["debt_owed"])
         changes = [Publish(k, v, self.name) for k, v in self.accounts(L).items()]
-        # The holders of the added debt press for repayment: one rate on the wage bill and on every firm's
-        # earnings before this tax, and the government repays them what it collects.
-        press = self.holders_press * max(self.added, 0.0)
+        # The holders of the added debt press for repayment in a lasting recovery: one rate on the wage bill
+        # and on every firm's earnings before this tax, and the government repays them what it collects.
+        if "unemployment" in A:
+            self.jobless.append(float(A["unemployment"]))
+        press = self.holders_press * max(self.added, 0.0) if self.recovering() else 0.0
         if press > 0:
             wages = L.shared["wage"] * L.n.sum()
             base = np.maximum(L.earnings() - L.n * L.components[PRESSED], 0.0)
@@ -144,34 +187,51 @@ class Debt:
         changes += self.order_cut(A.get("government", {}))
         return changes
 
+    def recovering(self):
+        """Whether unemployment has fallen in each of the last `recovery_years` years."""
+        n = int(self.recovery_years)
+        if n <= 0:
+            return True
+        u = self.jobless[-(n + 1):]
+        return len(u) == n + 1 and all(b < a for a, b in zip(u, u[1:]))
+
     def order_cut(self, G):
-        """Owners have the rates in law cut by what the taxes at those rates brought in last year beyond
-        what the government paid for with them, less what the cut ordered last year will already take
-        off. The tax pressed by the holders of the debt is not counted: it is collected to repay them.
-        The rate on earnings falls `owners_pace` times as fast as the rate on wages, in proportion, and
-        the cut is sized so that last year's taxes would have come to exactly what was paid. A deficit
-        orders no cut and no rise. The modules that tax at a rate in law apply the cut the next year."""
+        """Move the rates in law by last year's balance of the taxes at those rates, less what the change
+        ordered last year will already do. The tax pressed by the holders of the debt is not counted: it
+        is collected to repay them. In a surplus, owners have the rates cut by `cut_part` of it, the rate
+        on earnings falling `owners_pace` times as fast as the rate on wages, in proportion. In a deficit
+        the rates rise to bring in `rise_part` of it, the rate on earnings rising `rise_pace` times as
+        fast as the rate on wages. The modules that tax at a rate in law apply the change the next year."""
         if not self.cut_surplus:
             return []
         te, tw = float(G.get("taxed_earnings", 0.0)), float(G.get("taxed_wages", 0.0))
         gaps = G.get("gaps", {})
         surplus = -sum(gaps[k] for k in sorted(gaps) if k != REPAID)
         ke, kw = self.ordered
-        want = surplus - te * (1.0 - ke) - tw * (1.0 - kw)
+        left = surplus - te * (1.0 - ke) - tw * (1.0 - kw)   # what remains after the change already ordered
         self.ordered = (1.0, 1.0)
-        if want > 0 and te + tw > 0:
-            a = self.owners_pace
+        if left > 0 and te + tw > 0:         # a surplus: owners have a part of it cut, theirs faster
+            want, a = self.cut_part * left, self.owners_pace
             if want >= te + tw:              # the taxes brought in more than all they pay for: no rate is left
                 self.ordered = (0.0, 0.0)
             else:
-                taken = lambda k: te * (1.0 - np.exp(-a * k)) + tw * (1.0 - np.exp(-k))
-                lo, hi = 0.0, 1.0
-                while taken(hi) < want:
-                    hi *= 2.0
-                for _ in range(100):         # what is taken rises with k: find k by halving the interval
-                    mid = 0.5 * (lo + hi)
-                    lo, hi = (mid, hi) if taken(mid) < want else (lo, mid)
-                k = 0.5 * (lo + hi)
+                k = self._solve(lambda k: te * (1.0 - np.exp(-a * k)) + tw * (1.0 - np.exp(-k)), want)
                 self.ordered = (float(np.exp(-a * k)), float(np.exp(-k)))
-        return [Publish("tax_kept_earnings", self.ordered[0], self.name),
+        elif left < 0 and self.rise_part > 0 and te + tw > 0:   # a deficit: a part of it is raised
+            want, b = -self.rise_part * left, self.rise_pace
+            k = self._solve(lambda k: te * (np.exp(b * k) - 1.0) + tw * (np.exp(k) - 1.0), want)
+            self.ordered = (float(np.exp(b * k)), float(np.exp(k)))
+        resisted = float(np.exp(-self.owners_resist))   # owners wear the rate on earnings down, whatever the balance
+        return [Publish("tax_kept_earnings", self.ordered[0] * resisted, self.name),
                 Publish("tax_kept_wages", self.ordered[1], self.name)]
+
+    @staticmethod
+    def _solve(taken, want):
+        """The k at which `taken`, which rises with k from 0, comes to `want`: found by halving the interval."""
+        lo, hi = 0.0, 1.0
+        while taken(hi) < want:
+            hi *= 2.0
+        for _ in range(100):
+            mid = 0.5 * (lo + hi)
+            lo, hi = (mid, hi) if taken(mid) < want else (lo, mid)
+        return 0.5 * (lo + hi)

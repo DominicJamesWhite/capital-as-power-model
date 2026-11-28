@@ -167,9 +167,9 @@ class Force:
         self.level = 0.0                    # the level of organised force, from 0 to 1
         self.jobs = 0.0                     # military jobs now on the contractors' books
         self.planned = 0.0                  # hiring (+) or dismissals (-) planned last year for this year
-        self.rate = 0.0                     # the tax for military orders, as a part of earnings; set in law once, then cut only as the debt module orders
+        self.rate = 0.0                     # the tax for military orders, as a part of earnings; set in law once, then moved only as the debt module orders
         self.in_law = False                 # whether the rate has been set
-        self.wage_rate = 0.0                # the rate on wages: the same as the rate on earnings when set, then cut as the debt module orders
+        self.wage_rate = 0.0                # the rate on wages: the same as the rate on earnings when set, then moved as the debt module orders
 
     def contractors(self, L):
         """Positions of the arms contractors, and the top hundred."""
@@ -238,7 +238,7 @@ class Force:
         base = np.maximum(L.earnings() - L.n * L.components[TAX], 0.0)
         # The rate is set in law in the first year with orders, to cover them. The tax goes to
         # the government, which pays the armed forces for the orders. The difference is lent by owners, or
-        # repays them. Once in law, the rates are cut as the debt module orders after a surplus.
+        # repays them. Once in law, the rates move as the debt module orders after a surplus or a deficit.
         if self.in_law:
             self.rate *= L.accounts.get("tax_kept_earnings", 1.0)
             self.wage_rate *= L.accounts.get("tax_kept_wages", 1.0)
