@@ -11,16 +11,18 @@ firms sell.
   1. Wage earners buy with all the money they have: the wage bill, plus the payments they
      received, less the taxes and interest they paid, plus what households borrowed, less what
      they paid back.
-  2. The government buys with what it collected in the year and did not pay out. An organ of
-     government that a module names as a buyer, such as the armed forces, buys with all it
-     received.
+  2. An organ of government that a module names as a buyer, such as the armed forces, buys with
+     all it received. Money that the government holds buys nothing: it keeps it and uses it
+     before it borrows again.
   3. A tax is a rate on income set in law. Each module that taxes sets its rate once, to cover
      what it makes the government pay in its first year, and keeps it. In a slump, when
      fewer people are employed, the tax at that rate falls and what the government pays out
-     does not, and owners lend the government the difference; what they lend, they do not
-     spend. When the tax collects more than the government pays out, it repays owners, who
-     do not spend what is repaid. These are loans in the core's record of transfers, and the
-     debt module adds them to the government's debt.
+     does not. The core adds up what every module leaves the government short or with to
+     spare, and owners lend it what it is short of after it has used what it holds; what they
+     lend, they do not spend. When the taxes collect more than the government pays out, it
+     repays owners, who do not spend what is repaid, and holds what is left once it owes
+     nothing. These are loans in the core's record of transfers, and the debt module adds
+     them to the government's debt.
   3a. People out of work. This module has the government pay each person out of work a part of
      the wage (`benefit`), from a tax at one rate on the wage bill and on earnings, set in law
      in the first year in the same way. Their pay is counted with what wage earners have.
@@ -243,7 +245,9 @@ class Sales:
         # What each party had to spend.
         has_wages = (max(wages + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0)
                      + self.carried[WAGE_EARNERS])
-        has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + organs + self.carried[GOVERNMENT]
+        # The government buys through the organs that a module names as buyers. What it collects and does not
+        # pay out it holds, and uses before it borrows: money held buys nothing.
+        has_government = organs + self.carried[GOVERNMENT]
         building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
         # What is paid out is below nothing after a year in which owners lost more than they earned: they
         # then pay money into the firms to meet the wages that sales did not pay back, and buy no goods.

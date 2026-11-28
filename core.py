@@ -51,6 +51,11 @@ module's transfers is entered by the core in an income component of that module.
 A transfer can be marked as a loan: owners lend to the government out of their earnings of the
 year, or the government repays them. A loan is paid as any transfer is, and it is no income to
 anybody, so it is not entered in the component. The record of the year shows what was lent.
+The government has one account. A module that makes the government pay more than its tax collects,
+or less, reports the gap, and the core adds up the gaps of all modules. The government uses the
+money it holds before it borrows, and repays its debt, no more than it owes, with what is left
+over. For example, if one module is short by 100, another has 30 to spare and the government holds
+20, owners lend it 50.
 
 Two kinds of money are spent on goods and are therefore not transfers between the parties above.
 A module can name a party that spends all it receives, in the same year, on what firms sell: an
@@ -83,6 +88,8 @@ ATTR = {"employees": "n", "hype": "h", "risk": "d"}
 
 WAGE_EARNERS = "wage earners"      # a party to transfers: it has the wage bill of the year
 GOVERNMENT = "government"          # a party to transfers: it has what it holds and what it receives in the year
+LENT = "lent to the government"    # the loan that covers what the government is short of in a year (Model._government_loans)
+REPAID = "repaid by the government"
 
 # A firm that pays out all it has keeps this part of its earnings. It is an allowance for rounding and
 # not a rule: without it a rounding error could leave earnings a hair below zero, and earnings of exactly
@@ -210,22 +217,23 @@ class Transfer:
     loan: bool = False
 
 
+@dataclass
+class GovernmentGap:
+    """What a module makes the government pay in the year, less the tax it collects for it. Above 0
+    the government is short; below 0 it has collected more than it pays. The core adds up the gaps
+    of every module and keeps one account for the government (see Model._government_loans)."""
+    label: str
+    gap: float
+    source: str
+
+
 def lend_to_government(label, gap, L, receiver, source):
-    """The transfer that covers a gap between what a module makes the government pay and the tax it
-    collects for it. Above 0, owners lend the gap, each firm in proportion to its earnings, which is
-    what its owners have in the year; below 0, the government repays as much to the owners, each firm
-    in proportion to its capitalization, as holdings of the debt are (Hager 2015). It repays no more
-    than the debt it owes; what it collects beyond that it holds. Returns a list."""
+    """The gap between what a module makes the government pay and the tax it collects for it, as a
+    change for the core. `L` and `receiver` are kept so that every module calls it in the same way.
+    Returns a list."""
     if not (gap != 0.0 and np.isfinite(gap)):
         return []
-    if gap > 0:
-        have = np.maximum(L.n * L.e, 0.0)
-        return [Transfer(label, payer=gap * have / have.sum(), receiver=receiver, source=source, loan=True)] if have.sum() > 0 else []
-    owed = max(float(L.accounts.get("government_debt", 0.0)), 0.0)      # the debt last published by the debt module
-    K = np.maximum(L.cap(), 0.0)
-    if K.sum() <= 0 or owed <= 0:
-        return []
-    return [Transfer(label, payer=GOVERNMENT, receiver=K, source=source, amount=min(-gap, owed), loan=True)]
+    return [GovernmentGap(label, float(gap), source)]
 
 
 # ---------------------------------------------------------------- components
@@ -777,7 +785,7 @@ class Model:
                     if L.extra_owner.get(c.name) != m.name:
                         raise LedgerError(f"module '{m.name}' tried to set the attribute '{c.name}', which it does "
                                           f"not own. A module may set only the attributes it added with an owner.")
-                elif isinstance(c, Transfer):
+                elif isinstance(c, (Transfer, GovernmentGap)):
                     if c.source != m.name:
                         raise LedgerError(f"module '{m.name}' proposed a transfer under the name '{c.source}'")
                 elif isinstance(c, Scale) and c.term == "price":
@@ -800,6 +808,7 @@ class Model:
 
         ln0 = self._lndk()
         K0 = L.cap()
+        have0 = np.maximum(L.n * L.e, 0.0)      # what owners have at the start of the year, before the year's changes
         count = len(L)
         group = top_positions(K0, np.arange(count), self.top)
         touched = {}                    # for the guard: which firms each source changed in this step
@@ -831,6 +840,8 @@ class Model:
         comp_changes = [c for c in changes if isinstance(c, (SetComponent, ScaleComponent))]
         wage_sets = [c for c in changes if isinstance(c, Set) and c.key == "wage"]
         transfers = [c for c in changes if isinstance(c, Transfer)]
+        government = self._government_loans([c for c in changes if isinstance(c, GovernmentGap)], have0, K0)
+        transfers += government.pop("loans")
         recording = sorted(name for name, c in L.info.items() if c.settled)    # the components that record transfers
         self.settlement = {"transfers": [], "parties": {}}
         if comp_changes or wage_sets or recording or transfers:
@@ -971,10 +982,47 @@ class Model:
         r["published"] = published
         r["transfers"] = self.settlement["transfers"]      # every transfer of the year: label, payer, receiver, asked, paid
         r["parties"] = self.settlement["parties"]          # for each party that is not a firm: received, paid, and what it holds
+        r["government"] = government                       # the government's one account: each module's gap, what it held, what it borrowed
         self.history.append(r)
         return r
 
     # ---- transfers
+
+    def _government_loans(self, gaps, have, K):
+        """The government's one account. Each module that taxes at a rate set in law reports its gap:
+        what it makes the government pay less the tax it collects for it. The core adds up the gaps
+        and sets against them the money the government holds from earlier years.
+
+          - If the sum is more than the government holds, owners lend it the rest, each firm in
+            proportion to its earnings at the start of the year, which is what its owners have.
+          - If it is less, the government repays its debt with what is left over, each firm in
+            proportion to its capitalization, as holdings of the debt are (Hager 2015). It repays no
+            more than the debt last published by the debt module. What is left after that it holds.
+
+        The loans are transfers marked as loans: no income to anybody. Returns the record: each
+        module's gap, what the government held, and the amount lent (below 0: repaid), with the
+        transfers under "loans"."""
+        L = self.L
+        by_label = {}
+        for g in sorted(gaps, key=lambda g: (g.source, g.label)):
+            by_label[g.label] = by_label.get(g.label, 0.0) + g.gap
+        held = float(L.holds[GOVERNMENT])
+        record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": []}
+        if not gaps:
+            return record
+        need = sum(by_label[k] for k in sorted(by_label)) - held
+        if need > 0 and have.sum() > 0:
+            record["lent"] = need
+            record["loans"] = [Transfer(LENT, payer=need * have / have.sum(), receiver=GOVERNMENT,
+                                        source=GOVERNMENT, loan=True)]
+        elif need < 0:
+            owed = max(float(L.accounts.get("government_debt", 0.0)), 0.0)    # the debt last published by the debt module
+            K = np.maximum(K, 0.0)
+            if K.sum() > 0 and owed > 0:
+                record["lent"] = -min(-need, owed)
+                record["loans"] = [Transfer(REPAID, payer=GOVERNMENT, receiver=K, source=GOVERNMENT,
+                                            amount=min(-need, owed), loan=True)]
+        return record
 
     def _settle(self, transfers, group):
         """Settle the year's transfers and enter the firms' side in the components that record them.
@@ -1019,7 +1067,7 @@ class Model:
                 if side not in L.parties:
                     raise LedgerError(f"module '{t.source}' named '{side}' in the transfer '{t.label}', and no "
                                       f"such party exists. Register it in start() with L.add_party.")
-            if (by_firms or to_firms) and L.transfer_component(t.source) is None:
+            if (by_firms or to_firms) and not t.loan and L.transfer_component(t.source) is None:
                 raise LedgerError(f"module '{t.source}' proposed the transfer '{t.label}', which firms pay or "
                                   f"receive, and has no component to record it. Register one in start() with "
                                   f"L.add_component(name, owner, kind='income', transfers=True).")

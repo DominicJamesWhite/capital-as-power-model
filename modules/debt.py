@@ -23,27 +23,42 @@ dominant capital's part of all capitalization. It does not pay that interest to 
 Optional modules change the government's debt, and the numbers they publish are 0 when they
 are off. The risk shaping module publishes what the government borrows to bail out dominant
 capital. The modules that tax at a rate set in law (public debt, privatisation, organised
-force, sales) have owners lend the government what the tax does not cover, and the record of
-transfers shows what was lent and what was repaid. The privatisation module publishes what
+force, sales, and this module) report what they leave the government short of or with to
+spare, and the core keeps one account for the government: owners lend it what it is short of
+after it has used the money it holds, and it repays them with what is left over, no more than
+this module last reported it owes. The record of transfers shows what was lent and what was
+repaid. The privatisation module publishes what
 dominant capital pays for the public services it takes over, and the government retires debt
 with it. The module keeps the sum as a stock of money and adds it to the debt. A government
 whose proceeds exceed its whole debt has no debt, and the rest of the proceeds is set against
 later borrowing.
 
 The holders of that added debt press for repayment. Each year the module charges a tax at one
-rate on the wage bill and on every firm's earnings, of `holders_press` times the added debt,
-and the government repays as much to owners, in proportion to the capitalization of each firm.
+rate on the wage bill and on every firm's earnings, of `holders_press` times the added debt.
+The tax goes into the government's one account, so it first pays for what the other taxes do
+not cover, such as interest on the debt, and what is left repays owners, in proportion to the
+capitalization of each firm. For example, with an added debt of 1,000 the tax is 50; if the
+other modules leave the government 30 short, owners are repaid 20.
 Sandy Brian Hager writes that the interests of the large holders of the debt "are best served
-by an austerity program of social spending cuts" (Public Debt, Inequality, and Power, 2016),
-and Bichler and Nitzan that the deficits after 2008 were reversed "because of the public debt"
-("Can Capitalists Afford Recovery?", 2014). Neither gives a figure. `holders_press`, 0.05, is
-Henning Bohn's measure for the United States, 1916 to 1995 ("The Behavior of U.S. Public Debt
-and Deficits", 1998): the primary surplus rose by about 0.05 of national income for each year
-of national income that the debt held by the public came to. The same regression on the
-national accounts gives 0.07 (give or take 0.035) for 1960 to 2007 and below 0 for 1960 to
-2019, when holders accepted more debt after 2008. In terms of power: what the holders of the
-debt can make the government collect from everybody else, for them. With no added debt the
-tax is nothing, so the main modules alone are unchanged.
+by an austerity program of social spending cuts" (Public Debt, Inequality, and Power, 2016,
+chapter 1), and Bichler and Nitzan that the deficits after 2008 were reversed "because of the
+public debt" ("Can Capitalists Afford Recovery?", 2014). Neither gives a figure.
+`holders_press`, 0.05, is our own choice from the record. Henning Bohn ("The Behavior of U.S.
+Public Debt and Deficits", 1998) is reported to find that the primary surplus of the United
+States rose by about 0.05 of national income for each year of national income that the debt
+held by the public came to, 1916 to 1995; the paper is not on disk and the figure has not been
+checked against it. The same regression on the national accounts gives 0.07 (give or take
+0.035) for 1960 to 2007 and below 0 for 1960 to 2019, when holders accepted more debt after
+2008, so the record supports anything from a little below 0 to about 0.1. In terms of power:
+what the holders of the debt can make the government collect from everybody else, for them.
+With no added debt the tax is nothing, so the main modules alone are unchanged.
+
+The government never refuses to pay. Hager writes of the first holders of the United States
+debt that they "would provide a powerful force against repudiation" (chapter 1), and reports
+the argument that a government can instead lower its debt by inflation, a "default by
+stealth" (chapter 5). Here the debt is kept in money, so rising prices and wages lower it as a
+part of income. When the taxes do not reach, the core pays holders only what the government
+has; what it does not repay stays owed, and interest it does not pay is lost to them.
 
 Additions to the book: the interest part of the first year, the government's interest stream
 as a fixed part of all income, the stock that bailouts add to the debt and proceeds take from

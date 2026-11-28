@@ -15,6 +15,8 @@ shift onto others and for advertising has a payer and a receiver, and that the s
 counts each of them.
 Check 20 tests that when buyers do not even pay back the wage bill, no firm books a loss below nothing
 and no firm that holds back production is left with fewer than no employees.
+Check 22 tests the government's one account: it uses the money it holds before it borrows, and
+several modules together repay no more than the government owes.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
@@ -22,7 +24,8 @@ Run from the folder that holds this file:
 """
 import numpy as np
 from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Publish, Transfer, LedgerError,
-                  readouts, top_positions, group_value, lend_to_government, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT)
+                  readouts, top_positions, group_value, lend_to_government, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT,
+                  LENT, REPAID)
 
 
 def make_ledger(count=3000, seed=1):
@@ -559,7 +562,8 @@ def check_transfers():
     def lend_once(L):
         if not getattr(L, "_lent", False):
             L._lent = True
-            return [Transfer("loan", payer=1000.0 * L.n * L.e / (L.n * L.e).sum(), receiver=GOVERNMENT, source="lender", loan=True)]
+            return [Transfer("loan", payer=1000.0 * L.n * L.e / (L.n * L.e).sum(), receiver=GOVERNMENT, source="lender", loan=True),
+                    Transfer("spent", payer=GOVERNMENT, receiver=WAGE_EARNERS, source="lender", amount=1000.0)]
         return []
     def lender_start(L):
         L.add_component("lender income", "lender", kind="income", transfers=True)
@@ -567,7 +571,7 @@ def check_transfers():
     rs = [m.step() for _ in range(4)]
     debt = m.modules[0] if isinstance(m.modules[0], Debt) else m.modules[1]
     pressed = [sum(t["paid"] for t in r["transfers"] if t["label"].startswith("tax on")) for r in rs]
-    repaid = [sum(t["paid"] for t in r["transfers"] if t["label"] == "repaid to the holders of the public debt") for r in rs]
+    repaid = [sum(t["paid"] for t in r["transfers"] if t["label"] == REPAID) for r in rs]
     assert pressed[0] == 0.0 and np.isclose(pressed[1], 50.0) and np.isclose(pressed[2], 47.5) and np.allclose(pressed, repaid)
     assert np.isclose(debt.added, 1000.0 * 0.95 ** 2)
     # With nothing lent, the debt module proposes no transfer.
@@ -767,7 +771,7 @@ def check_sales_account():
               [Levy(), Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)], top=1)
     with np.errstate(divide="ignore"):
         r3 = [m.step() for _ in range(3)][-1]
-    assert np.isclose(m.L.accounts["transfers"]["lent"]["lent_to_government"], -50.0) and np.isclose(r3["parties"][GOVERNMENT]["holds"], 65.0)
+    assert np.isclose(m.L.accounts["transfers"][REPAID]["lent_to_government"], -50.0) and np.isclose(r3["parties"][GOVERNMENT]["holds"], 65.0)
 
     # 2. Long runs, with the modules that move money, in opposite listing orders.
     import registry
@@ -808,7 +812,7 @@ def check_sales_account():
                                   if p not in (WAGE_EARNERS, GOVERNMENT) and p not in m.L.buyers)
                     lent, repaid = pub.get("household_debt_lent", 0.0), pub.get("household_debt_repaid", 0.0)
                     assert a["bought_by_wage_earners"] <= max(a["wages"] + net.get(WAGE_EARNERS, 0.0) + lent - repaid, 0.0) + kept + tol
-                    assert a["bought_by_government"] <= max(net.get(GOVERNMENT, 0.0), 0.0) + organs + kept + tol
+                    assert a["bought_by_government"] <= organs + kept + tol      # money the government holds buys nothing
                     # What the government borrowed is what the record shows owners lent, less what they were repaid.
                     loans = sum(t["paid"] * ((t["payer"] == "firms") - (t["receiver"] == "firms"))
                                 for t in last["transfers"] if t["loan"])
@@ -1290,6 +1294,82 @@ def check_leaders():
           f"firms that hold their price keep {f.min():.3f} or more of their employees.")
 
 
+def check_government_account():
+    """The government has one account: it uses what it holds before it borrows, and the modules together
+    repay no more than it owes."""
+    from modules.debt import Debt
+    # Three firms with earnings of 50, 50 and 40 and a wage bill of 280. The government owes 100. Each year
+    # lists, for each of three stand-in modules, what it pays wage earners and what it taxes them.
+    plan = {1: {"c": (0, 20)},                                   # a tax of 20 with nothing to pay: the government holds 20
+            2: {"a": (100, 0), "b": (0, 30)},                    # a is 100 short, b has 30 to spare, 20 is held: owners lend 50
+            3: {"b": (0, 80), "c": (0, 80)},                     # 160 to spare: 100 repays the debt, 60 is held
+            4: {"a": (50, 0)}}                                   # 50 short with 60 held: nothing is borrowed, 10 repays
+
+    class Stand:
+        def __init__(self, name):
+            self.name, self.year = name, 0
+
+        def start(self, L):
+            return {"government_debt": 100.0}
+
+        def propose(self, L, rng):
+            self.year += 1
+            pay, tax = plan.get(self.year, {}).get(self.name, (0, 0))
+            out = []
+            if tax:
+                out.append(Transfer("tax", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=float(tax)))
+            if pay:
+                out.append(Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=float(pay)))
+            if self.name != "c" or self.year != 1:
+                out += lend_to_government("gap of " + self.name, float(pay - tax), L, GOVERNMENT, self.name)
+            return out
+
+    L = Ledger(employees=[100.0, 100.0, 80.0], epe=0.5, industry=[0, 0, 0], sector_of_industry=[0])
+    m = Model(L, [Stand("a"), Stand("b"), Stand("c")], top=1)
+    lent, repaid, held = [], [], []
+    for _ in range(4):
+        r = m.step()
+        rows = {t["label"]: t["paid"] for t in r["transfers"]}
+        lent.append(rows.get(LENT, 0.0))
+        repaid.append(rows.get(REPAID, 0.0))
+        held.append(m.L.holds[GOVERNMENT])
+        assert np.allclose(m.L.n * m.L.e, [50.0, 50.0, 40.0])        # loans are no income
+    assert np.allclose(lent, [0, 50, 0, 0]) and np.allclose(repaid, [0, 0, 100, 10]) and np.allclose(held, [20, 0, 60, 0])
+    assert np.isclose(m.history[1]["government"]["gaps"]["gap of a"], 100.0) and np.isclose(m.history[1]["government"]["held"], 20.0)
+
+    # With the debt module, the tax pressed by the holders first covers another module's shortfall. Owners lend
+    # 1,000 once; the next year the holders press a tax of 50 while a stand-in is 30 short: 20 is repaid, nothing lent.
+    class Short:
+        name = "short"
+
+        def __init__(self):
+            self.year = 0
+
+        def start(self, L):
+            L.add_component("short income", self.name, kind="income", transfers=True)
+            return {}
+
+        def propose(self, L, rng):
+            self.year += 1
+            if self.year == 1:
+                return [Transfer("loan", payer=1000.0 * L.n * L.e / (L.n * L.e).sum(), receiver=GOVERNMENT,
+                                 source=self.name, loan=True),
+                        Transfer("spent", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=1000.0)]
+            return [Transfer("pay", payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=30.0)] + \
+                lend_to_government("short", 30.0, L, GOVERNMENT, self.name)
+
+    m = Model(make_ledger(), [Debt(), Short()])
+    m.step()
+    r = m.step()
+    rows = {t["label"]: t["paid"] for t in r["transfers"]}
+    pressed = sum(v for k, v in rows.items() if k.startswith("tax on"))
+    assert np.isclose(pressed, 50.0) and np.isclose(rows.get(REPAID, 0.0), 20.0) and LENT not in rows
+    print("22. Government account: with 20 held, a module 100 short and another with 30 to spare, owners lend 50. "
+          "Two modules with 80 to spare each repay a debt of 100 once, and the government holds the other 60, "
+          "which it uses the next year before it borrows. A tax of 50 pressed by the holders of the debt first "
+          "covers another module's shortfall of 30, and repays 20.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1312,4 +1392,5 @@ if __name__ == "__main__":
     check_public_debt_tax()
     check_no_earnings()
     check_leaders()
-    print("All twenty-one checks passed.")
+    check_government_account()
+    print("All twenty-two checks passed.")
