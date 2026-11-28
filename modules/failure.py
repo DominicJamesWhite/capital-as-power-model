@@ -44,9 +44,14 @@ THE RULE IN PLAIN WORDS
      came back.
   8. Its lenders. A firm that closes takes its debt with it, and lenders lose it. A
      restructuring loses them the part written off. Neither is a payment: a claim on a firm's
-     future earnings ends, and nobody receives anything. The module publishes what lenders
-     lost, as a part of all debt owed, the interest that the firms left owe, as a part of their
-     earnings, and the debt that they owe, and the debt module reports the last two.
+     future earnings ends, and nobody receives anything. The lenders are the owners of firms,
+     who hold debt as they hold shares. The module writes the debt off in the core's record
+     against them. What their claim was worth is already in the firm's capitalization, which
+     prices all its earnings, the interest with the rest. So a closure loses them what the
+     firm was worth, and the debt beyond that was never counted as anybody's worth. The module
+     publishes what lenders lost, as a part of all debt owed, the interest that the firms left
+     owe, as a part of their earnings, and the debt that they owe, and the debt module reports
+     the last two.
 
 The module moves no money. Interest is a division of a firm's earnings between its lenders and
 its owners, and the module only keeps count of it.
@@ -83,6 +88,14 @@ WHAT IT RESTS ON
     have incentives to roll over loans to non-viable firms rather than writing them off". In
     terms of power: whether a firm that cannot pay goes on is the lenders' choice. Part 4 rests
     on this.
+  - Chapter 12, "Equity versus debt": "As an absentee owner, the contemporary investor views both
+    equity and debt as undifferentiated, self-expanding claims on the asset side of the balance
+    sheet". "Fractions of capital": a financial fraction of owners apart from the rest, as Marx
+    had it, "could still not be identified". Part 8 names the owners of firms as the holders of
+    their debt.
+    Hager (Public Debt, Inequality, and Power, 2016, chapter 2, Table 3) finds United States
+    corporate bonds held as narrowly as shares: the richest 1 per cent of households held 58 per
+    cent of the corporate bonds that households held in 2013, and 46 per cent of the shares.
   - Chapter 13, "The mega-machine resurrected: capital": "large-scale capitalist organizations
     are usually able to resurrect themselves through merger, restructuring and the
     securitization of debt". Part 6 rests on this.
@@ -134,7 +147,7 @@ firm. Borrowing buys nothing: the firm's debt follows its sales, and its sales d
 follow its debt.
 """
 import numpy as np
-from core import Dissolve, Scale, Publish, SetAttribute, top_positions
+from core import Dissolve, Scale, Publish, SetAttribute, WriteOff, OWNERS, top_positions
 from modules.sales import UNCOVERED
 
 DEBT = "debt"            # each firm's debt, in money
@@ -142,6 +155,7 @@ INTEREST = "interest"    # the interest a firm owes on it in a year, in money, a
 UNDER = "years owing more than worth"   # the years in a row that a firm has owed more than it is worth
 AGE = "years in the list"                # the years a firm has been in the list; the firms of the first year start at 0
 BELOW = "years earning less than interest"   # the years in a row that a firm has earned less than its interest
+WRITTEN_OFF = "debt of firms that closed or were restructured"   # this module's write-off in the core's record
 
 
 class Failure:
@@ -256,7 +270,8 @@ class Failure:
         written = np.where(restructured, average * np.maximum(K, 0.0) / (1.0 + self.restructuring_risk), debt)
         with np.errstate(divide="ignore", invalid="ignore"):
             owed = np.where(restructured, np.where(debt > 0, owed * written / debt, 0.0), owed)
-        lost = float(debt[closes].sum() + (debt - written)[restructured].sum())   # lenders' claims that end this year
+        gone = np.where(closes, debt, np.where(restructured, debt - written, 0.0))   # lenders' claims that end this year
+        lost = float(gone[closes].sum() + gone[restructured].sum())
         before = float(debt.sum())
         debt = written
         employed = n.sum()
@@ -294,6 +309,9 @@ class Failure:
                    Publish("short_of_cover", float((n[small] * short[small]).sum() / small_n), self.name),
                    Publish("interest_cover", float(earnings[small].sum() / interest[small].sum())
                            if interest[small].sum() > 0 else 0.0, self.name)]
+        if closes.any() or restructured.any():
+            # The owners of firms held the debt, as they hold the shares; the core records what they lost.
+            changes.append(WriteOff(WRITTEN_OFF, np.maximum(gone, 0.0), self.name, OWNERS))
         if restructured.any():
             changes.append(Scale("risk", np.where(restructured, 1.0 + self.restructuring_risk, 1.0), self.name))
         if closes.any():

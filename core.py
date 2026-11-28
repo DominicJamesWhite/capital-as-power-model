@@ -57,6 +57,16 @@ money it holds before it borrows, and repays its debt, no more than it owes, wit
 over. For example, if one module is short by 100, another has 30 to spare and the government holds
 20, owners lend it 50.
 
+Write-offs. A debt that is written off is no payment: no money moves, and nobody receives anything.
+A module that writes off firms' debt proposes a write-off with the amount for each firm and names
+who held the debt. Owners hold firms' debt as they hold their shares (Capital as Power, chapter 12,
+"Equity versus debt": the absentee owner "views both equity and debt as undifferentiated,
+self-expanding claims"). What those claims are worth is already in a firm's capitalization, which
+prices all its earnings, the interest with the rest. So when a firm closes, its holders lose its
+capitalization, and the rest of the debt was never counted as anybody's worth. The core records
+each write-off in the year's record: the holder, the amount, the part of it owed by firms that
+close in the year, and what those firms were worth at the start of the year.
+
 Two kinds of money are spent on goods and are therefore not transfers between the parties above.
 A module can name a party that spends all it receives, in the same year, on what firms sell: an
 organ of government that buys arms with a tax, for example. Such a party holds nothing. And a
@@ -90,6 +100,7 @@ WAGE_EARNERS = "wage earners"      # a party to transfers: it has the wage bill 
 GOVERNMENT = "government"          # a party to transfers: it has what it holds and what it receives in the year
 LENT = "lent to the government"    # the loan that covers what the government is short of in a year (Model._government_loans)
 REPAID = "repaid by the government"
+OWNERS = "owners"                  # the holders of firms' debt in a write-off: the owners of firms, as a class
 
 # A firm that pays out all it has keeps this part of its earnings. It is an allowance for rounding and
 # not a rule: without it a rounding error could leave earnings a hair below zero, and earnings of exactly
@@ -215,6 +226,20 @@ class Transfer:
     source: str
     amount: float = None
     loan: bool = False
+
+
+@dataclass
+class WriteOff:
+    """Debt of firms that their lenders write off in this year. It is no payment: no money moves and
+    nobody receives anything. The core records it (see the top of this file).
+
+    firms     an array with the debt written off for each firm, in money, for the firms as they stand at
+              the start of the year.
+    holder    who held the debt: OWNERS, or the name of a party."""
+    label: str
+    firms: object
+    source: str
+    holder: str = OWNERS
 
 
 @dataclass
@@ -838,9 +863,12 @@ class Model:
                     if L.extra_owner.get(c.name) != m.name:
                         raise LedgerError(f"module '{m.name}' tried to set the attribute '{c.name}', which it does "
                                           f"not own. A module may set only the attributes it added with an owner.")
-                elif isinstance(c, (Transfer, GovernmentGap)):
+                elif isinstance(c, (Transfer, GovernmentGap, WriteOff)):
                     if c.source != m.name:
                         raise LedgerError(f"module '{m.name}' proposed a transfer under the name '{c.source}'")
+                    if isinstance(c, WriteOff) and c.holder != OWNERS and c.holder not in L.parties:
+                        raise LedgerError(f"module '{m.name}' wrote off debt held by '{c.holder}', which is neither "
+                                          f"the owners of firms nor a party that a module has registered")
                 elif isinstance(c, Scale) and c.term == "price":
                     raise LedgerError(f"module '{m.name}' proposed Scale('price', ...). The price is worked out from "
                                       f"the wage, the markup and the cost components and cannot be scaled directly. "
@@ -899,6 +927,17 @@ class Model:
         for c in changes:
             if isinstance(c, Dissolve):
                 closing[np.asarray(c.positions, dtype=int)] = True
+        # Write-offs: no money moves. The record names who held the debt, and what the firms that close were worth.
+        written_off = []
+        for c in changes:
+            if isinstance(c, WriteOff):
+                amount = np.broadcast_to(np.asarray(c.firms, dtype=float), count)
+                if not np.all(np.isfinite(amount) & (amount >= 0)):
+                    raise LedgerError(f"module '{c.source}' wrote off debt that is below zero or not finite")
+                gone = closing & (amount > 0)
+                written_off.append({"label": c.label, "source": c.source, "holder": c.holder,
+                                    "amount": float(amount.sum()), "of_closing": float(amount[gone].sum()),
+                                    "worth_of_closing": float(K0[gone].sum())})
         gaps = [c for c in changes if isinstance(c, GovernmentGap)]
         government = None
         recording = sorted(name for name, c in L.info.items() if c.settled)    # the components that record transfers
@@ -1073,6 +1112,7 @@ class Model:
         r["transfers"] = self.settlement["transfers"]      # every transfer of the year: label, payer, receiver, asked, paid
         r["parties"] = self.settlement["parties"]          # for each party that is not a firm: received, paid, and what it holds
         r["government"] = government                       # the government's one account: each module's gap, what it held, what it borrowed
+        r["written_off"] = written_off                     # every write-off of the year: label, source, holder, amount, and the firms that closed
         self.history.append(r)
         return r
 

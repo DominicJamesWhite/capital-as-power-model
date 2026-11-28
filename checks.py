@@ -27,7 +27,7 @@ Run from the folder that holds this file:
 import numpy as np
 from core import (Ledger, Model, Scale, SetComponent, ScaleComponent, Merge, Found, Set, Publish, Transfer, LedgerError,
                   readouts, top_positions, group_value, lend_to_government, HOLD_ON_BUYERS, BASE, WAGE_EARNERS, GOVERNMENT,
-                  LENT, REPAID)
+                  LENT, REPAID, WriteOff, OWNERS)
 
 
 def make_ledger(count=3000, seed=1):
@@ -985,9 +985,18 @@ def check_failure():
         assert np.isclose(r["published"]["short_of_cover"], 1500.0 / (before.sum() - 50000.0))   # the 150 cut are all short
     assert (m.L.extra[UNDER][100:150] == 2).all() and (m.L.extra[UNDER][:100] == 0).all()
     owed_before = m.modules[1].year(m.L)[1]          # what each firm owes this year before anyone closes
+    worth_before = m.L.cap()[100:150].sum()
     r = m.step()
     assert r["published"]["failures"] == 50 and len(m.L) == 350
     assert np.isclose(r["published"]["debt_lost"], owed_before[100:150].sum() / owed_before.sum(), rtol=1e-12)
+    # The core records the debt written off against the owners of firms, and what the closed firms were worth: less
+    # than they owed. No money moved, so no transfer was recorded for it.
+    (w,) = r["written_off"]
+    assert w["holder"] == OWNERS and w["source"] == "failure"
+    assert np.isclose(w["amount"], owed_before[100:150].sum(), rtol=1e-12) and np.isclose(w["of_closing"], w["amount"], rtol=1e-12)
+    assert np.isclose(w["worth_of_closing"], worth_before, rtol=1e-12) and 0 < w["worth_of_closing"] < w["amount"]
+    assert not r["transfers"]
+    assert not m.history[-2]["written_off"]          # in a year with no closure nothing is written off
     assert np.array_equal(m.L.n[:100], before[:100]) and np.array_equal(m.L.n[100:], before[150:])
     assert (m.L.extra[DEBT][:100] > d1[:100]).all() and (m.L.extra[DEBT][:100] < m.L.cap()[:100]).all()   # the shortfall was lent
     assert np.allclose(m.L.extra[DEBT][100:], d1[150:], rtol=1e-12) and np.allclose(m.L.extra[INTEREST][100:], i1[150:], rtol=1e-12)
@@ -1039,6 +1048,9 @@ def check_failure():
     assert len(m.L) == 400 and m.L.n[-1] == 5000.0 and np.isclose(m.L.d[-1], 1.5) and m.L.extra[UNDER][-1] == 0
     assert r["published"]["restructurings"] == 1 and r["published"]["failures"] == 0
     assert np.isclose(r["published"]["debt_lost"], (owed_before[-1] - m.L.extra[DEBT][-1]) / owed_before.sum(), rtol=1e-9)
+    (w,) = r["written_off"]                          # written off against the owners; no firm closed, so no worth left the list
+    assert w["holder"] == OWNERS and np.isclose(w["amount"], owed_before[-1] - m.L.extra[DEBT][-1], rtol=1e-9)
+    assert w["of_closing"] == 0.0 and w["worth_of_closing"] == 0.0
     K = m.L.cap()
     assert np.isclose(m.L.extra[DEBT][-1] / K[-1], m.L.extra[DEBT][:-1].sum() / K[:-1].sum(), rtol=1e-9)
 
@@ -1064,6 +1076,14 @@ def check_failure():
     assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10)
     assert np.isclose(r["attribution"]["buyer"], alone["attribution"]["buyer"], atol=1e-10)   # the buyer is credited as if nobody closed
 
+    # A write-off must name the owners of firms or a registered party as the holder, and cannot be below zero.
+    for holder, amount in (("nobody", 1.0), (OWNERS, -1.0)):
+        try:
+            Model(make_ledger(), [Fixed("lender", lambda L, h=holder, a=amount: [WriteOff("debt", np.full(len(L), a), "lender", h)])]).step()
+            raise AssertionError("a write-off with no holder, or below zero, was accepted")
+        except LedgerError:
+            pass
+
     # A full run with the sales, proletarianization, privatisation, public debt and organised force modules: firms
     # fail in a slump, and the books stay whole.
     from modules.privatisation import Privatisation
@@ -1077,13 +1097,20 @@ def check_failure():
         closed += r["published"]["failures"]
         restructured += r["published"]["restructurings"]
         assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-9)
+        # every year with a closure or a restructuring writes debt off against the owners, and a closed firm was worth
+        # less than it owed
+        assert bool(r["written_off"]) == (r["published"]["failures"] + r["published"]["restructurings"] > 0)
+        for w in r["written_off"]:
+            assert w["holder"] == OWNERS and w["of_closing"] <= w["amount"] * (1.0 + 1e-12)
+            assert w["worth_of_closing"] < w["of_closing"] or w["of_closing"] == 0.0
     assert closed > 0
     print(f"15. Failure: in the first year the interest that firms owe adds up to the total, a small firm owes 5.92 for "
           f"each 1.90 that a large firm owes on the same sales, and the rates stand as 7.8, 5.1 and 3.9; a firm whose "
           f"sales halve still owes its interest and repays the part of its debt that falls due; firms short of cover are lent the "
           f"shortfall and stay, firms that owe more than they are worth for three years close and their employees are "
           f"without work, "
-          f"and nobody else's debt moves; in a merger the buyer takes on its targets' debt, and only the owner may set "
+          f"and nobody else's debt moves; the core records their debt as written off against the owners of firms, with "
+          f"what the closed firms were worth, which is less than they owed, and no payment; in a merger the buyer takes on its targets' debt, and only the owner may set "
           f"it; a firm among the largest is restructured and stays, with the average debt for its worth; switched off, "
           f"nothing fails; firms bought and firms closed in one year are each credited with their own part of the gain. "
           f"In a run of 60 years from 5,000 firms with the sales, proletarianization, privatisation, public debt and organised force modules, {closed:.0f} firms closed and {restructured:.0f} of the largest "
