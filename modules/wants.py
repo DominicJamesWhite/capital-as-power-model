@@ -174,7 +174,7 @@ class Wants:
     }
 
     def __init__(self, customary=1 / 3, ceiling=0.5, step=0.10, ease=0.05, reach=1.25, build=0.2,
-                 tilt=0.2, most_lead=1.0, steady=0.1, floor=0.005, top=100, fade=1.0):
+                 tilt=0.2, most_lead=1.0, steady=0.1, top=100, fade=1.0):
         self.customary = customary   # customary outlay as a part of earnings. The value is an addition worked out from chapter 9,
                                      # which prints no such ratio. The book says that capitalists worldwide spend "up to $600 billion"
                                      # a year on advertising, and its "roughly 5 per cent" implies net corporate income of 1,800 billion.
@@ -189,7 +189,6 @@ class Wants:
         self.tilt = tilt             # difference from the industry's markup, as a fraction of it, per unit of lead (addition)
         self.most_lead = most_lead   # the largest lead the rule counts (addition)
         self.steady = steady         # yearly part of a firm's risk above 1 that is removed per unit of lead (addition)
-        self.floor = floor           # a markup cannot fall below this (the same floor as in the sabotage module)
         self.top = top               # the number of firms counted as dominant capital, as in the book
         self.fade = fade             # part of the way the difference in markup moves each year toward the difference that the
                                      # hold and the outlay call for (addition). 1 is the rule: the
@@ -241,7 +240,6 @@ class Wants:
         # The premium is reckoned against the part of the markup that stacks, so it does not depend on
         # any other premium in the same overlap group.
         rest = L.stacking_markup()                                    # each firm's markup apart from every hold on buyers
-        M_rest = np.maximum(np.bincount(ind, n * rest, k) / safe, 1e-12)
 
         # part 1: a firm that trails its industry lays out more next year; outlay above the customary level lapses
         raised = np.where(m < M[ind] * (1 - 1e-9), part * (1 + self.step), part)
@@ -264,10 +262,12 @@ class Wants:
             kept = np.log(L.extra[KEPT])
             x = kept + self.fade * (x - kept)
             x = x - (np.bincount(ind, n * x, k) / safe)[ind]
-        # The module sets its own component and nothing else: the premium adds this difference to
-        # the firm's markup apart from every hold on buyers.
-        premium = 1 + M_rest[ind] * x / rest
-        premium = np.maximum(premium, np.minimum(1.0, self.floor / rest))
+        # The module sets its own component and nothing else. The difference is a ratio: a firm's markup apart
+        # from every hold on buyers is multiplied by about (1 + x), as the price leaders module multiplies it.
+        # The premiums are then scaled so that the industry earns what it did: what one firm gains the
+        # others lose, and no firm can lose more than a part of its own markup.
+        raw = np.exp(x)
+        premium = raw * (np.bincount(ind, n * rest, k) / np.maximum(np.bincount(ind, n * rest * raw, k), 1e-300))[ind]
 
         # part 6: the industry's average outlay is a cost in its price, for each employee and counted in wages
         outlay = np.where(n_j > 0, M * avg_part, 0.0)

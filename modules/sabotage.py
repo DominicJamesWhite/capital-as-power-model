@@ -26,7 +26,7 @@ The rule has five parts, each tied to a passage of the book (see modules.md):
 Every other rate below is an addition to the book.
 """
 import numpy as np
-from core import ScaleComponent, Publish, top_positions, BASE
+from core import ScaleComponent, Publish, top_positions, squeeze, BASE
 
 
 class Sabotage:
@@ -37,7 +37,7 @@ class Sabotage:
 
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
                  hold=0.1, share_gain=0.3, labour_gain=2.6, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
-                 floor=0.005, top=100):
+                 top=100):
         self.normal_markup = normal_markup    # the markup at which small firms neither expand nor cut back
         self.target_markup = target_markup    # the markup dominant capital holds an industry toward
         self.erosion = erosion                # fall in the markup per unit of capacity growth beyond the pack (part 2)
@@ -49,7 +49,6 @@ class Sabotage:
         self.gain_years = gain_years          # years that the share lags behind unemployment: each year 1 / gain_years of the gap is closed
         self.standing = 0.0                   # the gain in the share that unemployment has brought so far, by industry
         self.labour_holds_at = labour_holds_at  # unemployment at which wages keep pace with prices: the strength of labour
-        self.floor = floor                    # a markup cannot fall below this
         self.resistance_shift = 0.05          # rise in that level of unemployment at full resistance
         self.top = top
 
@@ -122,7 +121,18 @@ class Sabotage:
         grip = 1 - min(1.0, L.accounts.get("resistance", 0.0))                    # coordination weakens under resistance
         grip = grip * (1 - L.accounts.get("eruption_frees_markups", 0.0))         # an eruption suspends the hold (optional module); 0 without it
         held_rise = held * self.hold * (self.target_markup * grip + self.normal_markup * (1 - grip) - markup)   # part 4
-        new = np.maximum(markup + wages + undercut + held_rise, self.floor)
+        # Part 4 adds the three changes. A rise is added; a fall is taken out of the margin as a part of what
+        # is left, so it can take the markup close to nothing but never through it (squeeze in core.py).
+        change = wages + undercut + held_rise
+        new = squeeze(markup, change)
+        # Wage earners take back only what owners still hold. Where the squeeze left part of a fall untaken, the
+        # part of it that wage earners pressed for is not counted as taken back, and stays in the share's gain.
+        untaken = np.maximum(new - (markup + change), 0.0)
+        share_fall = np.minimum(gain * (1 + markup) ** 2, 0.0)
+        falls = (share_fall + np.minimum(wages - gain * (1 + markup) ** 2, 0.0) + np.minimum(undercut, 0.0)
+                 + np.minimum(held_rise, 0.0))
+        pressed = np.where(falls < 0, share_fall / np.where(falls < 0, falls, 1.0), 0.0)
+        self.standing = self.standing + pressed * untaken / (1 + markup) ** 2
         small, dominant = self.hiring(L, held, new, np.maximum(held_rise, 0.0))
         # The rule moves the markup of the industry as a whole. The change is proposed to the base
         # markup of every firm in the industry, in proportion. At the end of the year the core sets

@@ -250,6 +250,8 @@ class Component:
     settled: bool = False           # income component only: the core sets it each year from the owner's transfers.
                                     # Every such income has a payer inside the model, so it adds nothing to total income.
     bought_from_firms: bool = False # cost component only: firms lay this cost out on what firms of the ledger sell
+    unpriced: bool = False          # markup component only: a part of the markup that firms did not receive,
+                                    # while their price stays as it was (see Ledger.priced_markup)
 
 
 def group_value(values, part, discounts_overlap=False):
@@ -344,7 +346,7 @@ class Ledger:
     # ---- components
 
     def add_component(self, name, owner, kind="markup", group=None, default=None, values=None,
-                      paid_from_wages=False, transfers=False, bought_from_firms=False):
+                      paid_from_wages=False, transfers=False, bought_from_firms=False, unpriced=False):
         """Register a component of earnings per employee. A module calls this in its start().
 
         kind    "markup" (neutral value 1), "income" (neutral value 0, in money per employee) or
@@ -359,6 +361,9 @@ class Ledger:
                 changes, for each employee. The owner cannot set it directly.
         bought_from_firms  cost component only: firms lay this cost out on what firms of the ledger
                 sell, so the money is part of other firms' sales.
+        unpriced  markup component only, in an overlap group of its own: the part of the markup that
+                firms did not receive, while their price stays as it was. A rule that sets a price
+                works on the markup without it (priced_markup).
         The base markup exists from the start; registering it gives it its owner."""
         if kind not in ("markup", "income", "cost"):
             raise LedgerError(f"component '{name}': kind must be 'markup', 'income' or 'cost'")
@@ -377,8 +382,11 @@ class Ledger:
             raise LedgerError(f"component '{name}': only a markup component can be in an overlap group")
         if bought_from_firms and kind != "cost":
             raise LedgerError(f"component '{name}': only a cost component can be laid out on what firms sell")
+        if unpriced and (kind != "markup" or group != name):
+            raise LedgerError(f"component '{name}': only a markup component in an overlap group of its own can be unpriced")
         self.info[name] = Component(kind, owner, neutral, neutral if default is None else float(default),
-                                    group, bool(paid_from_wages), bool(transfers), bool(bought_from_firms))
+                                    group, bool(paid_from_wages), bool(transfers), bool(bought_from_firms),
+                                    bool(unpriced))
         start = neutral if values is None else values
         self.components[name] = np.broadcast_to(np.asarray(start, dtype=float), self.n.size).copy()
         if group is not None:
@@ -411,6 +419,11 @@ class Ledger:
     def markup(self):
         """Each firm's markup: the combination of its markup components."""
         return self.markup_from(self.components)
+
+    def priced_markup(self):
+        """Each firm's markup as its price asks it: the markup without any part that firms did not receive."""
+        comps = {name: v for name, v in self.components.items() if not self.info[name].unpriced}
+        return self.markup_from(comps)
 
     def markup_with(self, name, values):
         """Each firm's markup if one component had the given values and nothing else changed."""
@@ -501,6 +514,27 @@ def top_positions(K, members, top):
     k = min(top, members.size)
     part = np.argpartition(K[members], -k)[-k:]
     return members[part]
+
+
+def squeeze(markup, change):
+    """A markup after a rule has moved it by an amount (an addition to the literature).
+
+    A rise is added. A fall F is taken out of the margin m as a part of it: the new markup is
+    the square root of (m squared plus F squared), less F. A small fall comes to almost the same as
+    subtracting it: a fall of 0.01 from 0.10 leaves 0.0905. A fall as large as the markup leaves 41
+    per cent of it, one twice as large 24 per cent, and a very large fall about m / (2F) of it. The
+    shape is our own choice: of the smooth rules that never pass through nothing, it stays close to
+    subtraction for small falls, and a large fall still leaves a number the bookkeeping can hold.
+    A large fall takes the margin close to nothing and never through it, because no seller prices below
+    what it pays in wages: "produce only if you expect to earn at least the normal rate of return.
+    Otherwise, shut down" (Capital as Power, chapter 12, "Is free competition free of power?"). A firm left with almost no markup earns
+    almost nothing, and the failure module and its lenders decide whether it goes on."""
+    markup = np.asarray(markup, dtype=float)
+    change = np.broadcast_to(np.asarray(change, dtype=float), markup.shape)
+    with np.errstate(divide="ignore", over="ignore"):
+        f = np.minimum(change, 0.0)
+        fall = markup * markup / (np.sqrt(markup * markup + f * f) - f)     # the same as sqrt(m^2 + F^2) - F, without cancelling
+    return np.where(change >= 0, markup + change, fall)
 
 
 # What the workbench calls each number the core reports every year: label, unit, note. The units

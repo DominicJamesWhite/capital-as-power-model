@@ -11,7 +11,7 @@ Additions to the book: the size of the price rises, the parts obtained by small 
 wages, the cut in hiring, and the rise in risk.
 """
 import numpy as np
-from core import Scale, ScaleComponent, Set, Publish, top_positions
+from core import Scale, ScaleComponent, Set, Publish, top_positions, squeeze
 
 # The part of what a firm's price rises gained it over wages that still stands. The book says the
 # gains "last only as long as the underlying bout of inflation continues" (chapter 16,
@@ -68,12 +68,17 @@ class Stagflation:
         wage_rise = push * wage_part
         price_rise = np.where(dominant, push, push * small_part)
         wage = L.shared["wage"]
-        markup = L.markup()
-        new_markup = np.maximum((1 + markup) * (1 + price_rise) / (1 + wage_rise) - 1, 1e-4)
+        # The rule moves prices, so it works on the markup that each firm's price asks. Where goods were unsold
+        # (optional module), a firm received less than that this year, and the part it did not receive is no
+        # part of its price.
+        markup = L.priced_markup()
+        # The new markup is the one at which the firm's wage and markup together have risen by its price
+        # rise. Where wages rise faster than the price, the firm's margin bears the difference, and a fall
+        # is taken out of the margin as a part of what is left (squeeze in core.py).
+        new_markup = squeeze(markup, (1 + markup) * ((1 + price_rise) / (1 + wage_rise) - 1))
         # The markup changes through this module's own component. The core works out earnings per
-        # employee and the price from the new wage and the new markup. The new markup is the one at
-        # which a firm's wage and markup together have risen by its price rise, so the price that
-        # the core works out rises by that amount. (A firm that carries a named cost of another
+        # employee and the price from the new wage and the new markup, so the price rises by the firm's
+        # price rise, or a little more where its margin was squeezed. (A firm that carries a named cost of another
         # module sees that cost rise with the wage and not with the price.) At the end of the year
         # the core keeps in the component only the part of the gain that no fall of the markup has
         # taken away.

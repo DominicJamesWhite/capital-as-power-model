@@ -979,8 +979,13 @@ def check_failure():
     assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10)
     assert np.isclose(r["attribution"]["buyer"], alone["attribution"]["buyer"], atol=1e-10)   # the buyer is credited as if nobody closed
 
-    # A full run with the sales and proletarianization modules: firms fail in a slump, and the books stay whole.
-    m = Model(starting_ledger(0, 5000), all_modules() + [Sales(), Proletarianization()], seed=0)
+    # A full run with the sales, proletarianization, privatisation, public debt and organised force modules: firms
+    # fail in a slump, and the books stay whole.
+    from modules.privatisation import Privatisation
+    from modules.public_debt import PublicDebt
+    from modules.force import Force
+    m = Model(starting_ledger(0, 5000), all_modules() + [Sales(), Proletarianization(), Privatisation(), PublicDebt(), Force()],
+              seed=0)
     closed = restructured = 0
     for _ in range(60):
         r = m.step()
@@ -996,7 +1001,7 @@ def check_failure():
           f"and nobody else's debt moves; in a merger the buyer takes on its targets' debt, and only the owner may set "
           f"it; a firm among the largest is restructured and stays, with the average debt for its worth; switched off, "
           f"nothing fails; firms bought and firms closed in one year are each credited with their own part of the gain. "
-          f"In a run of 60 years from 5,000 firms with the sales and proletarianization modules, {closed:.0f} firms closed and {restructured:.0f} of the largest "
+          f"In a run of 60 years from 5,000 firms with the sales, proletarianization, privatisation, public debt and organised force modules, {closed:.0f} firms closed and {restructured:.0f} of the largest "
           f"were restructured.")
 
 def check_payers():
@@ -1370,6 +1375,67 @@ def check_government_account():
           "covers another module's shortfall of 30, and repays 20.")
 
 
+def check_markups_near_nothing():
+    """A fall of a markup never takes it through nothing, and a rule that sets a price works on the markup that
+    the price asks, not on what firms received."""
+    from core import squeeze
+    from modules.stagflation import Stagflation, LEAD
+    from modules.wants import Wants, PREMIUM as WANTS, HOLD
+    # 1. By hand. A rise is added, and a small fall comes to the same as subtracting it. A fall as large as the
+    #    markup leaves 41 per cent of it, one twice as large 24 per cent, and a fall a million times as large about a
+    #    two-millionth.
+    m = np.array([0.10, 0.10, 0.10, 0.10, 0.10])
+    out = squeeze(m, [0.05, -0.0001, -0.10, -0.20, -1e5])
+    tiny = out[4] / 0.10
+    assert np.isclose(out[0], 0.15) and np.isclose(out[1], 0.0999, rtol=1e-6)
+    assert np.isclose(out[2], 0.10 * (2 ** 0.5 - 1)) and np.isclose(out[3], 0.10 * (5 ** 0.5 - 2)) and np.isclose(tiny, 5e-7, rtol=1e-6)
+    # 2. A part of the markup that firms did not receive is left out of the markup that the price asks.
+    L = Ledger(employees=[100.0, 100.0], epe=0.10, industry=[0, 0], sector_of_industry=[0])
+    L.add_component("short", "s", group="short", unpriced=True, values=[1e-6, 1.0])
+    assert np.isclose(L.markup()[0], 1e-7) and np.allclose(L.priced_markup(), 0.10)
+    for bad in ({"group": None}, {"group": "other"}, {"kind": "income"}):
+        try:
+            L.add_component("bad", "s", unpriced=True, **{"group": "bad", **bad})
+            raise AssertionError("an unpriced component outside its own overlap group was accepted")
+        except LedgerError:
+            pass
+    # 3. Stagflation. The firm that received a millionth of its earnings gets the same gain from a price rise as the
+    #    firm that received them all, and not a million times as much.
+    def lead_factor(resistance):
+        L = Ledger(employees=[1000.0, 100.0, 100.0], epe=0.10, industry=[0, 0, 0], sector_of_industry=[0])
+        L.components["base"][2] = 0.1               # the third firm's markup is 0.01
+        L.refresh()
+        L.add_component("short", "s", group="short", unpriced=True, values=[1.0, 1e-6, 1.0])
+        s = Stagflation(top=1)
+        s.start(L)
+        L.accounts.update(stagflation_intensity=1.0, unemployment=0.05, resistance=resistance)
+        return [c for c in s.propose(L, np.random.default_rng(0)) if isinstance(c, ScaleComponent) and c.name == LEAD][0].factor
+    f = lead_factor(0.0)
+    small = 1 + 0.10 * (0.6 + 0.03)                # in the first year of a bout small firms obtain 0.63 of the push
+    assert np.isclose(f[1], ((1 + 0.10) * small / 1.05 - 1) / 0.10)
+    # Under full resistance wages rise by the whole push and small firms obtain 0.6 of it: the firm with a markup
+    # of 0.01 keeps part of it, where the subtraction would leave it below nothing.
+    g = lead_factor(1.0)
+    left = 0.01 * g[2]
+    assert (1 + 0.01) * small / 1.10 - 1 < 0 < left < 0.01
+    # 4. Wants. A firm far behind its industry's hold on buyers keeps a part of its markup, and the industry earns
+    #    what it earned.
+    L = Ledger(employees=[1000.0, 1000.0, 10.0], epe=0.10, industry=[0, 0, 0], sector_of_industry=[0])
+    w = Wants(top=1)
+    m2 = Model(L, [w], top=1)
+    m2.L.extra[HOLD][:] = [1e-9, 1.0, 1e-9]
+    kept = [c for c in w.propose(m2.L, np.random.default_rng(0)) if isinstance(c, SetComponent) and c.name == WANTS][0].values
+    r, n = m2.L.stacking_markup(), m2.L.n
+    assert (kept > 0).all() and np.isclose((n * r * kept).sum(), (n * r).sum(), rtol=1e-12) and kept.min() < 0.9
+    print(f"23. Markups near nothing: a rise is added, and a small fall comes to almost the same as subtracting it; a fall as large as the markup "
+          f"leaves 41 per cent of it, and one a million times as large leaves {tiny:.1e} of it. The part of the markup that firms did "
+          f"not receive is left out of the markup that prices are set from, and only a markup component in an overlap "
+          f"group of its own can be such a part. In a bout of stagflation the markup of a firm that received a millionth "
+          f"of its earnings rises by a factor of {f[1]:.3f}, as it would if the firm had received them all. Where "
+          f"wages rise faster than its price, a firm with a markup of 0.010 keeps {left:.4f}. A firm far behind its "
+          f"industry's hold on buyers keeps {kept.min():.3f} of its markup, and the industry earns what it earned.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1393,4 +1459,5 @@ if __name__ == "__main__":
     check_no_earnings()
     check_leaders()
     check_government_account()
-    print("All twenty-two checks passed.")
+    check_markups_near_nothing()
+    print("All twenty-three checks passed.")

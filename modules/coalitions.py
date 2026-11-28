@@ -236,7 +236,7 @@ class Coalitions:
         if m["members"].size:
             mine = np.zeros(len(L), dtype=bool)
             mine[m["members"]] = True
-            markup = L.markup()
+            markup = L.priced_markup()        # the markup that each firm's price asks; the price rise is reckoned on it
             # The war premium: what a coalition firm's markup holds above the markup of the
             # other firms of the top hundred. It fades in a year without violence.
             rest = m["top"][~mine[m["top"]]]

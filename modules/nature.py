@@ -180,7 +180,7 @@ class Nature:
 
     def __init__(self, industries=(0, 20, 40), core_owners=7, free_flow_markup=0.10,
                  price_multiple=3.5, speed=0.25, alarm=1.0, diffusion=0.3, volume_cost=0.5,
-                 keep=0.5, floor=0.005, top=100):
+                 keep=0.5, top=100):
         self.industries = tuple(industries)        # the industries that stand for resource industries; an addition (three industries of sector 0, the oil and arms sector of the coalitions module)
         self.core_owners = core_owners             # the number of largest firms whose part of the industry measures tight ownership; 7 for the "Seven Sisters" (1995 paper); the measure is an addition, and so is the number: seven is the count of one historical group of oil companies, and the paper does not give it as a measure of tight ownership
         self.free_flow_markup = free_flow_markup   # markup of a resource industry whose owners have no cohesion; the normal markup of the sabotage module; an addition
@@ -190,7 +190,6 @@ class Nature:
         self.diffusion = diffusion                 # part of the atmosphere of crisis that is lost each year; an addition
         self.volume_cost = volume_cost             # employees given up per unit of proportional price rise; the figure of the sabotage module; an addition
         self.keep = keep                           # smallest part of its employees a firm keeps in one year of restriction; an addition
-        self.floor = floor                         # a markup cannot fall below this; the figure of the sabotage module
         self.top = top                             # the number of largest firms that stands for dominant capital
         self.atmosphere = 0.0                      # the atmosphere of crisis, from 0 to 1
         self.last_violence = 0.0                   # the violence of the year before
@@ -214,7 +213,7 @@ class Nature:
         res = np.array([r for r in self.industries if r < k], dtype=int)
         wage = L.shared["wage"]
         n = np.bincount(L.ind, L.n, k)
-        earnings = np.bincount(L.ind, L.markup_earnings(), k)             # earnings from the markup alone, as in the sabotage module
+        earnings = np.bincount(L.ind, L.n * (wage * L.priced_markup()), k)   # earnings from the markup as priced, as in the sabotage module
         markup = np.where(n > 0, earnings / (wage * np.maximum(n, 1e-12)), self.free_flow_markup)
         tight = np.zeros(k)
         for r in res:                                                     # part 2
@@ -267,7 +266,7 @@ class Nature:
         markup = m["markup"]
         aim = self.free_flow_markup + (self.limited_flow_markup() - self.free_flow_markup) * m["cohesion"]
         new = markup.copy()
-        new[res] = np.maximum(markup[res] + self.speed * (aim[res] - markup[res]), self.floor)
+        new[res] = markup[res] + self.speed * (aim[res] - markup[res])   # between the markup and the aim, both above nothing
         # Part 6: a price rise is paid for with restriction.
         price = (1 + new) / (1 + markup)
         limit = np.maximum(1 - self.volume_cost * np.maximum(price - 1, 0.0), self.keep)

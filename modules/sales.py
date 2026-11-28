@@ -211,7 +211,7 @@ class Sales:
 
     def start(self, L):
         L.add_component(PRICE_CUT, self.name)
-        L.add_component(SHORTFALL, self.name, group=SHORTFALL)
+        L.add_component(SHORTFALL, self.name, group=SHORTFALL, unpriced=True)
         L.add_component(CARRIED, self.name, kind="cost")
         L.add_component(BENEFIT_TAX, self.name, kind="income", transfers=True)
         return {"unsold": 0.0, "sold_part": 1.0, "sales_cut": 0.0, "bought_not_built": 0.0, "sales_account": {},
