@@ -141,7 +141,7 @@ What works:
 
 What does not work yet:
 
-- **Many modules together.** With most optional modules on, unemployment reaches levels that are not believable.
+- **Many modules together.** With every optional module on, unemployment over the last 20 of 60 years is about 7 per cent from 30,000 firms and about 10 per cent from 300,000. That figure hides a slump much like the one the sales module gives alone. Public hiring in the privatisation module takes about a tenth of all working people off the count of people out of work, and the government borrows to pay them for decades. With public hiring switched off, unemployment is about 19 per cent. `modules.md` says more under the privatisation module.
 - **The sales module.** With the optional `sales` module alone, a slump leaves about a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although very few firms close. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
 - **Too few firms fail.** With the ten main modules alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
