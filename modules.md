@@ -465,7 +465,9 @@ Name in the model: `cost cutting`
 
 Every firm tries to cut its costs, and this module shows why that does not put large firms ahead. A haulage firm that finds a cheaper route earns more for a year or two. Then its rivals find the same route and the advantage is gone. The module gives every firm a random gain or loss each year and then lets the difference fade. A large firm is made of many parts whose luck partly cancels out, so its gains and losses are smaller.
 
-It is also what sets firms of one industry apart. Some firms earn much more for each employee than their neighbours, and some much less, and the differences last for some years. A firm that falls far enough behind its neighbours may come to owe more than it is worth, and then the failure module and its lenders decide whether it goes on.
+It is one of the things that set firms of one industry apart, and the only one that changes quickly. Some firms earn much more for each employee than their neighbours, and some much less, for a few years. A firm that falls far enough behind its neighbours may come to owe more than it is worth, and then the failure module and its lenders decide whether it goes on.
+
+The lasting differences come from other modules: patents, holds on buyers, ties to government, and who bears a fall in sales. In the default run they set the firms of an industry about 0.26 apart without this module's draws. "What is known to be wrong or untested" gives the figures.
 
 ### What the theory says
 
@@ -483,6 +485,10 @@ The book gives no size for the gains and no speed for their spread. Both come fr
 
 In terms of power: for the same people and plant, one firm obtains almost twice what a neighbour obtains, and about three tenths of that difference goes each year as methods spread, which is the book's "rapid spread".
 
+The 0.651 does not mean in the model what it means in the study. The study measures a plant's sales for each unit of all its inputs: "these figures are for revenue-based productivity measures". The model applies the figure to a firm's earnings for each employee, which are about a tenth of its sales. In the quantity the study measures, a firm's price over its unit cost, the firms of an industry in the model lie only about 0.06 apart. So `gap`, `gain` and `spread` count as unsourced. No study found gives the spread of markups or margins inside one industry as a single number.
+
+The book does say that the draws should exist and should not last. Large firms pursue cost cutting "with much zeal, lest it falls behind; but it can rarely use it to get ahead" (chapter 16, "Input prices").
+
 ### What the module does each year
 
 1. **It works out the level of each industry.** This is the average markup of the industry's firms, counting only the parts of the markup that any firm can have. Premiums that rest on a hold on buyers, such as a patent, are left out.
@@ -499,11 +505,11 @@ Step 5 matters for a firm that stands above its industry for another reason. Top
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `gap` | 0.651 | How far apart the firms of one industry lie: the difference, in logarithms of their markups, between the firm at the 90th percentile and the firm at the 10th | Syverson (2011), the gap between the 90th and 10th percentile plants of an industry. |
+| `gap` | 0.651 | How far apart the firms of one industry lie: the difference, in logarithms of their markups, between the firm at the 90th percentile and the firm at the 10th | Unsourced. Taken from Syverson (2011), the gap between the 90th and 10th percentile plants of an industry, but that gap is in sales for each unit of all inputs, not in earnings for each employee. |
 | `size_scale` | 0.18 | How fast the draw shrinks with the size of a firm. A firm k times the median size draws the median firm's draw × k to the power −0.18. | Amaral and others, "Scaling behavior in economics: I. Empirical results for company growth" (1997), a study outside the tradition: among listed United States manufacturing firms, the spread of yearly growth in employees falls with size to the power 0.18, give or take 0.03. If the parts of a firm did well or badly independently of one another, the power would be 0.5. In terms of power, the parts of a large firm are held together, and mergers "stabilize earnings growth". |
 | `whole_spread` | on | When it is on, the draws are sized each year so that all firms together lie `gap` apart once the drift back has acted. A firm whose draws have a spread s settles at a spread of s ÷ √(1 − 0.7²); the module finds the draw of the median firm for which 90 per cent of all firms, so settled, lie within half of `gap` above the middle. When it is off, a switch kept for comparisons, the median firm draws `gain`. | Our own way of applying Syverson's figure to firms of different sizes. |
-| `gain` | 0.18 | With `whole_spread` off, the yearly gain or loss of a firm of median size, in logarithms of its markup | Syverson (2011): a gap of 0.651 is a spread of 0.254, and with `spread` at 0.3 the draws that keep it are 0.254 × √(1 − 0.7²) = 0.18. |
-| `spread` | 0.3 | The part of any difference from the industry that disappears each year | Syverson (2011): one less the yearly persistence of 0.6 to 0.8, so 0.2 to 0.4 |
+| `gain` | 0.18 | With `whole_spread` off, the yearly gain or loss of a firm of median size, in logarithms of its markup | Unsourced, worked out from `gap`: a gap of 0.651 is a spread of 0.254, and with `spread` at 0.3 the draws that keep it are 0.254 × √(1 − 0.7²) = 0.18. |
+| `spread` | 0.3 | The part of any difference from the industry that disappears each year | Unsourced in the model's terms. Syverson (2011) gives a yearly persistence of 0.6 to 0.8 for sales for each unit of all inputs, so 0.2 to 0.4 |
 | `wears_holds` | off | A switch kept for comparisons. When it is on, the drift back also wears down premiums that rest on a hold on buyers. | Our own choice. The book supports leaving it off (see below). |
 
 ### What it reads from other modules and what it gives them
@@ -518,7 +524,17 @@ It owns two parts of each firm's record: a part of the markup called the cost-cu
 - **The split between cost and price in steps 4 and 5 is an addition.** Chapter 16 lists "lowering unit cost faster than the average" and "increasing unit price faster than the average" as separate routes, and gives no rule.
 - **A firm that cuts costs keeps its price.** The book also allows it to sell more for each employee. The model has no count of goods, so it cannot show that.
 - **The rule has not been read against the book line by line.**
-- **The firms of a run lie a little closer together than Syverson's plants.** The rule aims at a gap of 0.651, but new firms start at the level of their industry and firms that fall far behind close, so at the end of 60 years from 30,000 firms the gap in earnings for each employee within industries is 0.63 to 0.64 with the basic set or the sales module alone, and 0.55 to 0.60 with the sales module and the four modules that run deficits.
+- **The size of the draws has no source.** "What the theory says" explains why. In the default run from 30,000 firms, at the end of 60 years and over six seeds, the draws do this:
+
+  | Measure, within industries | With the draws | Without them (`whole_spread` off, `gain` 0) | US data |
+  |---|---|---|---|
+  | Gap between the 90th and 10th percentile, in logarithms of earnings for each employee | 0.72 | 0.26 (0.29 with `gain` 0.02) | No figure found |
+  | The same gap in logarithms of price over unit cost | 0.063 | 0.021 | No figure found |
+  | How closely price over unit cost rises with a firm's sales (correlation) | 0.15 | 0.68 | Positive within narrow industries (De Loecker and others, 2020) |
+
+  Without the draws, unemployment over the last 20 years averages 7.0 per cent against 6.9, and differential capitalization in the last year averages 250 against 275. So firms of one industry still differ without the draws, and the differences then follow size, as the data say. With the draws, luck hides that.
+- **Neither setting matches the data on markups.** Across all firms, weighted by sales, the 75th and 90th percentiles of price over unit cost are about 1.14 and 1.18 with the draws and 1.13 and 1.16 without them. De Loecker, Eeckhout and Unger (2020) give 1.30 and 1.46 for 1980 and 1.52 and 2.6 for 2014. The model's markups are too close together either way.
+- **Large firms earn higher margins from the start.** The top 10 per cent of firms by sales keep about 15 per cent of their sales after interest and the bottom half about 6 per cent, in every sector, with or without the draws. Baines and Hager (2023) find that "in the 1950s, the difference in the profit margins of the largest and smallest firms was relatively minor". By 2019 it was 7.3 per cent against −31 per cent (Baines and Hager, 2021). No firm in the model makes a loss.
 - **The smaller draws of large firms raise unemployment a little when the sales module is on, for a reason not yet found.** With the sales module alone, from 30,000 firms over 60 years, unemployment over the last 20 years was 22.1 and 20.4 per cent with `size_scale` at 0.18 and 20.8 and 19.0 per cent at 0, with two seeds. More firms close with the slope (424 and 357 against 181 and 54), but that is too few to explain it, and the markups of firms below the median size are no higher than those of larger firms.
 
 Leaving `wears_holds` off follows the book. Chapter 16 sets what spreads, the organisation of production, apart from what patents and copyrights protect. With the switch on, differential capitalization after 30 years was 9 to 17 per cent lower in runs with the protections and wants modules, and a firm was recorded as having fallen behind in its methods because it held a patent.

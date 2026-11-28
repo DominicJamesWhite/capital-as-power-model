@@ -8,8 +8,9 @@ to the power -0.18; the book: mergers "stabilize earnings growth", chapter 15). 
 therefore does less for the largest firms. Cost cutting lets dominant capital "meet the average, not beat
 it", and the module exists to show that.
 
-The book gives no size for the draws and no speed for the spread. Both come from a study outside the
-tradition, Syverson, "What determines productivity?" (2011): within industries "the average difference in
+The book gives no size for the draws and no speed for the spread. Both are unsourced. They are taken from a
+study outside the tradition that measures something else: a plant's sales for each unit of all its inputs, where
+the model spreads earnings for each employee (see modules.md). Syverson, "What determines productivity?" (2011): within industries "the average difference in
 logged total factor productivity (TFP) between an industry's 90th and 10th percentile plants is 0.651", and
 the yearly persistence is "on the order of 0.6 to 0.8". In terms of power: for the same people and plant one
 firm obtains almost twice what a neighbour obtains, and the difference fades as methods spread. The draws
