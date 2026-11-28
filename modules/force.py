@@ -251,7 +251,7 @@ class Force:
                         Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
                                  amount=self.wage_rate * wages)]
             tax = self.rate * (wages + base.sum()) if self.wage_rate == self.rate else sum(taxed)
-            changes += lend_to_government(LENT, float(orders - tax), L, GOVERNMENT, self.name, taxed)
+            changes += lend_to_government(LENT, float(orders - tax), L, GOVERNMENT, self.name, taxed, (base.sum(), wages))
             if orders > 0:
                 changes.append(Transfer(ORDERS, payer=GOVERNMENT, receiver=ARMED_FORCES, source=self.name, amount=orders))
         return changes + self.readouts(L)

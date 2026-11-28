@@ -1551,17 +1551,36 @@ def check_tax_cut():
     # The next year's record was made before that cut acted: the cut ordered then is for what that one leaves.
     ke2, kw2 = (c.value for c in d.order_cut(G))
     assert np.isclose(taken(ke2, kw2), d.cut_part * (30.0 - taken(ke, kw)))
-    # A deficit of 40 raises the rates to bring in a part of it, the rate on earnings faster.
+    # Without rise_kept, a deficit of 40 raises the rates to bring in a part of it, the rate on earnings faster.
     D = {"gaps": {"x": 40.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0}
-    re_, rw_ = (c.value for c in Debt(owners_resist=0.0).order_cut(D))
+    re_, rw_ = (c.value for c in Debt(owners_resist=0.0, rise_kept=False).order_cut(D))
     assert re_ > rw_ > 1.0 and np.isclose(-taken(re_, rw_), Debt().rise_part * 40.0)
     assert np.isclose(np.log(re_), Debt().rise_pace * np.log(rw_))
+    # With rise_kept, the same deficit in an income of 400, with the rates in law adding up to 0.2 on earnings and
+    # 0.1 on wages: the part of earnings kept, 0.8, falls by kept_earnings times 0.1 in proportion; of wages likewise.
+    K = dict(D, rate_earnings=0.2, rate_wages=0.1)
+    k = Debt(owners_resist=0.0)
+    ce, cw = (c.value for c in k.order_cut(K, income=400.0))
+    assert np.isclose(1 - 0.2 * ce, 0.8 * np.exp(-k.kept_earnings * 0.1)) and np.isclose(1 - 0.1 * cw, 0.9 * np.exp(-k.kept_wages * 0.1))
+    # A deficit a hundred times all income, with the rate on earnings already at 0.9: the rate comes closer to the
+    # whole of earnings and does not pass it. The next order starts from the rate as it now stands.
+    H = dict(K, gaps={"x": 40000.0}, rate_earnings=0.9)
+    h = Debt(owners_resist=0.0)
+    he, _ = (c.value for c in h.order_cut(H, income=400.0))
+    he2, _ = (c.value for c in h.order_cut(H, income=400.0))
+    assert 0.9 < 0.9 * he < 1.0 and 0.9 * he < 0.9 * he * he2 < 1.0
+    # Military jobs rose by 0.02 of the working population, with the account balanced: the parts kept fall by
+    # war_earnings and war_wages times 0.02.
+    B = dict(K, gaps={})
+    ae, aw = (c.value for c in Debt(owners_resist=0.0).order_cut(B, income=400.0, armed=0.02))
+    assert np.isclose(1 - 0.2 * ae, 0.8 * np.exp(-Debt().war_earnings * 0.02)) and np.isclose(1 - 0.1 * aw, 0.9 * np.exp(-Debt().war_wages * 0.02))
+    assert [c.value for c in Debt(owners_resist=0.0).order_cut(B, income=400.0)] == [1.0, 1.0]
     # With the whole surplus cut and no rise: one cut, none for the same record,
     # none in a deficit, and no rate left after a surplus as large as all the taxes.
-    w = Debt(cut_part=1.0, rise_part=0.0, owners_resist=0.0)
+    w = Debt(cut_part=1.0, rise_part=0.0, owners_resist=0.0, rise_kept=False)
     ke1, kw1 = (c.value for c in w.order_cut(G))
     assert np.isclose(taken(ke1, kw1), 30.0) and [c.value for c in w.order_cut(G)] == [1.0, 1.0]
-    assert [c.value for c in w.order_cut(D)] == [1.0, 1.0]
+    assert [c.value for c in w.order_cut(D)] == [1.0, 1.0] and [c.value for c in w.order_cut(K, income=400.0)] == [1.0, 1.0]
     assert [c.value for c in w.order_cut({"gaps": {"x": -300.0}, "taxed_earnings": 100.0, "taxed_wages": 200.0})] == [0.0, 0.0]
     assert Debt(cut_surplus=False).order_cut(G) == []
     # Whatever the balance, owners wear down the rate on earnings by a part of itself each year.
@@ -1592,7 +1611,9 @@ def check_tax_cut():
     assert np.isclose(p["tax_kept_wages"], kept) and np.isclose(p["tax_kept_earnings"], kept ** 2.3 * np.exp(-Debt().owners_resist))
     print(f"25. Tax cut and rise: taxes in law that ask 100 of earnings and 200 of wages and bring in 30 more than they "
           f"pay for keep {ke:.3f} of the rate on earnings and {kw:.3f} of the rate on wages; a deficit of 40 raises them "
-          f"to {re_:.3f} and {rw_:.3f}; the same record a year later is answered only for what the first change leaves; whatever the balance the rate "
+          f"by {ce:.3f} and {cw:.3f} times in an income of 400 (by {re_:.3f} and {rw_:.3f} times when it is to bring in a "
+          f"part of the deficit); a deficit of 100 years of income raises a rate of 0.9 on earnings until {1 - 0.9 * he:.1e} "
+          f"of earnings is kept, and not past the whole; a rise of military jobs raises the rates; the same record a year later is answered only for what the first change leaves; whatever the balance the rate "
           f"on earnings loses {1 - np.exp(-Debt().owners_resist):.3f} of itself a year; and the holders of the debt press only "
           f"after two years running of falling unemployment.")
 

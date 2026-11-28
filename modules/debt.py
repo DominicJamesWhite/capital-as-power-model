@@ -93,11 +93,46 @@ on profits of 1.7 per cent of itself a year, against 1.9 in the record from 1951
 terms of power: how much of what the government lacks owners let it take back, how much of what
 it does not need they take for themselves, and their steady power to resist being taxed.
 
+With `rise_kept`, on by default, a rise after a deficit takes a part of what is kept, and
+`rise_part` and `rise_pace` are not used. The part of firms' earnings kept after all the rates in law, added up,
+falls by `kept_earnings` times last year's deficit as a part of all income, in proportion, and the
+part of wages kept by `kept_wages` times it. For example, a rate of 0.2 on earnings and a deficit
+of a tenth of all income leave owners 0.8 × exp(-0.0155) of their earnings, so the rate becomes
+0.212. A rate set this way comes closer to the whole of earnings after each deficit and never
+reaches it. A rule that brings in a part of the deficit raises the rate on earnings 5.2 times as
+fast as the rate on wages, in proportion, and in a run with a deep slump that rule took the rate
+for public pay to 5.4 times firms' earnings: when earnings had all but vanished, the money had to
+come from wages, and the rate on earnings rose eight times in a year. Both figures are from the
+same accounts as the rest, with the change of military spending as a part of national product held
+apart: a deficit of 1 per cent of national product was followed by a fall of the part of profits
+kept of 0.155 per cent (give or take 0.156) and of the part of pay kept of 0.054 per cent (give or
+take 0.071). Both are smaller than their errors: once war is held apart, the record shows little
+rise after deficits. In the record the rates lay between 0.10 and 0.47 on profits and between 0.14
+and 0.29 on pay, where the change of a rate and the change of the part kept fit about as well (on
+profits a share of the variation explained of 0.33 for the part kept and 0.36 for the rate). The
+record cannot tell the two apart; the part kept is chosen because a rate of tax is a part of the
+income it is charged on.
+
+Rates also rise in a war. Nitzan and Bichler write that after the Second World War "sharp
+increases in corporate taxation" lowered the share of after-tax profit and interest in national
+income, and that "Subsequently, though, the effective tax rate drifted downwards" (chapter 13,
+"Owners and technocrats", note). When military jobs (the force module) rose last year as a part
+of the working population, the part of earnings kept falls by `war_earnings`, 1.80, times the
+rise, in proportion, and the part of wages kept by `war_wages`, 0.25, times it. In the same
+accounts a rise of federal military spending of 1 per cent of national product came with a fall of
+the part of profits kept of 1.80 per cent (give or take 0.45) and of the part of pay kept of 0.25
+per cent (give or take 0.20) in the same year. A fall of military spending came with a cut less
+than twice its error, which is left out. The force module's military jobs as a part of the working population
+stand for its orders as a part of all income. In the record the rise comes in the same year as the
+spending; here it comes in the year after the force module publishes it. In terms of power: in a
+war, owners let the government tax them to pay for the war that their own contractors supply.
+
 Additions to the book: the interest part of the first year, the government's interest stream
 as a fixed part of all income, the stock that bailouts add to the debt and proceeds take from
 it, the tax pressed by the holders of the added debt and its single rate on all income, the
-number of years of falling unemployment before they press, and repaying them in proportion to
-capitalization.
+number of years of falling unemployment before they press, repaying them in proportion to
+capitalization, the form of the rise as a part of what is kept, and military jobs standing for
+military spending.
 """
 import numpy as np
 from core import Publish, Transfer, lend_to_government, WAGE_EARNERS, GOVERNMENT
@@ -123,7 +158,8 @@ class Debt:
     }
 
     def __init__(self, government_part=0.02, start=0.20, holders_press=0.05, cut_surplus=True, owners_pace=2.3,
-                 cut_part=0.24, rise_part=0.045, rise_pace=5.2, owners_resist=0.039, recovery_years=2):
+                 cut_part=0.24, rise_part=0.045, rise_pace=5.2, owners_resist=0.039, recovery_years=2,
+                 rise_kept=True, kept_earnings=0.155, kept_wages=0.054, war_earnings=1.80, war_wages=0.25):
         self.government_part = government_part   # government interest payments as a part of all income
         self.share = start
         self.holders_press = holders_press   # tax pressed by the holders of the added debt, as a part of it in a year (Bohn 1998)
@@ -134,8 +170,15 @@ class Debt:
         self.rise_pace = rise_pace           # how many times as fast the rate on earnings rises as the rate on wages, in proportion (the same accounts)
         self.owners_resist = owners_resist   # the part of itself by which the rate on earnings falls each year whatever the balance, in proportion (the same accounts)
         self.recovery_years = recovery_years # years running of falling unemployment before the holders press (Hager 2016, chapter 4; the number is our own)
+        self.rise_kept = rise_kept           # after a deficit, the rise takes a part of what is kept after the rates in law (True), or brings in `rise_part` of the deficit (False)
+        self.kept_earnings = kept_earnings   # how far the part of earnings kept falls, in proportion, for a deficit of all income (United States federal accounts, 1951 to 2017)
+        self.kept_wages = kept_wages         # the same for the part of wages kept (the same accounts)
+        self.war_earnings = war_earnings     # how far the part of earnings kept falls, in proportion, when military jobs rise by the whole working population (the same accounts)
+        self.war_wages = war_wages           # the same for the part of wages kept (the same accounts)
+        self.military = None                 # military jobs last year, as a part of the working population (the force module); None without it
         self.jobless = []                    # unemployment of past years, as the core published it
         self.ordered = (1.0, 1.0)            # the change ordered last year: each rate on earnings and on wages next year, as a part of this year's
+        self.published = (1.0, 1.0)          # the same change with the owners' wearing down, as published
         self.debt = None                  # the debt that firms owe (the failure module); None without it
         self.added = 0.0                  # debt added by bailouts and by borrowing to spend, less debt retired with the proceeds of privatisation, in money
 
@@ -184,7 +227,15 @@ class Debt:
                         Transfer(PRESSED_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
                                  amount=rate * wages)]
             changes += lend_to_government(REPAID, -press, L, GOVERNMENT, self.name)
-        changes += self.order_cut(A.get("government", {}))
+        # The rise of military jobs last year, as a part of the working population (the force module).
+        armed = 0.0
+        if "force_jobs" in A:
+            jobs = float(A["force_jobs"])
+            if self.military is not None:
+                armed = max(jobs - self.military, 0.0)
+            self.military = jobs
+        income = float(L.earnings().sum()) + L.shared["wage"] * L.n.sum()
+        changes += self.order_cut(A.get("government", {}), income, armed)
         return changes
 
     def recovering(self):
@@ -195,16 +246,23 @@ class Debt:
         u = self.jobless[-(n + 1):]
         return len(u) == n + 1 and all(b < a for a, b in zip(u, u[1:]))
 
-    def order_cut(self, G):
+    def order_cut(self, G, income=0.0, armed=0.0):
         """Move the rates in law by last year's balance of the taxes at those rates, less what the change
         ordered last year will already do. The tax pressed by the holders of the debt is not counted: it
         is collected to repay them. In a surplus, owners have the rates cut by `cut_part` of it, the rate
-        on earnings falling `owners_pace` times as fast as the rate on wages, in proportion. In a deficit
-        the rates rise to bring in `rise_part` of it, the rate on earnings rising `rise_pace` times as
-        fast as the rate on wages. The modules that tax at a rate in law apply the change the next year."""
+        on earnings falling `owners_pace` times as fast as the rate on wages, in proportion. In a deficit,
+        with `rise_kept`, the part of earnings kept after all the rates in law falls by `kept_earnings`
+        times the deficit as a part of `income`, in proportion, and the part of wages kept by
+        `kept_wages` times it; without it the rates rise to bring in `rise_part` of the deficit, the
+        rate on earnings rising `rise_pace` times as fast as the rate on wages. When military jobs rose
+        last year by `armed` of the working population, the parts kept fall further, by `war_earnings`
+        and `war_wages` times it. The modules that tax at a rate in law apply the change the next year."""
         if not self.cut_surplus:
             return []
         te, tw = float(G.get("taxed_earnings", 0.0)), float(G.get("taxed_wages", 0.0))
+        # the rates in law added up, as they stand this year after the change published last year
+        re = float(G.get("rate_earnings", 0.0)) * self.published[0]
+        rw = float(G.get("rate_wages", 0.0)) * self.published[1]
         gaps = G.get("gaps", {})
         surplus = -sum(gaps[k] for k in sorted(gaps) if k != REPAID)
         ke, kw = self.ordered
@@ -217,13 +275,31 @@ class Debt:
             else:
                 k = self._solve(lambda k: te * (1.0 - np.exp(-a * k)) + tw * (1.0 - np.exp(-k)), want)
                 self.ordered = (float(np.exp(-a * k)), float(np.exp(-k)))
-        elif left < 0 and self.rise_part > 0 and te + tw > 0:   # a deficit: a part of it is raised
+        elif left < 0 and self.rise_kept and te + tw > 0 and income > 0:   # a deficit: a part of what is kept is taken
+            d = -left / income
+            self.ordered = (self._kept(re, self.kept_earnings * d), self._kept(rw, self.kept_wages * d))
+        elif left < 0 and not self.rise_kept and self.rise_part > 0 and te + tw > 0:   # a deficit: a part of it is raised
             want, b = -self.rise_part * left, self.rise_pace
             k = self._solve(lambda k: te * (np.exp(b * k) - 1.0) + tw * (np.exp(k) - 1.0), want)
             self.ordered = (float(np.exp(b * k)), float(np.exp(k)))
+        if armed > 0 and te + tw > 0:        # military orders grew: a further part of what is kept is taken
+            ke, kw = self.ordered
+            self.ordered = (ke * self._kept(re * ke, self.war_earnings * armed),
+                            kw * self._kept(rw * kw, self.war_wages * armed))
         resisted = float(np.exp(-self.owners_resist))   # owners wear the rate on earnings down, whatever the balance
-        return [Publish("tax_kept_earnings", self.ordered[0] * resisted, self.name),
-                Publish("tax_kept_wages", self.ordered[1], self.name)]
+        self.published = (self.ordered[0] * resisted, self.ordered[1])
+        return [Publish("tax_kept_earnings", self.published[0], self.name),
+                Publish("tax_kept_wages", self.published[1], self.name)]
+
+    @staticmethod
+    def _kept(rate, fall):
+        """What a rate is multiplied by when the part of the income kept after it, 1 - rate, falls by
+        `fall` in proportion (in logarithms). The new rate is 1 - (1 - rate) * exp(-fall): it rises by
+        about `fall` itself while the rate is small, and comes ever closer to the whole income without
+        reaching it. A rate of 0 has nothing to rise from, and a rate of 1 or more leaves nothing kept."""
+        if fall <= 0 or not 0.0 < rate < 1.0:
+            return 1.0
+        return float((1.0 - (1.0 - rate) * np.exp(-fall)) / rate)
 
     @staticmethod
     def _solve(taken, want):

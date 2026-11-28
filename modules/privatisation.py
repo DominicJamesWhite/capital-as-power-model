@@ -270,7 +270,7 @@ class Privatisation:
             changes += [Transfer(TAX_EARNINGS, payer=self.rate * base, receiver=GOVERNMENT, source=self.name),
                         Transfer(TAX_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name,
                                  amount=self.wage_rate * wages)]
-            changes += lend_to_government(LENT, float(pay - tax), L, GOVERNMENT, self.name, taxed)
+            changes += lend_to_government(LENT, float(pay - tax), L, GOVERNMENT, self.name, taxed, (base.sum(), wages))
             if pay > 0:
                 changes.append(Transfer(PAY, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay))
         return changes + self.readouts(L, held + take)

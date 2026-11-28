@@ -264,7 +264,7 @@ class PublicDebt:
         # Owners lend what the tax at the rate in law does not cover, or are repaid what it collects beyond the interest.
         taxed = (rate * liable.sum(), wage_tax)
         tax = rate * taxable if same else sum(taxed)
-        transfers += lend_to_government(LENT, float(interest - tax), L, GOVERNMENT, self.name, taxed)
+        transfers += lend_to_government(LENT, float(interest - tax), L, GOVERNMENT, self.name, taxed, (base.sum(), wages))
         # The part of last year's interest that the government was able to pay (1 in the first year).
         last = A.get("transfers", {})
         asked = sum(last[label]["asked"] for label in INTEREST if label in last)

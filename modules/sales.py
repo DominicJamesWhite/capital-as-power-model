@@ -409,7 +409,7 @@ class Sales:
         out = [Transfer(BENEFIT_EARNINGS, payer=rate * base, receiver=GOVERNMENT, source=self.name),
                Transfer(BENEFIT_WAGES, payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=wage_rate * wages),
                Publish("benefit_paid", float(pay / wages), self.name)]
-        out += lend_to_government(BENEFIT_LENT, float(pay - tax), L, GOVERNMENT, self.name, taxed)
+        out += lend_to_government(BENEFIT_LENT, float(pay - tax), L, GOVERNMENT, self.name, taxed, (base.sum(), wages))
         if pay > 0:
             out.append(Transfer(BENEFIT, payer=GOVERNMENT, receiver=WAGE_EARNERS, source=self.name, amount=pay))
         return out

@@ -223,23 +223,27 @@ class GovernmentGap:
     the government is short; below 0 it has collected more than it pays. The core adds up the gaps
     of every module and keeps one account for the government (see Model._government_loans).
     `taxed_earnings` and `taxed_wages` are what the module's tax at a rate set in law asks of firms'
-    earnings and of wages in the year; the core only records them."""
+    earnings and of wages in the year, and `base_earnings` and `base_wages` the earnings and the wage
+    bill that the tax is charged on; the core only records them, and adds up the rates."""
     label: str
     gap: float
     source: str
     taxed_earnings: float = 0.0
     taxed_wages: float = 0.0
+    base_earnings: float = 0.0
+    base_wages: float = 0.0
 
 
-def lend_to_government(label, gap, L, receiver, source, taxed=(0.0, 0.0)):
+def lend_to_government(label, gap, L, receiver, source, taxed=(0.0, 0.0), bases=(0.0, 0.0)):
     """The gap between what a module makes the government pay and the tax it collects for it, as a
     change for the core. `L` and `receiver` are kept so that every module calls it in the same way.
-    `taxed` is what a tax at a rate set in law asks of firms' earnings and of wages, for the record.
-    Returns a list."""
+    `taxed` is what a tax at a rate set in law asks of firms' earnings and of wages, and `bases` the
+    earnings and the wage bill it is charged on, for the record. Returns a list."""
     e, w = float(taxed[0]), float(taxed[1])
     if not (gap != 0.0 and np.isfinite(gap)) and not (e > 0 or w > 0):
         return []
-    return [GovernmentGap(label, float(gap) if np.isfinite(gap) else 0.0, source, e, w)]
+    return [GovernmentGap(label, float(gap) if np.isfinite(gap) else 0.0, source, e, w,
+                          float(bases[0]), float(bases[1]))]
 
 
 # ---------------------------------------------------------------- components
@@ -677,7 +681,8 @@ class Model:
                         for m in self.modules}
         self.history = []
         self.settlement = {"transfers": [], "parties": {}}     # the record of the last year's transfers
-        self.government = {"gaps": {}, "held": 0.0, "lent": 0.0, "taxed_earnings": 0.0, "taxed_wages": 0.0}
+        self.government = {"gaps": {}, "held": 0.0, "lent": 0.0, "taxed_earnings": 0.0, "taxed_wages": 0.0,
+                           "rate_earnings": 0.0, "rate_wages": 0.0}
         supplied = set(self.CORE_SUPPLIES)
         for m in self.modules:
             supplied.update(getattr(m, "supplies", ()))
@@ -1019,7 +1024,8 @@ class Model:
         published = {c.key: c.value for c in changes if isinstance(c, Publish)}
         L.accounts.update(published)
         self._guard(touched, "after the year's mergers, dissolutions and foundings")
-        self.government = {k: government[k] for k in ("gaps", "held", "lent", "taxed_earnings", "taxed_wages")}
+        self.government = {k: government[k] for k in ("gaps", "held", "lent", "taxed_earnings", "taxed_wages",
+                                                      "rate_earnings", "rate_wages")}
         self._core_accounts()
 
         r = readouts(L, self.top)
@@ -1056,7 +1062,10 @@ class Model:
         held = float(L.holds[GOVERNMENT])
         record = {"gaps": by_label, "held": held, "lent": 0.0, "loans": [],
                   "taxed_earnings": sum(g.taxed_earnings for g in gaps),   # asked by the taxes at rates in law
-                  "taxed_wages": sum(g.taxed_wages for g in gaps)}
+                  "taxed_wages": sum(g.taxed_wages for g in gaps),
+                  # the rates in law added up, each as a part of the income it is charged on
+                  "rate_earnings": sum(g.taxed_earnings / g.base_earnings for g in gaps if g.base_earnings > 0),
+                  "rate_wages": sum(g.taxed_wages / g.base_wages for g in gaps if g.base_wages > 0)}
         if not any(g.gap != 0.0 for g in gaps):
             return record
         need = sum(by_label[k] for k in sorted(by_label)) - held
