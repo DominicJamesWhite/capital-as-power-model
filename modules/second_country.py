@@ -227,7 +227,10 @@ class SecondCountry:
             # a purchase across the border meets the roadblocks of both countries
             mood = mood * (1 - min(1.0, self.home.counterforce * A.get("roadblocks", 0.0)))
             mood = mood * (1 - min(1.0, self.local.counterforce * self.roadblocks))
-            want1 = self.home.base_rate * n[top1] * p * n[free2].sum() / n_second * mood
+            # the first country's hundred largest also seek abroad the firms they buy in place of jobs held back
+            # for want of sales (the sales module; 0 without it), as the merger rule has them do at home
+            seek = self.home.base_rate + A.get("bought_not_built", 0.0)
+            want1 = seek * n[top1] * p * n[free2].sum() / n_second * mood
             b, t, inward = self._buy(top1, want1, free2, n, rng, self.home.max_targets)
             cross_b += [int(x) for x in b]; cross_t += [int(x) for x in t]
             buyers2 = top2[~bought[top2]]

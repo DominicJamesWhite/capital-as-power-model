@@ -13,6 +13,8 @@ firms are bought and others close is divided among its sources with nothing left
 Check 16 tests that the money for military orders, for public employment, for burdens that firms
 shift onto others and for advertising has a payer and a receiver, and that the sales account
 counts each of them.
+Check 20 tests that when buyers do not even pay back the wage bill, no firm books a loss below nothing
+and no firm that holds back production is left with fewer than no employees.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
 
 Run from the folder that holds this file:
@@ -1167,6 +1169,72 @@ def check_public_debt_tax():
           f"whole and wages carry the tax.")
 
 
+def check_no_earnings():
+    """When buyers do not even pay back the wage bill, no firm books a loss larger than its earnings, owners
+    buy no goods with a payout below nothing, and a firm that holds back production keeps no fewer than nobody."""
+    from core import ROUNDING
+    from modules.sales import Sales, SHORTFALL
+    from modules.greenfield import Greenfield
+
+    # 1. Two firms with a wage of 1 and a markup of 0.15: wages of 1,000, priced earnings of 150. From the second
+    #    year a stand-in module taxes wage earners 500 and the government repays owners with it, who do not spend
+    #    it. Wage earners buy 500 of the 1,150 offered, owners lay out the 150 they were paid, and 500 is unsold:
+    #    more than the 150 priced. Each firm keeps the allowance for rounding of its markup and the run goes on.
+    class Repay:
+        name, supplies = "repay", ("jobs_created", "government_debt")
+
+        def __init__(self):
+            self.year = 0
+
+        def start(self, L):
+            L.add_component("repay income", self.name, kind="income", transfers=True)
+            return {"jobs_created": 0.0, "government_debt": 1e6}
+
+        def propose(self, L, rng):
+            self.year += 1
+            if self.year < 2:
+                return []
+            return ([Transfer("tax", payer=WAGE_EARNERS, receiver=GOVERNMENT, source=self.name, amount=500.0)]
+                    + lend_to_government("repaid", -500.0, L, GOVERNMENT, self.name))
+
+    L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0])
+    sales = Sales(top=1, retained=0.0, payout_follows=1.0, benefit=0.0)
+    m = Model(L, [Repay(), sales], top=1)
+    with np.errstate(divide="ignore"):
+        rs = [m.step() for _ in range(4)]
+    a = rs[2]["published"]["sales_account"]
+    assert np.isclose(a["bought_by_wage_earners"], 500.0) and np.isclose(a["unsold"], 500.0)
+    assert np.allclose(L.components[SHORTFALL], [ROUNDING, ROUNDING / (1 - 0.5 * (1 - ROUNDING))])
+    assert (L.e > 0).all() and (L.e < 1e-9).all()
+    # The year after, owners' income was 150 - 500 below nothing: they are paid nothing to spend on goods.
+    assert sales.payout < 0 and rs[3]["published"]["sales_account"]["owners_outlay"] == 0.0
+    assert rs[3]["published"]["sales_account"]["bought_by_owners"] >= 0.0
+
+    # 2. The green-field module: the top firm's industry rate is -0.5 and it holds back 0.9 of what is left for
+    #    want of sales. It keeps 0.5 x 0.1 = 0.05 of its employees.
+    L = Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0],
+               shared={"workforce": 2000.0, "workforce_growth": 0.0})
+    class Rates:
+        name, supplies = "rates", ("hire_small", "hire_dominant", "entry_open", "sales_cut")
+
+        def start(self, L):
+            return {"hire_small": np.array([0.0]), "hire_dominant": np.array([-0.5]),
+                    "entry_open": np.array([1.0]), "sales_cut": 0.9}
+
+        def propose(self, L, rng):
+            return []
+
+    green = Greenfield(top=1)
+    m = Model(L, [Rates(), green], top=1)
+    scale = [c for c in green.propose(m.L, np.random.default_rng(0)) if isinstance(c, Scale) and c.term == "employees"][0]
+    assert np.allclose(scale.factor, [0.05, 1.0])
+    print(f"20. No earnings: when wage earners pay 500 of a wage bill of 1,000 to owners who do not spend it, 500 is "
+          f"unsold against priced earnings of 150. Each firm keeps one part in a million million of its markup in "
+          f"place of a loss below nothing, the run goes on, and the next year owners, paid below nothing, buy no "
+          f"goods. A top firm whose industry rate is -0.5 and that holds back 0.9 for want of sales keeps 0.05 of "
+          f"its employees.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1187,4 +1255,5 @@ if __name__ == "__main__":
     check_unemployment_level()
     check_second_country_purchases()
     check_public_debt_tax()
-    print("All nineteen checks passed.")
+    check_no_earnings()
+    print("All twenty checks passed.")

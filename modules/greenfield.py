@@ -65,7 +65,9 @@ class Greenfield:
         taken = np.where(takers, taken[ind], 0.0)
         rate = rate + taken
         rate = rate - A.get("crisis", 0.0)                      # stagflation's cut in hiring: the crisis
-        rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0)   # production held back for want of sales (optional module); 0 without it
+        # production held back for want of sales (optional module); 0 without it. It is a part of what the firm
+        # would otherwise employ, so a firm that holds back everything keeps nobody and never fewer.
+        rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0) * (1 + rate)
         jobs = rate * n
         up = jobs > 0
         kept_on = np.where(up, 1 - min(1.0, A.get("hiring_drag", 0.0)), 1.0)

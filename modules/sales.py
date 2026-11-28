@@ -43,8 +43,15 @@ Owners then respond, and each response lowers the unsold amount:
   - A firm outside dominant capital takes half of its loss out of its price, where it stays
     until a later rise restores it. It books the other half once, on the next year's earnings.
   - A firm of dominant capital keeps its price and books its whole loss once. It holds back
-    production: its hiring rate falls by the unsold part. It seeks the same number of
-    employees by buying firms.
+    production: it holds back the unsold part of the employees it would otherwise have. It
+    seeks the same number of employees by buying firms.
+  - No firm books a loss larger than the earnings it priced for. If buyers did not even pay
+    back the wage bill, each firm keeps the core's allowance for rounding of its markup, and
+    the rest of the loss is paid out of money that owners hold, such as public debt repaid to
+    them. Owners whose payout is then below nothing buy no goods. The failure module finds
+    such a firm with nothing to pay its interest: "produce only if you expect to earn at least
+    the normal rate of return. Otherwise, shut down" (chapter 12, "Is free competition free of
+    power?").
 
 When nothing is unsold, none of these happens. The module also reports each year whether the
 two conditions of accumulation hold: differential capitalization that is not falling, and a
@@ -139,7 +146,8 @@ and not money, so owners cannot spend it. The services of public employees are n
 they are not among the goods offered; their pay is counted with what wage earners have.
 """
 import numpy as np
-from core import ScaleComponent, SetComponent, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS, GOVERNMENT
+from core import (ScaleComponent, SetComponent, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS,
+                  GOVERNMENT, ROUNDING)
 
 # The part of a firm's markup given up by cutting its price for want of sales, as far as no later
 # rise has restored it. A later rise of the firm's markup, from any rule, restores this component
@@ -237,7 +245,9 @@ class Sales:
                      + self.carried[WAGE_EARNERS])
         has_government = max(net.get(GOVERNMENT, 0.0), 0.0) + organs + self.carried[GOVERNMENT]
         building = self.job_cost * wage * float(A.get("jobs_created", 0.0))
-        outlay = self.payout * wage
+        # What is paid out is below nothing after a year in which owners lost more than they earned: they
+        # then pay money into the firms to meet the wages that sales did not pay back, and buy no goods.
+        outlay = max(self.payout, 0.0) * wage
 
         # What each bought. Wage earners and the government spend all they have. If that is more than
         # everything offered, each buys in proportion and keeps the rest of its money for next year.
@@ -299,7 +309,11 @@ class Sales:
         # Every firm loses the same part of its priced earnings. A firm of dominant capital keeps its
         # price and books the whole loss once, on this year's earnings. Any other firm takes a part of
         # the loss out of its price, where it stays until a later rise restores it, and books the rest.
-        lost = 1.0 - sold
+        # A firm cannot book a loss larger than the earnings it priced for. When buyers did not even pay
+        # back the wage bill, the rest of the loss is paid out of what owners hold, which is not part of any
+        # firm's earnings, such as public debt repaid to them, and the firm keeps the core's allowance for
+        # rounding. The failure module then finds it with no cover for its interest.
+        lost = min(1.0 - sold, 1.0 - ROUNDING)
         price_cut = np.where(dominant, 0.0, self.price_give * lost)
         changes += [SetComponent(SHORTFALL, (1.0 - lost) / (1.0 - price_cut), self.name),
                     SetComponent(CARRIED, asked * (lost - price_cut), self.name)]
