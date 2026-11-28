@@ -17,11 +17,12 @@ The rule has five parts, each tied to a passage of the book (see modules.md):
      a target. Raising the markup costs the dominant firms some volume.
   5. Unemployment weakens wages against prices. Each level of unemployment has a level of the
      capitalist share of income that goes with it, and markups move toward that level over
-     some years. The size and the delay come from the authors' measurements for the United
-     States ("Nonlinearities of the Sabotage-Redistribution Process", 2014; "Can Capitalists
-     Afford Recovery?", 2014). Below the unemployment at which wages keep pace with prices,
-     wage earners can press for more, and the level falls faster with each point of
-     unemployment than it rises above it (measured from the United States national accounts).
+     some years. The delay comes from the authors' measurement for the United States ("Can
+     Capitalists Afford Recovery?", 2014: the share follows unemployment three years earlier).
+     Both slopes come from one fit to the United States national accounts in the form of this
+     rule: above the unemployment at which wages keep pace with prices the level rises 0.75 for
+     each point of unemployment, close to the authors' own 0.8 in the same paper; below it wage
+     earners can press for more, and the level falls 2.6 for each point.
 
 Every other rate below is an addition to the book.
 """
@@ -36,7 +37,7 @@ class Sabotage:
     figures = {}           # nothing it supplies is a single yearly figure
 
     def __init__(self, normal_markup=0.10, target_markup=0.30, erosion=1.0, response=0.5,
-                 hold=0.1, share_gain=0.3, labour_gain=2.6, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
+                 hold=0.1, share_gain=0.75, labour_gain=2.6, gain_years=3.0, labour_holds_at=0.05, volume_cost=0.5,
                  top=100):
         self.normal_markup = normal_markup    # the markup at which small firms neither expand nor cut back
         self.target_markup = target_markup    # the markup dominant capital holds an industry toward

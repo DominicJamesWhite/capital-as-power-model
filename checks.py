@@ -1148,9 +1148,10 @@ def check_unemployment_level():
     still, slump = shares[0.05], shares[0.15]
     # At the level where wages keep pace with prices, nothing moves.
     assert max(still) - min(still) < 1e-12
-    # Ten points above it the share ends 3 points higher. A third of that comes in the first year,
-    # and after 40 years of the same unemployment the share has stopped rising.
-    assert abs(slump[0] - still[0] - 0.01) < 5e-4 and abs(slump[-1] - still[-1] - 0.03) < 1.5e-3
+    # Ten points above it the share ends share_gain times 0.10 higher. A third of that comes in the first
+    # year, and after 40 years of the same unemployment the share has stopped rising.
+    rise = Sabotage().share_gain * 0.10
+    assert abs(slump[0] - still[0] - rise / 3) < 0.05 * rise and abs(slump[-1] - still[-1] - rise) < 0.05 * rise
     assert all(b > a for a, b in zip(slump[:10], slump[1:11])) and slump[-1] - slump[-2] < 1e-8
     # One point below it, wage earners press for more: the share ends labour_gain times 0.01 lower.
     tight, drop = shares[0.04], Sabotage().labour_gain * 0.01
