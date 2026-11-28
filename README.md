@@ -183,6 +183,7 @@ What does not work yet:
 | `checks.py` | Tests of the bookkeeping. |
 | `modules.md` | What each module does, and the passage in the book it is based on. |
 | `workbench/` | A page in your web browser for running the model and comparing runs. |
+| `data/` | Published US series for a start from 1950 or from the present, and for comparing runs with history. The model does not read them yet. `data/README.md` lists the sources. |
 
 ## How to contribute
 
