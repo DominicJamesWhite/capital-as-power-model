@@ -1378,13 +1378,15 @@ In the first year of a run the module does nothing, because it has no earlier pr
 1. **It sorts all firms into eight groups by size.** The top group is the 100 firms with the highest capitalization. The seven groups below are cut off at fixed fractions of the capitalization of the smallest top-100 firm: one half of one per cent, 1, 2.5, 5, 10 and 25 per cent. These are the proportions of the thesis's cut-offs to 1 billion dollars.
 2. **It gives each firm a standing.** The bottom group has a standing of 0 and the top group a standing of 1, with steps of one seventh between. The module then compares each firm's standing with the average standing in its industry.
 3. **It measures how each industry's average price moved over the last year.**
-4. **Where the price rose, large firms lead.** The module sets a difference between the markup of a top-group firm and the markup of a bottom-group firm in that industry. As a fraction of the industry's markup, the difference is 4 times the rate at which the price rose. A firm in a middle group gets the part that matches its standing. The difference is set afresh each year, so it shrinks when the rise slows and is gone when the price is still.
-5. **Where the price fell, large firms hold.** The module sets the difference between the price of a top-group firm and the price of a bottom-group firm equal to the fall. A firm that keeps its price above its industry's falling price loses employees that year. The loss is half of the amount by which its price stands above the industry's, as a fraction of the industry's price.
-6. **The difference has a limit.** It cannot be more than the whole of the industry's markup, and it cannot take a firm's markup below 0.005. In an industry whose firms are all in one size group, the module does nothing.
+4. **Where the price rose, large firms lead.** The module sets how much higher the markup of a top-group firm is than the markup of a bottom-group firm in that industry: 4 times the rate at which the price rose. The book measures dominant capital's lead the same way, as one markup divided by another. Each step of standing multiplies the markup by the same factor, so a firm in a middle group gets the part that matches its standing. The difference is set afresh each year, so it shrinks when the rise slows and is gone when the price is still.
+5. **Where the price fell, large firms hold.** The module sets the difference between the price of a top-group firm and the price of a bottom-group firm equal to the fall. A firm that keeps its price above its industry's falling price loses employees that year. For a small gap the loss is half of the amount by which its price stands above the industry's, as a fraction of the industry's price. The module divides the firm's employees by (1 + that gap) to the power 0.5, so a firm keeps some employees however wide the gap.
+6. **The industry's earnings stay the same.** The module scales the markups so that what the firms above the industry's average gain, the firms below it lose. Because the rule sets a ratio, every firm keeps a part of its own markup however fast prices move, and no limit is needed. In an industry whose firms are all in one size group, the module does nothing.
 
-**An example of a rise.** An industry has a markup of 0.20 and its price rose 5 per cent last year. The difference between top and bottom is 4 × 0.05 = 0.20 of the markup, which is 0.04. The average standing in the industry is 0.4. A top-group firm stands 0.6 above the average, so its markup becomes 0.20 + 0.6 × 0.04 = 0.224. A bottom-group firm stands 0.4 below, so its markup becomes 0.20 − 0.4 × 0.04 = 0.184.
+**An example of a rise.** An industry has a markup of 0.20 and its price rose 5 per cent last year. A top-group firm's markup is then 1 + 4 × 0.05 = 1.2 times a bottom-group firm's. The average standing in the industry is 0.4. A top-group firm stands 0.6 above the average, so its markup becomes about 0.20 × 1.2^0.6 = 0.223. A bottom-group firm stands 0.4 below, so its markup becomes about 0.20 ÷ 1.2^0.4 = 0.186. The module then scales both slightly so that the industry earns what it did.
 
-**An example of a fall.** The same industry's price, 1.20, fell 2 per cent. The difference in price between top and bottom is set at 2 per cent of 1.20, which is 0.024. The top-group firm keeps its price 0.6 × 0.024 = 0.0144 above the industry's, which is 1.2 per cent of the price. It loses 0.6 per cent of its employees.
+**An example of a fast rise.** If the price had risen 50 per cent, the top-group firm's markup would be 3 times the bottom-group firm's. In an industry where nearly all employees work for top-group firms, the bottom-group firm keeps about a third of its markup and the top-group firms keep about their own.
+
+**An example of a fall.** The same industry's price, 1.20, fell 2 per cent. The difference in price between top and bottom is set at 2 per cent of 1.20, which is 0.024, or 0.12 of the markup: a top-group firm's markup is 1.12 times a bottom-group firm's. The top-group firm's markup becomes about 0.20 × 1.12^0.6 = 0.214, so it keeps its price about 0.014 above the industry's, which is 1.2 per cent of the price. It loses about 0.6 per cent of its employees.
 
 **How the module records its changes.** A firm's markup is kept as a product of named parts, each owned by one module. "How modules share a quantity" explains this. The module owns one part, named "size premium". A size premium of 1.12 raises the firm's markup by 12 per cent, and one of 0.92 lowers it by 8 per cent. The size premium is one of three parts that the model treats as holds on the same buyers. The other two belong to the protections and wants modules. When a firm has more than one of them, only the largest counts in full.
 
@@ -1394,11 +1396,9 @@ The module leaves alone any difference between large and small firms that anothe
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `lead` | 4.0 | The difference between top-group and bottom-group markups, as a fraction of the industry's markup, for each unit of yearly price rise. A rise of 10 per cent gives a difference of 40 per cent of the markup. | Our own choice |
+| `lead` | 4.0 | How much higher a top-group firm's markup is than a bottom-group firm's, for each unit of yearly price rise. A rise of 10 per cent makes the top-group markup 1.4 times the bottom-group markup. | Our own choice |
 | `hold` | 1.0 | The part of a fall in the industry's price that a top-group firm does not follow | Our own choice |
 | `volume_cost` | 0.5 | The employees lost for each unit of price kept above the industry's falling price. The sabotage module uses the same figure for a price rise. | Our own choice |
-| `most` | 1.0 | The largest difference the rule will set, as a fraction of the industry's markup | A plain limit with no source |
-| `floor` | 0.005 | The lowest markup the size premium can leave a firm with | A plain limit with no source |
 | `top` | 100 | How many firms are in the top group | The book, chapter 14 |
 | `levels_others` | off | A switch kept for comparisons. When on, the size premium also cancels differences by size that other modules left. | Our own choice |
 
@@ -1412,7 +1412,7 @@ It publishes `leader_premium`, the average difference it set across all industri
 
 ### What is known to be wrong or untested
 
-- **Every number in the rule is our own.** So are the even steps of standing between the groups.
+- **Every number in the rule is our own.** So are the even steps of standing between the groups, each multiplying the markup by the same factor.
 - **The rule measures things differently from its sources.** The thesis measured size by assets, and the rule uses capitalization. The thesis compared markups with inflation in manufacturing as a whole, and the rule uses the price of each industry. Means compared concentrated industries with competitive ones, and the rule applies his finding to large and small firms inside one industry.
 - **Large firms get no advantage when prices are still.** No passage supports a figure for one.
 - **The module takes slightly more from an industry than it gives when another hold on buyers is present.** A firm's gains from several holds overlap, and its losses do not. "The choices of the overlap group, tested" gives the size of this.

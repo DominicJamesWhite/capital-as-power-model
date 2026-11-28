@@ -13,11 +13,13 @@ between the large firms and the small firms of the same industry.
      group, and even steps between.
   2. Leading a rise. When the average price of an industry rose over the last year, the larger
      firms of that industry are taken to have led the rise and the smaller firms to have
-     followed late and in part. The module sets the difference between the markup of a
-     top-group firm and the markup of a bottom-group firm, as a fraction of the industry's
-     markup, in proportion to the rate at which the industry's price rose. The difference
-     lasts only while the price goes on rising. When the rise slows, the difference shrinks,
-     and the large firms give back what they gained.
+     followed late and in part. The module sets how much higher the markup of a top-group
+     firm is than the markup of a bottom-group firm, in proportion to the rate at which the
+     industry's price rose. This is the book's differential markup: one markup divided by
+     another. Each step of standing multiplies the markup by the same factor, so every firm
+     keeps a part of its own markup however fast prices rise. The difference lasts only while
+     the price goes on rising. When the rise slows, the difference shrinks, and the large
+     firms give back what they gained.
   3. Holding against a fall. When the average price of an industry fell over the last year,
      the larger firms are taken to keep their prices and the smaller firms to cut theirs.
      The module sets the difference between the price of a top-group firm and the price of a
@@ -48,6 +50,9 @@ WHAT IT RESTS ON
     systematic its differential gains from inflation". The largest firms "do not simply react
     passively; they take the initiative. They actively raise their prices, markup and profit
     per employee faster than the average".
+  - Chapter 16, "Small and large firms": the differential markup "measures the ratio between the
+    net profit share of sales in the Fortune 500 group and in the business sector". The rule sets
+    such a ratio between the top and the bottom groups of an industry.
   - Chapter 16, "Capitalization risk": the gains "are always short-lived: they last only as
     long as the underlying bout of inflation continues".
   - Nitzan, "Inflation as Restructuring" (1992), chapter 9. "The large corporations are the
@@ -76,7 +81,7 @@ when prices are still, because no passage supports a figure for one. Every numbe
 addition, with one exception: the cut-offs of the eight groups keep the proportions of the
 thesis (5, 10, 25, 50, 100 and 250 million dollars against 1 billion). Placing the top group
 at the hundred largest firms is the model's own convention. The even steps of standing
-between the groups are an addition. The thesis compared markups with the general rate of
+between the groups, each multiplying the markup by the same factor, are an addition. The thesis compared markups with the general rate of
 inflation in manufacturing, and the rule uses the price of each industry. Means compared
 concentrated industries with competitive ones, and the rule applies his finding to large and
 small firms inside one industry. The rule sets the difference in markups afresh each year
@@ -115,15 +120,13 @@ class Leaders:
     # of the size of the hundredth largest firm, and the rule measures size by capitalization.
     CUTOFFS = np.array([0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 1.0])
 
-    def __init__(self, lead=4.0, hold=1.0, volume_cost=0.5, most=1.0, floor=0.005, top=100, levels_others=False):
-        self.lead = lead                # difference between the markups of a top-group and a bottom-group firm, as a fraction
-                                        # of the industry's markup, per unit of yearly rise in the industry's price
-                                        # (4 means 40 per cent of the industry's markup when its price rises 10 per cent a year)
+    def __init__(self, lead=4.0, hold=1.0, volume_cost=0.5, top=100, levels_others=False):
+        self.lead = lead                # how much higher a top-group firm's markup is than a bottom-group firm's, per unit of
+                                        # yearly rise in the industry's price (4 means 40 per cent higher when its price
+                                        # rises 10 per cent a year)
         self.hold = hold                # part of a fall in the industry's price that a top-group firm does not follow
         self.volume_cost = volume_cost  # employees lost per unit of price kept above the industry's falling price
-                                        # (the same figure as the cost of a price rise in the sabotage module)
-        self.most = most                # the largest difference the rule will set, as a fraction of the industry's markup
-        self.floor = floor              # a markup cannot fall below this (the same floor as in the sabotage module)
+                                        # for a small gap (the same figure as the cost of a price rise in the sabotage module)
         self.top = top                  # the top group is this many of the largest firms
         self.levels_others = levels_others   # a switch for comparisons, off unless a run asks for it.
                                         # Off: the module sets its own difference and leaves alone the differences that other
@@ -161,26 +164,31 @@ class Leaders:
         spread = np.bincount(ind, n * ds * ds, k)
         mixed = spread > 1e-9 * safe                             # industries that hold more than one size group
 
-        # The difference the rule sets: leading a rise, or holding against a fall.
+        # The rule sets the differential markup of the book: the markup of a top-group firm divided by the
+        # markup of a bottom-group firm, less 1. Leading a rise and holding against a fall each add to it.
         led = self.lead * np.maximum(rise, 0.0)
         held = self.hold * np.maximum(-rise, 0.0) * (1 + M) / M
-        want = np.where(mixed, np.minimum(led + held, self.most), 0.0)
-        held = np.minimum(held, want)
+        want = np.where(mixed, led + held, 0.0)
+        held = np.where(mixed, held, 0.0)
 
-        # The module sets its own component and nothing else. The premium adds the difference the
-        # rule calls for to the firm's markup apart from every hold on buyers. What the firms above the
-        # industry's average standing gain, the firms below it lose.
-        differ = want
+        # The module sets its own component and nothing else. Each step of standing multiplies the markup
+        # by the same factor, so a top-group firm's markup is (1 + want) times a bottom-group firm's. The
+        # premiums are then scaled so that the industry's earnings are unchanged: what the firms above the
+        # industry's average gain, the firms below it lose. Every firm keeps a part of its own markup.
+        log_ratio = np.log1p(want)
         if self.levels_others:           # for comparisons: take off the difference by size that other modules left
-            now = np.where(mixed, np.bincount(ind, n * ds * (r / M[ind] - 1), k) / np.maximum(spread, 1e-12), 0.0)
-            differ = want - now
-        size_premium = 1 + M[ind] * differ[ind] * ds / r
-        size_premium = np.maximum(size_premium, np.minimum(1.0, self.floor / r))
-        # A firm that keeps its price above a falling one gives up employees (Means).
-        kept = np.maximum(M[ind] * held[ind] * ds, 0.0) / (1 + M[ind])
+            now = np.where(mixed, np.bincount(ind, n * ds * np.log(r / M[ind]), k) / np.maximum(spread, 1e-12), 0.0)
+            log_ratio = log_ratio - now
+        raw = np.exp(log_ratio[ind] * ds)
+        size_premium = raw * (np.bincount(ind, n * r, k) / np.maximum(np.bincount(ind, n * r * raw, k), 1e-300))[ind]
+        # A firm that keeps its price above a falling one gives up employees (Means). `kept` is the part of its
+        # gain in markup that comes from holding its price, as a part of the industry's price. Its employees are
+        # divided by (1 + kept) to the power `volume_cost`: about half of kept for a small gap, and never all.
+        part = np.where(want > 0, held / np.maximum(want, 1e-300), 0.0)
+        kept = np.maximum(r * (size_premium - 1), 0.0) * part[ind] / (1 + M[ind])
         premium = float((want * n_j).sum() / n_j.sum())
         # The price of each firm follows its markup: the core works it out from the wage and the
         # markup, and counts only the largest premium of the overlap group, as the markup does.
         return [SetComponent(SIZE, size_premium, self.name),
-                Scale("employees", 1 - self.volume_cost * kept, self.name),
+                Scale("employees", (1 + kept) ** -self.volume_cost, self.name),
                 Publish("leader_premium", premium, self.name)]

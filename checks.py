@@ -1256,6 +1256,40 @@ def check_no_earnings():
           f"its employees.")
 
 
+def check_leaders():
+    """The price leaders module sets the ratio of a top-group firm's markup to a bottom-group firm's, keeps
+    the industry's earnings unchanged, and leaves every firm a part of its markup however fast prices rise."""
+    from modules.leaders import Leaders, SIZE
+    from core import SetComponent
+    # One industry: a top firm of 900 employees, one of 60 (standing 4 in 7) and one of 3 (the bottom group).
+    # The industry's price rose by half in a year, so the top firm's markup is 1 + 4 x 0.5 = 3 times the bottom's.
+    L = Ledger(employees=[900.0, 60.0, 3.0], epe=0.15, industry=[0, 0, 0], sector_of_industry=[0])
+    lead = Leaders(top=1)
+    m = Model(L, [lead], top=1)
+    rng = np.random.default_rng(0)
+    lead.propose(m.L, rng)                       # the first year only remembers the price
+    lead.last_price = lead.last_price / 1.5
+    p = [c for c in lead.propose(m.L, rng) if isinstance(c, SetComponent) and c.name == SIZE][0].values
+    r, n = m.L.stacking_markup(), m.L.n
+    assert np.isclose(p[0] / p[2], 3.0) and np.isclose(p[1] / p[2], 3.0 ** (4 / 7))
+    assert np.isclose((n * r * p).sum(), (n * r).sum(), rtol=1e-12) and (p > 0).all()
+    # A rise of 300 per cent in a year: the ratio is 13, and the bottom firm still keeps a part of its markup.
+    lead.last_price = lead.last_price / 4.0      # the proposal was not applied, so the price is still what it was
+    q = [c for c in lead.propose(m.L, rng) if isinstance(c, SetComponent) and c.name == SIZE][0].values
+    assert np.isclose(q[0] / q[2], 13.0) and q[2] > 0 and np.isclose((n * r * q).sum(), (n * r).sum(), rtol=1e-12)
+    # A fall of 80 per cent: the firms above the industry's average standing hold their price and lose employees,
+    # the others lose none, and every firm keeps some.
+    lead.last_price = lead.last_price * 4.0 * 5.0
+    out = lead.propose(m.L, rng)
+    f = [c for c in out if isinstance(c, Scale) and c.term == "employees"][0].factor
+    h = [c for c in out if isinstance(c, SetComponent) and c.name == SIZE][0].values
+    assert (f > 0).all() and (f[h > 1] < 1).all() and (f[h <= 1] == 1).all()
+    print(f"21. Price leaders: when an industry's price rises by half in a year, the top firm's markup becomes "
+          f"3 times the smallest firm's ({p[0]:.3f} and {p[2]:.3f} of their own markups), the industry earns what it "
+          f"earned, and when the price rises fourfold the ratio is 13 and the smallest firm keeps {q[2]:.3f} of its markup. When the price falls by 80 per cent, the "
+          f"firms that hold their price keep {f.min():.3f} or more of their employees.")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1277,4 +1311,5 @@ if __name__ == "__main__":
     check_second_country_purchases()
     check_public_debt_tax()
     check_no_earnings()
-    print("All twenty checks passed.")
+    check_leaders()
+    print("All twenty-one checks passed.")
