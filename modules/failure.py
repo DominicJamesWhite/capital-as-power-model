@@ -117,11 +117,15 @@ nothing is counted before the tenth year.
 WHAT IS MISSING
 
 The count of firms kept alive by lenders is almost nil in the full run, never above 1 firm in
-10,000 in a year from 30,000 firms, against about 12 per cent of listed firms in the record. For a firm that borrows at the normal rate of return or less,
-earning less than its interest means that it is worth less than it owes, unless owners expect
-much more than it now earns. So three years short of its interest are three years in which it
-owes more than it is worth, and lenders close it before it can be counted. In the record such
-firms are often valued above other firms: owners expect them to recover.
+10,000 in a year from 30,000 firms, against about 12 per cent of listed firms in the record. The
+main reason is that almost no firm earns less than its interest at all. No markup falls below
+zero, so no firm earns less than nothing, and the lowest 1 per cent of firms earn about 5 per
+cent of their sales. Lenders closing firms is a small part of it: with lenders that never refuse,
+the count is still never above 2 firms in 1,000. Most firms that the record counts make losses
+(Banerjee and Hofmann 2018: "the median ICRs are below minus 7"), owners value them above other
+firms, and they raise new shares worth about 18 per cent of their assets in a year (Banerjee and
+Hofmann 2020, Table A1). So owners carry most of them, not lenders. The model has no firm that
+makes a loss and no owner who pays in to cover one.
 
 
 Nobody receives a failed firm's plant: with the capacity module on, the plant is lost with the
