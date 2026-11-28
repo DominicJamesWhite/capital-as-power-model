@@ -76,7 +76,7 @@ Each module describes one way that power is used. Ten modules always run.
 | Resistance | Wage earners and others push back when prices, unemployment or mergers go too far. |
 | Envelope | Opens the boundaries between industries, sectors and countries, so that large firms can buy firms beyond them. |
 | Debt | Records lending. |
-| Failure | Firms that cannot pay the interest they owe close, and their employees lose their jobs. Small firms pay lenders more than large ones, so they close more often. |
+| Failure | Each firm carries a debt. Lenders lend a firm what it cannot pay, but close it once it has owed more than it is worth for three years, and its employees lose their jobs. Small firms pay lenders more than large ones. |
 
 More than 30 other modules are optional. They cover things such as public debt, organised labour, advertising, patents and war. `registry.py` lists them.
 
@@ -142,7 +142,8 @@ What works:
 What does not work yet:
 
 - **Many modules together.** With most optional modules on, unemployment reaches levels that are not believable.
-- **The sales module.** With the optional `sales` module alone, a slump leaves about a fifth to a quarter of people out of work for decades, and with `proletarianization` as well, about nine tenths. Firms that cannot pay their lenders go on closing faster than the firms that are left take on their people. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
+- **The sales module.** With the optional `sales` module alone, a slump leaves about a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although no firm closes. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
+- **Too few firms fail.** With the ten main modules alone no firm fails at all, and the number of firms grows about sixfold in 60 years. In the record some firms fail every year.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
 - **History.** The years in the output are labels. A year marked 1930 in a run has nothing to do with the real 1930.

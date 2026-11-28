@@ -109,6 +109,16 @@ class Scale:
 
 
 @dataclass
+class SetAttribute:
+    """Replace the values of an added per-firm attribute. Only the module that added it with an
+    owner may do this. The values are for the firms as they stand at the start of the year, before
+    the year's mergers, dissolutions and foundings."""
+    name: str
+    values: object       # one number for all firms, or an array with one number per firm
+    source: str
+
+
+@dataclass
 class SetComponent:
     """Replace the values of a component. Only the module that owns the component may do this."""
     name: str
@@ -276,6 +286,8 @@ class Ledger:
         self.accounts = {}
         self.extra = {}          # added per-firm attributes, by name
         self.extra_default = {}
+        self.extra_adds = set()  # the added attributes that add up in a merger
+        self.extra_owner = {}    # the module that may set each owned attribute
         # Components of earnings per employee. At the start the whole markup is the base markup.
         base = np.broadcast_to(np.asarray(epe, dtype=float), size) / self.shared["wage"]
         self.components = {BASE: base.copy()}
@@ -295,12 +307,18 @@ class Ledger:
 
     # ---- added attributes
 
-    def add_attribute(self, name, values, default):
+    def add_attribute(self, name, values, default, adds=False, owner=None):
         """Give every firm an extra attribute, such as a coalition label. A module calls this
-        in its start(). In a merger the buyer keeps its own value. A new firm takes `default`
-        unless the Found change supplies a value."""
+        in its start(). In a merger the buyer keeps its own value, or, with `adds`, takes the sum
+        of its own and its targets' values, as with a debt. A new firm takes `default` unless the
+        Found change supplies a value. With an `owner`, that module alone may set the values
+        (SetAttribute)."""
         self.extra[name] = np.broadcast_to(np.asarray(values), self.n.size).copy()
         self.extra_default[name] = default
+        if adds:
+            self.extra_adds.add(name)
+        if owner is not None:
+            self.extra_owner[name] = owner
 
     def add_party(self, name, holds=False, buys=False):
         """Name a party to transfers that is not a firm, such as a group of households. A module
@@ -755,6 +773,10 @@ class Model:
                     if L.info[c.name].settled:
                         raise LedgerError(f"module '{m.name}' tried to set the component '{c.name}' directly. It "
                                           f"records transfers, and the core sets it from the module's Transfer changes.")
+                elif isinstance(c, SetAttribute):
+                    if L.extra_owner.get(c.name) != m.name:
+                        raise LedgerError(f"module '{m.name}' tried to set the attribute '{c.name}', which it does "
+                                          f"not own. A module may set only the attributes it added with an owner.")
                 elif isinstance(c, Transfer):
                     if c.source != m.name:
                         raise LedgerError(f"module '{m.name}' proposed a transfer under the name '{c.source}'")
@@ -791,6 +813,9 @@ class Model:
         def add_log(source, values):
             logf[source] = logf.get(source, 0.0) + values
 
+        for c in changes:
+            if isinstance(c, SetAttribute):     # touches no term of capitalization
+                L.extra[c.name] = np.broadcast_to(np.asarray(c.values, dtype=float), count).copy()
         for c in changes:
             if isinstance(c, Scale):
                 f = np.broadcast_to(np.asarray(c.factor, dtype=float), count)
@@ -1165,6 +1190,8 @@ class Model:
                 continue
             weight, total = (ME, ME_sum) if info.kind == "markup" else (L.n, n_sum)
             L.components[name][ub] = summed(weight * L.components[name])[ub] / total[ub]
+        for name in sorted(L.extra_adds):                   # a debt, for example: the buyer takes on its targets'
+            L.extra[name][ub] = summed(L.extra[name])[ub]
         L.n[ub] = n_sum[ub]
         L.components[BASE][ub] = 1.0
         rest = L.markup()[ub]                               # the buyer's markup apart from its base

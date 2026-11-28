@@ -242,7 +242,9 @@ class HouseholdDebt:
         changes = [Publish(key, value, self.name) for key, value in out.items()]
 
         # part 8: wage earners pay this year's interest, and the firms receive it
-        if interest > 0:
-            changes.append(Transfer(INTEREST, payer=WAGE_EARNERS, receiver=(new[L.ind] - 1) * base_firm,
+        # A firm whose earnings are below nothing, which its lenders may still carry, receives no part.
+        parts = (new[L.ind] - 1) * np.maximum(base_firm, 0.0)
+        if interest > 0 and parts.sum() > 0:
+            changes.append(Transfer(INTEREST, payer=WAGE_EARNERS, receiver=parts,
                                     source=self.name, amount=interest))
         return changes

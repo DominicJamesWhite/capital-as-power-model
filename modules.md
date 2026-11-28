@@ -216,7 +216,7 @@ Name in the model: `debt`
 
 ### What it is about
 
-This module keeps count of lending. It works out what part of owners' income is paid as interest, how much corporate debt that interest supports, and how large the government's debt is. It is a set of running totals, like a page of accounts kept beside the list of firms. When the government has borrowed, the holders of that debt make it tax everybody to repay them, and that is the only change this module makes.
+This module keeps count of lending. It reports what part of owners' income is paid as interest and how much corporate debt firms owe, which the failure module works out firm by firm, and it works out how large the government's debt is. It is a set of running totals, like a page of accounts kept beside the list of firms. When the government has borrowed, the holders of that debt make it tax everybody to repay them, and that is the only change this module makes.
 
 ### What the theory says
 
@@ -229,45 +229,39 @@ Chapter 12, "Equity versus debt", "Immaterial assets", "Material assets" and "Th
 
 Sandy Brian Hager's studies of the United States find that the public debt is concentrated in the hands of large owners and paid for by taxes levied broadly ("What Happened to the Bondholding Class?", 2013). He writes that the interests of the large holders "are best served by an austerity program of social spending cuts" (*Public Debt, Inequality, and Power*, 2016). Bichler and Nitzan write that the deficits after 2008 were reversed "because of the public debt" ("Can Capitalists Afford Recovery?", 2014).
 
-The book gives no rule for how fast the interest part moves or how large the government's debt is, and no figure for what the holders of the debt can make the government collect.
+The book gives no rule for how large the government's debt is, and no figure for what the holders of the debt can make the government collect. Its Figure 12.4 compares the ratio of interest to profit with unemployment. The model does not use that comparison as a rule. It is measured from runs (see the failure module).
 
 ### What the module does each year
 
-1. It averages unemployment over the last five years. From each year's figure it first takes off the part of all employees whose firms closed that year, which the failure module publishes. The book ties debt to how solid the institutions of power are, and promises that are being broken are no sign of that.
-2. It sets a level for the interest part of owners' income. The book's Figure 12.4 compares the ratio of interest to profit with unemployment, so the module makes that ratio 7.95 times the average unemployment (`maturity`), the figure the United States record gives. A ratio r means that interest is r ÷ (1 + r) of owners' income: 28 per cent when unemployment has averaged 5 per cent, 61 per cent at 20 per cent unemployment. However high unemployment goes, interest stays below the whole of owners' income, so no limit is needed.
-3. It moves the interest part one tenth of the way from where it is to that level. The interest part starts at 20 per cent. This part is the terms that lenders set for all firms. What each firm owes on those terms is worked out by the failure module, from the firm's own sales and size, and a firm that closes takes its debt with it.
-4. It works out corporate debt as the value of the interest that firms owe: the interest part × the part of the terms that firms owed the year before, which the failure module publishes, × the earnings of all firms ÷ the normal rate of return. Without the failure module that part is 1. Debt is a promised return, so the module gives it a risk of 1.
-5. It works out the government's debt. The government's interest payments are taken to be 2 per cent of all income, and the debt is their value: 2 per cent of all income ÷ the normal rate of return.
-6. It adds what the government borrowed for bailouts and what owners lent it, and takes off what it repaid them and what it received from selling public services. The risk shaping module publishes the bailouts and the privatisation module the sales. What owners lent and were repaid is in the core's record of transfers: the optional modules that tax at a rate set in law (public debt, privatisation, organised force and sales) have owners lend what the tax does not cover. With those modules off, all of these are zero. If sales ever brought in more than the whole debt, the module would report no debt and set the rest against later borrowing.
-7. **The holders of the added debt press for repayment.** The added debt is what step 6 has added, less what it has taken off. Each year the module has the government tax one twentieth of it (`holders_press`), at one rate on all wages and on every firm's earnings. The government repays the same amount to owners, each firm in proportion to its worth, as holdings of the debt are. Repayment is not income, so it raises no firm's earnings. With nothing added, there is no such tax.
-8. It reports the part of the government's debt held by dominant capital. This is taken to be the same as the top 100's part of all capitalization.
+1. It reports the interest part of owners' income: the interest that firms owed last year as a part of their earnings, which the failure module publishes. Each firm owes interest on its own debt, at the rate at which the debt was lent, so when profit falls interest does not fall with it, and the part rises. Without the failure module the part stays at its first value, 20 per cent.
+2. It reports corporate debt: the debt that firms owed last year, which the failure module publishes. Without the failure module it is the interest part × the earnings of all firms ÷ the normal rate of return. Debt is a promised return, so it is given a risk of 1.
+3. It works out the government's debt. The government's interest payments are taken to be 2 per cent of all income, and the debt is their value: 2 per cent of all income ÷ the normal rate of return.
+4. It adds what the government borrowed for bailouts and what owners lent it, and takes off what it repaid them and what it received from selling public services. The risk shaping module publishes the bailouts and the privatisation module the sales. What owners lent and were repaid is in the core's record of transfers: the optional modules that tax at a rate set in law (public debt, privatisation, organised force and sales) have owners lend what the tax does not cover. With those modules off, all of these are zero. If sales ever brought in more than the whole debt, the module would report no debt and set the rest against later borrowing.
+5. **The holders of the added debt press for repayment.** The added debt is what step 4 has added, less what it has taken off. Each year the module has the government tax one twentieth of it (`holders_press`), at one rate on all wages and on every firm's earnings. The government repays the same amount to owners, each firm in proportion to its worth, as holdings of the debt are. Repayment is not income, so it raises no firm's earnings. With nothing added, there is no such tax.
+6. It reports the part of the government's debt held by dominant capital. This is taken to be the same as the top 100's part of all capitalization.
 
-**An example.** Unemployment has averaged 8 per cent. The ratio is 7.95 × 0.08 = 0.636, so the level is 0.636 ÷ 1.636 = 0.389. The interest part was 0.20, so it moves to 0.219. Last year firms owed three quarters of the terms they were set. All firms together earn 1,000 and the normal rate of return is 5 per cent, so corporate debt is 0.219 × 0.75 × 1,000 ÷ 0.05 = 3,285. All income is 10,000, so the government pays interest of 200 and its debt is 200 ÷ 0.05 = 4,000. If the top 100 firms hold 30 per cent of all capitalization, they are taken to hold 1,200 of it. If owners have lent the government 1,000 in earlier years, it taxes 50 this year and repays 50 to owners, and the added debt falls to 950.
+**An example.** Last year firms owed 22 per cent of their earnings as interest, and their debts came to 3,300. The module reports both. All income is 10,000, so the government pays interest of 200 and its debt is 200 ÷ 0.05 = 4,000. If the top 100 firms hold 30 per cent of all capitalization, they are taken to hold 1,200 of it. If owners have lent the government 1,000 in earlier years, it taxes 50 this year and repays 50 to owners, and the added debt falls to 950.
 
 ### Settings
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `maturity` | 7.95 | The ratio of interest to profit for each unit of unemployment, both averaged over five years | The form is the book's Figure 12.4. The figure is from the United States national accounts for 1952 to 2019: net interest against corporate profit before tax, both averaged over five years, fitted through zero. It gives 7.95, give or take 0.55 (6.8 for 1952 to 1985, 8.9 for 1986 to 2019). See below for what it does to the runs |
-| `years` | 5 | The number of years over which unemployment is averaged | Our own choice |
-| `speed` | 0.1 | The part of the gap that the interest part closes each year | Our own choice |
 | `government_part` | 0.02 | The government's interest payments as a part of all income | Our own choice |
 | `start` | 0.20 | The interest part in the first year | Our own choice |
 | `holders_press` | 0.05 | The part of the added debt that its holders make the government collect and repay each year | Henning Bohn, "The Behavior of U.S. Public Debt and Deficits" (1998), for the United States, 1916 to 1995: "the U. S. primary surplus is an increasing function of the debt-GDP ratio", by about 0.05 of national income for each year of national income the debt comes to. The same regression on the national accounts (all governments' receipts less their spending other than interest, as a part of national income, against the federal debt held by the public a year before, with unemployment) gives 0.07, give or take 0.035, for 1960 to 2007, and below 0 for 1960 to 2019, when holders accepted far more debt after 2008. Here it applies to the debt added in the run, not to the debt at the start. In terms of power: what the holders of the debt can make the government collect from everybody else, for them. |
 
 ### What it reads from other modules and what it gives them
 
-It reads `unemployment` and the record of transfers (`transfers`) from the core, and `interest_owed` and `failed_employees` from the failure module. When the optional risk shaping and privatisation modules are on, it reads `bailout_borrowing` and `privatisation_proceeds` from them.
+It reads the record of transfers (`transfers`) from the core, and `interest_owed` and `debt_owed` from the failure module. When the optional risk shaping and privatisation modules are on, it reads `bailout_borrowing` and `privatisation_proceeds` from them.
 
-It publishes four numbers: `interest_share`, `corporate_debt`, `government_debt` and `government_debt_dominant`. The failure module reads `interest_share` as the terms that lenders set, and closes firms that cannot pay what they owe on them. No other main module reads them. The optional public debt module reads the government's debt and decides who is taxed for the interest and who receives it.
+It publishes four numbers: `interest_share`, `corporate_debt`, `government_debt` and `government_debt_dominant`. The failure module reads `interest_share` in the first year only, to set what firms owe. No other main module reads them. The optional public debt module reads the government's debt and decides who is taxed for the interest and who receives it.
 
 ### What is known to be wrong or untested
 
 - **No payment of interest is recorded.** With only the main modules on, the module reports debts and no money moves. The failure module closes firms that could not have paid, but it charges nobody. In particular, when bailouts add to the government's debt and the public debt module is off, nobody pays interest on them, though their holders are repaid.
 - **The holders' pressure cannot hold the debt in a collapse.** It is a part of the debt in money, so it is a part of income only while income holds up. With the sales and proletarianization modules alone, income fell by nine tenths and the debt reached 60 years of all income (30,000 firms, two seeds). The tax the holders pressed for then took everything firms earned and up to 29 per cent of the wage bill, and from the 43rd year only the top 100 firms were left, with almost no earnings. Nothing in the model lets a government default or the holders take less.
 - **The figure for the holders' pressure is not settled by the record.** Bohn's figure and the regression up to 2007 agree. Over 1960 to 2019 the regression gives a figure below 0. The pressure acts in a run once owners have lent: with the public debt, privatisation, force and sales modules on, it lowered the debt after 60 years from 12 to 7.4 years of all income (30,000 firms, seed 0).
-- **With the figure the record gives, the main modules collapse in some runs.** At 7.95, interest is 28 per cent of owners' income at an unemployment of 5 per cent. Without the failure module this changes little: unemployment over the last 20 of 60 years was 3.5 and 2.7 per cent (30,000 firms, two seeds). With it, closures take 2 to 4 per cent of employees in ordinary years and waves of 10 to 20 per cent follow swings of the markup. Unemployment then stays high, the five-year average rises, and the terms rise with it, to above 60 per cent. Over the last 20 years unemployment was 13.1 and 41.5 per cent, and 70.6 per cent from 300,000 firms. With `maturity` at 2.22, a figure of our own that gives 10 per cent at an unemployment of 5 per cent, the same runs give 3.4 and 3.3 per cent. The part of the loop that has no source is in the failure module: how the chance of failing follows from cover and risk. Baines and Hager find the smaller half of United States firms with "consistently negative profit margins" for decades, so in the record firms with too little cover do not simply close.
-- **The link to unemployment is only one of the things the book describes.** The book says that debt grows when the institutions of power are solid. The module uses unemployment alone to stand for that.
+- **The link between interest and unemployment that the record shows does not come out of the model.** The failure module says how far off it is.
 - **The rule has not been read against the book line by line.** It was written quickly and has only been checked for running correctly.
 
 ---
@@ -779,43 +773,48 @@ Name in the model: `failure`
 
 ### What it is about
 
-This module closes firms that cannot pay their lenders. Think of a small printing shop that borrows at a high rate. In an ordinary year it earns enough to pay the interest. In a year when its prices lag behind its costs, or when lenders take more from everybody, it does not, and it shuts. Its employees are out of work until another firm hires them. A firm among the 100 largest that cannot pay is not shut: its lenders keep it going.
+This module keeps each firm's debt and closes firms whose lenders stop lending to them. Think of a small printing shop that borrowed 70,500 when its sales were 100,000 a year, at 7.8 per cent. It owes 5,500 in interest a year, whatever it sells. When its earnings fall and it cannot pay, its lenders lend it the difference and wait. If the shop comes to owe more than it is worth and stays that way for three years, they refuse to lend more. The shop closes, and its employees are out of work until another firm hires them. A firm among the 100 largest is not closed: its lenders write its debt down.
 
 ### What the theory says
 
-Chapter 12, "Is free competition free of power?" and "Material assets". Chapter 11, "The degree of confidence". Chapter 13, "The mega-machine resurrected: capital", under "Flexibility". The book says almost nothing about small firms failing, so two papers are used as well. Both are by Nitzan and Bichler or build on their work, and no study from outside that tradition is used.
+Chapter 12, "Is free competition free of power?" and "The maturity of capitalism". Chapter 9, "Capitalization: a brief anthropology". Chapter 13, "The mega-machine resurrected: capital". The book says almost nothing about small firms failing, so two studies are used as well.
 
-- "The actual production of a single firm and the number of firms in operation therefore are bounded not by the state of industrial arts, but by what can be sold at a 'reasonable' profit." A firm that does not expect the normal rate of return is told to shut down.
-- Debt "capitalizes the average ability of all owners to limit industry at large", while equity capitalizes the firm's own. So lenders set one set of terms for all owners, and a firm has only its own earnings to pay what it owes on them.
-- Joseph Baines and Sandy Brian Hager, "The Great Debt Divergence and its Implications for the Covid-19 Crisis: Mapping Corporate Leverage as Power" (2021), measure what United States firms pay their lenders. The interest expenses of small firms reached "5.9 per cent of revenues in 2019, over triple the debt servicing burden of large firms". Their Figure 1 gives 5.92 per cent for the smaller half of firms, 3.48 for the next four tenths and 1.90 for the largest tenth.
-- Bichler and Nitzan, "New Imperialism or New Capitalism?" (2006): with debt high, "if prices begin falling, firms will be unable to service their debt – and then we face the risk of debt deflation, chain bankruptcies, and a total meltdown of accumulation".
-- "Big capitalists do not take the odds as given; they try to change them." The module lets a firm's risk set its odds of failing.
+- "The number of firms in operation" is "bounded not by the state of industrial arts, but by what can be sold at a 'reasonable' profit."
+- Debt is "a promise of return". "Economic fluctuations affect profit more than interest", though "in the longer haul, interest payments are much more flexible." So a firm owes what it promised when it borrowed, and what it owes follows its sales only as its debts fall due.
+- Bernoulli, quoted in chapter 9: a man "pressed by creditors" can own "less than nothing". The module sets what a firm owes against what owners think it is worth.
+- Joseph Baines and Sandy Brian Hager, "The Great Debt Divergence" (2021), measure United States listed firms in 2019. Interest was 5.92 per cent of sales for the smaller half of firms, 3.48 for the next four tenths and 1.90 for the largest tenth, and "Large firms see their cost of borrowing fall to 3.9 per cent, medium-size firms to 5.1 per cent, and small firms to 7.8 per cent." The smaller half had "consistently negative profit margins" for decades.
+- Ryan Banerjee and Boris Hofmann, "The rise of zombie firms" (BIS Quarterly Review, 2018), a study from outside the theory's tradition that Baines and Hager cite. About 12 per cent of listed firms in 14 rich countries in 2016 had earned less than their interest for at least three years in a row. Of these, 60 per cent in the late 1980s and 85 per cent in 2016 were still in that state a year later, because "banks have incentives to roll over loans to non-viable firms rather than writing them off". In terms of power: whether a firm that cannot pay goes on is its lenders' choice.
 - Large organizations "are usually able to resurrect themselves through merger, restructuring and the securitization of debt".
 
-The literature gives no rule for which firm fails and no rate of failure. The form of the rule is our own.
+The literature gives no rule for when lenders stop lending. That rule is our own.
 
 ### What the module does each year
 
-1. **It works out what each firm owes.** Each firm owes interest on its own debt, and lenders lend against what a firm sells. A firm owes in proportion to its sales, with a heavier weight on small firms: 5.92 for a firm in the smaller half of all firms, 1.90 for a firm in the largest tenth, and 3.48 for a firm in between. The size of a firm is its sales counted in wages, and the sizes that divide the three groups are those of the first year. In the first year one number scales all firms so that together they owe the part of owners' income that the debt module gives, its terms. After that the number moves only with those terms. So a firm that closes takes its debt with it and raises nothing that the others owe, and a firm whose neighbours earn more owes no more.
-2. **It works out each firm's cover.** Cover is the firm's earnings divided by the interest it owes. A firm has less cover if it is small, if its markup is low, if it could not sell all it offered, or if lenders take more from everybody.
-3. **It works out each firm's chance of failing.** The module treats a year's earnings as uncertain, and the firm's risk says how uncertain. Earnings as low as the expected figure divided by the firm's risk come up about one year in six. The firm fails if the year's earnings fall short of the interest. A firm with a risk of 1 fails only if its cover is below 1.
-4. **It draws, firm by firm.** A firm outside the top 100 that fails is closed. It leaves the list, and its employees are without work until a firm hires them.
-5. **A top-100 firm that fails is restructured.** It stays in the list with all its employees, and its risk rises by half.
+1. **In the first year it gives every firm a debt.** A firm owes interest in proportion to its sales: 5.92 for each 100 of sales if it is in the smaller half of firms, 1.90 if it is in the largest tenth and 3.48 in between. One number scales all firms so that together they owe the part of owners' income that the debt module gives for the first year. A firm's debt is its interest divided by its rate. A firm in between borrows at the normal rate of return. A small firm borrows at 7.8 for each 5.1 that it pays, and a large firm at 3.9. The size of a firm is its sales counted in wages, and the sizes that divide the three groups are kept from the first year.
+2. **Each year a fifth of every debt falls due** (`term`, 5 years). Lenders lend again, at the rate of the year for a firm of that size, up to the debt for each unit of sales that a firm of that size had in the first year. A firm whose sales have grown borrows more. A firm whose sales have fallen has to repay part of what falls due. The rest of every debt keeps the rate at which it was lent.
+3. **A firm that cannot pay is lent what it is short.** If its earnings do not cover its interest and what it has to repay, lenders lend it the difference, and its debt grows.
+4. **Lenders refuse a firm that has owed more than it is worth for three years in a row** (`patience`). What a firm is worth is its capitalization, the price owners put on its expected earnings. A firm outside the top 100 that lenders refuse is closed. It leaves the list, its employees are without work, and its lenders lose its debt.
+5. **A top-100 firm that lenders refuse is restructured.** It keeps all its employees, and its risk rises by half. Its lenders write its debt down to the debt that the average firm has for what it is worth.
 6. **It says how much of each industry closed.** The next year the green-field module has the firms left in the industry take on the closed firms' buyers and hire for them. The sabotage module counts the closure as capacity that left and that hiring as capacity that came back, so a closure whose buyers are all served again moves no markup.
-7. **It tells the debt module what firms owe.** It publishes the interest that the firms left owe, as a part of their earnings, and the debt module works out the corporate debt from it. The debt module also takes the jobs lost in closed firms off the unemployment it reads.
+7. **It tells the debt module what firms owe:** the interest that the firms left owe this year, as a part of their earnings, and their debt.
 
-**An example.** The terms are a fifth of owners' income. In the first year the average weight, counted by sales, was 3.5. A small firm carries a weight of 5.92 and earns as much on its sales as the average firm of the first year. Its cover is 1 ÷ (0.20 × 5.92 ÷ 3.5) = 3.0. Its risk is 2. The chance that a year's earnings fall below a third of the expected figure is about 6 in 100. A firm in the largest tenth has a cover of 1 ÷ (0.20 × 1.90 ÷ 3.5) = 9.2, and its chance is less than 1 in 1,000.
+**An example.** A small firm sells 100,000 a year and earns 8,000 from its markup. In the first year it owes 5,500 in interest at 7.8 per cent, so its debt is 70,500. It is worth 160,000 (8,000 ÷ 0.05). Its markup halves: it earns 4,000 and sells 96,000. It still owes 5,500 in interest. Against its lower sales lenders lend only 67,700, so it has to repay 2,800. It is 4,300 short, and lenders lend it that at 7.8 per cent. It now owes 72,000 and is worth 80,000, so lenders go on. If its markup halves again, it is worth 40,000 and owes more than that. If it is still in that state in the third year, its lenders refuse it and it closes.
 
 ### Settings
 
 | Name in the code | Default | What it means | Where the figure comes from |
 |---|---|---|---|
-| `on` | on | Switches the module off. With it off no firm fails and every result is the same as without the module. | Our own choice |
-| `small_burden` | 5.92 | Interest paid by a small firm for each 100 of its sales. Only the proportions among the three figures count. | Baines and Hager (2021), Figure 1, for 2019 |
+| `on` | on | Switches the module off. With it off no firm fails. | Our own choice |
+| `small_burden` | 5.92 | Interest paid by a small firm for each 100 of its sales in the first year. Only the proportions among the three figures count. | Baines and Hager (2021), Figure 1, for 2019 |
 | `medium_burden` | 3.48 | The same for a firm that is neither small nor large | The same |
 | `large_burden` | 1.90 | The same for a large firm | The same |
-| `small_part` | 0.5 | The part of all firms in the first year, counted from the smallest by sales, that are small. The size that divides them is kept | The same: their small firms are the smaller half |
-| `large_part` | 0.1 | The part of all firms in the first year, counted from the largest by sales, that are large. The size that divides them is kept | The same: their large firms are the largest tenth |
+| `small_rate` | 7.8 | The rate a small firm borrows at, for each 5.1 that a firm in between pays | The same, Figure 1, panel C, for 2019 |
+| `medium_rate` | 5.1 | The rate of a firm in between. It pays the normal rate of return. | The same; that it pays the normal rate is our own choice |
+| `large_rate` | 3.9 | The rate of a large firm, for each 5.1 that a firm in between pays | The same |
+| `small_part` | 0.5 | The part of all firms in the first year, counted from the smallest by sales, that are small | The same: their small firms are the smaller half |
+| `large_part` | 0.1 | The part of all firms in the first year, counted from the largest by sales, that are large | The same: their large firms are the largest tenth |
+| `term` | 5 | The years over which a debt falls due: a fifth of it each year | S&P Global Ratings, median remaining maturity of the rated debt of United States firms on 1 January 2024: 5.9 years for the safest debt and 3.9 years for the rest |
+| `patience` | 3 | The years in a row that lenders carry a firm that owes more than it is worth | Our own choice. Banerjee and Hofmann count a firm as kept alive by its lenders after three years in a row of earning less than its interest |
 | `restructuring_risk` | 0.5 | The rise in the risk of a top-100 firm when its lenders restructure it | Our own choice |
 | `top` | 100 | How many firms count as dominant capital | The book, chapter 14 |
 
@@ -823,30 +822,32 @@ You can also leave the module out of a run with `--without failure`.
 
 ### What it reads from other modules and what it gives them
 
-It reads `interest_share` from the debt module.
+It reads `interest_share` from the debt module, in the first year only.
 
-It publishes eight numbers.
+It keeps three numbers for each firm in the list: its debt, the interest it owes in a year, and the years in a row it has owed more than it is worth. In a merger the buyer takes on its targets' debt and interest.
+
+It publishes nine numbers.
 
 - `failed_by_industry`: for each industry, the part of its employees whose firms closed. The sabotage and green-field modules read it.
 - `closed_employees`: for each industry, the employees of the firms that closed. The green-field module reads it.
-- `interest_owed`: the interest that the firms left owe, as a part of their earnings. The debt module reads it.
-- `failed_employees`: the part of all employees whose firms closed. The debt module reads it.
-- `failures`, `restructurings`, `failure_chance` and `interest_cover`: the number of firms closed, the number of top-100 firms restructured, the average chance of failing and the average cover of firms outside the top 100. No module reads these.
+- `interest_owed` and `debt_owed`: the interest that the firms left owe this year, as a part of their earnings, and the debt they owe. The debt module reads both.
+- `failures`, `failed_employees`, `restructurings`, `short_of_cover` and `interest_cover`: the number of firms closed, the part of all employees in them, the number of top-100 firms restructured, the part of employees outside the top 100 in firms that earned less than their interest, and the earnings of the firms outside the top 100 divided by their interest. No module reads these.
 
 It owns no part of a firm's markup and moves no money.
 
 ### What is known to be wrong or untested
 
-- **The buyers of a closed firm go to every firm left in its industry, in proportion to size.** Top-100 firms in the industry take their part (`taken_by_top` in the green-field module). No study was found of where the buyers of a closed firm go, and the plant of a closed firm still goes to nobody.
-- **Lenders lose without a payment being recorded.** The debt of a closed firm leaves the total. No loss is charged to any party.
-- **A firm carries no debt from year to year.** What it owes is worked out afresh each year from its sales, its size and the terms. A promise of return is fixed when it is made, so in the record a firm whose sales fall still owes what it borrowed. A firm that has been short for years is treated like one that is short for the first time.
-- **The weights are those of one country in one year.** Baines and Hager find that United States firms of all sizes paid alike in the 1950s and drew apart after 1980. The module keeps the proportions of 2019 throughout.
-- **The sizes that divide the groups are those of the first year.** Baines and Hager rank firms afresh each year. Ranking afresh would move a firm into a dearer group when smaller firms close, so the module keeps the first year's sizes. As firms grow, more of them count as large.
-- **The reading of risk is our own.** The book defines risk as the inverse of owners' confidence. Reading it as the spread of a year's earnings, with a bell-shaped curve, is an addition.
-- **The sales module still spreads unsold goods evenly.** Every firm loses the same part of its earnings when goods are unsold. With this module on, the firms with least cover then close first, so the loss ends unevenly, but the sales module's own rule is unchanged.
-- **Figures given elsewhere in this file for runs of the main modules were made without this module,** unless they say otherwise.
+- **With the main modules alone no firm fails.** Their markups move together across a whole industry, so no firm falls behind its own debt for three years. In runs of 60 years from 30,000 firms no firm closed (two seeds), unemployment over the last 20 years was 3.5 and 2.7 per cent, and the number of firms grew to about 180,000. From 300,000 firms unemployment was 6.0 per cent. With the sales module alone no firm closed either, and unemployment was 20.6 and 18.3 per cent. In the record some firms fail every year, and about one listed firm in eight is kept alive by its lenders. In a screen of 100 mixes of optional modules (30,000 firms, one seed), firms that closed held 0.6 per cent of employees in an average year, nearly all in mixes with the sales module.
+- **The link between interest and unemployment that the record shows does not come out of the model.** The book's Figure 12.4 sets the ratio of interest to profit against unemployment, both averaged over five years. In the United States from 1952 to 2019 the ratio was 7.95 times unemployment, fitted through zero. Measured the same way from year 11 of runs of 60 years from 30,000 firms, it was 2.4 and 2.5 with the main modules, 2.9 from 300,000 firms, about 0.8 with the sales module and 1.8 to 2.0 with every optional module on. Within most runs the ratio falls when unemployment rises, because markups rise in a bout of stagflation while interest does not.
+- **Firms that earn almost nothing are carried as well.** A firm whose markup the sales module has cut to the core's allowance for rounding is carried for three years like any other. In a run of every optional module from 3,000 firms, other modules then raised such a firm's markup by a factor of about a hundred thousand million in a year, and the run broke down in its 55th year.
 
-What should happen: few firms close while lenders take little, many close after a bout of stagflation or when unemployment has been high, small firms close far more often than large ones, and no top-100 firm leaves the list by failing. With the debt module's `maturity` at 2.22, a figure of our own, a run of the main modules from 30,000 firms had 0.33 and 0.35 per cent of employees in firms that closed in an average year (two seeds). It ended with 156,000 and 146,000 firms, and unemployment over the last 20 years was 3.4 and 3.3 per cent. With the sales module alone, 1.0 per cent of employees were in firms that closed in an average year (seed 0). For the figure the record gives, see the debt module.
+- **Borrowing buys nothing.** A firm's debt follows its sales. Its sales do not follow its debt.
+- **Lenders lose without a payment being recorded.** The debt of a closed firm leaves the total, and no loss is charged to any party. Nobody receives a closed firm's plant.
+- **The buyers of a closed firm go to every firm left in its industry, in proportion to size.** No study was found of where they go.
+- **The figures are those of one country in one year.** Baines and Hager find that United States firms of all sizes paid alike in the 1950s and drew apart after 1980.
+- **The sizes that divide the groups are those of the first year.** As firms grow, more of them count as large.
+
+What should happen: few firms close in ordinary years, many after a long fall of markups or sales, small firms far more often than large ones, and no top-100 firm leaves the list by failing.
 
 ---
 
