@@ -26,7 +26,8 @@ THE RULE IN PLAIN WORDS
      was lent. So a firm whose sales fall still owes what it borrowed, and only over the years
      does what it owes come to follow its sales.
   4. A firm whose earnings fall short of its interest and of what it has to repay is lent the
-     shortfall, at the rate of the year, and its debt grows.
+     shortfall, at the rate of the year, and its debt grows. So is a firm whose buyers did not
+     pay back even its wages: the sales module reports what its lenders lent it for that loss.
   5. Lenders refuse to lend more when a firm has owed more than it is worth for three years
      in a row (`patience`). What it is worth is its capitalization, the price owners put on
      all its expected earnings. Owners then have had nothing left in the firm for years, and
@@ -134,6 +135,7 @@ follow its debt.
 """
 import numpy as np
 from core import Dissolve, Scale, Publish, SetAttribute, top_positions
+from modules.sales import UNCOVERED
 
 DEBT = "debt"            # each firm's debt, in money
 INTEREST = "interest"    # the interest a firm owes on it in a year, in money, at the rates at which it was lent
@@ -232,6 +234,8 @@ class Failure:
         repaid = np.maximum(debt - planned, 0.0)
         earnings = L.n * np.maximum(L.e, 0.0)
         short = np.maximum(interest + repaid - earnings, 0.0)   # what lenders lend to cover what the firm cannot pay
+        # and what they lent it last year for a loss beyond its earnings, when buyers did not pay back its wages
+        short = short + L.extra.get(UNCOVERED, 0.0)
         new_interest = interest * (1.0 - 1.0 / self.term) + rate * (borrowed + short)
         return interest, planned + short, new_interest, interest > earnings
 

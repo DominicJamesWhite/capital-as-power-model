@@ -283,7 +283,9 @@ class Barriers:
             src = np.array(new_from)
             changes.append(Scale("employees", factor, self.name))
             # a holding that is sold keeps every component of the firm that sold it: markup, other income
-            # and named costs. Its price is therefore the seller's, and the core works it out.
+            # and named costs. Its price is therefore the seller's, and the core works it out. The components
+            # that record transfers are the exception: the core starts them at 0, as the seller paid and
+            # received the year's transfers.
             # With the capacity module on, the holding takes its part of the seller's plant: a forced sale
             # moves plant from one owner to another and builds none.
             extra = None

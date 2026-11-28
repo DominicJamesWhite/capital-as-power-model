@@ -712,15 +712,18 @@ class Model:
 
     def _core_accounts(self):
         r = readouts(self.L, self.top)
-        # "transfers": for each label, the money asked and the money paid in the last year. A module
-        # reads it the next year, like every account, to learn whether its transfers were paid in full.
+        # "transfers": for each label, the money asked and the money paid in the last year, what firms lent the
+        # government under it, and what firms received under it less what they paid. A module reads it the next
+        # year, like every account, to learn whether its transfers were paid in full.
         paid = {}
         for t in self.settlement["transfers"]:
-            row = paid.setdefault(t["label"], {"asked": 0.0, "paid": 0.0, "lent_to_government": 0.0})
+            row = paid.setdefault(t["label"], {"asked": 0.0, "paid": 0.0, "lent_to_government": 0.0, "to_firms": 0.0})
             row["asked"] += t["asked"]
             row["paid"] += t["paid"]
             if t["loan"]:                   # money lent to the government (above 0) or repaid by it (below 0)
                 row["lent_to_government"] += t["paid"] * ((t["payer"] == "firms") - (t["receiver"] == "firms"))
+            else:                           # what firms received less what they paid: income to them
+                row["to_firms"] += t["paid"] * ((t["receiver"] == "firms") - (t["payer"] == "firms"))
         # "wage_earners_net": what wage earners received in transfers less what they paid, as a part of the wage bill.
         w = self.settlement["parties"].get(WAGE_EARNERS)
         net = (w["received"] - w["paid"]) / w["wage_bill"] if w and w["wage_bill"] > 0 else 0.0
@@ -890,7 +893,14 @@ class Model:
         comp_changes = [c for c in changes if isinstance(c, (SetComponent, ScaleComponent))]
         wage_sets = [c for c in changes if isinstance(c, Set) and c.key == "wage"]
         transfers = [c for c in changes if isinstance(c, Transfer)]
-        government = self._government_loans([c for c in changes if isinstance(c, GovernmentGap)], have0, K0)
+        # A firm that closes this year employs nobody in the year and sells nothing, so it takes no part in the
+        # year's transfers: it pays nothing, receives nothing and lends nothing.
+        closing = np.zeros(count, dtype=bool)
+        for c in changes:
+            if isinstance(c, Dissolve):
+                closing[np.asarray(c.positions, dtype=int)] = True
+        government = self._government_loans([c for c in changes if isinstance(c, GovernmentGap)],
+                                            np.where(closing, 0.0, have0), np.where(closing, 0.0, K0))
         transfers += government.pop("loans")
         recording = sorted(name for name, c in L.info.items() if c.settled)    # the components that record transfers
         self.settlement = {"transfers": [], "parties": {}}
@@ -909,7 +919,7 @@ class Model:
             w1 = L.shared["wage"]
             L.refresh()
             if recording or transfers:      # after the year's scalings, markups and wage: what each payer has is now known
-                self.settlement = self._settle(transfers, group)
+                self.settlement = self._settle(transfers, group, closing)
             for name in old:
                 touch(L.info[name].owner, L.components[name] != old[name])
             # Divide the change in the logarithm of earnings per employee among the sources, exactly.
@@ -1082,7 +1092,7 @@ class Model:
                                             amount=min(-need, owed), loan=True)]
         return record
 
-    def _settle(self, transfers, group):
+    def _settle(self, transfers, group, closing=None):
         """Settle the year's transfers and enter the firms' side in the components that record them.
 
         THE RULE. Every transfer has a payer and a receiver, and no payer pays more than it has.
@@ -1107,6 +1117,12 @@ class Model:
         has after the year's scalings. The whole amount settled is therefore the amount that
         changes the firms' earnings, to the last unit.
 
+        A firm that closes in the year (`closing`) employs nobody in the year and sells nothing.
+        It pays nothing and receives nothing, and its employees are not in the wage bill. A firm
+        with no employees receives nothing. What a transfer gives to firms goes to the others in
+        the same proportions. So the record of transfers and the firms' components always give
+        the same total.
+
         Returns the record of the year: one row for each transfer, and one for each party."""
         L = self.L
         count = len(L)
@@ -1114,8 +1130,10 @@ class Model:
         for name in recording:                     # last year's amounts are replaced and never added to
             L.components[name] = np.zeros(count)
         L.refresh()
-        wage_bill = L.shared["wage"] * L.n.sum()
-        means = np.maximum(L.n * L.e, 0.0) * (1.0 - ROUNDING)    # what each firm has: its earnings before any transfer
+        out = np.zeros(count, dtype=bool) if closing is None else closing     # firms that close this year take no part
+        takes_part = ~out & (L.n > 0)              # a firm with no employees records nothing, so it receives nothing
+        wage_bill = L.shared["wage"] * L.n[~out].sum()
+        means = np.where(out, 0.0, np.maximum(L.n * L.e, 0.0) * (1.0 - ROUNDING))    # what each firm has: its earnings before any transfer
 
         rows = []
         for t in transfers:
@@ -1131,6 +1149,8 @@ class Model:
                                   f"L.add_component(name, owner, kind='income', transfers=True).")
             if by_firms:
                 ask = np.broadcast_to(np.asarray(t.payer, dtype=float), count)
+                if out.any():
+                    ask = np.where(out, 0.0, ask)
                 asked = float(ask.sum())
             else:
                 if t.amount is None:
@@ -1150,6 +1170,11 @@ class Model:
             if not np.isfinite(asked) or asked < 0 or (ask is not None and (ask < 0).any()):
                 raise LedgerError(f"the transfer '{t.label}' of module '{t.source}' asks for an amount that is "
                                   f"negative or not a number. A transfer in the other direction names the other payer.")
+            if parts is not None and not takes_part.all():
+                parts = np.where(takes_part, parts, 0.0)
+                if parts.sum() <= 0:                # no firm is left to receive it, so nobody pays it
+                    asked = 0.0
+                    ask = None if ask is None else np.zeros(count)
             rows.append({"t": t, "ask": ask, "asked": asked, "parts": parts, "paid": None})
 
         received = {p: 0.0 for p in L.parties}
@@ -1312,7 +1337,8 @@ class Model:
         remove[t] = True
 
     def _found(self, c):
-        """Add new firms. Each component takes the value the Found change gives, or its default.
+        """Add new firms. Each component takes the value the Found change gives, or its default. A
+        component that records transfers starts at 0: the core sets it from the next year's transfers.
         The base markup takes the average of the industry entered, weighted by employees, unless
         the change gives earnings per employee; it is then set to produce exactly those earnings."""
         L = self.L
@@ -1321,7 +1347,9 @@ class Model:
         ind = np.asarray(c.industry, dtype=int)
         new = {}
         for name, info in L.info.items():
-            if name in given:
+            if info.settled:            # a new firm took no part in the year's transfers, whatever the change gives
+                new[name] = np.zeros(k)
+            elif name in given:
                 new[name] = np.broadcast_to(np.asarray(given[name], dtype=float), k).copy()
             elif name != BASE:
                 new[name] = np.full(k, info.default)

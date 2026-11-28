@@ -54,12 +54,19 @@ Owners then respond, and each response lowers the unsold amount:
     otherwise have. It
     seeks the same number of employees by buying firms.
   - No firm books a loss larger than the earnings it priced for. If buyers did not even pay
-    back the wage bill, each firm keeps the core's allowance for rounding of its markup, and
-    the rest of the loss is paid out of money that owners hold, such as public debt repaid to
-    them. Owners whose payout is then below nothing buy no goods. The failure module finds
-    such a firm with nothing to pay its interest: "produce only if you expect to earn at least
-    the normal rate of return. Otherwise, shut down" (chapter 12, "Is free competition free of
-    power?").
+    back the wage bill, each firm keeps the core's allowance for rounding of its markup. Its
+    lenders lend it the rest of its loss, in proportion to the earnings it priced for. The
+    account shows this as money that owners lend to firms (`lent_to_firms`), as they lend to
+    the government, and not as income below nothing. The failure module adds the loan to the
+    firm's debt, and finds the firm with nothing to pay its interest: "produce only if you
+    expect to earn at least the normal rate of return. Otherwise, shut down" (chapter 12, "Is
+    free competition free of power?").
+
+Owners' money is accounted for in full. What owners had, after what they lent the government,
+households and firms, is what they bought plus what they saved (`owners_saved`). When owners
+and firms seek more goods than are left, the part they could not buy is reported
+(`owners_unspent`). It is saved like the rest of what they do not spend: nothing carries it into
+the next year.
 
 When nothing is unsold, none of these happens. The module also reports each year whether the
 two conditions of accumulation hold: differential capitalization that is not falling, and a
@@ -173,8 +180,8 @@ and not money, so owners cannot spend it. The services of public employees are n
 they are not among the goods offered; their pay is counted with what wage earners have.
 """
 import numpy as np
-from core import (ScaleComponent, SetComponent, Publish, Transfer, top_positions, lend_to_government, WAGE_EARNERS,
-                  GOVERNMENT, ROUNDING)
+from core import (ScaleComponent, SetComponent, SetAttribute, Publish, Transfer, top_positions, lend_to_government,
+                  WAGE_EARNERS, GOVERNMENT, ROUNDING)
 from modules.capacity import PLANT
 
 # The part of a firm's markup given up by cutting its price for want of sales, as far as no later
@@ -198,6 +205,11 @@ BENEFIT_EARNINGS = "tax on earnings for pay to people out of work"
 BENEFIT_WAGES = "tax on wages for pay to people out of work"
 BENEFIT = "pay to people out of work"
 BENEFIT_LENT = "lent to the government for pay to people out of work"   # below 0 in a year, repaid by it
+
+# An attribute: what lenders lent each firm last year to cover a loss beyond the earnings it priced
+# for, in money. It is above 0 only in a year in which buyers did not even pay back the wage bill.
+# The failure module adds it to the firm's debt.
+UNCOVERED = "lent for a loss beyond earnings"
 
 
 class Sales:
@@ -238,6 +250,9 @@ class Sales:
         self.dk, self.share = [], []    # differential capitalization and the capitalist share, year by year
         self.account = {}               # the last account, in money
 
+    def register(self, L):
+        L.add_attribute(UNCOVERED, 0.0, 0.0, adds=True, owner=self.name)
+
     def start(self, L):
         L.add_component(PRICE_CUT, self.name)
         L.add_component(SHORTFALL, self.name, group=SHORTFALL, unpriced=True)
@@ -263,8 +278,10 @@ class Sales:
         organs = sum(flows[p]["received"] for p in sorted(flows) if p in L.buyers)     # parties that spend all they receive
         holders = sum(flows[p]["received"] for p in sorted(flows)
                       if p not in (WAGE_EARNERS, GOVERNMENT) and p not in L.buyers)
-        to_firms = sum(float((n * L.components[name]).sum())           # what firms received less what they paid
-                       for name in sorted(L.info) if L.info[name].settled)
+        # What firms received less what they paid, from the core's record of transfers. A firm that closed in the
+        # year took no part in them, so this is also the total of the firms' components that record them.
+        record = A.get("transfers", {})
+        to_firms = sum(record[label].get("to_firms", 0.0) for label in sorted(record))
         lent, repaid = float(A.get("household_debt_lent", 0.0)), float(A.get("household_debt_repaid", 0.0))
 
         # What owners lent the government in the year, less what it repaid them (loans in the record of transfers).
@@ -297,7 +314,10 @@ class Sales:
         unsold = rest - by_owners
         if unsold < 1e-12 * offered:                      # a rounding error is not unsold goods
             by_owners, unsold = rest, 0.0
-        income = priced - unsold + to_firms + holders     # owners' money income of the year
+        # The part of the unsold goods beyond what firms can book as a loss: their lenders lend it to them.
+        beyond = max(unsold - (1.0 - ROUNDING) * priced, 0.0)
+        income = priced - unsold + beyond + to_firms + holders     # owners' money income of the year
+        had = income - borrowed + repaid - lent - beyond  # what owners had, after what they lent and were repaid
         # What is paid out to owners moves part of the way toward the paid-out part of the year's income.
         # What firms kept is the result: what owners earned less what was paid out to them.
         self.payout += self.payout_follows * (self.paid_out * income / wage - self.payout)
@@ -305,9 +325,10 @@ class Sales:
                 "bought_by_wage_earners": by_wages, "bought_by_government": by_government,
                 "bought_by_owners": by_owners, "bought_by_firms": outlays, "unsold": unsold,
                 "wage_earners_had": has_wages, "government_had": has_government,
-                "owners_had": income - borrowed + repaid - lent, "owners_income": income,
+                "owners_had": had, "owners_income": income, "owners_saved": had - by_owners,
+                "owners_unspent": max(outlay + building - by_owners, 0.0), "lent_to_firms": beyond,
                 "owners_outlay": outlay, "kept": income - outlay, "building": building, "lent": lent, "repaid": repaid,
-                "borrowed_by_government": borrowed,
+                "borrowed_by_government": borrowed, "to_firms": to_firms,
                 "kept_for_next_year": self.carried[WAGE_EARNERS] + self.carried[GOVERNMENT]}
 
     def conditions(self, L, top):
@@ -362,8 +383,12 @@ class Sales:
         # earnings, such as public debt repaid to them, and the firm keeps the core's allowance for
         # rounding. The failure module then finds it with no cover for its interest.
         price_cut = np.where(dominant, 0.0, self.price_give * lost)
+        # What lenders lend each firm for a loss beyond its priced earnings, in proportion to those earnings.
+        weight = L.n * asked if (L.n * asked).sum() > 0 else L.n
+        uncovered = a["lent_to_firms"] * weight / weight.sum() if a["lent_to_firms"] > 0 else np.zeros(len(L))
         changes += [SetComponent(SHORTFALL, kept / (1.0 - price_cut), self.name),
-                    SetComponent(CARRIED, asked * (lost - price_cut), self.name)]
+                    SetComponent(CARRIED, asked * (lost - price_cut), self.name),
+                    SetAttribute(UNCOVERED, uncovered, self.name)]
         if total > 0:
             changes.append(ScaleComponent(PRICE_CUT, 1.0 - price_cut, self.name))
         return changes + self.pay_out_of_work(L)

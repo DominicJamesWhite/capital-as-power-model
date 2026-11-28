@@ -798,15 +798,18 @@ def check_sales_account():
     from stage2 import starting_ledger
     mixes = [["sales"],
              ["sales", "public_debt", "household_debt", "privatisation", "risk_shaping", "labour", "force",
-              "externalisation", "proletarianization", "wants"]]
+              "externalisation", "proletarianization", "wants", "barriers"]]
     years_unsold = years = stopped = years_borrowed = years_repaid = 0
-    largest = 0.0
+    largest = largest_gap = 0.0
+    lowest_saved = np.inf
     for names in mixes:
         histories = []
         for order in names, names[::-1]:
             m = Model(starting_ledger(0, 5000), registry.basic() + registry.make(order), seed=0)
             kept = 0.0
             for step in range(60):
+                # what the firms' components that record transfers hold, which the account reads this year
+                held_by_firms = sum(float((m.L.n * m.L.components[k]).sum()) for k in m.L.info if m.L.info[k].settled)
                 try:
                     r = m.step()
                 except LedgerError:      # the guard stopped the run: the years so far are tested
@@ -839,6 +842,19 @@ def check_sales_account():
                     years_repaid += a["borrowed_by_government"] < -tol
                     assert a["bought_by_owners"] <= (a["priced_earnings"] - a["unsold"] + to_firms + holders
                                                      - a["borrowed_by_government"] + repaid - lent + tol)
+                    # One total for what firms received: the record of transfers and the firms' components agree,
+                    # because a firm that closes takes no part in the transfers of its last year.
+                    assert abs(a["to_firms"] - to_firms) <= tol and abs(held_by_firms - to_firms) <= tol
+                    largest_gap = max(largest_gap, abs(held_by_firms - to_firms) / a["priced_earnings"])
+                # The money balances. Wage earners and the government bought with what they had and carry the rest.
+                # Owners had their income less what they lent the government, households and firms, plus what
+                # was repaid to them; they bought with it and saved the rest, and saved nothing below zero.
+                assert abs(a["wage_earners_had"] + a["government_had"] - a["bought_by_wage_earners"]
+                           - a["bought_by_government"] - a["kept_for_next_year"]) <= tol
+                assert abs(a["owners_income"] - a["borrowed_by_government"] + a["repaid"] - a["lent"]
+                           - a["lent_to_firms"] - a["owners_had"]) <= tol
+                assert abs(a["owners_had"] - a["bought_by_owners"] - a["owners_saved"]) <= tol and a["owners_saved"] >= -tol
+                lowest_saved = min(lowest_saved, a["owners_saved"] / a["offered"])
                 kept = a["kept_for_next_year"]
                 years += 1
                 years_unsold += a["unsold"] > 0
@@ -857,7 +873,10 @@ def check_sales_account():
           f"{lost:.1%} each, and the losses still add up to 33.75. The capitalist "
           f"share is 146.25 in 1,146.25. In {years} years of runs with the modules that move money, what was offered equalled "
           f"what wage earners, the government, owners and firms bought plus what was unsold, and no buyer spent more than the "
-          f"record of transfers shows it had. When the government pays out 115 more than a tax set in law collects, "
+          f"record of transfers shows it had. What firms received in transfers was the same in the record and in the "
+          f"firms' own books (largest difference {largest_gap:.1e} of priced earnings). Wage earners and the government "
+          f"bought with what they had and carried the rest; owners bought with what they had after lending and saved "
+          f"the rest, which was never below zero by more than {max(-lowest_saved, 0.0):.0e} of what was offered. When the government pays out 115 more than a tax set in law collects, "
           f"owners lend it 115, have 115 less to spend, and nothing is unsold; when the pay stops, the tax repays them, "
           f"but no more than the government owes. "
           f"The loans lower no earnings. In the long runs the government borrowed in {years_borrowed} of those years and "
@@ -1228,7 +1247,8 @@ def check_no_earnings():
     """When buyers do not even pay back the wage bill, no firm books a loss larger than its earnings, owners
     buy no goods with a payout below nothing, and a firm that holds back production keeps no fewer than nobody."""
     from core import ROUNDING
-    from modules.sales import Sales, SHORTFALL
+    from modules.sales import Sales, SHORTFALL, UNCOVERED
+    from modules.failure import Failure
     from modules.greenfield import Greenfield
 
     # 1. Two firms with a wage of 1 and a markup of 0.15: wages of 1,000, priced earnings of 150. From the second
@@ -1256,14 +1276,36 @@ def check_no_earnings():
     sales = Sales(top=1, paid_out=1.0, payout_follows=1.0, benefit=0.0)
     m = Model(L, [Repay(), sales], top=1)
     with np.errstate(divide="ignore"):
-        rs = [m.step() for _ in range(4)]
+        rs = [m.step() for _ in range(3)]
+        lent_by_firm = L.extra[UNCOVERED].copy()
+        rs.append(m.step())
     a = rs[2]["published"]["sales_account"]
     assert np.isclose(a["bought_by_wage_earners"], 500.0) and np.isclose(a["unsold"], 500.0)
     assert np.allclose(L.components[SHORTFALL], [ROUNDING, ROUNDING / (1 - 0.5 * (1 - ROUNDING))])
     assert (L.e > 0).all() and (L.e < 1e-9).all()
-    # The year after, owners' income was 150 - 500 below nothing: they are paid nothing to spend on goods.
-    assert sales.payout < 0 and rs[3]["published"]["sales_account"]["owners_outlay"] == 0.0
+    # The 350 beyond the 150 priced is lent to the firms, 210 and 140 in proportion to their priced earnings. It is
+    # no loss of income: owners earned only the allowance for rounding, had the 500 repaid to them less the 350 they
+    # lent, and bought the 150 with it. The year after they are paid next to nothing to spend on goods.
+    assert np.isclose(a["lent_to_firms"], 350.0) and abs(a["owners_income"]) < 1e-6
+    assert np.isclose(a["owners_had"], 150.0) and abs(a["owners_saved"]) < 1e-6
+    assert np.allclose(lent_by_firm, [210.0, 140.0])
+    assert 0.0 <= rs[3]["published"]["sales_account"]["owners_outlay"] < 1e-6
     assert rs[3]["published"]["sales_account"]["bought_by_owners"] >= 0.0
+    # The failure module adds what was lent to each firm's debt, beside the interest the firm cannot pay.
+    failure = Failure()
+    Repay.supplies = ("jobs_created", "government_debt", "interest_share")
+    Repay.start = lambda self, L: (L.add_component("repay income", self.name, kind="income", transfers=True),
+                                   {"jobs_created": 0.0, "government_debt": 1e6, "interest_share": 0.1})[1]
+    m = Model(Ledger(employees=[600.0, 400.0], epe=0.15, industry=[0, 0], sector_of_industry=[0]),
+              [Repay(), Sales(top=1, paid_out=1.0, payout_follows=1.0, benefit=0.0), failure], top=1)
+    with np.errstate(divide="ignore"):
+        for _ in range(3):
+            m.step()
+    lent_for_loss = m.L.extra[UNCOVERED].copy()
+    with_loan = failure.year(m.L)[1]
+    m.L.extra[UNCOVERED][:] = 0.0
+    without = failure.year(m.L)[1]
+    assert np.allclose(lent_for_loss, [210.0, 140.0]) and np.allclose(with_loan - without, lent_for_loss)
 
     # 2. The green-field module: the top firm's industry rate is -0.5 and it holds back 0.9 of what is left for
     #    want of sales. It keeps 0.5 x 0.1 = 0.05 of its employees.
@@ -1285,8 +1327,9 @@ def check_no_earnings():
     assert np.allclose(scale.factor, [0.05, 1.0])
     print(f"20. No earnings: when wage earners pay 500 of a wage bill of 1,000 to owners who do not spend it, 500 is "
           f"unsold against priced earnings of 150. Each firm keeps one part in a million million of its markup in "
-          f"place of a loss below nothing, the run goes on, and the next year owners, paid below nothing, buy no "
-          f"goods. A top firm whose industry rate is -0.5 and that holds back 0.9 for want of sales keeps 0.05 of "
+          f"place of a loss below nothing, and the run goes on. Owners lend the firms the other 350, out of the 500 "
+          f"repaid to them, and the failure module adds it to the firms' debts. The next year owners, who earned next "
+          f"to nothing, buy next to no goods. A top firm whose industry rate is -0.5 and that holds back 0.9 for want of sales keeps 0.05 of "
           f"its employees.")
 
 
