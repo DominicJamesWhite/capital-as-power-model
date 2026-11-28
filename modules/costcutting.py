@@ -13,7 +13,8 @@ tradition, Syverson, "What determines productivity?" (2011): within industries "
 logged total factor productivity (TFP) between an industry's 90th and 10th percentile plants is 0.651", and
 the yearly persistence is "on the order of 0.6 to 0.8". In terms of power: for the same people and plant one
 firm obtains almost twice what a neighbour obtains, and the difference fades as methods spread. The draws
-are the ones that keep the markups of an industry's firms that far apart. They are also what sets a firm
+are sized each year so that all the firms of an industry, large and small together, lie that far apart once
+the drift back has acted. They are also what sets a firm
 behind its neighbours, so that some firms come to owe more than they are worth (see the failure module).
 
 The module owns one markup component, the cost-cutting edge. The drift back is reckoned on the
@@ -52,19 +53,31 @@ EDGE = "cost-cutting edge"
 COST = "cost difference"
 
 
+def normal_below(z):
+    """The part of a normal distribution with mean 0 and spread 1 that lies below z, from the approximation to the error
+    function in Abramowitz and Stegun (1964), 7.1.26, which is out by less than 1.5e-7."""
+    a = np.abs(z) / np.sqrt(2.0)
+    t = 1.0 / (1.0 + 0.3275911 * a)
+    erf = 1.0 - t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * np.exp(-a * a)
+    return 0.5 * (1.0 + np.sign(z) * erf)
+
+
 class CostCutting:
     name = "cost cutting"
     reads = ()
     supplies = ()
     figures = {}           # nothing it supplies is a single yearly figure
 
-    def __init__(self, gain=0.18, spread=0.3, size_scale=0.18, wears_holds=False):
-        self.gain = gain        # typical yearly gain or loss of one firm against its neighbours, in logarithms of its markup.
-                                # Set so that firms of one industry lie as far apart as plants of one industry do in
-                                # Syverson (2011): a gap of 0.651 in logarithms between the 90th and 10th percentile,
-                                # a spread of 0.254, and 0.254 x sqrt(1 - 0.7 x 0.7) = 0.18
+    def __init__(self, gap=0.651, spread=0.3, size_scale=0.18, whole_spread=True, gain=0.18, wears_holds=False):
+        self.gap = gap          # how far apart the firms of one industry lie, in logarithms of their markups, between the
+                                # 90th and the 10th percentile: Syverson (2011) finds 0.651 between the plants of one industry
         self.spread = spread    # part of any difference from the industry that disappears each year: 1 less the
                                 # yearly persistence of 0.6 to 0.8 that Syverson (2011) reports
+        self.whole_spread = whole_spread   # on: each year the draws are sized so that all firms together, large and small,
+                                           # lie `gap` apart once the drift back has acted (step 1b). Off, kept for
+                                           # comparisons: the firm of median size draws `gain`
+        self.gain = gain        # with `whole_spread` off, the yearly gain or loss of a firm of median size, in logarithms of its
+                                # markup: 0.651 is a spread of 0.254, and 0.254 x sqrt(1 - 0.7 x 0.7) = 0.18
         self.size_scale = size_scale   # how fast the draw shrinks with the size of a firm, against the typical (median)
                                        # firm: Amaral and others (1997) find the spread of firms' yearly growth falls as
                                        # size to the power -0.18 +/- 0.03, measured in employees. Independent parts
@@ -73,6 +86,21 @@ class CostCutting:
                                          # Off: the drift back is reckoned on the part of the markup that stacks, so a
                                          # premium that rests on a hold on buyers is not worn down. On: the drift back is
                                          # reckoned on the whole markup, premiums included.
+
+    def typical_gain(self, shrink):
+        """The draw of a firm of median size that sets all firms `gap` apart (step 1b). A firm whose draws have a spread
+        g x shrink, and which loses `spread` of its difference each year, settles at a spread of g x shrink / sqrt(1 - p^2),
+        where p = 1 - spread. All firms together are a mixture of such spreads. The point x that 90 per cent of that mixture
+        lies below is found by halving, for g = 1, and g is then gap / (2 x)."""
+        settle = np.sqrt(1.0 - (1.0 - self.spread) ** 2)
+        low, high = 0.0, 10.0 * shrink.max()
+        for _ in range(60):
+            x = 0.5 * (low + high)
+            if normal_below(x / shrink).mean() < 0.9:
+                low = x
+            else:
+                high = x
+        return self.gap * settle / (2.0 * 0.5 * (low + high))
 
     def start(self, L):
         L.add_component(EDGE, self.name)
@@ -88,12 +116,16 @@ class CostCutting:
         m = L.markup() if self.wears_holds else L.stacking_markup()
         level = np.bincount(L.ind, L.n * m, k) / np.maximum(np.bincount(L.ind, L.n, k), 1e-12)
         back = (level[L.ind] / m) ** self.spread
-        # A firm is many parts, and the luck of its parts partly averages out: the typical firm draws `gain`, and a
-        # firm k times its size draws gain / k^size_scale (step 1a). A firm with no employees has no parts to average.
+        # A firm is many parts, and the luck of its parts partly averages out: the typical (median) firm draws a gain g,
+        # and a firm k times its size draws g / k^size_scale (step 1a). A firm with no employees has no parts to average.
+        # g is set so that all the firms together lie as far apart as Syverson's plants (step 1b), so firms smaller
+        # than the median lie further apart than that and larger firms closer.
         n = L.n
         typical = np.median(n[n > 0]) if (n > 0).any() else 1.0
         parts = np.where(n > 0, n / typical, 1.0)
-        draw = np.exp(rng.normal(0.0, self.gain, len(L)) * parts ** -self.size_scale)
+        shrink = parts ** -self.size_scale
+        gain = self.typical_gain(shrink) if self.whole_spread else self.gain
+        draw = np.exp(rng.normal(0.0, gain, len(L)) * shrink)
         # The edge stacks, so the firm's whole markup moves by the same factor as the edge. The
         # movement is divided into the draw and the drift back, each as an amount in wages.
         whole = L.markup()

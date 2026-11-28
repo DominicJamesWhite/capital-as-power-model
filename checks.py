@@ -1485,6 +1485,15 @@ def check_markups_near_nothing():
     m4 = Model(L, [cc], top=1)
     edge = [c for c in cc.propose(m4.L, Draws([0.1, 0.1, 0.1])) if isinstance(c, ScaleComponent)][0].factor
     assert np.allclose(np.log(edge), [0.1, 0.1, 0.1 * 1000 ** -0.18], rtol=1e-12)
+    # The draw that sets all firms 0.651 apart. Firms of one size settle at a normal spread g / sqrt(1 - 0.7^2), so
+    # g = 0.651 x sqrt(0.51) / (2 x 1.28155). For a mixture of two sizes, 90 per cent of the settled firms lie below
+    # half the gap.
+    from modules.costcutting import normal_below
+    cc = CostCutting()
+    assert np.isclose(cc.typical_gain(np.ones(4)), 0.651 * np.sqrt(0.51) / (2 * 1.2815516), rtol=1e-6)
+    shrink = np.array([1.0, 1000 ** -0.18])
+    g = cc.typical_gain(shrink)
+    assert np.isclose(normal_below(0.651 / 2 / (g * shrink / np.sqrt(0.51))).mean(), 0.9, atol=1e-6)
     print(f"23. Markups near nothing: a rise is added, and a small fall comes to almost the same as subtracting it; a fall as large as the markup "
           f"leaves 41 per cent of it, and one a million times as large leaves {tiny:.1e} of it. The part of the markup that firms did "
           f"not receive is left out of the markup that prices are set from, and only a markup component in an overlap "
