@@ -223,3 +223,10 @@ If your version is closer to the book or to the evidence than the default, it ca
 ### Writing
 
 Write for a reader who is curious and new to the project. Use everyday words, give an example, and explain each term from the theory the first time you use it.
+## Licence
+
+You may use, change and share this model for any purpose that is not commercial. Commercial use is not allowed.
+
+The full terms are in `LICENSE.md`: the PolyForm Noncommercial License 1.0.0.
+
+Required Notice: Copyright Dominic White (https://github.com/DominicJamesWhite/capital-as-power-model)
