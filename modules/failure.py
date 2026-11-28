@@ -29,10 +29,11 @@ THE RULE IN PLAIN WORDS
   5. A firm among the hundred largest that fails is not closed. Its lenders restructure it:
      it stays in the list with all its employees, and its risk rises.
   6. Its buyers. The module publishes, for each industry, the part of its employees that
-     worked for firms that closed. The sabotage module reads it the next year and counts it
-     as capacity that has left the industry. Where dominant capital does not hold the
-     industry, the firms that are left undercut each other less and their markup rises. They
-     then hire, which is how some of the people who lost their jobs find work again.
+     worked for firms that closed. The next year the green-field module has the firms that
+     are left in the industry take on the closed firms' buyers and hire for them, in
+     proportion to their size, and the sabotage module counts the closure as capacity that
+     left and the hiring as capacity that came back, so a closure whose buyers are all served
+     again moves no markup.
   7. Its lenders. The firms that close stop paying. The module publishes the part of the
      interest that is left, set against the earnings that are left, and the debt module
      multiplies the interest part by it the next year. It also publishes the part of all
@@ -85,13 +86,13 @@ large firms come back. It gives no rule and no rate of failure. These are additi
 the proportions of one country in one year for every year; the reading of risk as the
 spread of a year's earnings, and the bell-shaped curve used for it; that a restructured
 firm keeps everything and only its risk rises, and by how much; that the buyers of a
-closed firm count as capacity that has left its industry; and that the jobs lost in closed
+closed firm turn to the firms left in its industry; and that the jobs lost in closed
 firms are taken off the unemployment that the debt module reads. Every source is by Nitzan and
 Bichler, or builds on their work and is listed in their archive. No other study is used.
 
 WHAT IS MISSING
 
-Nobody receives a failed firm's plant or its buyers directly, and its lenders lose what it
+Nobody receives a failed firm's plant directly, and its lenders lose what it
 owed without any payment being recorded. A firm does not build up debt of its own, so a
 firm that has been short of cover for years is treated like one that is short for the first
 time. Baines and Hager find that the three groups paid alike in the 1950s and drew apart
@@ -114,7 +115,7 @@ def chance_below(z):
 class Failure:
     name = "failure"
     reads = ("interest_share",)
-    supplies = ("failures", "failed_employees", "failed_by_industry", "restructurings", "interest_left",
+    supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_left",
                 "failure_chance", "interest_cover")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "failures": ("Firms that failed", "number", "Firms outside the top 100 that closed in the year."),
@@ -138,6 +139,7 @@ class Failure:
 
     def start(self, L):
         return {"failures": 0.0, "failed_employees": 0.0, "failed_by_industry": np.zeros(L.sector_of.size),
+                "closed_employees": np.zeros(L.sector_of.size),
                 "restructurings": 0.0, "interest_left": 1.0, "failure_chance": 0.0, "interest_cover": 0.0}
 
     def chances(self, L):
@@ -185,6 +187,8 @@ class Failure:
                    Publish("failed_employees", float(n[closes].sum() / max(employed, 1e-300)), self.name),
                    # the sabotage module counts this next year as capacity that has left the industry
                    Publish("failed_by_industry", by_industry, self.name),
+                   # the green-field module has the firms left in each industry hire this many next year
+                   Publish("closed_employees", np.bincount(L.ind[closes], n[closes], k), self.name),
                    Publish("restructurings", float(restructured.sum()), self.name),
                    # the debt module multiplies the part of capitalist income paid as interest by this next year
                    Publish("interest_left", float(left), self.name),

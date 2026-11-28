@@ -883,6 +883,38 @@ def check_failure():
     assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-10) and set(r["attribution"]) == {"failure"}
     assert np.isclose(r["published"]["failed_by_industry"] @ np.bincount(np.arange(400) % 20, before, 20), 2000.0)
 
+    # The year after, the firms left in each industry take on the buyers of those that closed and hire for them,
+    # in proportion to their size. With no other hiring, every industry is back to its employees of the start,
+    # and the hiring counts as no growth of the industry's capacity: it only moved from one firm to another.
+    class Plain:
+        name, supplies = "plain", ("hire_small", "hire_dominant", "entry_open")
+
+        def start(self, L):
+            return {"hire_small": np.zeros(20), "hire_dominant": np.zeros(20), "entry_open": np.zeros(20)}
+
+        def propose(self, L, rng):
+            return []
+
+    class Lenders2(Lenders):
+        def propose(self, L, rng):                   # lenders take nothing after the first year
+            return [Publish("interest_share", 0.0, self.name)]
+
+    from modules.greenfield import Greenfield
+    L = ledger(1.0)
+    L.shared.update(workforce=float(L.n.sum()) / 0.9, workforce_growth=0.0)
+    m = Model(L, [Lenders2(), Plain(), Failure(top=10), Greenfield(top=10)], seed=0)
+    m.step()
+    assert len(m.L) == 200
+    r = m.step()
+    by_industry = np.bincount(m.L.ind, m.L.n, 20)
+    assert np.allclose(by_industry, np.bincount(np.arange(400) % 20, before, 20), rtol=1e-12)
+    assert np.allclose(r["published"]["industry_sought"] - 2000.0 / before.sum(), 0.0, atol=1e-12)
+    L = ledger(1.0)
+    L.shared.update(workforce=float(L.n.sum()) / 0.9, workforce_growth=0.0)
+    m = Model(L, [Lenders2(), Plain(), Failure(top=10), Greenfield(top=10, taken_on=0.0)], seed=0)
+    m.step(); m.step()
+    assert np.isclose(m.L.n.sum(), before.sum() - 2000.0)       # with taken_on at 0 nobody is taken on
+
     # A firm among the largest that cannot pay is restructured: it stays, with every employee, and its risk rises.
     L = ledger(1.0)
     L.components[BASE][-1] = 0.03                    # one of the largest firms earns a third of what the others earn
@@ -954,9 +986,10 @@ def check_payers():
     names = ["sales", "force", "privatisation", "externalisation", "wants"]
     m = Model(starting_ledger(0, 5000), all_modules() + registry.make(names), seed=0)
     arms = pay = burdens = advertising = short = 0.0
-    kept = 0.0
+    kept = held = 0.0
     for step in range(45):
         outlay = float((m.L.n * m.L.shared["wage"] * m.L.components[OUTLAY]).sum())
+        owed = max(float(m.L.accounts.get("government_debt", 0.0)), 0.0)    # what the government owes at the start of the year
         r = m.step()
         rows = {t["label"]: t for t in r["transfers"]}
         parties = r["parties"]
@@ -971,7 +1004,12 @@ def check_payers():
         for k in ("pay of public employees", "military orders paid by the government", "pay to people out of work"):
             if k in rows:
                 short = max(short, 1.0 - rows[k]["paid"] / rows[k]["asked"])
-        assert abs(parties[GOVERNMENT]["holds"]) <= tol
+        # What it holds rises only in a year when it collected more beyond its spending than all it owed, and
+        # repaid all of that (the rule of lend_to_government in core.py). What it holds is not spent later.
+        repaid = sum(t["paid"] for t in r["transfers"] if t["payer"] == GOVERNMENT and t["receiver"] == "firms")
+        rise = parties[GOVERNMENT]["holds"] - (m.history[-2]["parties"][GOVERNMENT]["holds"] if step else 0.0)
+        assert parties[GOVERNMENT]["holds"] >= -tol and (rise <= tol or repaid >= owed - tol)
+        held = max(held, parties[GOVERNMENT]["holds"] / (r["employment"] * m.L.shared["wage"]))
         # Wage earners pay for the burdens on employees and communities, in full.
         b = rows["burdens borne by employees and communities"]
         assert b["payer"] == WAGE_EARNERS and b["receiver"] == "firms" and abs(b["paid"] - b["asked"]) <= tol
@@ -984,7 +1022,11 @@ def check_payers():
         assert np.isclose(a["offered"], a["wages"] + a["priced_earnings"] + a["bought_by_firms"], rtol=1e-12)
         if step:
             last = m.history[-2]["parties"]
-            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept) <= tol
+            # what the government had to spend: the orders it paid, money that found no goods the year before, and
+            # what it collected in that year beyond its spending and its repayments (when it paid out more than it
+            # collected, what it drew from its holdings went to those it paid, and is counted with them)
+            gained = max(last[GOVERNMENT]["holds"] - (m.history[-3]["parties"][GOVERNMENT]["holds"] if step > 1 else 0.0), 0.0)
+            assert abs(a["government_had"] - last[ARMED_FORCES]["received"] - kept - gained) <= tol
             net = last[WAGE_EARNERS]["received"] - last[WAGE_EARNERS]["paid"]
             assert abs(a["wage_earners_had"] - max(a["wages"] + net, 0.0) - kept_wages) <= tol
         kept, kept_wages = 0.0, 0.0
@@ -998,7 +1040,8 @@ def check_payers():
     print(f"16. Payers: a party that spends all it receives holds nothing. In a run of 45 years from 5,000 firms with "
           f"the sales, force, privatisation, externalisation and wants modules, the armed forces received exactly the "
           f"military orders that the government paid (at most {arms:.1%} of all income) and the sales account counted "
-          f"them as bought by the government; the government paid out all it collected and borrowed and kept nothing, "
+          f"them as bought by the government; the government paid out all it collected and borrowed, and added to the money "
+          f"it holds (at most {held:.1%} of the wage bill) only in years when it had repaid all it owed, "
           f"public employees (at most {pay:.1%}) among them, short of what was asked by at most {short:.2%} in a year; wage earners paid in full for the burdens on employees and communities (at most "
           f"{burdens:.1%}); and the outlay on advertising (at most {advertising:.1%} of what firms offered) was on "
           f"both sides of the sales account.")

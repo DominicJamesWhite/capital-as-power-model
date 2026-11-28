@@ -9,8 +9,13 @@ A new firm is staffed out of the year's new employment of the small firms of its
 takes nobody from an existing firm. It starts with the part of its industry's markup that stacks
 and with no premium or other income that it does not hold.
 
-Additions to the book: the part of new employment that goes to new firms, their size, and the
-markup at which a new firm starts.
+The buyers of a firm that closed (the failure module) turn to the firms left in its industry,
+which hire for them the next year in proportion to their size. The book says that "the number
+of firms in operation" is bounded "by what can be sold at a 'reasonable' profit" (chapter 12):
+a closure removes a seller, not what can be sold.
+
+Additions to the book: the part of new employment that goes to new firms, their size, the
+markup at which a new firm starts, and the part of a closed firm's buyers that the others serve.
 """
 import numpy as np
 from core import Scale, Found, Set, Publish, top_positions
@@ -18,15 +23,16 @@ from core import Scale, Found, Set, Publish, top_positions
 
 class Greenfield:
     name = "greenfield"
-    reads = ("hire_small", "hire_dominant", "entry_open")
+    reads = ("hire_small", "hire_dominant", "entry_open")   # it also reads failed_by_industry when the failure module is on
     supplies = ("new_hires", "jobs_created", "industry_growth", "industry_sought")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "new_hires": ("New hires", "number", "Employees added by hiring in the year."),
         "jobs_created": ("Jobs created", "number", "Employees added by the firms that grew, before the cutbacks of other firms are taken off."),
     }
 
-    def __init__(self, new_firm_share=0.35, new_firm_size=0.15, floor=0.005, top=100):
+    def __init__(self, new_firm_share=0.35, new_firm_size=0.15, taken_on=1.0, floor=0.005, top=100):
         self.new_firm_share = new_firm_share   # part of small firms' new employment that goes to new firms
+        self.taken_on = taken_on               # part of the buyers of firms that closed whom the firms left in the industry serve, and hire for, the year after
         self.new_firm_size = new_firm_size     # size of a new firm, as a fraction of the working population for each firm (the average firm if everybody had work)
         self.floor = floor                       # unemployment cannot fall below this
         self.top = top
@@ -45,14 +51,31 @@ class Greenfield:
         dominant[top_positions(L.cap(), np.arange(len(L)), self.top)] = True
         A = L.accounts
         rate = np.where(dominant, A["hire_dominant"][ind], A["hire_small"][ind])
-        rate = rate - A.get("crisis", 0.0)                       # stagflation's cut in hiring: the crisis
+        # The buyers of a firm that closed last year turn to the firms that are left in its industry, and those
+        # firms take on people to serve them, in proportion to their size. The failure module publishes the part
+        # of each industry's employees whose firms closed; 0 when no firm closed.
+        closed = np.zeros(k) + A.get("failed_by_industry", 0.0)
+        here = np.bincount(ind, n, k)
+        # the employees to be taken on, as a part of the employees of the firms in the industry now; an industry
+        # in which no firm is left takes on nobody
+        taken = np.where(here > 0, self.taken_on * (np.zeros(k) + A.get("closed_employees", 0.0)) / np.maximum(here, 1e-300), 0.0)
+        taken = taken[ind]
+        rate = rate + taken
+        rate = rate - A.get("crisis", 0.0)                      # stagflation's cut in hiring: the crisis
         rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0)   # production held back for want of sales (optional module); 0 without it
         jobs = rate * n
         up = jobs > 0
-        jobs[up] *= 1 - min(1.0, A.get("hiring_drag", 0.0))      # money spent on buying is not spent on building
+        kept_on = np.where(up, 1 - min(1.0, A.get("hiring_drag", 0.0)), 1.0)
+        jobs = jobs * kept_on                                    # money spent on buying is not spent on building
         # What the firms of each industry set out to hire, before the size of the working population limits it.
         # The sabotage module reads it: firms that seek more people than there are bid against each other.
-        sought = np.bincount(ind, jobs, k) / np.maximum(np.bincount(ind, n, k), 1e-12)
+        # It also takes off the part of the industry's employees whose firms closed, as capacity that left. The
+        # hiring that takes on their buyers is therefore counted as that same part, so that capacity that only
+        # moved from one firm to another counts as no growth.
+        safe = np.maximum(here, 1e-12)
+        hired = np.bincount(ind, taken * n, k)
+        served = np.bincount(ind, taken * kept_on * n, k)
+        sought = (np.bincount(ind, jobs, k) - served) / safe + closed * served / np.maximum(hired, 1e-300)
         room = workforce * (1 - self.floor) - employed - jobs[~up].sum()
         room = room - A.get("force_hires", 0.0)                  # military hiring planned for this year (optional module)
         room = room - A.get("privatisation_jobs", 0.0)           # privatised employees arrive with their jobs (optional module); 0 without it

@@ -4,7 +4,14 @@
 whereas debt capitalizes the average ability of all owners to limit industry at large."
 Interest is the return on average sabotage and profit the return on differential sabotage.
 The part of capitalist income paid as interest rises when the institutions of power are
-settled, which the book measures by unemployment averaged over several years.
+settled, which the book measures by unemployment averaged over several years. Its Figure 12.4
+sets the ratio of interest to profit against unemployment, both averaged over five years, and
+the module makes that ratio proportional to unemployment (`maturity`). A ratio r is an interest
+part of r / (1 + r), which stays below the whole of capitalist income however high unemployment
+goes. Measured from the United States national accounts for 1952 to 2019, the ratio was 7.95
+times unemployment (give or take 0.55). With that figure the failure module closes firms
+without end even with the main modules alone, so the default, 2.22, is our own: it gives an
+interest part of 0.10 at an unemployment of 5 per cent.
 
 The module keeps its own accounts and changes no entry in the ledger: it divides the
 capitalist income of the envelope into interest and profit, and puts a price on two running
@@ -47,7 +54,7 @@ national accounts gives 0.07 (give or take 0.035) for 1960 to 2007 and below 0 f
 debt can make the government collect from everybody else, for them. With no added debt the
 tax is nothing, so the main modules alone are unchanged.
 
-Additions to the book: the speed and slope of the interest share, pooling corporate debt into
+Additions to the book: the speed of the interest share and the size of its link to unemployment, pooling corporate debt into
 one total, the government's interest stream as a fixed part of all income, the stock that
 bailouts add to the debt and proceeds take from it, and taking the jobs lost in closed firms
 off the unemployment that the module reads, the tax pressed by the holders of the added debt
@@ -73,11 +80,9 @@ class Debt:
         'government_debt_dominant': ('Government debt held by the top 100', 'number', "Taken to equal the top 100's part of all capitalization, in money."),
     }
 
-    def __init__(self, base=0.10, slope=4.0, usual_unemployment=0.05, years=5, speed=0.1,
+    def __init__(self, maturity=2.22, years=5, speed=0.1,
                  government_part=0.02, start=0.20, holders_press=0.05):
-        self.base = base                  # interest as a part of capitalist income when unemployment is at its usual level
-        self.slope = slope                # rise in that part per unit of unemployment above the usual level
-        self.usual_unemployment = usual_unemployment
+        self.maturity = maturity          # ratio of interest to profit for each unit of unemployment averaged over five years; our own figure (the record gives 7.95, see modules.md)
         self.years = years                # years over which unemployment is averaged
         self.speed = speed                # yearly speed of adjustment
         self.government_part = government_part   # government interest payments as a part of all income
@@ -117,8 +122,11 @@ class Debt:
         # because their firm could not pay its lenders show the opposite, so the part of all employees whose
         # firms closed in a year is taken off that year's unemployment (the failure module; 0 without it).
         self.past = (self.past + [L.accounts["unemployment"] - A.get("failed_employees", 0.0)])[-self.years:]
-        target = self.base + self.slope * (np.mean(self.past) - self.usual_unemployment)
-        self.share = float(np.clip(self.share + self.speed * (target - self.share), 0.0, 0.9))
+        # The book's Figure 12.4 sets the ratio of interest to profit against unemployment, both averaged over five
+        # years. The ratio is proportional to unemployment, and the interest part of capitalist income follows from
+        # it: a ratio r is a part r / (1 + r), which is always below 1.
+        ratio = self.maturity * max(float(np.mean(self.past)), 0.0)
+        self.share = self.share + self.speed * (ratio / (1 + ratio) - self.share)
         changes = [Publish(k, v, self.name) for k, v in self.accounts(L).items()]
         # The holders of the added debt press for repayment: one rate on the wage bill and on every firm's
         # earnings before this tax, and the government repays them what it collects.
