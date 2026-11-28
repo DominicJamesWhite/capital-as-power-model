@@ -6,13 +6,16 @@ hundred largest that fails is kept going by its lenders.
 
 THE RULE IN PLAIN WORDS
 
-  1. What a firm owes. The debt module says what part of all capitalist income is paid as
-     interest. Lenders lend against what a firm sells, and they take more from a small
-     firm than from a large one. Of each 100 of its sales, a firm among the largest tenth
-     of firms pays 1.90 in interest, a firm in the smaller half pays 5.92, and a firm in
-     between pays 3.48. These figures set only the proportions: all three are scaled by the
-     same number, so that the interest of all firms adds up to the total that the debt
-     module gives.
+  1. What a firm owes. Each firm owes interest on its own debt, and lenders lend against what
+     a firm sells. They take more from a small firm than from a large one. Of each 100 of its
+     sales, a firm in the smaller half of firms pays 5.92 in interest, a firm among the largest
+     tenth pays 1.90, and a firm in between pays 3.48. The size of a firm is its sales counted
+     in wages, and the two sizes that divide the three groups are those of the first year. In
+     the first year the three figures are scaled by one number so that the interest of all
+     firms is the part of capitalist income that the debt module gives. After that the number
+     moves only with that part. So what a firm owes depends on its own sales, its own size
+     and the terms that lenders set for all firms, and a firm that closes takes its debt with
+     it: it raises nothing that the firms left owe.
   2. Its cover. A firm's cover is its earnings divided by the interest it owes. If a fifth
      of capitalist income is paid as interest and every firm paid alike, a firm with
      average earnings would have a cover of 5. A small firm has less cover than a large
@@ -34,9 +37,9 @@ THE RULE IN PLAIN WORDS
      proportion to their size, and the sabotage module counts the closure as capacity that
      left and the hiring as capacity that came back, so a closure whose buyers are all served
      again moves no markup.
-  7. Its lenders. The firms that close stop paying. The module publishes the part of the
-     interest that is left, set against the earnings that are left, and the debt module
-     multiplies the interest part by it the next year. It also publishes the part of all
+  7. Its lenders. The firms that close stop paying, and their interest leaves the total. The
+     module publishes the interest that all firms owe, as a part of capitalist income, and the
+     debt module reports the corporate debt from it. It also publishes the part of all
      employees whose firms closed. The debt module takes that off the unemployment it
      reads, because it reads unemployment as a sign that the institutions of power are
      solid, and promises that are being broken are a sign of the opposite. Without this,
@@ -83,7 +86,8 @@ The literature says that a firm shuts down when it cannot earn the normal return
 rests on the average and equity on the firm's own power, that small firms pay lenders more
 than large ones, that firms which cannot service their debt go bankrupt in chains, and that
 large firms come back. It gives no rule and no rate of failure. These are additions: using
-the proportions of one country in one year for every year; the reading of risk as the
+the proportions of one country in one year for every year; the sizes that divide the groups
+and the scale of the terms, both fixed in the first year; the reading of risk as the
 spread of a year's earnings, and the bell-shaped curve used for it; that a restructured
 firm keeps everything and only its risk rises, and by how much; that the buyers of a
 closed firm turn to the firms left in its industry; and that the jobs lost in closed
@@ -115,13 +119,13 @@ def chance_below(z):
 class Failure:
     name = "failure"
     reads = ("interest_share",)
-    supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_left",
+    supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_owed",
                 "failure_chance", "interest_cover")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "failures": ("Firms that failed", "number", "Firms outside the top 100 that closed in the year."),
         "failed_employees": ("Employees of failed firms", "share", "Employees of the firms that closed in the year, as a part of all employees."),
         "restructurings": ("Top 100 firms restructured", "number", "Top 100 firms that failed in the year and were kept going by their lenders."),
-        "interest_left": ("Interest left after failures", "share", "Part of the interest share that is left once the firms that closed have stopped paying."),
+        "interest_owed": ("Interest owed", "share", "Interest that all firms owe, as a part of capitalist income."),
         "failure_chance": ("Chance of failing", "share", "Average chance that a firm outside the top 100 fails in the year, weighted by employees."),
         "interest_cover": ("Interest cover", "times", "Earnings divided by interest owed, averaged over the firms outside the top 100 and weighted by employees."),
     }
@@ -136,24 +140,36 @@ class Failure:
         self.large_part = large_part                  # the part of all firms, counted from the largest by sales, that are large
         self.restructuring_risk = restructuring_risk  # rise in the risk of a firm of dominant capital when its lenders restructure it
         self.top = top                                # the number of firms counted as dominant capital, as in the book
+        self.terms = None                             # the two sizes that divide the groups, and the scale of what is owed, set in the first year
 
     def start(self, L):
         return {"failures": 0.0, "failed_employees": 0.0, "failed_by_industry": np.zeros(L.sector_of.size),
                 "closed_employees": np.zeros(L.sector_of.size),
-                "restructurings": 0.0, "interest_left": 1.0, "failure_chance": 0.0, "interest_cover": 0.0}
+                "restructurings": 0.0, "failure_chance": 0.0, "interest_cover": 0.0}
+
+    def burden(self, L):
+        """Each firm's interest for each unit of its sales, from its size alone."""
+        size = L.n * L.p / L.shared["wage"]           # sales counted in wages, so that a rise of all wages moves nobody
+        if self.terms is None:                        # the first year: the groups and the scale are set here and kept
+            small_below, large_from = np.quantile(size, [self.small_part, 1.0 - self.large_part])
+            weight = self.weights(size, small_below, large_from)
+            scale = (L.n * np.maximum(L.e, 0.0)).sum() / max((weight * L.n * L.p).sum(), 1e-300)
+            self.terms = (small_below, large_from, scale)
+        small_below, large_from, scale = self.terms
+        return scale * self.weights(size, small_below, large_from)
+
+    def weights(self, size, small_below, large_from):
+        return np.where(size >= large_from, self.large_burden,
+                        np.where(size < small_below, self.small_burden, self.medium_burden))
 
     def chances(self, L):
         """Each firm's cover and its chance of failing this year."""
         n = L.n
         earnings = n * np.maximum(L.e, 0.0)
-        interest = L.accounts["interest_share"] * earnings.sum()      # the interest that all firms owe together
-        sales = n * L.p
-        if interest <= 0 or sales.sum() <= 0:         # nothing is owed: no firm can fall short
+        share = L.accounts["interest_share"]          # the terms that lenders set for all firms (the debt module)
+        if len(L) == 0 or share <= 0:                 # nothing is owed: no firm can fall short
             return np.full(len(L), np.inf), np.zeros(len(L)), np.zeros(len(L))
-        small_below, large_from = np.quantile(sales, [self.small_part, 1.0 - self.large_part])
-        burden = np.where(sales >= large_from, self.large_burden,
-                          np.where(sales < small_below, self.small_burden, self.medium_burden))
-        owed = burden * sales * (interest / (burden * sales).sum())   # each firm's part of that interest
+        owed = share * self.burden(L) * n * L.p      # each firm's interest on its own debt
         with np.errstate(divide="ignore", invalid="ignore"):
             cover = np.where(owed > 0, earnings / owed, np.inf)
         spread = np.log(np.maximum(L.d, 1.0))         # a risk of 1 is full confidence: no spread
@@ -164,8 +180,8 @@ class Failure:
         return cover, chance, owed
 
     def propose(self, L, rng):
-        if not self.on:
-            return []
+        if not self.on:                               # nobody fails, and firms owe the terms that lenders set
+            return [Publish("interest_owed", float(L.accounts["interest_share"]), self.name)]
         k, n = L.sector_of.size, L.n
         cover, chance, owed = self.chances(L)
         fails = rng.random(len(L)) < chance
@@ -177,12 +193,9 @@ class Failure:
         small_n = max(n[small].sum(), 1e-300)
         by_industry = np.bincount(L.ind[closes], n[closes], k) / np.maximum(np.bincount(L.ind, n, k), 1e-300)
         finite = np.isfinite(cover)
-        # What the lenders lose. The firms that close stop paying, so the interest that is left is a smaller
-        # part of the earnings that are left, if those firms owed more for each unit of earnings than the rest.
+        # The interest that the firms left owe; a firm that closes takes its debt with it.
         earnings = n * np.maximum(L.e, 0.0)
-        left = 1.0
-        if closes.any() and owed.sum() > 0 and earnings[~closes].sum() > 0:
-            left = (owed[~closes].sum() / owed.sum()) / (earnings[~closes].sum() / earnings.sum())
+        owed_left = float(owed[~closes].sum() / earnings[~closes].sum()) if earnings[~closes].sum() > 0 else 0.0
         changes = [Publish("failures", float(closes.sum()), self.name),
                    Publish("failed_employees", float(n[closes].sum() / max(employed, 1e-300)), self.name),
                    # the sabotage module counts this next year as capacity that has left the industry
@@ -190,8 +203,8 @@ class Failure:
                    # the green-field module has the firms left in each industry hire this many next year
                    Publish("closed_employees", np.bincount(L.ind[closes], n[closes], k), self.name),
                    Publish("restructurings", float(restructured.sum()), self.name),
-                   # the debt module multiplies the part of capitalist income paid as interest by this next year
-                   Publish("interest_left", float(left), self.name),
+                   # the debt module reports the corporate debt from this next year
+                   Publish("interest_owed", owed_left, self.name),
                    Publish("failure_chance", float((n[small] * chance[small]).sum() / small_n), self.name),
                    Publish("interest_cover",
                            float((n[small] * cover[small]).sum() / small_n) if finite.all() else 0.0, self.name)]

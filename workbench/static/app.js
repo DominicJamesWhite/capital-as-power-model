@@ -725,7 +725,7 @@ const FIGNAME = { unemployment: "Unemployment", concentration: "Top 100's share 
   new_hires: "New hires", merger_volume: "Merger volume", hiring_drag: "Cut in hiring caused by mergers", pool_open: "Firms the top 100 can still buy",
   stagflation_intensity: "Intensity of stagflation", cohesion: "Cohesion of the top 100", crisis: "Crisis level", inflation_push: "Price rise pushed by the top 100",
   resistance: "Resistance", roadblocks: "Roadblocks against mergers", pressure: "Pressure on boundaries", government_debt: "Government debt",
-  interest_share: "Interest share", corporate_debt: "Corporate debt", government_debt_dominant: "Government debt held by the top 100" };
+  interest_share: "Interest terms", corporate_debt: "Corporate debt", government_debt_dominant: "Government debt held by the top 100" };
 const figName = k => FIGMETA[k] ? figInfo(k).title : FIGNAME[k] || human(k);
 const MS = state.map;
 const mapRun = () => { const shown = shownRuns(); if (!shown.length) return null; const r = byId(MS.run); return shown.includes(r) ? r : refOf(shown); };

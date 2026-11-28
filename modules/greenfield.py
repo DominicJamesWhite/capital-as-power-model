@@ -30,9 +30,10 @@ class Greenfield:
         "jobs_created": ("Jobs created", "number", "Employees added by the firms that grew, before the cutbacks of other firms are taken off."),
     }
 
-    def __init__(self, new_firm_share=0.35, new_firm_size=0.15, taken_on=1.0, floor=0.005, top=100):
+    def __init__(self, new_firm_share=0.35, new_firm_size=0.15, taken_on=1.0, taken_by_top=True, floor=0.005, top=100):
         self.new_firm_share = new_firm_share   # part of small firms' new employment that goes to new firms
         self.taken_on = taken_on               # part of the buyers of firms that closed whom the firms left in the industry serve, and hire for, the year after
+        self.taken_by_top = taken_by_top       # True: the top 100 take on their part too, in proportion to size; False: only the other firms do
         self.new_firm_size = new_firm_size     # size of a new firm, as a fraction of the working population for each firm (the average firm if everybody had work)
         self.floor = floor                       # unemployment cannot fall below this
         self.top = top
@@ -56,10 +57,12 @@ class Greenfield:
         # of each industry's employees whose firms closed; 0 when no firm closed.
         closed = np.zeros(k) + A.get("failed_by_industry", 0.0)
         here = np.bincount(ind, n, k)
-        # the employees to be taken on, as a part of the employees of the firms in the industry now; an industry
-        # in which no firm is left takes on nobody
-        taken = np.where(here > 0, self.taken_on * (np.zeros(k) + A.get("closed_employees", 0.0)) / np.maximum(here, 1e-300), 0.0)
-        taken = taken[ind]
+        takers = np.ones(len(L), dtype=bool) if self.taken_by_top else ~dominant
+        among = np.bincount(ind[takers], n[takers], k)
+        # the employees to be taken on, as a part of the employees of the firms that take them on; an industry
+        # in which no such firm is left takes on nobody
+        taken = np.where(among > 0, self.taken_on * (np.zeros(k) + A.get("closed_employees", 0.0)) / np.maximum(among, 1e-300), 0.0)
+        taken = np.where(takers, taken[ind], 0.0)
         rate = rate + taken
         rate = rate - A.get("crisis", 0.0)                      # stagflation's cut in hiring: the crisis
         rate = rate - np.where(dominant, A.get("sales_cut", 0.0), 0.0)   # production held back for want of sales (optional module); 0 without it

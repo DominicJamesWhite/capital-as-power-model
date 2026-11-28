@@ -859,8 +859,21 @@ def check_failure():
     L = ledger(1.0)
     L.accounts["interest_share"] = 0.4
     cover, chance, owed = f.chances(L)
-    assert np.isclose(owed.sum(), 0.4 * (L.n * L.e).sum(), rtol=1e-12)      # the interest of all firms is the total owed
+    assert np.isclose(owed.sum(), 0.4 * (L.n * L.e).sum(), rtol=1e-12)      # in the first year the interest of all firms is the total owed
     assert np.isclose(cover[0] / cover[-1], 1.90 / 5.92) and np.isclose(cover[250] / cover[-1], 1.90 / 3.48)
+    # Each firm owes on its own debt: when half the small firms have closed, and when the largest firms earn
+    # three times as much, every firm that is left owes what it owed before.
+    left = np.arange(100, 400)
+    fewer = Ledger(employees=L.n[left], epe=0.10, industry=left % 20, sector_of_industry=np.repeat(np.arange(5), 4),
+                   risk=1.0, shared={"workforce": float(L.n.sum())})
+    fewer.accounts["interest_share"] = 0.4
+    assert np.allclose(f.chances(fewer)[2], owed[left], rtol=1e-12)
+    richer = ledger(1.0)
+    richer.components[BASE][360:] = 0.30
+    richer.refresh()
+    richer.accounts["interest_share"] = 0.4
+    assert np.allclose(f.chances(richer)[2][:360], owed[:360], rtol=1e-12)
+    assert owed[left].sum() / (L.n * L.e)[left].sum() < 0.4      # the firms that closed owed the most for their earnings
     assert set(np.unique(chance)) <= {0.0, 1.0}                              # with a risk of 1 nothing is left to chance
     assert (chance[:200] == 1.0).all() and (chance[360:] == 0.0).all() and cover[:200].max() < 1 < cover[360:].min()
 
@@ -954,7 +967,7 @@ def check_failure():
         restructured += r["published"]["restructurings"]
         assert np.isclose(sum(r["attribution"].values()), r["da"], atol=1e-9)
     assert closed > 0
-    print(f"15. Failure: the interest that firms owe adds up to the total; a small firm owes 5.92 for each 1.90 that a "
+    print(f"15. Failure: in the first year the interest that firms owe adds up to the total; each firm owes on its own debt, so a firm left owes the same when other firms close or earn more; a small firm owes 5.92 for each 1.90 that a "
           f"large firm owes on the same sales; a firm with a risk of 1 fails only if it cannot pay; a firm that closes "
           f"leaves the list and its employees are without work; a firm among the largest is restructured and stays; "
           f"switched off, nothing fails; firms bought and firms closed in one year are each credited with their own "

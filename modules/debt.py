@@ -9,9 +9,9 @@ sets the ratio of interest to profit against unemployment, both averaged over fi
 the module makes that ratio proportional to unemployment (`maturity`). A ratio r is an interest
 part of r / (1 + r), which stays below the whole of capitalist income however high unemployment
 goes. Measured from the United States national accounts for 1952 to 2019, the ratio was 7.95
-times unemployment (give or take 0.55). With that figure the failure module closes firms
-without end even with the main modules alone, so the default, 2.22, is our own: it gives an
-interest part of 0.10 at an unemployment of 5 per cent.
+times unemployment (give or take 0.55), and that is the default. The interest part is the terms
+that lenders set for all firms. The failure module works out what each firm owes on its own
+debt on those terms, and the corporate debt is worked out from the total that firms owe.
 
 The module keeps its own accounts and changes no entry in the ledger: it divides the
 capitalist income of the envelope into interest and profit, and puts a price on two running
@@ -23,9 +23,9 @@ therefore reports the part of the government's debt held by dominant capital, ta
 dominant capital's part of all capitalization. It does not pay that interest to those firms.
 
 The failure module closes firms that cannot pay their lenders, and it publishes two numbers
-that this module reads. Both change nothing when no firm closes. The first is the part of the
-interest that is left once the closed firms have stopped paying, and the interest part is
-multiplied by it. The second is the part of all employees whose firms closed, which is taken
+that this module reads. The first is the interest that all firms owe, as a part of capitalist
+income; a firm that closes takes its debt with it, and the corporate debt is worked out from
+this part. The second is the part of all employees whose firms closed, which is taken
 off the unemployment that this module reads: the book ties debt to "the strength and solidity
 of existing power institutions", and promises that are being broken are no sign of solidity.
 
@@ -74,21 +74,23 @@ class Debt:
     reads = ("unemployment", "transfers")
     supplies = ("interest_share", "corporate_debt", "government_debt", "government_debt_dominant")
     figures = {                   # what the workbench calls each published number: label, unit, note
-        "interest_share": ("Interest share", "share", "Part of capitalist income paid as interest."),
+        "interest_share": ("Interest terms", "share", "Part of capitalist income that lenders ask as interest, on the terms of the first year."),
         "corporate_debt": ("Corporate debt", "number", "Capitalized value of the interest that corporations pay, in money."),
         'government_debt': ('Government debt', 'number', "Capitalized value of the government's interest payments, in money."),
         'government_debt_dominant': ('Government debt held by the top 100', 'number', "Taken to equal the top 100's part of all capitalization, in money."),
     }
 
-    def __init__(self, maturity=2.22, years=5, speed=0.1,
+    def __init__(self, maturity=7.95, years=5, speed=0.1,
                  government_part=0.02, start=0.20, holders_press=0.05):
-        self.maturity = maturity          # ratio of interest to profit for each unit of unemployment averaged over five years; our own figure (the record gives 7.95, see modules.md)
+        self.maturity = maturity          # ratio of interest to profit for each unit of unemployment averaged over five years (United States national accounts, 1952 to 2019, see modules.md)
         self.years = years                # years over which unemployment is averaged
         self.speed = speed                # yearly speed of adjustment
         self.government_part = government_part   # government interest payments as a part of all income
         self.share = start
         self.holders_press = holders_press   # tax pressed by the holders of the added debt, as a part of it in a year (Bohn 1998)
         self.past = []
+        self.owed_part = 1.0              # what firms owed last year as a part of the terms (the failure module); 1 without it
+        self.terms = [start, start]       # the terms published two years ago and last year: firms owed last year on the first
         self.added = 0.0                  # debt added by bailouts and by borrowing to spend, less debt retired with the proceeds of privatisation, in money
 
     def accounts(self, L):
@@ -103,7 +105,8 @@ class Debt:
             government = dominant = 0.0
         return {"government_debt_dominant": dominant,
                 "interest_share": self.share,
-                "corporate_debt": self.share * capitalist / nrr,          # a promised return: risk of one
+                # a promised return: risk of one. On the terms, times the part of the terms that firms owed last year.
+                "corporate_debt": self.share * self.owed_part * capitalist / nrr,
                 "government_debt": government}
 
     def start(self, L):
@@ -116,8 +119,10 @@ class Debt:
         # privatisation (optional modules; 0 without them).
         lent = sum(row.get("lent_to_government", 0.0) for row in A.get("transfers", {}).values())
         self.added += A.get("bailout_borrowing", 0.0) + lent - A.get("privatisation_proceeds", 0.0)
-        # Firms that closed last year stopped paying their lenders (the failure module); 1 when no firm closed.
-        self.share = self.share * A.get("interest_left", 1.0)
+        # What firms owed last year on the terms they read then (the failure module). A firm that closed took its
+        # debt with it.
+        if self.terms[0] > 0 and "interest_owed" in A:
+            self.owed_part = A["interest_owed"] / self.terms[0]
         # Unemployment stands here for how solid the institutions of power are. People who lost their jobs
         # because their firm could not pay its lenders show the opposite, so the part of all employees whose
         # firms closed in a year is taken off that year's unemployment (the failure module; 0 without it).
@@ -127,6 +132,7 @@ class Debt:
         # it: a ratio r is a part r / (1 + r), which is always below 1.
         ratio = self.maturity * max(float(np.mean(self.past)), 0.0)
         self.share = self.share + self.speed * (ratio / (1 + ratio) - self.share)
+        self.terms = [self.terms[1], self.share]
         changes = [Publish(k, v, self.name) for k, v in self.accounts(L).items()]
         # The holders of the added debt press for repayment: one rate on the wage bill and on every firm's
         # earnings before this tax, and the government repays them what it collects.
