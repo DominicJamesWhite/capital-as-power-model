@@ -17,7 +17,7 @@
         <button role="menuitem" id="m-run">New run<span>One run with the settings you choose.</span></button>
         <button role="menuitem" id="m-exp">New experiment<span>Several runs that vary one or more settings.</span></button>
       </div>
-      <p class="small muted">Tick runs to show them. ★ marks the baseline.</p>
+      <p class="small muted">Tick runs to show them. ★ marks the baseline of each experiment: the run the others in it are compared with.</p>
     </div>
     <div class="runs-list" id="runs-list"></div>
   </aside>
@@ -53,6 +53,7 @@
       <nav class="mp-strip" id="mp-strip" aria-label="Main figures"></nav>
     </div>
     <div class="panel" id="panel-compare" role="tabpanel" hidden></div>
+    <div class="panel" id="panel-score" role="tabpanel" hidden></div>
     <div class="panel" id="panel-gain" role="tabpanel" hidden></div>
     <div class="panel" id="panel-experiment" role="tabpanel" hidden></div>
   </main>

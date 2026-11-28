@@ -157,19 +157,33 @@ const ENDED = new Set(["done", "stopped", "failed"]);
 const hasData = r => r.rows.length > 0 && r.step >= 0;
 const runLabel = r => r.name;
 const fullName = r => r.name;
+// Whether a module runs: a module of the model runs unless it is switched off; a replacement runs if it is chosen.
+const isCore = name => !!(MODS[name] && MODS[name].core);
+const isOn = (spec, name) => isCore(name) ? !(spec.without || []).includes(name) : (spec.optional || []).includes(name);
+function setOn(optional, without, name, on) { if (isCore(name)) on ? without.delete(name) : without.add(name); else on ? optional.add(name) : optional.delete(name); }
+const startLabel = n => ((CAT.starts || []).find(x => x.name === n) || { label: n }).label;
+const startText = r => startLabel(r.start || "stated") + (r.draws ? ", with the conditions of a random year of US data" : "");
 function colLabel(c) { return c.kind === "module" ? `${modName(c.name)} on or off` : `${modName(c.mod)} › ${setLabel(c.name)}`; }
-function colBase(c, baseRun) { return c.kind === "module" ? (baseRun.optional || []).includes(c.name) : valueIn(baseRun, c.mod, c.name); }
+function colBase(c, baseRun) { return c.kind === "module" ? isOn(baseRun, c.name) : valueIn(baseRun, c.mod, c.name); }
 let DEFAULT_BASE = null;
 const baseOf = id => byId(id) || DEFAULT_BASE;
 function startFromOptions(selId) { return runs.some(hasData) ? runOptions(() => true, selId) : [el("option", { value: "__default", text: DEFAULT_BASE.name })]; }
 const startBtn = () => el("button", { class: "btn primary", type: "button", text: "Start a run", onclick: () => openSetup(null, null) });
 function emptyState(text, withStart) { return el("div", { class: "empty" }, el("p", { text }), withStart ? startBtn() : null); }
 const noRuns = () => !runs.length;
-// The reference for Diff and Experiment: the baseline if it is ticked, otherwise the first ticked run.
-function refOf(shown) { const b = byId(state.baseline); return shown.includes(b) ? b : shown[0]; }
+// Each experiment has a baseline: the run it chose, or else its first run with results.
+function baseIdOf(g) {
+  if (!g) return null;
+  const b = byId(g.baseline); if (b && hasData(b)) return b.id;
+  const f = membersOf(g).find(hasData); return f ? f.id : null;
+}
+const isBaseline = r => !!r && baseIdOf(gById(r.group)) === r.id;
+// The reference for Diff, Scorecard and Experiment: the baseline of the experiment of the first ticked run,
+// shown even if it is not ticked.
+function refOf(shown) { const b = shown.length ? byId(baseIdOf(gById(shown[0].group))) : null; return b || shown[0]; }
 
 const state = {
-  shown: new Set(), slot: new Map(), baseline: null, tab: "charts",
+  shown: new Set(), slot: new Map(), tab: "charts",
   open: new Set(), closed: new Set(), renaming: null, hover: null, extra: [], log: { dk: true }, gainRun: null,
   expView: "grid", sumFig: "dk", recent: null,
   map: { run: null, vs: "", measure: "run", year: 1920, sel: null, hiFig: null, fig: null },
@@ -184,7 +198,7 @@ function tick(id) {
 function untick(id) { state.shown.delete(id); state.slot.delete(id); }
 function setTicks(ids) { for (const id of [...state.shown]) if (!ids.includes(id)) untick(id); for (const id of ids) tick(id); }
 function colourOf(r) { return r && state.slot.has(r.id) ? css(`--s${state.slot.get(r.id) + 1}`) : css("--unticked"); }
-function saveView() { store("ticks", [...state.slot.entries()]); store("baseline", state.baseline); store("tab", state.tab); }
+function saveView() { store("ticks", [...state.slot.entries()]); store("tab", state.tab); }
 
 // ---- module colours: a fixed, muted palette that shares no hue with the run colours
 const MOD_COLOURS = { sabotage: "#8c6d5a", greenfield: "#7d8a5c", mergers: "#5d6f86", "cost cutting": "#a8926a", stagflation: "#8a5f6e", compass: "#6f7f7a",
@@ -201,8 +215,8 @@ const expMeta = id => recall("exp:" + id, null);
 function deriveCols(ms) {
   if (ms.length < 2) return [];
   const cols = [];
-  const opts = [...new Set(ms.flatMap(r => r.optional))];
-  for (const k of opts) if (ms.some(r => r.optional.includes(k) !== ms[0].optional.includes(k))) cols.push({ kind: "module", name: k });
+  const opts = [...new Set(ms.flatMap(r => [...r.optional, ...r.without]))];
+  for (const k of opts) if (ms.some(r => isOn(r, k) !== isOn(ms[0], k))) cols.push({ kind: "module", name: k });
   const keys = new Map();
   for (const r of ms) for (const mid of Object.keys(r.settings || {})) for (const n of Object.keys(r.settings[mid])) keys.set(mid + "|" + n, [mid, n]);
   for (const [mid, n] of keys.values()) if (ms.some(r => !same(valueIn(r, mid, n), valueIn(ms[0], mid, n)))) cols.push({ kind: "setting", mod: mid, name: n });
@@ -211,12 +225,12 @@ function deriveCols(ms) {
 function deriveAll() {
   for (const g of groups) {
     const ms = membersOf(g), meta = expMeta(g.id);
-    g.base = meta && byId(meta.base) ? meta.base : ms[0] ? ms[0].id : null;
+    g.base = baseIdOf(g) || (ms[0] ? ms[0].id : null);
     g.claims = ms[0] ? ms[0].claims : 30000; g.years = ms[0] ? ms[0].years : 119;
     const cols = meta && meta.cols && meta.cols.length ? meta.cols : deriveCols(ms);
     // Group by value only when the runs vary one or more settings and nothing else but the seed.
     g.cols = cols.length === 1 || (meta && meta.cols && meta.cols.length) ? cols : [];
-    for (const r of ms) r.vals = g.cols.length ? g.cols.map(c => c.kind === "module" ? r.optional.includes(c.name) : valueIn(r, c.mod, c.name)) : null;
+    for (const r of ms) r.vals = g.cols.length ? g.cols.map(c => c.kind === "module" ? isOn(r, c.name) : valueIn(r, c.mod, c.name)) : null;
   }
 }
 
@@ -226,9 +240,9 @@ function diffs(run, base) {
   if (run.claims !== base.claims) out.push(["Firms", base.claims.toLocaleString("en-GB"), run.claims.toLocaleString("en-GB")]);
   if (run.years !== base.years) out.push(["Years", base.years, run.years]);
   if (run.seed !== base.seed) out.push(["Seed", base.seed, run.seed]);
-  const ob = new Set(base.optional), or = new Set(run.optional);
-  for (const k of or) if (!ob.has(k)) out.push([modName(k), "Off", "On", k]);
-  for (const k of ob) if (!or.has(k)) out.push([modName(k), "On", "Off", k]);
+  if (startText(run) !== startText(base)) out.push(["Start", startText(base), startText(run)]);
+  for (const k of new Set([...base.optional, ...run.optional, ...(base.without || []), ...(run.without || [])]))
+    if (isOn(base, k) !== isOn(run, k)) out.push([modName(k), isOn(base, k) ? "On" : "Off", isOn(run, k) ? "On" : "Off", k]);
   const mods = new Set([...Object.keys(run.settings || {}), ...Object.keys(base.settings || {})]);
   for (const mid of mods) {
     const a = (base.settings || {})[mid] || {}, b = (run.settings || {})[mid] || {};
@@ -270,8 +284,9 @@ function keyedGain(gain, optional) { const out = {}; for (const [k, v] of Object
 function toRun(sm, old) {
   const r = old || { rows: [] };
   Object.assign(r, { id: sm.id, name: sm.name, claims: sm.claims, years: sm.years, seed: sm.seed, optional: sm.optional || [], settings: sm.settings || {},
+    without: sm.without || [], start: sm.start || "stated", draws: !!sm.draws, drawnFrom: sm.drawn_from ?? null, scorecard: sm.scorecard || null,
     group: sm.experiment, srv: sm.status, status: STATUS[sm.status] || sm.status, message: sm.message || "", rowsCount: sm.rows_count || 0, created: sm.created });
-  r.modules = sm.modules && sm.modules.length ? sm.modules.map(n => keyFor(n, r.optional)) : [...CORE_ORDER, ...r.optional];
+  r.modules = sm.modules && sm.modules.length ? sm.modules.map(n => keyFor(n, r.optional)) : [...CORE_ORDER.filter(n => !r.without.includes(n)), ...r.optional];
   r.step = r.rows.length - 1;
   return r;
 }
@@ -290,13 +305,12 @@ async function refresh(force) {
     runs = (rs.runs || []).map(sm => toRun(sm, old.get(sm.id)));
     const need = runs.filter(r => r.rowsCount > r.rows.length);
     for (let i = 0; i < need.length; i += 6) await Promise.all(need.slice(i, i + 6).map(fetchRows));
-    groups = (ex.experiments || []).map(e => ({ id: e.id, name: e.name, created: e.created, runIds: e.run_ids || [] }));
+    groups = (ex.experiments || []).map(e => ({ id: e.id, name: e.name, created: e.created, runIds: e.run_ids || [], baseline: e.baseline || null }));
     deriveAll();
     for (const id of [...state.shown]) if (!byId(id)) untick(id);
-    if (!byId(state.baseline)) { const r = runs.find(hasData); state.baseline = r ? r.id : null; }
     if (!gById(state.recent)) state.recent = groups.length ? groups[groups.length - 1].id : null;
     for (const g of groups) if (!state.closed.has(g.id) && membersOf(g).length <= 6) state.open.add(g.id);
-    const sig = JSON.stringify([runs.map(r => [r.id, r.name, r.status, r.rows.length, r.message, r.group]), groups.map(g => [g.id, g.name, g.runIds.length])]);
+    const sig = JSON.stringify([runs.map(r => [r.id, r.name, r.status, r.rows.length, r.message, r.group]), groups.map(g => [g.id, g.name, g.runIds.length, g.baseline])]);
     if (force || sig !== lastSig) { lastSig = sig; if (pop.hidden && !state.renaming) renderAll(); else renderTab(); }
   } catch (e) { toast(e.message); }
   if (runs.some(r => r.status === "running" || r.status === "waiting")) pollTimer = setTimeout(() => refresh(), 1000);
@@ -308,7 +322,7 @@ async function act(path, body, done) {
 
 // ================================================ runs column
 function openFolderInTab(g) { setTicks(membersOf(g).filter(r => hasData(r) || r.status === "failed").map(r => r.id)); saveView(); setTab("experiment"); renderRuns(); renderLegend(); }
-function setBaseline(r) { state.baseline = r.id; saveView(); renderAll(); }
+function setBaseline(r) { act(`/api/experiments/${r.group}/baseline`, { run: r.id }); }
 function renameInput(current, done) {
   let finished = false;
   const fin = v => { if (finished) return; finished = true; done(v); };
@@ -321,7 +335,9 @@ function kebab(label, open) {
     onclick: e => { e.stopPropagation(); open(e.currentTarget, e.detail === 0); } });
 }
 function metaText(r) {
-  const facts = `${r.claims.toLocaleString("en-GB")} firms · ${r.years} years · seed ${r.seed}`;
+  const off = (r.without || []).length;
+  const facts = `${r.claims.toLocaleString("en-GB")} firms · ${r.years} years · seed ${r.seed}` + (r.start && r.start !== "stated" ? ` · from ${r.start === "1950" ? "1950" : "now"}` : "")
+    + (r.draws ? " · random US year" : "") + (off ? ` · ${off} switched off` : "");
   if (r.status === "running") return [el("span", { class: "running", text: `Running, year ${Math.max(r.step, 0)} of ${r.years}` }), " · " + facts];
   if (r.status === "waiting") return [el("span", { class: "running", text: "Waiting" }), " · " + facts];
   if (r.status === "failed") return [el("span", { class: "failed", text: r.message ? `Stopped by the model: ${r.message}` : "Stopped by the model" })];
@@ -333,9 +349,9 @@ function runRow(r) {
   const box = el("input", { type: "checkbox", id: "show-" + r.id, "aria-label": `Show ${r.name} on the charts`, disabled: !canTick || null,
     onchange: e => { e.target.checked ? tick(r.id) : untick(r.id); saveView(); renderAll(); } });
   box.checked = state.shown.has(r.id);
-  const isBase = state.baseline === r.id;
-  const star = el("button", { class: "star" + (isBase ? " on" : ""), type: "button", "aria-label": isBase ? `${r.name} is the baseline` : `Set ${r.name} as baseline`,
-    "data-tip": isBase ? "Baseline" : "Set as baseline", text: isBase ? "★" : "☆", disabled: !hasData(r) || null, onclick: () => setBaseline(r) });
+  const isBase = isBaseline(r);
+  const star = el("button", { class: "star" + (isBase ? " on" : ""), type: "button", "aria-label": isBase ? `${r.name} is the baseline of its experiment` : `Set ${r.name} as the baseline of its experiment`,
+    "data-tip": isBase ? "The baseline of this experiment" : "Set as the baseline of this experiment", text: isBase ? "★" : "☆", disabled: !hasData(r) || null, onclick: () => setBaseline(r) });
   const name = state.renaming === r.id
     ? renameInput(r.name, v => { state.renaming = null; if (v && v !== r.name) act(`/api/runs/${r.id}/rename`, { name: v }); else renderRuns(); })
     : el("label", { class: "run-name", for: "show-" + r.id }, el("span", { class: "swatch", style: `background:${colourOf(r)}` }), el("span", { text: r.name }));
@@ -398,7 +414,7 @@ function openRunMenu(r, anchor, focus) {
     mi("Rename", () => { closePop(); state.renaming = r.id; renderRuns(); }),
     mi("New run with these settings", () => { closePop(); openSetup(r, r.group); }),
     mi("New experiment from this run", () => { closePop(); openExpSetup(null, r); }),
-    r.id === state.baseline || !hasData(r) ? null : mi("Set as baseline", () => { closePop(); setBaseline(r); }),
+    isBaseline(r) || !hasData(r) ? null : mi("Set as baseline", () => { closePop(); setBaseline(r); }),
     hasData(r) ? mi("Download CSV", () => { closePop(); download(`/api/runs/${r.id}/csv`); }) : null,
     busy(r) ? mi("Stop run", () => { closePop(); act(`/api/runs/${r.id}/stop`); }) : null,
     el("hr"),
@@ -489,24 +505,29 @@ function figInfo(key) {
 const fromLink = src => src === null ? modLink(HUB, "From the ledger") : src ? modLink(src, `From ${modName(src)}`) : null;
 
 // ================================================ charts tab (from A)
-const ptsOf = (r, key) => r.rows.slice(0, r.step + 1).map(x => [x.year, x.v[key]]);
+// Runs from different starts are set side by side by the years since their start, not by the year.
+const byStep = rs => new Set(rs.map(r => r.rows.length ? r.rows[0].year : 0)).size > 1;
+const ptsOf = (r, key, step) => r.rows.slice(0, r.step + 1).map((x, i) => [step ? i : x.year, x.v[key]]);
+const rowAt = (r, x, step) => { const i = step ? x : x - r.rows[0].year; return i >= 0 && i <= r.step ? r.rows[i] : null; };
+const yearText = (y, step) => step ? `Year ${y} of each run` : String(y);
 function shownRuns() { return runs.filter(r => hasData(r) && state.shown.has(r.id)); }
 function chartCard(fig, removable) {
   const shown = shownRuns();
   const logBox = fig.log ? el("label", { class: "opts" }, (() => { const c = el("input", { type: "checkbox", onchange: e => { state.log[fig.key] = e.target.checked; renderCharts(); } }); c.checked = !!state.log[fig.key]; return c; })(), "Log scale") : null;
-  const svg = lineChart({ series: shown.map(r => ({ colour: colourOf(r), pts: ptsOf(r, fig.key), width: shown.length > 6 ? 1.1 : null })), unit: fig.unit, log: fig.log && state.log[fig.key], fixed: fig.fixed, zero: fig.key === "inflation" });
+  const st = byStep(shown);
+  const svg = lineChart({ series: shown.map(r => ({ colour: colourOf(r), pts: ptsOf(r, fig.key, st), width: shown.length > 6 ? 1.1 : null })), unit: fig.unit, log: fig.log && state.log[fig.key], fixed: fig.fixed, zero: fig.key === "inflation" });
   const read = el("div", { class: "readout" });
   const upd = y => {
     svg._setYear(y);
-    const yr = y ?? Math.max(...shown.map(r => r.rows[r.step].year));
-    const at = r => { const row = r.rows[yr - r.rows[0].year]; return row && r.rows.indexOf(row) <= r.step ? row.v[fig.key] : null; };
+    const yr = y ?? Math.max(...shown.map(r => st ? r.step : r.rows[r.step].year));
+    const at = r => { const row = rowAt(r, yr, st); return row ? row.v[fig.key] : null; };
     const bits = [];
     for (const g of groups) {
       const rs = shown.filter(r => r.group === g.id); if (!rs.length) continue;
       if (rs.length > 3) { const vs = rs.map(at).filter(v => v != null); if (vs.length) bits.push(el("span", { text: `${g.name}: ${fmt(Math.min(...vs), fig.unit)} to ${fmt(Math.max(...vs), fig.unit)}` })); }
       else bits.push(...rs.map(r => el("span", {}, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), fmt(at(r), fig.unit))));
     }
-    read.replaceChildren(el("span", {}, el("b", { text: String(yr) })), ...bits);
+    read.replaceChildren(el("span", {}, el("b", { text: yearText(yr, st) })), ...bits);
   };
   hoverables.push(upd); upd(state.hover);
   const line = fig.line ? fig.line() : [fig.note ? fig.note.replace(/\.?$/, ".") + " " : "", fig.suffix ? `Per cent${fig.suffix}. ` : "", fromLink(fig.source)];
@@ -561,7 +582,7 @@ function notices() {
 }
 function renderLegend() {
   const shown = shownRuns();
-  if (shown.length <= 4) { $("legend").replaceChildren(...shown.map(r => el("span", {}, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), (r.id === state.baseline ? "★ " : "") + fullName(r)))); return; }
+  if (shown.length <= 4) { $("legend").replaceChildren(...shown.map(r => el("span", {}, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), (isBaseline(r) ? "★ " : "") + fullName(r)))); return; }
   $("legend").replaceChildren(...groups.map(g => { const rs = shown.filter(r => r.group === g.id); if (!rs.length) return null;
     return el("span", {}, el("span", { style: "display:inline-flex;gap:1px" }, rs.slice(0, 8).map(r => el("i", { style: `width:4px;height:10px;display:inline-block;background:${colourOf(r)}` }))), `${g.name} (${rs.length})`); }).filter(Boolean));
 }
@@ -571,37 +592,42 @@ function runOptions(filter, selId) {
 }
 
 // ================================================ compare tab (from A)
+// The column headings of a table of runs: the reference first. Selecting another makes it the baseline of its experiment.
+function runHeads(cols, isBase, first) {
+  return el("tr", {}, el("th", { text: "" }), first || null, cols.map((r, i) => el("th", { class: "colth" },
+    el("button", { class: "colhead" + (i === 0 ? " ref" : ""), type: "button", "data-tip": i === 0 ? (isBase ? "The baseline of its experiment" : "The reference run") : "Select to make this run the baseline of its experiment",
+      onclick: () => { if (!isBaseline(r)) setBaseline(r); } },
+      el("span", { class: "nm" }, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), (isBaseline(r) ? "★ " : "") + fullName(r)),
+      el("span", { class: "sub", text: i === 0 ? (isBase ? "Baseline" : "Reference") : "Make baseline" })))));
+}
+const refLine = (ref, isBase) => isBase ? `Each run is shown against ${fullName(ref)}, the baseline of its experiment.` : `Each run is shown against ${fullName(ref)}, the first ticked run.`;
 const CMP_FIGS = ["dk", "breadth", "depth", "unemployment", "capital_share", "price_level", "inflation", "resistance"];
 function renderCompare() {
   hoverables.length = 0;
   const p = $("panel-compare");
   const shown = shownRuns();
   if (noRuns()) { p.replaceChildren(emptyState("There are no runs yet.", true)); return; }
-  if (shown.length < 2) { p.replaceChildren(emptyState("Tick 2 or more runs to see their differences.")); return; }
-  const ref = refOf(shown), cols = [ref, ...shown.filter(r => r !== ref)];
-  const isBase = ref.id === state.baseline, base = byId(state.baseline);
+  const ref = shown.length ? refOf(shown) : null, cols = ref ? [ref, ...shown.filter(r => r !== ref)] : [];
+  if (cols.length < 2) { p.replaceChildren(emptyState("Tick 2 or more runs, or a run that is not its experiment's baseline, to see their differences.")); return; }
+  const isBase = isBaseline(ref);
   // settings that differ between any of the ticked runs
   const rows = [];
   const add = (label, get, mod) => { const vals = cols.map(get); if (vals.some(v => !same(v, vals[0]))) rows.push({ label, vals, mod }); };
-  add("Firms", r => r.claims.toLocaleString("en-GB")); add("Years", r => r.years); add("Seed", r => r.seed);
-  for (const k of [...new Set(cols.flatMap(r => r.optional))]) add(modName(k), r => r.optional.includes(k) ? "On" : "Off", k);
+  add("Firms", r => r.claims.toLocaleString("en-GB")); add("Years", r => r.years); add("Seed", r => r.seed); add("Start", startText);
+  for (const k of [...new Set(cols.flatMap(r => [...r.optional, ...r.without]))]) add(modName(k), r => isOn(r, k) ? "On" : "Off", k);
   const keys = new Map();
   for (const r of cols) for (const mid of Object.keys(r.settings || {})) for (const n of Object.keys(r.settings[mid])) keys.set(mid + "|" + n, [mid, n]);
   for (const [mid, n] of keys.values()) add(`${modName(mid)} › ${setLabel(n)}`, r => valueIn(r, mid, n), keyOf(mid));
   const labelCell = row => { if (!row.mod) return row.label; const [a, b] = row.label.split(" › "); return b ? [modLink(row.mod, a), " › " + b] : [modLink(row.mod, a)]; };
-  const head = () => el("tr", {}, el("th", { text: "" }), cols.map((r, i) => el("th", { class: "colth" },
-    el("button", { class: "colhead" + (i === 0 ? " ref" : ""), type: "button", "data-tip": i === 0 ? (isBase ? "The baseline" : "The reference run") : "Select to make this run the baseline",
-      onclick: () => { if (r.id !== state.baseline) setBaseline(r); } },
-      el("span", { class: "nm" }, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), (r.id === state.baseline ? "★ " : "") + fullName(r)),
-      el("span", { class: "sub", text: i === 0 ? (isBase ? "Baseline" : "Reference") : "Make baseline" })))));
+  const head = () => runHeads(cols, isBase);
   const wide = cols.length > 6 ? " wide" : "";
   const settingsTable = el("div", { class: "dwrap" }, el("table", { class: "tbl dtable" + wide },
     el("thead", {}, head()),
     el("tbody", {}, rows.length ? rows.map(row => el("tr", {}, el("th", { scope: "row" }, ...[].concat(labelCell(row))),
       row.vals.map((v, i) => el("td", { class: i > 0 && same(v, row.vals[0]) ? "muted" : null, text: String(v) }))))
       : el("tr", {}, el("td", { colspan: String(cols.length + 1), class: "muted", text: "No settings differ." })))));
-  const year = Math.min(...cols.map(r => r.rows[r.step].year));
-  const at = (r, k) => { const row = r.rows.find(x => x.year === year); return row ? row.v[k] : null; };
+  const st = byStep(cols), year = Math.min(...cols.map(r => st ? r.step : r.rows[r.step].year));
+  const at = (r, k) => { const row = rowAt(r, year, st); return row ? row.v[k] : null; };
   const gap = (f, a, b) => {
     if (a == null || b == null) return "";
     if (f.unit === "pct") { const g = (b - a) * 100; return (g >= 0 ? "+" : "") + g.toFixed(1) + " points"; }
@@ -615,22 +641,56 @@ function renderCompare() {
         return el("td", { class: "n" }, el("span", { text: fmt(v, f.unit) }), i > 0 ? el("span", { class: "gap", text: gap(f, a, v) }) : null); })); }))));
   const charts = ["dk", "unemployment", "capital_share", "price_level"].map(k => {
     const f = FIG[k];
-    const svg = lineChart({ series: cols.map((r, i) => ({ colour: colourOf(r), pts: ptsOf(r, k), dash: i === 0 ? "4 3" : "", width: cols.length > 6 ? 1.1 : null })), unit: f.unit, log: f.log && state.log[k], height: 150 });
+    const svg = lineChart({ series: cols.map((r, i) => ({ colour: colourOf(r), pts: ptsOf(r, k, st), dash: i === 0 ? "4 3" : "", width: cols.length > 6 ? 1.1 : null })), unit: f.unit, log: f.log && state.log[k], height: 150 });
     const read = el("div", { class: "readout" });
-    const upd = y => { svg._setYear(y); const yr = y ?? year; const v = r => { const row = r.rows.find(x => x.year === yr); return row ? row.v[k] : null; };
+    const upd = y => { svg._setYear(y); const yr = y ?? year; const v = r => { const row = rowAt(r, yr, st); return row ? row.v[k] : null; };
       const others = cols.slice(1).map(v).filter(x => x != null);
-      read.replaceChildren(el("span", {}, el("b", { text: String(yr) })), el("span", { text: `${isBase ? "★" : "Reference"} ${fmt(v(ref), f.unit)}` }),
+      read.replaceChildren(el("span", {}, el("b", { text: yearText(yr, st) })), el("span", { text: `${isBase ? "★" : "Reference"} ${fmt(v(ref), f.unit)}` }),
         ...(cols.length <= 4 ? cols.slice(1).map(r => el("span", {}, el("i", { class: "swatch", style: `background:${colourOf(r)}` }), fmt(v(r), f.unit)))
           : others.length ? [el("span", { text: `Others ${fmt(Math.min(...others), f.unit)} to ${fmt(Math.max(...others), f.unit)}` })] : [])); };
     hoverables.push(upd); upd(state.hover);
     return el("div", { class: "card chart" }, el("div", { class: "card-head" }, el("h2", { text: f.title })), svg, read);
   });
   p.replaceChildren(
-    el("p", { class: "view-line", text: `Differences between the ${cols.length} ticked runs. Select a column heading to make that run the baseline.` }),
-    ...(isBase ? [] : [el("p", { class: "ref-note", text: base ? `★ ${fullName(base)} is not ticked. ${fullName(ref)} is the reference.` : `${fullName(ref)} is the reference.` })]),
+    el("p", { class: "view-line", text: `${refLine(ref, isBase)} Select a column heading to make that run the baseline.` }),
     el("h3", { class: "dh", text: `Settings that differ (${rows.length})` }), settingsTable,
-    el("h3", { class: "dh", text: `Results in ${year}` }), resultsTable,
+    el("h3", { class: "dh", text: `Results in ${st ? "year " + year + " of each run" : year}` }), resultsTable,
     el("div", { class: "dcharts" }, charts));
+}
+
+// ================================================ scorecard tab: each ticked run against US data
+// The tests come from scorecard.py in the model. A new test there appears here with no change to the page.
+function renderScore() {
+  const p = $("panel-score"), tests = CAT.scorecard || [];
+  if (noRuns()) { p.replaceChildren(emptyState("There are no runs yet.", true)); return; }
+  const shown = shownRuns();
+  if (!shown.length) { p.replaceChildren(emptyState("Tick a run in the list to see how close it comes to US data.")); return; }
+  if (!tests.length) { p.replaceChildren(emptyState("The model lists no tests against data. They are kept in scorecard.py.")); return; }
+  const ref = refOf(shown), cols = [ref, ...shown.filter(r => r !== ref)], isBase = isBaseline(ref);
+  const valueOf = (r, key) => { const x = (r.scorecard || []).find(t => t.key === key); return x ? x.value : null; };
+  const pc = v => (v * 100).toFixed(v !== 0 && Math.abs(v) < 0.01 ? 2 : 1) + "%";
+  const where = (t, v) => v < t.low ? "Below the US range" : v > t.high ? "Above the US range" : "In the US range";
+  const gap = (a, b) => { const g = (b - a) * 100; return `${g >= 0 ? "+" : ""}${g.toFixed(Math.abs(g) < 0.1 ? 2 : 1)} points`; };
+  const last = tests[0].window;
+  const usCell = t => el("td", { class: "n" }, el("span", { text: t.us == null ? `${pc(t.low)} to ${pc(t.high)}` : pc(t.us) }),
+    el("span", { class: "gap", text: t.us == null ? t.range : `${pc(t.low)} to ${pc(t.high)} in ${t.range}` }));
+  const runCell = (t, r, i) => {
+    const v = valueOf(r, t.key), a = valueOf(ref, t.key);
+    if (v == null) return el("td", { class: "n muted", text: r.scorecard ? "Not measured in this run" : "Not measured. Run it again to score it." });
+    return el("td", { class: "n" }, el("span", { text: pc(v) }), el("span", { class: "gap", text: where(t, v) }),
+      i > 0 && a != null ? el("span", { class: "gap", text: `${gap(a, v)} from the ${isBase ? "baseline" : "reference"}` }) : null);
+  };
+  const rows = tests.map(t => el("tr", {},
+    el("th", { scope: "row" }, el("div", { "data-tip": `In the run: ${t.model} In the data: ${t.data}` }, el("b", { text: t.label })),
+      el("div", { class: "small muted", text: `US data, ${t.span}. ${t.source}` })),
+    usCell(t), cols.map((r, i) => runCell(t, r, i))));
+  const table = el("div", { class: "dwrap" }, el("table", { class: "tbl dtable" + (cols.length > 5 ? " wide" : "") },
+    el("thead", {}, runHeads(cols, isBase, el("th", { class: "colth", text: "US data" }))), el("tbody", {}, rows)));
+  p.replaceChildren(
+    el("p", { class: "view-line", text: `How close each run comes to US data. Each run's figure is taken over its last ${last} years. The US figure is the mean of the years the data cover, and the range is the middle half of those years, unless the row says otherwise. Point at a figure's name to see what it measures.` }),
+    el("p", { class: "view-line", text: refLine(ref, isBase) }),
+    table,
+    el("p", { class: "small muted", text: "The tests are listed in scorecard.py in the model, with their sources. No module reads these figures: they are results of the run, not settings." }));
 }
 
 // ================================================ gain tab (from A)
@@ -1092,17 +1152,17 @@ function expColumns(shown, ref) {
     const keys = combos(one).filter(k => shown.some(r => comboKey(r) === k));
     return { one, byRun: false, cols: keys.map(k => ({ label: k, colour: comboColour(one, k), runs: shown.filter(r => comboKey(r) === k), isBase: comboIsBase(one, k) })) };
   }
-  return { one, byRun: true, cols: shown.map(r => {
+  return { one, byRun: true, cols: (shown.includes(ref) ? shown : [ref, ...shown]).map(r => {
     const d = r === ref ? null : diffs(r, ref);
     return { label: one ? runLabel(r) : fullName(r), colour: colourOf(r), runs: [r], isBase: r === ref, run: r,
-      note: d === null ? (r.id === state.baseline ? "Baseline" : "Reference") : d.length ? d.map(x => `${x[0]}: ${x[1]} → ${x[2]}`).join(", ") : "Same settings" };
+      note: d === null ? (isBaseline(r) ? "Baseline" : "Reference") : d.length ? d.map(x => `${x[0]}: ${x[1]} → ${x[2]}`).join(", ") : "Same settings" };
   }) };
 }
 function renderExperiment() {
   const p = $("panel-experiment");
   if (noRuns()) { p.replaceChildren(emptyState("There are no runs yet.", true)); return; }
   const shown = shownRuns();
-  if (shown.length < 2) { p.replaceChildren(emptyState("Tick 2 or more runs to compare them as an experiment.")); return; }
+  if (!shown.length || (shown.length === 1 && refOf(shown) === shown[0])) { p.replaceChildren(emptyState("Tick 2 or more runs to compare them as an experiment.")); return; }
   const ref = refOf(shown);
   const { one, byRun, cols } = expColumns(shown, ref);
   const seeds = [...new Set(shown.map(r => r.seed))];
@@ -1116,7 +1176,7 @@ function renderExperiment() {
   p.replaceChildren(
     el("div", { class: "exp-head" }, el("div", {}, el("h2", { text: title }), el("p", { class: "sub", text: sub })),
       el("div", { class: "exp-tools" }, one ? el("button", { class: "btn sm", text: "Edit as table", onclick: () => openExpSetup(one) }) : null, seg)),
-    el("p", { class: "view-line" }, ...(byRun ? [`Each column is one ticked run. The line under each name says what it changes from ${ref.id === state.baseline ? "the baseline" : "the reference run"}.`]
+    el("p", { class: "view-line" }, ...(byRun ? [`Each column is one ticked run. The line under each name says what it changes from ${isBaseline(ref) ? "the baseline" : "the reference run"}.`]
       : ["Each column is one value of what the experiment varies. Thin lines are ", term("seed", "seeds"), ". The thick line is their mean."])),
     body, el("div", { class: "xsum", id: "xsum" }));
   if (state.expView === "grid") {
@@ -1183,13 +1243,14 @@ function renderExpSummary(g, cols, byRun) {
 // ================================================ set-up: new run (modal, cards from B)
 let form = null;
 function newRunForm(from, folder) {
-  const src = from && hasData(from) ? from : (byId(state.baseline) || DEFAULT_BASE);
+  const src = from && hasData(from) ? from : (byId(baseIdOf(gById(folder || state.recent))) || DEFAULT_BASE);
   form = { kind: "run", name: "", claims: src.claims, years: src.years, seed: src.seed, basedOn: src.id,
     optional: new Set((src.optional || []).filter(k => MODS[k] && !MODS[k].core)), settings: JSON.parse(JSON.stringify(src.settings || {})),
+    without: new Set((src.without || []).filter(isCore)), start: src.start || "stated", draws: !!src.draws,
     folder: folder && gById(folder) ? folder : gById(state.recent) ? state.recent : groups.length ? groups[groups.length - 1].id : "__new",
     newFolder: "", view: "cards", mapSel: null, pick: new Set(), errors: [] };
 }
-function formSpec() { return { optional: [...form.optional], settings: form.settings, seed: form.seed }; }
+function formSpec() { return { optional: [...form.optional], without: [...form.without], start: form.start, draws: form.draws, settings: form.settings, seed: form.seed }; }
 function setDraft(mid, name, v) {
   const ms = form.settings[mid] || (form.settings[mid] = {});
   if (same(v, defaultOf(mid, name))) delete ms[name]; else ms[name] = v;
@@ -1198,9 +1259,11 @@ function setDraft(mid, name, v) {
 function draftDiffs() {
   if (!form || form.kind !== "run") return [];
   const base = baseOf(form.basedOn), spec = formSpec(), out = [];
-  const ob = new Set(base.optional);
-  for (const k of form.optional) if (!ob.has(k)) out.push({ label: modName(k), a: "Off", b: "On", mod: k, optional: "added" });
-  for (const k of ob) if (!form.optional.has(k)) out.push({ label: modName(k), a: "On", b: "Off", mod: k, optional: "removed" });
+  for (const k of new Set([...base.optional, ...form.optional, ...(base.without || []), ...form.without])) {
+    const a = isOn(base, k), b = isOn(spec, k);
+    if (a !== b) out.push({ label: modName(k), a: a ? "On" : "Off", b: b ? "On" : "Off", mod: k, optional: b ? "added" : "removed" });
+  }
+  if (startText(spec) !== startText(base)) out.push({ label: "Start", a: startText(base), b: startText(spec) });
   for (const mid of new Set([...Object.keys(spec.settings), ...Object.keys(base.settings || {})])) {
     const names = new Set([...Object.keys(spec.settings[mid] || {}), ...Object.keys((base.settings || {})[mid] || {})]);
     for (const n of names) { const a = valueIn(base, mid, n), b = valueIn(spec, mid, n); if (!same(a, b)) out.push({ label: `${modName(mid)} › ${setLabel(n)}`, a, b, mod: keyOf(mid) }); }
@@ -1223,6 +1286,13 @@ function moduleCard(m) {
     ...(m.core ? [] : [el("button", { class: "x", type: "button", "aria-label": `Remove ${modName(m.name)}`, "data-tip": "Remove this module", text: "×", onclick: () => { form.optional.delete(m.name); afterDraftChange(); } })]),
     el("p", { class: "what", text: LINE[m.name] || "" }));
   if (rep) { card.append(el("p", { class: "replaced-note", text: `Replaced by ${modName(rep)}.` })); refreshLater(refresh); return card; }
+  if (m.core) {
+    const off = form.without.has(m.name);
+    card.append(el("p", { class: "small" }, off ? el("span", { class: "muted", text: "Switched off. The run leaves this module out, to show what it adds. " }) : null,
+      el("button", { class: "link", type: "button", "data-tip": off ? null : "Leave this module out of the run, to test what it adds. The model is meant to run with every module.",
+        text: off ? "Switch on" : "Switch off", onclick: () => { off ? form.without.delete(m.name) : form.without.add(m.name); afterDraftChange(); } })));
+    if (off) { card.classList.add("replaced"); refreshLater(refresh); return card; }
+  }
   const tip = st => st.note ? firmify(st.note.charAt(0).toUpperCase() + st.note.slice(1)) + "." : null;
   for (const st of m.settings) {
     const name = st.name, id = `lv-${m.name.replace(/\W/g, "-")}-${name}`;
@@ -1336,6 +1406,15 @@ function folderFields() {
     form.folder === "__new" ? el("div", {}, el("label", { class: "lbl", for: "f-newfolder", text: "Name of the new experiment" }),
       el("input", { class: "input", id: "f-newfolder", value: form.newFolder, placeholder: "For example: Labour tests", style: "width:15rem", oninput: e => form.newFolder = e.target.value })) : null];
 }
+// The conditions of the first year: stated by the model, or US data. Only the first year comes from the data.
+function startFields() {
+  const sel = el("select", { class: "select", id: "f-start", onchange: e => { form.start = e.target.value; if (form.start !== "stated") form.draws = false; renderSetup(); } },
+    (CAT.starts || [{ name: "stated", label: "Stated by the model" }]).map(x => el("option", { value: x.name, text: x.label, selected: form.start === x.name || null })));
+  const box = el("input", { type: "checkbox", id: "f-draws", onchange: e => { form.draws = e.target.checked; updateFoot(); } });
+  box.checked = form.draws;
+  return [el("div", {}, el("label", { class: "lbl", for: "f-start", "data-tip": "Only the first year comes from the data. Every later year is made by the modules." }, "Conditions in the first year"), sel,
+    form.start === "stated" ? el("label", { class: "small", for: "f-draws", style: "display:block;margin-top:6px" }, box, " Take them from a random year of US data, picked by the seed") : null)];
+}
 function setupCtx() {
   const b = baseOf(form.basedOn);
   return { E: $("su-edges"), N: $("su-nodes"), legend: $("su-legend"), run: b.rows.length ? b : null, vs: null, measure: "run", year: 1920, blankLine: "Gains show once the start run has results.",
@@ -1356,7 +1435,7 @@ function renderSetup() {
   const view = form.view;
   const seg = el("div", { class: "seg", role: "group", "aria-label": "Show modules as" },
     [["cards", "Cards"], ["map", "Map"]].map(([v, l]) => el("button", { type: "button", "aria-pressed": String(view === v), text: l, onclick: () => { form.view = v; if (v === "cards") form.mapSel = null; renderSetup(); } })));
-  const nOpt = form.optional.size;
+  const nOpt = form.optional.size, nOff = form.without.size;
   let content;
   if (view === "cards") {
     content = el("div", { class: "mcards" }, CORE_ORDER.map(n => moduleCard(MODS[n])), [...form.optional].map(n => moduleCard(MODS[n])),
@@ -1368,11 +1447,12 @@ function renderSetup() {
       el("div", {}, el("label", { class: "lbl", for: "f-based", text: "Start from" }), basedSel),
       el("div", {}, el("label", { class: "lbl", for: "f-claims", text: "Firms at the start" }), firms),
       el("div", {}, el("label", { class: "lbl", for: "f-years", text: "Years" }), el("input", { class: "input num", id: "f-years", value: form.years, inputmode: "numeric", oninput: e => { form.years = e.target.value.trim(); updateFoot(); } })),
-      el("div", {}, el("label", { class: "lbl", for: "f-seed" }, term("seed", "Seed")), el("input", { class: "input num", id: "f-seed", value: form.seed, inputmode: "numeric", oninput: e => { form.seed = e.target.value.trim(); updateFoot(); } }))),
+      el("div", {}, el("label", { class: "lbl", for: "f-seed" }, term("seed", "Seed")), el("input", { class: "input num", id: "f-seed", value: form.seed, inputmode: "numeric", oninput: e => { form.seed = e.target.value.trim(); updateFoot(); } })),
+      ...startFields()),
     el("div", { class: "su-sec-head" }, el("h3", { text: "Modules" }), seg, el("span", { class: "spacer" }),
       view === "map" ? el("button", { class: "btn sm", type: "button", text: "+ Replace a module", onclick: openPicker }) : null),
     el("p", { class: "sub", text: view === "cards"
-      ? `Every module runs. ${nOpt} replacement${nOpt === 1 ? " runs" : "s run"} in place of a module. Select a module's name to see it on the map.`
+      ? `Every module runs unless you switch it off. ${nOpt} replacement${nOpt === 1 ? " runs" : "s run"} in place of a module. ${nOff} module${nOff === 1 ? " is" : "s are"} switched off. Select a module's name to see it on the map.`
       : "Dashed rings mark changes that have not run yet. Select a module to go to its card." }),
     content);
   setupShell("New run", body, "Start run", startRun);
@@ -1429,12 +1509,12 @@ async function startRun() {
   }
   if (errs.length) { showErrors(errs); return; }
   const b = $("start-btn"); b.disabled = true;
-  const body = { name: form.name.trim() || `Run ${runs.length + 1}`, claims: form.claims, years: +form.years, seed: +form.seed, optional: [...form.optional], settings: settingsBody(formSpec()) };
+  const body = { name: form.name.trim() || `Run ${runs.length + 1}`, claims: form.claims, years: +form.years, seed: +form.seed, optional: [...form.optional],
+    without: [...form.without], start: form.start, draws: form.draws, settings: settingsBody(formSpec()) };
   if (form.folder === "__new" || !gById(form.folder)) body.new_experiment = form.newFolder.trim() || `Experiment ${groups.length + 1}`; else body.experiment = form.folder;
   try {
     const d = await api("/api/runs", "POST", body);
     tick(d.id); state.recent = d.experiment || state.recent; if (d.experiment) { state.open.add(d.experiment); state.closed.delete(d.experiment); }
-    if (!byId(state.baseline)) state.baseline = d.id;
     saveView();
     form = null; $("setup").hidden = true; $("setup").replaceChildren(); closePicker();
     setTab("charts");
@@ -1536,16 +1616,16 @@ function tableFromFolder(g) {
   const cols = [];
   const addCol = c => { if (!cols.some(x => x.kind === c.kind && x.name === c.name && x.mod === c.mod)) cols.push(c); };
   for (const r of ms) {
-    for (const k of new Set([...r.optional, ...base.optional])) if (r.optional.includes(k) !== base.optional.includes(k)) addCol({ kind: "module", name: k });
+    for (const k of new Set([...r.optional, ...base.optional, ...r.without, ...(base.without || [])])) if (isOn(r, k) !== isOn(base, k)) addCol({ kind: "module", name: k });
     for (const mid of new Set([...Object.keys(r.settings || {}), ...Object.keys(base.settings || {})]))
       for (const n of new Set([...Object.keys((r.settings || {})[mid] || {}), ...Object.keys((base.settings || {})[mid] || {})]))
         if (!same(valueIn(r, mid, n), valueIn(base, mid, n))) addCol({ kind: "setting", mod: mid, name: n });
   }
-  return { base, cols, rows: ms.map(r => ({ vals: cols.map(c => c.kind === "module" ? r.optional.includes(c.name) : valueIn(r, c.mod, c.name)), seed: r.seed })) };
+  return { base, cols, rows: ms.map(r => ({ vals: cols.map(c => c.kind === "module" ? isOn(r, c.name) : valueIn(r, c.mod, c.name)), seed: r.seed })) };
 }
 function newExpForm(g, fromRun) {
   if (g) { const t = tableFromFolder(g); form = { kind: "exp", title: `New experiment from ${g.name}`, name: `${g.name} (copy)`, basedOn: t.base.id, claims: g.claims, years: g.years, cols: t.cols, rows: t.rows, tool: null }; return; }
-  const base = fromRun && hasData(fromRun) ? fromRun : (byId(state.baseline) || DEFAULT_BASE);
+  const base = fromRun && hasData(fromRun) ? fromRun : (byId(baseIdOf(gById(state.recent))) || DEFAULT_BASE);
   form = { kind: "exp", title: "New experiment", name: "", basedOn: base.id, claims: base.claims, years: base.years, cols: [], rows: [{ vals: [], seed: base.seed }], tool: null };
 }
 function openExpSetup(g, fromRun) { newExpForm(g || null, fromRun || null); form.errors = []; renderExpSetup(); }
@@ -1600,11 +1680,11 @@ function toolForm(base) {
     const modSel = el("select", { class: "select", id: "c-mod", onchange: e => { t.mod = e.target.value; t.name = null; renderExpSetup(); } },
       el("optgroup", { label: "Modules" }, CORE_ORDER.map(n => el("option", { value: "core:" + n, text: modName(n), selected: t.mod === "core:" + n || null }))),
       el("optgroup", { label: "Replacements" }, CAT.optional.map(o => el("option", { value: "opt:" + o.name, text: modName(o.name), selected: t.mod === "opt:" + o.name || null }))));
-    const opts = (m.core ? [] : [{ name: "__onoff", label: "On or off" }]).concat(m.settings.filter(x => x.name !== "top").map(x => ({ name: x.name, label: setLabel(x.name) })));
+    const opts = [{ name: "__onoff", label: m.core ? "Runs or is switched off" : "On or off" }].concat(m.settings.filter(x => x.name !== "top").map(x => ({ name: x.name, label: setLabel(x.name) })));
     t.name = t.name && opts.some(o => o.name === t.name) ? t.name : opts[0].name;
     const setSel = el("select", { class: "select", id: "c-set", onchange: e => { t.name = e.target.value; renderExpSetup(); } }, opts.map(o => el("option", { value: o.name, text: o.label, selected: o.name === t.name || null })));
     const st = m.settings.find(x => x.name === t.name);
-    const hint = t.name === "__onoff" ? `${LINE[m.name] || ""} ${(base.optional || []).includes(m.name) ? "On" : "Off"} in ${base.name}.`
+    const hint = t.name === "__onoff" ? `${LINE[m.name] || ""} ${isOn(base, m.name) ? "On" : "Off"} in ${base.name}.`
       : `${st && st.note ? firmify(st.note.charAt(0).toUpperCase() + st.note.slice(1)) + ". " : ""}Default ${st ? st.default : "–"}. In ${base.name}: ${valueIn(base, t.mod, t.name)}.`;
     return el("div", { class: "inline-form" },
       el("div", { class: "field" }, el("label", { for: "c-mod", text: "Module" }), modSel),
@@ -1655,10 +1735,11 @@ async function startExperiment() {
   const base = baseOf(form.basedOn);
   const name = form.name.trim() || (form.cols.length ? form.cols.map(colLabel).join(" and ") : "Experiment");
   const specs = form.rows.map(row => {
-    const settings = JSON.parse(JSON.stringify(base.settings || {})), optional = new Set(base.optional);
-    form.cols.forEach((c, ci) => { if (c.kind === "module") row.vals[ci] ? optional.add(c.name) : optional.delete(c.name); else (settings[c.mod] || (settings[c.mod] = {}))[c.name] = row.vals[ci]; });
+    const settings = JSON.parse(JSON.stringify(base.settings || {})), optional = new Set(base.optional), without = new Set(base.without || []);
+    form.cols.forEach((c, ci) => { if (c.kind === "module") setOn(optional, without, c.name, !!row.vals[ci]); else (settings[c.mod] || (settings[c.mod] = {}))[c.name] = row.vals[ci]; });
     const label = form.cols.length ? form.cols.map((c, ci) => `${c.kind === "module" ? modName(c.name) : setLabel(c.name)} ${showVal(row.vals[ci])}`).join(", ") : base.name;
-    return { name: `${label}, seed ${row.seed}`, claims: form.claims, years: +form.years, seed: row.seed, optional: [...optional], settings: settingsBody({ settings }) };
+    return { name: `${label}, seed ${row.seed}`, claims: form.claims, years: +form.years, seed: row.seed, optional: [...optional], without: [...without],
+      start: base.start || "stated", draws: !!base.draws, settings: settingsBody({ settings }) };
   });
   const b = $("start-btn"); b.disabled = true;
   let expId = null;
@@ -1682,11 +1763,12 @@ const ICON = {
   charts: '<path d="M4 19h16M5 15l4-5 4 3 6-7"/>',
   map: '<circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="17" r="2.4"/><path d="M8.2 8.2l2.6 6.6M15.8 8.2l-2.6 6.6M8.5 7h7"/>',
   compare: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+  score: '<path d="M5 5h14v14H5zM8 10l2.5 2.5L16 8M8 16h8"/>',
   gain: '<path d="M4 12h16M7 12V6M11 12V9M15 12v5M19 12v3"/>',
   experiment: '<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
 };
 const TABS = [["charts", "Charts", "Every figure for the ticked runs"], ["map", "Map", "Modules and the figures they pass to each other"], ["compare", "Diff", "Differences between the ticked runs"],
-  ["gain", "Gain by source", "What each module added each year"], ["experiment", "Experiment", "Results of a series of runs"]];
+  ["score", "Scorecard", "How close each ticked run comes to US data"], ["gain", "Gain by source", "What each module added each year"], ["experiment", "Experiment", "Results of a series of runs"]];
 TABS.forEach(([id, label, line], i) => {
   const b = el("button", { class: "tab", role: "tab", "data-tab": id, "data-tip": `${line}. Key: ${i + 1}`, onclick: () => setTab(id) });
   b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg>`;
@@ -1703,18 +1785,17 @@ function setTab(t) {
   renderTab();
  
 }
-function renderTab() { ({ charts: renderCharts, map: renderMap, compare: renderCompare, gain: renderGain, experiment: renderExperiment })[state.tab](); }
+function renderTab() { ({ charts: renderCharts, map: renderMap, compare: renderCompare, score: renderScore, gain: renderGain, experiment: renderExperiment })[state.tab](); }
 function syncTabs() {
-  const few = shownRuns().length < 2;
+  const shown = shownRuns(), few = !shown.length || (shown.length === 1 && refOf(shown) === shown[0]);
   for (const id of ["compare", "experiment"]) {
     const b = document.querySelector(`.tab[data-tab="${id}"]`);
     b.classList.toggle("faded", few);
     const line = TABS.find(x => x[0] === id)[2], key = TABS.findIndex(x => x[0] === id) + 1;
-    b.dataset.tip = few ? `Tick 2 or more runs to use this tab. Key: ${key}` : `${line}. Key: ${key}`;
+    b.dataset.tip = few ? `Tick 2 or more runs, or a run that is not its experiment's baseline, to use this tab. Key: ${key}` : `${line}. Key: ${key}`;
   }
 }
 function renderAll() {
-  if (!byId(state.baseline)) { const r = runs.find(hasData); state.baseline = r ? r.id : null; }
   renderRuns(); renderLegend(); syncTabs(); renderTab();
 }
 function toast(msg) { const t = el("div", { class: "toast", role: "status", text: msg }); document.body.append(t); setTimeout(() => t.remove(), 2600); }
@@ -1737,7 +1818,7 @@ document.addEventListener("keydown", e => {
     else if (MS.fig) { MS.fig = null; renderMap(); }
     return;
   }
-  if (!typing && !e.metaKey && !e.ctrlKey && /^[1-5]$/.test(e.key) && $("setup").hidden) setTab(TABS[+e.key - 1][0]);
+  if (!typing && !e.metaKey && !e.ctrlKey && /^[1-9]$/.test(e.key) && +e.key <= TABS.length && $("setup").hidden) setTab(TABS[+e.key - 1][0]);
 });
 // tooltips: any [data-tip]
 const tip = $("tip");
@@ -1754,12 +1835,12 @@ async function boot() {
   for (const m of CAT.core) MODS[m.name] = { ...m, title: firmify(m.title), core: true };
   for (const m of CAT.optional) MODS[m.name] = { ...m, title: firmify(m.title), core: false };
   CORE_ORDER.splice(0, CORE_ORDER.length, ...CAT.core.map(m => m.name));
-  DEFAULT_BASE = { id: "__default", name: "Every module", claims: 30000, years: 119, seed: 0, optional: [], settings: {}, modules: CAT.core.map(m => m.name), rows: [], step: -1, group: null };
+  DEFAULT_BASE = { id: "__default", name: "Every module", claims: 30000, years: 119, seed: 0, optional: [], without: [], start: "stated", draws: false,
+    settings: {}, modules: CAT.core.map(m => m.name), rows: [], step: -1, group: null };
   buildFigures();
   if ((CAT.problems || []).length) toast(CAT.problems[0]);
   const ticks = recall("ticks", []);
   for (const [id, slot] of ticks) { state.shown.add(id); state.slot.set(id, slot); }
-  state.baseline = recall("baseline", null);
   state.extra = recall("extra", []);
   await refresh(true);
   if (!state.shown.size) { const r = [...runs].reverse().find(x => x.status === "done"); if (r) { tick(r.id); saveView(); } }

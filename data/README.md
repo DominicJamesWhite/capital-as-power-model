@@ -19,6 +19,9 @@ Each file is a small CSV table with one row for each year. A blank cell means th
 | `public_debt.csv` | Federal debt held by the public, as a part of GDP, by fiscal year | per cent | 1939 to 2025 | Office of Management and Budget and Federal Reserve Bank of St. Louis, series FYPUGDA188S, through FRED |
 | `corporate_debt.csv` | Debt securities and loans owed by nonfinancial corporations at the end of the year, and the same as a part of GDP | millions of dollars; per cent | 1946 to 2025 | Federal Reserve, Financial Accounts of the United States, series BCNSDODNS; GDP from the Bureau of Economic Analysis, series GDPA; both through FRED |
 | `mergers.csv` | Money spent on mergers and acquisitions, as a part of money spent on new plant and equipment: the "buy-to-build" indicator | per cent | 1887 to 2017 | Nitzan and Bichler's series (1895 to 2007) and Joseph Francis's two series (to 2012 and to 2017), from the workbooks of Bichler and Nitzan (2013) and Francis (2018) at bnarchives.net |
+| `kept_and_borrowed.csv` | Corporate profit before tax plus net interest (owners' income); the net saving of domestic business; the net lending of government at all levels; and the saving and the government's net borrowing as parts of owners' income | billions of dollars; part of 1 | 1929 to 2025 | Bureau of Economic Analysis, series A053RC, W255RC, A127RC and A922RC, through FRED |
+| `firm_survival.csv` | New employer firms, the same firms five years later, and the part still there | number; part of 1 | firms founded 1978 to 2018 | US Census Bureau, Business Dynamics Statistics, 2023 release, table by firm age: firms aged 5 in a year, divided by firms aged 0 five years before |
+| `firm_deaths.csv` | Employer firms, the firms that closed all their establishments in the year, and these as a part of the firms of the year before | number; part of 1 | 1978 to 2023 (closures from 1979) | as above |
 | `dominant_capital.csv` | The 100 and 500 largest listed firms against the average firm, and their part of all corporate profit | ratio; per cent | 1950 to 2018 | Workbooks of Nitzan and Bichler (2011) and Bichler and Nitzan (2021) at bnarchives.net |
 
 ## What the figures in `dominant_capital.csv` mean
@@ -74,9 +77,14 @@ Figures the model cannot yet take:
 Figures that are results, to compare a run with:
 
 - the capitalist share of income
+- unemployment
+- what firms keep of owners' income, and what the government borrows
+- the part of firms that close in a year, and the part of new firms still there after five years
 - the buy-to-build indicator
 - the 100 largest firms against the average
 - concentration in each sector and industry
+
+`scorecard.py` sets the first four lines of this list beside a run, with the count of firms kept alive by lenders from Banerjee and Hofmann (2018). A firm in the Census tables is a whole company with employees. A firm bought by another is not counted as closed, in the data or in the model.
 
 ## Cautions
 

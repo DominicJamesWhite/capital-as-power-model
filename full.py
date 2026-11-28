@@ -26,6 +26,7 @@ import sys
 import numpy as np
 from core import Model, LedgerError, HOLD_ON_BUYERS, readouts, top_positions
 import registry
+import scorecard
 import starts
 
 START = 0      # the label of the first year of the stated start: years are counted from 0
@@ -78,6 +79,7 @@ def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, ov
         print(head)
     window, last_price = {}, m.L.accounts and 1.0
     last_price = None
+    m.card = scorecard.Card()
     for step in range(1, years + 1):
         try:
             r = m.step()
@@ -87,6 +89,7 @@ def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, ov
         r["year"] = c["year"] + step
         r["perm_sector"], r["perm_nation"] = m.L.shared["perm_sector"], m.L.shared["perm_nation"]
         r["wage"] = m.L.shared["wage"]
+        m.card.add(r)
         for s, v in r["attribution"].items():
             window[s] = window.get(s, 0.0) + v
         if step % every == 0 and not quiet:
@@ -112,6 +115,13 @@ def run(count=300_000, years=119, seed=0, modules=None, every=5, quiet=False, ov
         for name, p in last["parties"].items():
             holds = "" if p["holds"] is None else f", holds {p['holds'] / income:.3%}"
             print(f"  {name}: received {p['received'] / income:.3%}, paid {p['paid'] / income:.3%}{holds}")
+    if not quiet and m.card.years:
+        print(f"Against US data, over the last {min(len(m.card.years), scorecard.WINDOW)} years (scorecard.py):")
+        for t, got in zip(m.card.tests, m.card.results()):
+            run = "not measured" if got["value"] is None else f"{got['value']:.1%}"
+            us = "" if t["us"] is None else f"typical {t['us']:.1%}, "
+            print(f"  {t['label']}: run {run}; US {us}{t['low']:.1%} to {t['high']:.1%} "
+                  f"({t.get('range', 'the middle half of the years')}, {t['span']})")
     return m
 
 

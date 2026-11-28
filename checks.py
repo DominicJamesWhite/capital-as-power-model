@@ -20,6 +20,7 @@ several modules together repay no more than the government owes.
 Check 24 tests the capacity module: people taken back on into idle plant need no equipment, and a
 buyer takes over its target's plant.
 Check 6 also tests that the figures a module declares for the workbench are figures it supplies.
+Check 27 tests the scorecard: it reads the data it names and adds up a run's figures as it says.
 
 Run from the folder that holds this file:
     python checks.py
@@ -1765,6 +1766,39 @@ def check_starts():
           f"years {', '.join(map(str, drawn))}; an unknown start is refused.")
 
 
+def check_scorecard():
+    """The scorecard reads the data it names and adds up a run's figures as it says, and the failure module's counts
+    of new firms hold together."""
+    import csv
+    import registry
+    import scorecard
+    import starts
+    tests = {t["key"]: t for t in scorecard.TESTS}
+    with open(scorecard.DATA / "kept_and_borrowed.csv", newline="", encoding="utf-8") as f:
+        rows = [r for r in csv.DictReader(f) if 1960 <= int(r["year"]) <= 2019]
+    kept = [float(r["business_net_saving_bn"]) / float(r["owners_income_bn"]) for r in rows]
+    assert np.isclose(tests["kept"]["us"], np.mean(kept), atol=1e-4) and len(rows) == 60
+    mods = registry.make(registry.plan(["sales"], start=registry.BASIC))
+    m = Model(starts.starting_ledger(0, 4000), mods, seed=0)
+    card, acc, new, kept_back = scorecard.Card(), [], [], []
+    for _ in range(14):
+        r = m.step()
+        card.add(r)
+        acc.append(r["published"]["sales_account"])
+        new.append(r["published"]["new_firms"])
+        kept_back.append(r["published"]["five_year_survivors"])
+    got = {x["key"]: x["value"] for x in card.results()}
+    last = acc[-scorecard.WINDOW:]
+    assert np.isclose(got["kept"], sum(a["kept"] for a in last) / sum(a["owners_income"] for a in last))
+    assert new[0] == 0 and all(k == 0 for k in kept_back[:6]) and sum(kept_back) > 0
+    assert all(kept_back[t] <= new[t - 5] for t in range(6, len(new)))
+    assert got["survival"] is not None and 0 < got["survival"] <= 1
+    print(f"27. Scorecard: what firms keep in US data, 1960 to 2019, is {tests['kept']['us']:.3f} of owners' income, as "
+          f"the data file gives; a run's figure is its sum over the last years divided by the sum of owners' income; "
+          f"no firm counts as new in the first year, and the new firms still there after five years are never more "
+          f"than the new firms of five years before ({got['survival']:.0%} in a short run).")
+
+
 if __name__ == "__main__":
     check_stillness()
     check_identity()
@@ -1792,4 +1826,5 @@ if __name__ == "__main__":
     check_idle_plant()
     check_tax_cut()
     check_starts()
-    print("All twenty-six checks passed.")
+    check_scorecard()
+    print("All twenty-seven checks passed.")

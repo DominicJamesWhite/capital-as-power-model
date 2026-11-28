@@ -42,6 +42,7 @@ EXPERIMENTS = {}                       # id -> {"id", "name", "created"}
 PROCS = {}                             # id -> subprocess.Popen
 AT_ONCE = 3                            # runs that may go at the same time
 DEFAULT_EXPERIMENT = "Runs"
+STARTS = ("stated", "1950", "present")   # the starts in starts.py
 
 
 def now():
@@ -118,8 +119,9 @@ def load_all():
 
 
 def summary(run):
-    keys = ("id", "name", "status", "claims", "years", "seed", "optional", "changed", "created",
-            "finished", "message", "step", "warnings", "left_out", "modules", "experiment", "settings_used")
+    keys = ("id", "name", "status", "claims", "years", "seed", "optional", "without", "start", "draws", "changed",
+            "created", "finished", "message", "step", "warnings", "left_out", "modules", "experiment", "settings_used",
+            "drawn_from", "scorecard")
     out = {k: run.get(k) for k in keys}
     out["settings"] = (run.get("spec") or {}).get("settings", {})
     out["rows_count"] = len(run.get("rows", []))
@@ -184,10 +186,13 @@ def follow(run, proc, spec_path):
                 run["settings_used"] = msg.get("settings_used", {})
                 run["left_out"] = msg.get("left_out", [])
                 run["warnings"] = msg.get("warnings", [])
+                run["drawn_from"] = msg.get("drawn_from")
             elif kind == "year":
                 run["rows"].append({"step": msg["step"], "year": msg["year"], "values": msg["values"],
                                     "gain": msg["gain"]})
                 run["step"] = msg["step"]
+                if "scorecard" in msg:
+                    run["scorecard"] = msg["scorecard"]
             elif kind == "error":
                 run["status"] = "failed"
                 year = None
@@ -247,6 +252,11 @@ def make_run(body, experiment, order=0):
     if not 0 <= seed <= 2**32 - 1:
         return None, "The seed must be a whole number of 0 or more."
     optional = [str(x) for x in body.get("optional", [])]
+    without = [str(x) for x in body.get("without", [])]
+    start = str(body.get("start") or "stated")
+    if start not in STARTS:
+        return None, f"There is no start called '{start}'. The starts are {', '.join(STARTS)}."
+    draws = bool(body.get("draws")) and start == "stated"
     settings = body.get("settings") or {}
     if not isinstance(settings, dict) or not all(isinstance(v, dict) for v in settings.values()):
         return None, "The settings could not be read."
@@ -256,8 +266,10 @@ def make_run(body, experiment, order=0):
         name = str(body.get("name") or "").strip()[:120] or f"Run {len(RUN_TABLE) + 1}"
         run = {"id": rid, "name": name, "status": "waiting", "created": now(), "finished": None,
                "order": order, "experiment": experiment,
-               "claims": claims, "years": years, "seed": seed, "optional": optional, "changed": changed,
-               "spec": {"claims": claims, "years": years, "seed": seed, "optional": optional, "settings": settings},
+               "claims": claims, "years": years, "seed": seed, "optional": optional, "without": without,
+               "start": start, "draws": draws, "changed": changed,
+               "spec": {"claims": claims, "years": years, "seed": seed, "optional": optional, "without": without,
+                        "start": start, "draws": draws, "settings": settings},
                "rows": [], "step": 0, "message": "", "modules": [], "settings_used": {},
                "warnings": [], "left_out": []}
         RUN_TABLE[rid] = run
@@ -528,6 +540,14 @@ class Handler(BaseHTTPRequestHandler):
             action = parts[3]
             if action == "runs":
                 return self.send(*new_runs(exp["id"], self.body()))
+            if action == "baseline":
+                run = self.run_of(self.body().get("run"))
+                if run is None or run.get("experiment") != exp["id"]:
+                    return self.send(*bad("That run is not in this experiment."))
+                with LOCK:
+                    exp["baseline"] = run["id"]
+                save_experiments()
+                return self.send(200, {"ok": True})
             if action == "rename":
                 name = str(self.body().get("name") or "").strip()[:120]
                 if not name:

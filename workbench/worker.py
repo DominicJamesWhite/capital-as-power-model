@@ -421,9 +421,14 @@ def load_core():
     return list(zip(keys, registry.make(keys)))
 
 
+START_LABELS = {"stated": "Stated by the model", "1950": "The United States in 1950",
+                "present": "The United States now (2021 to 2025)"}
+
+
 def catalogue():
     sections = md_sections()
-    out = {"core": [], "optional": [], "problems": [], "readout_notes": readout_notes(), "start_year": None}
+    out = {"core": [], "optional": [], "problems": [], "readout_notes": readout_notes(), "start_year": None,
+           "scorecard": [], "starts": []}
     out["core_figures"] = core_figures(out["readout_notes"])
     try:
         import full
@@ -431,6 +436,16 @@ def catalogue():
     except Exception as e:
         out["problems"].append(f"The file full.py could not be loaded: {e}")
         return out
+    try:
+        import starts
+        out["starts"] = [{"name": n, "label": START_LABELS.get(n, n)} for n in starts.NAMES]
+    except Exception as e:
+        out["problems"].append(f"The starts could not be read from starts.py: {type(e).__name__}: {e}")
+    try:
+        import scorecard
+        out["scorecard"] = scorecard.describe()
+    except Exception as e:
+        out["problems"].append(f"The tests against data could not be read from scorecard.py: {type(e).__name__}: {e}")
     try:
         core_mods = load_core()
     except Exception as e:
@@ -552,18 +567,22 @@ def row_of(model, r, step, start_year, prev_price):
 def run(spec_path):
     spec = json.loads(Path(spec_path).read_text(encoding="utf-8"))
     try:
-        import full
         from core import Model, LedgerError, readouts
-        from stage2 import starting_ledger
-        start_year = getattr(full, "START", None)
+        import scorecard
+        import starts
         modules, used, left_out, warnings = build(spec)
         claims, years, seed = int(spec["claims"]), int(spec["years"]), int(spec["seed"])
-        model = Model(starting_ledger(seed, claims), modules, seed=seed)
+        # The same start as full.py: the conditions of the first year, and the settings they fix.
+        c = starts.conditions(spec.get("start") or "stated", seed, bool(spec.get("draws")))
+        starts.apply(c, modules)
+        start_year = c["year"]
+        model = Model(starts.starting_ledger(seed, claims, start=c), modules, seed=seed)
+        card = scorecard.Card()
     except Exception as e:
         emit({"type": "error", "step": 0, "message": _message(e), "detail": traceback.format_exc()})
         return
     emit({"type": "start", "modules": [m.name for m in modules], "settings_used": used,
-          "left_out": left_out, "warnings": warnings})
+          "left_out": left_out, "warnings": warnings, "drawn_from": c.get("drawn_from")})
     try:
         r0 = readouts(model.L, model.top)
         first = row_of(model, r0, 0, start_year, None)
@@ -576,6 +595,8 @@ def run(spec_path):
         try:
             r = model.step()
             row = row_of(model, r, step, start_year, prev_price)
+            card.add(r)
+            row["scorecard"] = card.results()
         except LedgerError as stop:
             emit({"type": "error", "step": step, "message": str(stop), "guard": True})
             return

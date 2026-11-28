@@ -128,6 +128,12 @@ years in the list (`zombie_share`), and the part of last year's such firms that 
 (`zombie_stay`). The count changes nothing. The firms of the first year start at 0 years, so
 nothing is counted before the tenth year.
 
+It also counts new firms, to compare with the Census Bureau's count of how many new firms are
+still there after five years: the firms in their first year in the list (`new_firms`), and the
+firms that entered five years before and are still in the list at the end of the year
+(`five_year_survivors`). A firm that was bought counts as gone. These counts change nothing.
+The firms of the first year are not counted as new.
+
 WHAT IS MISSING
 
 The count of firms kept alive by lenders is almost nil in the full run, never above 1 firm in
@@ -162,7 +168,8 @@ class Failure:
     name = "failure"
     reads = ("interest_share",)
     supplies = ("failures", "failed_employees", "failed_by_industry", "closed_employees", "restructurings", "interest_owed",
-                "debt_owed", "debt_lost", "short_of_cover", "interest_cover", "zombie_share", "zombie_stay")
+                "debt_owed", "debt_lost", "short_of_cover", "interest_cover", "zombie_share", "zombie_stay", "new_firms",
+                "five_year_survivors")
     figures = {                   # what the workbench calls each published number: label, unit, note
         "failures": ("Firms that failed", "number", "Firms outside the top 100 that closed in the year."),
         "failed_employees": ("Employees of failed firms", "share", "Employees of the firms that closed in the year, as a part of all employees."),
@@ -174,6 +181,8 @@ class Failure:
         "interest_cover": ("Interest cover", "times", "Earnings divided by interest owed, over the firms outside the top 100."),
         "zombie_share": ("Firms kept alive by lenders", "share", "Firms at least 10 years in the list that earned less than their interest for at least 3 years in a row, as a part of all firms at least 10 years in the list. Counted the way Banerjee and Hofmann count listed firms."),
         "zombie_stay": ("Firms kept alive that stay so", "share", "Of last year's firms kept alive by lenders, the part that are still so this year. A firm that closed or was bought counts as one that left."),
+        "new_firms": ("New firms", "number", "Firms in their first year in the list. None are counted in the first year of a run."),
+        "five_year_survivors": ("New firms still there after five years", "number", "Firms that entered the list five years before and are still in it at the end of this year. The firms of the first year are not counted."),
     }
 
     def __init__(self, on=True, small_burden=5.92, medium_burden=3.48, large_burden=1.90,
@@ -195,6 +204,7 @@ class Failure:
         self.zombie_years = zombie_years              # for the measure only: years in a row of earning less than interest
         self.zombie_age = zombie_age                  # for the measure only: the years a firm must have been in the list
         self.zombies = 0.0                            # last year's count of firms kept alive by lenders
+        self.seen = 0                                 # years this module has run, for the counts of new firms
         self.terms = None                             # the two sizes that divide the groups, set in the first year
 
     def register(self, L):
@@ -207,7 +217,7 @@ class Failure:
     def start(self, L):
         return {"failures": 0.0, "failed_employees": 0.0, "failed_by_industry": np.zeros(L.sector_of.size),
                 "closed_employees": np.zeros(L.sector_of.size), "restructurings": 0.0, "debt_lost": 0.0, "short_of_cover": 0.0,
-                "interest_cover": 0.0, "zombie_share": 0.0, "zombie_stay": 0.0}
+                "interest_cover": 0.0, "zombie_share": 0.0, "zombie_stay": 0.0, "new_firms": 0.0, "five_year_survivors": 0.0}
 
     def groups(self, L):
         """Each firm's group by size: 0 small, 1 in between, 2 large."""
@@ -288,12 +298,16 @@ class Failure:
         old = age >= self.zombie_age
         zombie = old & (below >= self.zombie_years)
         stay = float((was & zombie).sum() / self.zombies) if self.zombies > 0 else 0.0
+        self.seen += 1
         self.zombies = float(zombie.sum())
         changes = [SetAttribute(DEBT, debt, self.name), SetAttribute(INTEREST, owed, self.name),
                    SetAttribute(UNDER, under, self.name),
                    SetAttribute(AGE, age, self.name), SetAttribute(BELOW, below, self.name),
                    Publish("zombie_share", float(zombie.sum() / old.sum()) if old.any() else 0.0, self.name),
                    Publish("zombie_stay", stay, self.name),
+                   # Counts of new firms, to compare with the record. They change nothing.
+                   Publish("new_firms", float((age == 1).sum()) if self.seen > 1 else 0.0, self.name),
+                   Publish("five_year_survivors", float(((age == 6) & left).sum()) if self.seen > 6 else 0.0, self.name),
                    Publish("failures", float(closes.sum()), self.name),
                    Publish("failed_employees", float(n[closes].sum() / max(employed, 1e-300)), self.name),
                    # the sabotage module counts this next year as capacity that has left the industry

@@ -147,6 +147,8 @@ Only the first year of such a run is historical. Every later year is made by the
 
 Small runs are faster but less reliable. With fewer firms, the top 100 are a bigger part of the whole, and the results change.
 
+At the end, a run prints how close it came to US data over its last 20 years: for example, what firms keep of owners' income, against 24 per cent in US data from 1960 to 2019. `scorecard.py` lists these tests and their sources. Add a test there and it appears in every run and in the workbench.
+
 Check that the bookkeeping is correct:
 
 ```
@@ -155,7 +157,11 @@ python checks.py
 
 ## Use the workbench
 
-The workbench is a page in your web browser. You choose modules and settings, start a run, watch the charts fill in, and compare runs side by side.
+The workbench is a page in your web browser for testing and extending the model. It answers one question: what did my change do?
+
+- Each experiment has a baseline run, and every other run in it is shown against that baseline.
+- A run can change a setting, replace a module with another version, or switch a module off to test what it adds.
+- A scorecard shows how close each run comes to US data.
 
 ```
 python workbench/server.py
@@ -175,7 +181,7 @@ What does not work yet:
 
 - **The full run hides a slump.** With every module on, unemployment over the last 20 of 60 years is about 7 per cent from 30,000 firms and about 10 per cent from 300,000. That figure hides a slump much like the one the sales module gives alone. Public hiring in the privatisation module takes about a tenth of all working people off the count of people out of work, and the government borrows to pay them for decades. With public hiring switched off, unemployment is about 19 per cent. `modules.md` says more under the privatisation module.
 - **The sales module with too few others.** With the basic set and the `sales` module alone, a slump leaves about a fifth of people out of work for decades, and with `proletarianization` as well, about three in ten, although very few firms close. The government's debt can grow far beyond a year's income in such a run. `modules.md` says more.
-- **Too few firms fail.** With the basic set alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year. And almost no firm in the model earns less than its interest for three years in a row, against about one listed firm in eight in the record: lenders close such a firm first, because by then it owes more than it is worth.
+- **Too few firms fail.** With every module, 0.1 per cent of firms close in a year, against 8.9 per cent of US employer firms, and 96 per cent of new firms are still there after five years, against 47 per cent in the US. With the basic set alone a few hundred firms in 170,000 close in 60 years, and the number of firms grows about fivefold. In the record many more fail every year. And almost no firm in the model earns less than its interest for three years in a row, against about one listed firm in eight in the record: lenders close such a firm first, because by then it owes more than it is worth.
 - **Some results contradict the theory.** For example, the theory says mergers and price rises take turns. In the model they do not yet do so clearly.
 - **Some numbers have no source.** Many settings are our own guesses. `modules.md` says which settings come from the literature and which do not.
 - **History.** A run from 1950 or from the present takes only its first year from the data. It does not yet reproduce what came after. A start from the present falls into a deep slump within ten years. In three runs from 30,000 firms, unemployment averaged 24 per cent over the last 20 of 60 years, fewer than 1,000 firms were left, and one run stopped in year 29. Without the sales module, unemployment in year 10 is 7 per cent.
@@ -189,11 +195,12 @@ What does not work yet:
 | `registry.py` | The names of every module, in the order in which they run, the modules that can run in place of them, and the basic set. |
 | `full.py` | Runs the model. |
 | `starts.py` | The three starts: stated, 1950 and present. |
+| `scorecard.py` | The tests of a run against US data, with their sources. |
 | `stage2.py` | Runs only three modules: sabotage, green-field growth and mergers. |
 | `checks.py` | Tests of the bookkeeping. |
 | `modules.md` | What each module does, and the passage in the book it is based on. |
 | `workbench/` | A page in your web browser for running the model and comparing runs. |
-| `data/` | Published US series. The 1950 and present starts read them, and runs can be compared with them. `data/README.md` lists the sources. |
+| `data/` | Published US series. The 1950 and present starts read them, and the scorecard compares runs with them. `data/README.md` lists the sources. |
 
 ## How to contribute
 
